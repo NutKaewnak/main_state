@@ -1,0 +1,30 @@
+cleaning stuff,hallway table
+-deodorant
+-tooth paste
+-cleaner
+-fresh discs
+-sponge
+drink,bar
+-beer bottle
+-fanta
+-beer can
+-coke
+-seven up
+-chocolate milk
+-energy drink
+-orange juice
+-milk
+-apple juice
+food,stove
+-tomato sauce
+-peanut butter
+-chicken noodles
+-marmalade
+-veggie noodles
+-garlic sauce
+snacks,side table
+-chocolate
+-cookies
+-drops
+-crackers
+unknown,trash
