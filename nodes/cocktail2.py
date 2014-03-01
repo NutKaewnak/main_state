@@ -37,8 +37,19 @@ currentTime = 0
 #objectName = None
 objectPoint = Vector3()
 locationName = ''
+isInit = False
 
 
+def manipulateInitialize():
+	heightCmdPublisher.publish(Float64(1.31))
+	tiltKinectCmdPublisher.publish(Float64(-0.40))
+	delay.delay(3)
+
+def normalInitialize():
+	heightCmdPublisher.publish(Float64(1.21))
+	tiltKinectCmdPublisher.publish(Float64(-0.40))
+	delay.delay(3)
+	
 
 def cb_objectDepthPoint(data):
 	print "get objectPoint at (" + str(data.x) + "," + str(data.y) + "," + str(data.z) + ")"
@@ -61,10 +72,13 @@ def cb_objectPoint(data):
 #	z = data.z
 #	rospy.loginfo('(' + str(x) + ',' + str(y) + ',' + str(z) + ')')
 #	execute_state("finding object's point succeeded")
-	print "in cb_objectPoint at state = " + state + " with data : " + data.data 
 
-	if state == 'GET_OBJECT':
-		execute_state('recognition',data.data)
+	#print "in cb_objectPoint at state = " + state + " with data : " + data.data 
+
+	#if state == 'GET_OBJECT':
+	#	execute_state('recognition',data.data)
+	execute_state('recognition',data.data)
+
 
 def cb_door(data):
     main_state('door',data.data)
@@ -93,22 +107,29 @@ def main_state(device,data):
 	if(state == 'init'):
 		if(device == 'door' and data == 'open'):
 			# move pass door
+			publish.pan_tilt_command(getQuaternion(0,50*pi/180,0))
 			publish.base.publish(NavGoalMsg('clear','relative',Pose2D(1.5,0,0)))
 			delay.delay(1)
 			state = 'passDoor'
-		publish.pan_tilt_command(getQuaternion(0,50*pi/180,0))
-                publish.manipulator_action.publish(String('walking'))
+		if(!isInit):
+			normalInitialize()
+			publish.manipulator_action.publish(String('walking'))
+			isInit = True
+
 	elif(state == 'passDoor'):
 		if(device == 'base' and data == 'SUCCEEDED'):
-			state = 'gotoKitchenRoom'
 			# send to base
-			delay.delay(1)
+			delay.delay(3)
+
+			state = 'gotoKitchenRoom'
 			publish.base.publish(location_list['kitchen_room'])
+
 	elif(state == 'gotoKitchenRoom'):
 		if(device == 'base' and data == 'SUCCEEDED'):
 			publish.pan_tilt_command(getQuaternion(0,0,currentAngle))
 			call(['espeak','Please wave your hand.','-ven+f4','-s 150'])
 			delay.waiting(8)
+			#delay.delay(3)
 			state = 'searchGesture'
 	elif(state == 'searchGesture'):
 		if(device == 'gesture'):
@@ -174,8 +195,8 @@ def main_state(device,data):
 			#taskList.append([peopleName,objectName])
 			#publish.pan_tilt_command(getQuaternion(0,50*pi/180,0))
 			#delay.delay(1)
-			#heightCmdPublisher.publish(Float64(1.21))
-			#tiltKinectCmdPublisher.publish(Float64(-0.40))
+
+			manipulateInitialize()
 			# go to move base
 			#publish.base.publish(location_list['bar_table_pos_'+str(currentTime)])
 
@@ -235,6 +256,7 @@ def main_state(device,data):
 			call(['espeak','I reach the destination.','-ven+f4','-s 150'])
 			currentObjectNumber  = 0
 			state = "GET_OBJECT"
+			delay.delay(2)
 			findObjectPointPublisher.publish(String("start"));
 
 	elif state == 'GET_OBJECT':
@@ -261,12 +283,15 @@ def main_state(device,data):
 						print "ITEM FOUND at pixel ("+ str(vec.x) + "," + str(vec.y)+")"
 						call(["espeak","-ven+f4",objectName + " found. I will get it.","-s 150"])
 						toClickObjectPublisher.publish(vec)
+
+						manipulateInitialize()
 						#heightCmdPublisher.publish(Float64(1.3))
-						heightCmdPublisher.publish(Float64(1.41))
+						#heightCmdPublisher.publish(Float64(1.41))
 						#delay.waiting(2)
-						print "before delay count"
-						delay.delay(2)
-						print "after delay count"
+						#print "before delay count"
+						#delay.delay(2)
+						#print "after delay count"
+
 						pickObjectPublisher.publish(objectPoint)
 						state = "PICK_OBJECT"
 						call(["aplay","/home/skuba/skuba_athome/main_state/sound/nomessage.wav"])
@@ -287,8 +312,9 @@ def main_state(device,data):
 		if(device == 'manipulator' and data == 'finish'):
 			call(["espeak","-ven+f4","I got it","-s 150"])
 			#heightCmdPublisher.publish(Float64(1.1))
-			heightCmdPublisher.publish(Float64(1.21))
-			tiltKinectCmdPublisher.publish(Float64(-0.40))
+			normalInitialize()
+			#heightCmdPublisher.publish(Float64(1.21))
+			#tiltKinectCmdPublisher.publish(Float64(-0.40))
 			state = 'GO_TO_LIVING_ROOM_WITH_OBJECT'
 			publish.base.publish(location_list['living_room'])
 
