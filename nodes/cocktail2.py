@@ -119,18 +119,18 @@ def main_state(device,data):
 	elif(state == 'passDoor'):
 		if(device == 'base' and data == 'SUCCEEDED'):
 			# send to base
-			delay.delay(3)
-
-			state = 'gotoKitchenRoom'
 			publish.base.publish(location_list['kitchen_room'])
+			delay.delay(3)
+			state = 'gotoKitchenRoom'
 
 	elif(state == 'gotoKitchenRoom'):
 		if(device == 'base' and data == 'SUCCEEDED'):
 			publish.pan_tilt_command(getQuaternion(0,0,currentAngle))
 			call(['espeak','Please wave your hand.','-ven+f4','-s 150'])
-			delay.waiting(8)
+			delay.waiting(3)
 			#delay.delay(3)
 			state = 'searchGesture'
+
 	elif(state == 'searchGesture'):
 		if(device == 'gesture'):
 			# x,y = from gesture
