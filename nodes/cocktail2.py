@@ -90,6 +90,10 @@ def cb_manipulator(data):
     main_state('manipulator',data.data)
 
 def cb_gesture(data):
+    call(["aplay","/home/skuba/skuba_athome/main_state/sound/accept.wav"])
+    print "delay.isWait() = " + str(delay.isWait())
+    print "GESTURE at %f,%f,%f" % (data.point.x,data.point.y,data.point.z)
+    #main_state('gesture',"%f,%f,%f" % (data.point.x,data.point.y,data.point.z))
     main_state('gesture',"%f,%f,%f" % (data.point.x,data.point.y,data.point.z))
 
 def cb_base(data):
@@ -99,11 +103,13 @@ def cb_object(data):
     main_state('object',data.data)
 
 def main_state(device,data):
-
-	global currentNum, currentObjectNumber, currentObject,currentTime, desiredObject, movingTime
+	global currentNum, currentObjectNumber, currentObject,currentTime, desiredObject, movingTime, isInit
 	global state,currentAngle,temp,peopleName,objectName,taskList
+
 	if(delay.isWait()): return None
-	rospy.loginfo("state:"+state+" from:"+device+" "+data)
+	if(device != 'door'):
+		rospy.loginfo("state:"+state+" from:"+device+" "+data)
+	
 	if(state == 'init'):
 		if(device == 'door' and data == 'open'):
 			# move pass door
@@ -111,7 +117,7 @@ def main_state(device,data):
 			publish.base.publish(NavGoalMsg('clear','relative',Pose2D(1.5,0,0)))
 			delay.delay(1)
 			state = 'passDoor'
-		if(!isInit):
+		if(not isInit):
 			normalInitialize()
 			publish.manipulator_action.publish(String('walking'))
 			isInit = True
@@ -127,12 +133,15 @@ def main_state(device,data):
 		if(device == 'base' and data == 'SUCCEEDED'):
 			publish.pan_tilt_command(getQuaternion(0,0,currentAngle))
 			call(['espeak','Please wave your hand.','-ven+f4','-s 150'])
-			delay.waiting(3)
+			delay.waiting(7)
 			#delay.delay(3)
 			state = 'searchGesture'
+			#call(['espeak','change state to search gesture.','-ven+f4','-s 150'])
 
 	elif(state == 'searchGesture'):
+		print 'device : ' + device + ', data : ' + data
 		if(device == 'gesture'):
+			call(['espeak','I see you.','-ven+f4','-s 150'])
 			# x,y = from gesture
 			x,y,z = data.split(',')
 			#print 'Kinect angle : ' + str(currentAngle)
@@ -145,13 +154,14 @@ def main_state(device,data):
 		if(delay.isWaitFinish()):
 			currentAngle += 0.3
 			publish.pan_tilt_command(getQuaternion(0,0,currentAngle))
-			delay.waiting(3)
+			delay.waiting(7)
 			if(currentAngle >= 90*pi/180):
 				publish.pan_tilt_command(getQuaternion(0,50*pi/180,0))
 				delay.delay(1)
 				call(['espeak','I did not found anyone.','-ven+f4','-s 150'])
 				#publish.base.publish(location_list['bar'])			
 				state = 'error'
+
 	elif(state == 'getCommand'):
 		if(device == 'base' and data == 'SUCCEEDED'):
 			publish.pan_tilt_command(getQuaternion(0,0,0))
@@ -189,8 +199,8 @@ def main_state(device,data):
 		if(device == 'voice' and 'yes' in data):
 			#desiredObject = object_mapping[objectName]
 			objectName = temp
-			call(['espeak','where is ' + objectName,'-ven+f4','-s 150'])
-			objectName = temp
+			#call(['espeak','where is ' + objectName,'-ven+f4','-s 150'])
+			#objectName = temp
 			#call(['espeak','i will bring you ' + temp,'-ven+f4','-s 150'])
 			#taskList.append([peopleName,objectName])
 			#publish.pan_tilt_command(getQuaternion(0,50*pi/180,0))
@@ -198,9 +208,10 @@ def main_state(device,data):
 
 			manipulateInitialize()
 			# go to move base
-			#publish.base.publish(location_list['bar_table_pos_'+str(currentTime)])
-
-			state  = "waitForLocation"
+			publish.base.publish(location_list['bar_table_pos_'+str(currentTime)])
+			delay.delay(1)
+			#state  = "waitForLocation"
+			state  = "MOVE_BASE"
 		elif(device == 'voice' and 'no' in data):
 			call(['espeak','Hello '+peopleName +' what do you want','-ven+f4','-s 150'])
 			state = 'waitForObject'
