@@ -1,41 +1,11 @@
 #!/usr/bin/env python
 import rospy
 import roslib
-import time
 roslib.load_manifest('main_state')
 
 import tf
 from lumyai_navigation_msgs.msg import NavGoalMsg
 from geometry_msgs.msg import Quaternion,Pose2D
-
-class Delay:
-	def __init__(self):
-		self.start_time = time.localtime()
-		self.period = 0
-		self.wait_period = 0
-
-	# in second
-	def delay(self,period):
-		self.start_time = time.localtime()
-		self.period = period
-		time.sleep(period)
-        
-        def waiting(self,period):
-		self.wait_period = period
-		self.start_time = time.localtime()
-		time.sleep(1)
-
-	def isWaitFinish(self):
-		current_time = time.localtime()
-		if(time.mktime(current_time)-time.mktime(self.start_time) >= self.wait_period):
-			return True
-		return False
-	
-	def isWait(self):
-		current_time = time.localtime()
-		if(time.mktime(current_time)-time.mktime(self.start_time) >= self.period):
-			return False
-		return True
 
 class a_object:
 	def __init__(self,name,catagory,place):
