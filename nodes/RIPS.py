@@ -30,42 +30,34 @@ class RIPS(BaseState):
                 self.state = 'gotoTable'
                 # send to base
                 self.move_robot('register_pos')
-        elif self.state == 'gotoTable':
+        elif self.state == 'goToTable':
             if device == Devices.base and data == 'SUCCEEDED':
-                state = 'moveArm'
+                self.state = 'moveArm'
                 # send to arm
                 Publish.set_manipulator_action('rips_out')
                 Publish.set_neck(0, 0, 0)
+        elif self.state == 'moveArm':
+            if device == Devices.manipulator and data == 'finish':
                 Publish.speak("Hello Sir, My name is Lumyai. I came from Kasetsart University Thailand. I am a robot from planet earth, came here to service you. Please accept this registration.")
-        elif (state == 'moveArm'):
-            if (device == 'manipulator' and data == 'finish'):
-                state = 'waitForCommand'
-
-        elif (state == 'waitForCommand'):
-            if (device == 'voice'):
-                if (data == 'get out'):
-                    state = 'arm out'
-                    # send to arm
-                    publish.manipulator_action.publish(String('walking'))
-        elif (state == 'arm out'):
-            if (device == 'manipulator' and data == 'finish'):
+                self.state = 'waitForCommand'
+        elif self.state == 'waitForCommand':
+            if self.device == Devices.voice and data == 'leave apartment':
+                self.state = 'armOut'
+                # send to arm
+                Publish.set_manipulator_action('walking')
+        elif self.state == 'armOut':
+            if device == Devices.manipulator and data == 'finish':
                 # send to pan_tilt
-                publish.pan_tilt_command(getQuaternion(0, 50 * pi / 180, 0))
-                delay.delay(2)
+                Publish.set_neck(0, 50*pi/180, 0)
+                self.delay.delay(2)
                 # send to base
-                publish.base.publish(location_list['outside_pos'])
-                state = 'get out'
-
-        elif (state == 'set neck'):
-            if (device == 'servo' and data == 'finish'):
-                # send to base
-                publish.base.publish(location_list['outside_pos'])
-                state = 'get out'
-        elif (state == 'get out'):
-            publish.pan_tilt_command(getQuaternion(0, 50 * pi / 180, 0))
-            publish.manipulator_action.publish(String('walking'))
-            if (device == 'base' and data == 'SUCCEEDED'):
-                state = 'finish'
+                self.move_robot('outside_pos')
+                self.state = 'getOut'
+        elif self.state == 'getOut':
+            Publish.set_neck(0, 50*pi/180,0)
+            Publish.set_manipulator_action('walking')
+            if device == Devices.base and data == 'SUCCEEDED':
+                self.state = 'finish'
 
 
 if __name__ == '__main__':
