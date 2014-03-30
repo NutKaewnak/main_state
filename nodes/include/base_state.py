@@ -6,22 +6,18 @@ from delay import *
 from publish import *
 roslib.load_manifest('main_state')
 
-
-
-
 class Devices:
     door = 'door'
     base = 'base'
     manipulator = 'manipulator'
     voice = 'voice'
 
-
 class BaseState:
     def __init__(self):
-        rospy.Subscriber('/door/is_open', String, self.CallbackDoor)
-        rospy.Subscriber('/base/is_fin', String, self.CallbackBase)
-        rospy.Subscriber('/manipulator/is_fin', String, self.CallbackManipulator)
-        rospy.Subscriber('/voice/output', String, self.CallbackVoice)
+        rospy.Subscriber('/door/is_open', String, self.callback_door)
+        rospy.Subscriber('/base/is_fin', String, self.callback_base)
+        rospy.Subscriber('/manipulator/is_fin', String, self.callback_manipulator)
+        rospy.Subscriber('/voice/output', String, self.callback_voice)
 
         self.delay = Delay()
         self.location_list = {}
