@@ -31,11 +31,11 @@ class Publish:
 
     @staticmethod
     def set_neck(roll, pitch, yaw):
-        Publish.pan_tilt_cmd.publish(getQuaternion(float(roll), float(pitch), float(yaw)))
+        Publish.pan_tilt_cmd.publish(get_quaternion(float(roll), float(pitch), float(yaw)))
 
     @staticmethod
     def set_manipulator_action(action):
-        Publish.manipulator_action(String(str(action)))
+        Publish.manipulator_action.publish(String(str(action)))
 
     @staticmethod
     def move_absolute(pose):
