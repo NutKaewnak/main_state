@@ -27,7 +27,7 @@ class RIPS(BaseState):
             Publish.set_manipulator_action('walking')
         elif self.state == 'passDoor':
             if device == Devices.base and data == 'SUCCEEDED':
-                self.state = 'gotoTable'
+                self.state = 'goToTable'
                 # send to base
                 self.move_robot('register_pos')
         elif self.state == 'goToTable':
@@ -41,11 +41,11 @@ class RIPS(BaseState):
                 Publish.speak("Hello Sir, My name is Lumyai. I came from Kasetsart University Thailand. I am a robot from planet earth, came here to service you. Please accept this registration.")
                 self.state = 'waitForCommand'
         elif self.state == 'waitForCommand':
-            if self.device == Devices.voice and data == 'leave apartment':
-                self.state = 'armOut'
+            if device == Devices.voice and data == 'leave apartment':
+                self.state = 'armIn'
                 # send to arm
                 Publish.set_manipulator_action('walking')
-        elif self.state == 'armOut':
+        elif self.state == 'armIn':
             if device == Devices.manipulator and data == 'finish':
                 # send to pan_tilt
                 Publish.set_neck(0, 50*pi/180, 0)
