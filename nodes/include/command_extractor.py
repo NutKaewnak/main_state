@@ -39,15 +39,13 @@ class CommandExtractor(object):
 
     def __init__(self):
         # Read config file
-        self.object_categories = readFileToList(
-            roslib.packages.get_pkg_dir('main_state') + '/config/command_config/object_categories.txt')
+        self.object_categories = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/object_categories.txt')
         self.objects = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/objects.txt')
-        self.locations = readFileToList(
-            roslib.packages.get_pkg_dir('main_state') + '/config/command_config/locations.txt')
+        self.locations = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/locations.txt')
         self.names = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/names.txt')
-        self.location_categories = readFileToList(
-            roslib.packages.get_pkg_dir('main_state') + '/config/command_config/location_categories.txt')
+        self.location_categories = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/location_categories.txt')
         self.verbs = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/verbs.txt')
+        self.intransitive_verbs = readFileToList(roslib.packages.get_pkg_dir('main_state') + 'config/command_config/intransitive_verbs.txt')
 
     # Extract action from command and return as tuple(s) of (verb,object,data)
     def extractActionTuples(self, command):
@@ -68,10 +66,10 @@ class CommandExtractor(object):
                         break
                 # Append an action to output list
                 if obj != None and data != None:
-                    output.append((commands[i], obj, data))
+                    output.append((commands[i].lower(), obj, data))
                 elif obj != None:
-                    output.append((commands[i], obj))
-                else:
-                    output.append((commands[i],))
+                    output.append((commands[i].lower(), obj))
+                elif commands[i].lower() in self.intransitive_verbs:
+                    output.append((commands[i].lower(),))
         #rospy.loginfo(output)
         return output
