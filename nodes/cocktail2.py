@@ -8,6 +8,7 @@ roslib.load_manifest('main_state')
 from include.function import *
 from include.publish import *
 from include.reconfig_kinect import *
+from include.delay import *
 from std_msgs.msg import String
 from lumyai_navigation_msgs.msg import NavGoalMsg
 from geometry_msgs.msg import Pose2D,Vector3,PointStamped
@@ -65,7 +66,7 @@ def cb_numberObject(data):
 	print "object_number : " + data.data
 	currentObjectNumber = int(data.data)
 
-def cb_objectPoint(data):
+def cb_detectedObject(data):
 #	tmp = data.split(' ')
 #	x = data.x
 #	y = data.y
@@ -77,7 +78,7 @@ def cb_objectPoint(data):
 
 	#if state == 'GET_OBJECT':
 	#	execute_state('recognition',data.data)
-	execute_state('recognition',data.data)
+	execute_state('recognition',data)
 
 
 def cb_door(data):
@@ -272,52 +273,141 @@ def main_state(device,data):
 
 	elif state == 'GET_OBJECT':
 		if(device == 'recognition'):
+			objects = []
 
-			currentNum+=1
-			print "currentNum : " + str(currentNum) + " currentObjectNumber : " + str(currentObjectNumber)
-			print "currentObject.append(" + str(data) + ")"
-
-			#call(["espeak","-ven+f4","ting","-s 250"])
 			call(["aplay","/home/skuba/skuba_athome/main_state/sound/accept.wav"])
-			currentObject.append(data)
-			if (currentNum == currentObjectNumber):
-				currentNum = 0
-				for tmp in currentObject:
-					print tmp
-				for tmp in currentObject:
-					elements = tmp.split(' ')
-					if desiredObject == int(elements[0]):
-						vec = Vector3()
-						vec.x = float(elements[1])
-						vec.y = float(elements[2])
-						state = 'FINISH'
-						print "ITEM FOUND at pixel ("+ str(vec.x) + "," + str(vec.y)+")"
-						call(["espeak","-ven+f4",objectName + " found. I will get it.","-s 150"])
-						toClickObjectPublisher.publish(vec)
+
+			if(data.isMove):
+				#go closer
+				pass
+			else:
+				objects = data.objects
+				for object_ in objects:
+					if object_.category == desiredObject:
+						centroidVector = Vector3()
+						centroidVector.x = object_.point.x
+						centroidVector.y = object_.point.y
+						centroidVector.z = object_.point.z
 
 						manipulateInitialize()
 						#heightCmdPublisher.publish(Float64(1.3))
 						#heightCmdPublisher.publish(Float64(1.41))
-						#delay.waiting(2)
-						#print "before delay count"
-						#delay.delay(2)
-						#print "after delay count"
+						delay.delay(2)
 
-						pickObjectPublisher.publish(objectPoint)
+						pickObjectPublisher.publish(centroidVector)
 						state = "PICK_OBJECT"
-						call(["aplay","/home/skuba/skuba_athome/main_state/sound/nomessage.wav"])
-						return 0
+						return None
 
 				if( currentTime < movingTime):
-					call(["espeak","-ven+f4",objectName + "go to next position","-s 150"])
+					call(["espeak","-ven+f4","go to next position.","-s 150"])
 					rospy.loginfo("go to next position")
+
 					#state = 'ERROR'
 					#publish.base.publish(NavGoalMsg('clear','relative',Pose2D(0,0.2,0)))
 					publish.base.publish(location_list['bar_table_pos_'+str(currentTime)])
+					delay.delay(1)
 					currentTime += 1
 					state = 'MOVE_BASE'
 				else:
-					state = 'ERROR'
+					state = "ERROR"
+
+
+
+
+
+#			detectedObjects =  data.split('|')
+#			reachedObject = ''
+#			objectType = []
+#			centroid = [[]]
+#			for i in range(len(detectedObjects)):
+#				if i == 0:
+#					 reachedObject = float(detectedObjects[i])
+#			    else:
+#					tmp = detectedObjects.split(' ')
+#					objectType = float(tmp[0])
+#					centroid.append([float(tmp[1]),float(tmp[2]),float(tmp[3])])
+#			call(["aplay","/home/skuba/skuba_athome/main_state/sound/accept.wav"])
+#
+#			if(reachedObject > 0.0):
+#				if desiredObject in objectType:
+#					centroidIndex = objectType.index(desiredObject)
+#					centroidVector = Vector3()
+#					centroidVector.x = centroid[centroidIndex][0]
+#					centroidVector.y = centroid[centroidIndex][1]
+#					centroidVector.z = centroid[centroidIndex][2]
+#
+#					manipulateInitialize()
+#					#heightCmdPublisher.publish(Float64(1.3))
+#					#heightCmdPublisher.publish(Float64(1.41))
+#					delay.delay(2)
+#
+#					pickObjectPublisher.publish(centroidVector)
+#					state = "PICK_OBJECT"
+#				else:
+#					if( currentTime < movingTime):
+#						call(["espeak","-ven+f4",objectName + "go to next position","-s 150"])
+#						rospy.loginfo("go to next position")
+#						#state = 'ERROR'
+#						#publish.base.publish(NavGoalMsg('clear','relative',Pose2D(0,0.2,0)))
+#						publish.base.publish(location_list['bar_table_pos_'+str(currentTime)])
+#						currentTime += 1
+#						state = 'MOVE_BASE'
+#					else:
+#						state = "ERROR"
+#			else:
+				#move robot steinghtly without avoiding obstacles
+
+
+             
+
+                #if objectType.index(desiredObject) == -1
+                
+                
+#			currentNum+=1
+#			print "currentNum : " + str(currentNum) + " currentObjectNumber : " + str(currentObjectNumber)
+#			print "currentObject.append(" + str(data) + ")"
+#
+#			#call(["espeak","-ven+f4","ting","-s 250"])
+#			call(["aplay","/home/skuba/skuba_athome/main_state/sound/accept.wav"])
+#			currentObject.append(data)
+#			if (currentNum == currentObjectNumber):
+#				currentNum = 0
+#				for tmp in currentObject:
+#					print tmp
+#				for tmp in currentObject:
+#					elements = tmp.split(' ')
+#					if desiredObject == int(elements[0]):
+#						vec = Vector3()
+#						vec.x = float(elements[1])
+#						vec.y = float(elements[2])
+#						state = 'FINISH'
+#						print "ITEM FOUND at pixel ("+ str(vec.x) + "," + str(vec.y)+")"
+#						call(["espeak","-ven+f4",objectName + " found. I will get it.","-s 150"])
+#						toClickObjectPublisher.publish(vec)
+#
+#						manipulateInitialize()
+#						#heightCmdPublisher.publish(Float64(1.3))
+#						#heightCmdPublisher.publish(Float64(1.41))
+#						#delay.waiting(2)
+#						#print "before delay count"
+#						#delay.delay(2)
+#						#print "after delay count"
+#
+#						pickObjectPublisher.publish(objectPoint)
+#						state = "PICK_OBJECT"
+#						call(["aplay","/home/skuba/skuba_athome/main_state/sound/nomessage.wav"])
+#						return 0
+#
+#				if( currentTime < movingTime):
+#					call(["espeak","-ven+f4",objectName + "go to next position","-s 150"])
+#					rospy.loginfo("go to next position")
+#					#state = 'ERROR'
+#					#publish.base.publish(NavGoalMsg('clear','relative',Pose2D(0,0.2,0)))
+#					publish.base.publish(location_list['bar_table_pos_'+str(currentTime)])
+#					currentTime += 1
+#					state = 'MOVE_BASE'
+#				else:
+#					state = 'ERROR'
 
 	elif state == "PICK_OBJECT":
 		if(device == 'manipulator' and data == 'finish'):
@@ -345,7 +435,7 @@ def main_state(device,data):
 			publish.base.publish(NavGoalMsg('clear','relative',Pose2D(float(x),float(y),currentAngle)))
 			publish.pan_tilt_command(getQuaternion(0,50*pi/180,0))
 			delay.delay(1)
-			state = 'SERVER_ORDER'
+			state = 'SERVE_ORDER'
 		if(delay.isWaitFinish()):
 			currentAngle += 0.3
 			publish.pan_tilt_command(getQuaternion(0,0,currentAngle))
@@ -356,7 +446,7 @@ def main_state(device,data):
 				call(["espeak","-ven+f4","lost master","-s 150"])
 				#publish.base.publish(location_list['bar'])			
 				#state = 'getDrink_moving'
-	elif(state == 'SERVER_ORDER'):
+	elif(state == 'SERVE_ORDER'):
 		if(device == 'base' and data == 'SUCCEEDED'):
 			publish.pan_tilt_command(getQuaternion(0,0,0))
 			delay.delay(1)
@@ -394,7 +484,8 @@ def main():
     rospy.Subscriber("/object/output", String, cb_object)
 
 
-    rospy.Subscriber("/verified_result", String, cb_objectPoint)
+    rospy.Subscriber("/detected_object", ObjectContainer, cb_detectedObject)
+    #rospy.Subscriber("/verified_result", String, cb_objectPoint)
     #rospy.Subscriber("/voice/output", String, cb_voice)
     #rospy.Subscriber("/base/is_fin", String, cb_base)
     #rospy.Subscriber("/findCenter", Vector3, cb_findCenter)
