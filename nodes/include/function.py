@@ -97,6 +97,6 @@ if __name__ == "__main__":
     readObject(object_list)
     print object_list
     location_list = {}
-    readLocation(location_list)
+    read_location(location_list)
     print location_list
 	

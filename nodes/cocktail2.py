@@ -10,13 +10,15 @@ from include.publish import *
 from include.reconfig_kinect import *
 from include.delay import *
 from std_msgs.msg import String
+from object_perception.msg import Object
+from object_perception.msg import ObjectContainer
 from lumyai_navigation_msgs.msg import NavGoalMsg
 from geometry_msgs.msg import Pose2D,Vector3,PointStamped
 from math import pi
 from math import sin,cos
 
 state = 'init'
-#state = 'searchGesture'
+#state = 'GET_OBJECT'
 location_list = {} 
 object_list = ['pringles','lay','water','orange juice','green tea','milk','s','fanta','corn flakes','corn']
 #currentObject = 0
@@ -67,6 +69,7 @@ def cb_numberObject(data):
 	currentObjectNumber = int(data.data)
 
 def cb_detectedObject(data):
+	print 'in cb_detectedObject method'
 #	tmp = data.split(' ')
 #	x = data.x
 #	y = data.y
@@ -78,7 +81,7 @@ def cb_detectedObject(data):
 
 	#if state == 'GET_OBJECT':
 	#	execute_state('recognition',data.data)
-	execute_state('recognition',data)
+	main_state('recognition',data)
 
 
 def cb_door(data):
@@ -108,8 +111,8 @@ def main_state(device,data):
 	global state,currentAngle,temp,peopleName,objectName,taskList
 
 	if(delay.isWait()): return None
-	if(device != 'door'):
-		rospy.loginfo("state:"+state+" from:"+device+" "+data)
+#	if(device != 'door'):
+#		rospy.loginfo("state:"+state+" from:"+device+" "+data)
 	
 	if(state == 'init'):
 		if(device == 'door' and data == 'open'):
@@ -275,28 +278,32 @@ def main_state(device,data):
 		if(device == 'recognition'):
 			objects = []
 
-			call(["aplay","/home/skuba/skuba_athome/main_state/sound/accept.wav"])
+			#call(["aplay","/home/skuba/skuba_athome/main_state/sound/accept.wav"])
+
 
 			if(data.isMove):
 				#go closer
 				pass
 			else:
+				print '--------len(data.objects) : ' +str(len(data.objects)) +  '-------'
 				objects = data.objects
-				for object_ in objects:
-					if object_.category == desiredObject:
+				for obj in objects:
+					if obj.category == desiredObject:
 						centroidVector = Vector3()
-						centroidVector.x = object_.point.x
-						centroidVector.y = object_.point.y
-						centroidVector.z = object_.point.z
+						centroidVector.x = obj.point.x
+						centroidVector.y = obj.point.y
+						centroidVector.z = obj.point.z
 
-						manipulateInitialize()
+						#manipulateInitialize()
 						#heightCmdPublisher.publish(Float64(1.3))
 						#heightCmdPublisher.publish(Float64(1.41))
-						delay.delay(2)
+						#delay.delay(2)
 
-						pickObjectPublisher.publish(centroidVector)
-						state = "PICK_OBJECT"
-						return None
+						#publihser sending Vector3 to manipulator node to perform manipulation
+						#pickObjectPublisher.publish(centroidVector)
+						#state = "PICK_OBJECT"
+						#return None
+					print "type : " + str(obj.category) + " x : " + str(centroidVector.x) + " y : " + str(centroidVector.y) + " z : " + str(centroidVector.z)
 
 				if( currentTime < movingTime):
 					call(["espeak","-ven+f4","go to next position.","-s 150"])
@@ -304,7 +311,9 @@ def main_state(device,data):
 
 					#state = 'ERROR'
 					#publish.base.publish(NavGoalMsg('clear','relative',Pose2D(0,0.2,0)))
-					publish.base.publish(location_list['bar_table_pos_'+str(currentTime)])
+
+					#publish.base.publish(location_list['bar_table_pos_'+str(currentTime)])
+
 					delay.delay(1)
 					currentTime += 1
 					state = 'MOVE_BASE'
@@ -508,7 +517,7 @@ if __name__ == '__main__':
 	heightCmdPublisher = rospy.Publisher('/height_cmd', Float64)
 	tiltKinectCmdPublisher = rospy.Publisher('/tilt_kinect/command', Float64)
 	#readObject(object_list)
-	readLocation(location_list)
+	read_location(location_list)
         main()
     except rospy.ROSInterruptException:
         pass
