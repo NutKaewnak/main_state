@@ -3,3 +3,6 @@ syntax: glob
 *~
 *.pyc
 *.swp
+CMakeFiles/*
+CMakeCache.txt
+cmake_install.cmake
