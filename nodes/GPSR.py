@@ -41,20 +41,23 @@ class GPSR(BaseState):
         rospy.spin()
 
     def startAction(self, action):
-        if action[0] in self.verb_categories['go']:
-            if action[1] in self.location_categories.values():
-                self.move_robot(action[1])
+        if action.action in self.verb_categories['go']:
+            if action.object in self.location_categories.values():
+                self.move_robot(action.object)
                 self.state = 'move'
-            elif action[1] in self.location_categories.keys():
-                Publish.speak("Please tell me where is the " + action[1])
+            elif action.object in self.location_categories.keys():
+                Publish.speak("Please tell me where is the " + action.object)
                 self.state = 'ask'
-        if action[0] in self.verb_categories['bring']:
+        if action.action in self.verb_categories['bring']:
             location = ''
-            if action[1] in self.object_categories.values():
-                object_category = [c for c in self.object_categories.keys() if action[1] in self.object_categories[c]][0]
+            if action.object in self.object_categories.values():
+                object_category = [c for c in self.object_categories.keys() if action.object in self.object_categories[c]]
                 location = self.object_locations[object_category]
                 self.move_robot(location)
                 self.state = 'move'
+            elif action.object in self.object_categories.keys():
+                Publish.speak("Please tell me what " + action.object + " you want")
+                self.state = 'ask'
 
     def main(self, device, data):
         rospy.loginfo('state in:' + self.state + ' from:' + device + ' data:' + str(data))
@@ -67,26 +70,31 @@ class GPSR(BaseState):
             if device == Devices.voice:
                 if 'yes' in data:
                     command_extractor = CommandExtractor()
-                    self.actions = command_extractor.extractActionTuples(self.command)
+                    self.actions = command_extractor.extractActions(self.command)
+                    rospy.loginfo(len(self.actions))
                     self.current_action = self.actions[self.current_action_index]
-                    Publish.speak('I will ' + self.command)
+                    Publish.speak('I will ' + self.current_action.action + ' ' + self.current_action.object)
                     self.startAction(self.current_action)
                 else:
                     Publish.speak('Please repeat your command.')
                     self.state = 'init'
         elif self.state == 'ask':
             if device == Devices.voice:
-                if data in self.location_categories.values():
-                    Publish.speak(self.current_action[1] + ' is at ' + data)
+                if data in [a for key in self.location_categories.keys() for a in self.location_categories[key]]:
+                    Publish.speak(self.current_action.object + ' is at ' + data + ' yes or no.')
+                    self.current_action.object = data
                     self.state = 'ask_confirm'
-                elif data in self.object_categories.values():
-                    Publish.speak(self.current_action[1] + ' is ' + data)
+                elif data in [a for key in self.object_categories.keys() for a in self.object_categories[key]]:
+                    Publish.speak(self.current_action.object + ' is ' + data + ' yes or no.')
+                    self.current_action.object = data
                     self.state = 'ask_confirm'
         elif self.state == 'ask_confirm':
             if device == Devices.voice:
                 if 'yes' in data:
-                    Publish.speak('I will ' + self.ac)
-        rospy.loginfo('state out:' + self.state + ' from:' + device + ' data:' + str(data))
+                    Publish.speak('I will '+ self.current_action.action + self.current_action.object)
+                    self.state = 'move'
+                else:
+                    self.state = 'ask'
 
 if __name__ == '__main__':
     try:

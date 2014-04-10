@@ -8,6 +8,11 @@ import roslib
 
 roslib.load_manifest('main_state')
 
+class Action:
+    def __init__(self):
+        self.action = ''
+        self.object = ''
+        self.data = ''
 
 def readFileToList(filename):
     output = []
@@ -45,31 +50,26 @@ class CommandExtractor(object):
         self.names = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/names.txt')
         self.location_categories = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/location_categories.txt')
         self.verbs = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/verbs.txt')
-        self.intransitive_verbs = readFileToList(roslib.packages.get_pkg_dir('main_state') + 'config/command_config/intransitive_verbs.txt')
+        self.intransitive_verbs = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/intransitive_verbs.txt')
 
     # Extract action from command and return as tuple(s) of (verb,object,data)
-    def extractActionTuples(self, command):
+    def extractActions(self, command):
         output = []
         commands = command.split()
         for i in xrange(0, len(commands)):
             # If commands[i] is verb, then looking for object and data
             if self.isVerb(commands[i].lower()):
-                obj = None
-                data = None
+                action = Action()
+                action.action = commands[i].lower()
                 for j in xrange(i + 1, len(commands)):
                     if self.isObject(commands[j].lower()):
-                        if obj == None:  # If object is null assign it to obj
-                            obj = commands[j].lower()
+                        if action.object == '':  # If object is null assign it to obj
+                            action.object = commands[j].lower()
                         else:  # If object is not null, then assume it is a data
-                            data = commands[j].lower()
+                            action.data = commands[j].lower()
                     if self.isVerb(commands[j].lower()):
                         break
                 # Append an action to output list
-                if obj != None and data != None:
-                    output.append((commands[i].lower(), obj, data))
-                elif obj != None:
-                    output.append((commands[i].lower(), obj))
-                elif commands[i].lower() in self.intransitive_verbs:
-                    output.append((commands[i].lower(),))
+                output.append(action)
         #rospy.loginfo(output)
         return output
