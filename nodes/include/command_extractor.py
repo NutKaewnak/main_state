@@ -73,3 +73,22 @@ class CommandExtractor(object):
                 output.append(action)
         #rospy.loginfo(output)
         return output
+
+    #Check whether command is valid or not
+    def isValidCommand(self, command):
+        words = command.split()
+        isVerbFound = False
+        isObjectFound = isObjectCategoryFound = False
+        isLocationFound = isLocationCategoryFound = False
+        for word in words:
+            if word in self.verbs or word in self.intransitive_verbs:
+                isVerbFound = True
+            elif word in self.objects:
+                isObjectFound = True
+            elif word in self.locations:
+                isLocationFound = True
+            elif word in self.object_categories:
+                isObjectCategoryFound = True
+            elif word in self.location_categories:
+                isLocationCategoryFound = True
+        return isVerbFound and ((isObjectFound or isObjectCategoryFound) or (isLocationFound or isLocationCategoryFound))
