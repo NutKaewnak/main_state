@@ -15,7 +15,7 @@ drink
 -orange juice
 -milk
 -apple juice
-snack
+snacks
 -chocolate
 -cookies
 -drops
