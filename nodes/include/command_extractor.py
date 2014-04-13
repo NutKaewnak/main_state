@@ -9,10 +9,10 @@ import roslib
 roslib.load_manifest('main_state')
 
 class Action:
-    def __init__(self):
-        self.action = ''
-        self.object = ''
-        self.data = ''
+    def __init__(self, action, object, data):
+        self.action = action
+        self.object = object
+        self.data = data
 
 def readFileToList(filename):
     output = []
@@ -41,6 +41,24 @@ class CommandExtractor(object):
         elif word in self.location_categories:
             return True
         return False
+
+    def getObject(self, sentence):
+        for obj in self.objects:
+            if obj in sentence:
+                return obj
+        for category in self.object_categories:
+            if category in sentence:
+                return category
+        return None
+
+    def getData(self, sentence):
+        for location in self.locations:
+            if location in sentence:
+                return location
+        for category in self.location_categories:
+            if category in sentence:
+                return category
+        return None
 
     def __init__(self):
         # Read config file
@@ -74,10 +92,48 @@ class CommandExtractor(object):
         #rospy.loginfo(output)
         return output
 
+    def getActions(selfs, command):
+        """
+        >>> CommandExtractor().getActions('')
+        []
+        >>> CommandExtractor().getActions('move to bar go to bed and leave apartment')
+        [('move', None, 'bar'), ('go', None, 'bed'), ('leave', None, None)]
+        >>> CommandExtractor().getActions('navigate to kitchen table bring coke and exit apartment')
+        [('navigate', None, 'kitchen table'), ('bring', 'coke', None), ('exit', None, None)]
+        >>> CommandExtractor().getActions('go to bar find milk and take it')
+        [('go', None, 'bar'), ('find', 'milk', None), ('take', None, None)]
+        >>> CommandExtractor().getActions('go to stove identify peanut butter and take it')
+        [('go', None, 'stove'), ('identify', 'peanut butter', None), ('take', None, None)]
+        >>> CommandExtractor().getActions('bring me a drink')
+        [('bring', 'drink', None)]
+        >>> CommandExtractor().getActions('carry a drink to table')
+        [('carry', 'drink', 'table')]
+        >>> CommandExtractor().getActions('navigate to shelf')
+        [('navigate', None, 'shelf')]
+        >>> CommandExtractor().getActions('carry a cleaning stuff to table')
+        [('carry', 'cleaning stuff', 'table')]
+        """
+        output = []
+        words = command.split()
+        for i in xrange(0,len(words)):
+            if selfs.isVerb(words[i].lower()):
+                startSentence = command.find(words[i])
+                endSentence = -1
+                for j in xrange(i+1,len(words)):
+                    if selfs.isVerb(words[j]):
+                        endSentence = command.find(words[j],command.find(words[j]))
+                        break
+                if endSentence == -1:
+                    endSentence = len(command)
+                sentence = command[startSentence:endSentence]
+                #output.append(Action(words[i], selfs.getObject(sentence), selfs.getData(sentence)))
+                output.append((words[i],selfs.getObject(sentence),selfs.getData(sentence)))
+        return output
+
     #Check whether command is valid or not
     def isValidCommand(self, command):
         words = command.split()
-        isVerbFound = False
+        isVerbFound =  False
         isObjectFound = isObjectCategoryFound = False
         isLocationFound = isLocationCategoryFound = False
         for word in words:
@@ -92,3 +148,7 @@ class CommandExtractor(object):
             elif word in self.location_categories:
                 isLocationCategoryFound = True
         return isVerbFound and ((isObjectFound or isObjectCategoryFound) or (isLocationFound or isLocationCategoryFound))
+
+if __name__ == '__main__':
+    import  doctest
+    doctest.testmod()
