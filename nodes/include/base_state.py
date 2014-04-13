@@ -1,10 +1,13 @@
 #!usr/bin/env python
 import rospy
 import roslib
-from std_msgs.msg import String
+from location import *
 from delay import *
 from publish import *
+
 roslib.load_manifest('main_state')
+
+from std_msgs.msg import String
 
 class Devices:
     door = 'door'
@@ -40,7 +43,7 @@ class BaseState:
         pass
 
     def move_robot(self, location):
-        Publish.move_absolute(self.location_list[location].pose)
+        Publish.move_absolute(self.location_list[location].position)
 
 
 if __name__ == '__main__':
