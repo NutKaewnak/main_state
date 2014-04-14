@@ -24,3 +24,4 @@ arm chair
 sofa
 TV counter
 plant
+kitchen
