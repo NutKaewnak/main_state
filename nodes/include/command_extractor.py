@@ -49,6 +49,9 @@ class CommandExtractor(object):
         for category in self.object_categories:
             if category in sentence:
                 return category
+        for name in self.names:
+            if name in sentence:
+                return name
         return None
 
     def getData(self, sentence):
@@ -92,6 +95,7 @@ class CommandExtractor(object):
         #rospy.loginfo(output)
         return output
 
+    # Get actions from command
     def getActions(selfs, command):
         """
         >>> CommandExtractor().getActions('')
@@ -104,6 +108,8 @@ class CommandExtractor(object):
         [('go', None, 'bar'), ('find', 'milk', None), ('take', None, None)]
         >>> CommandExtractor().getActions('go to stove identify peanut butter and take it')
         [('go', None, 'stove'), ('identify', 'peanut butter', None), ('take', None, None)]
+        >>> CommandExtractor().getActions('go to kitchen find amanda and exit')
+        [('go', None, 'kitchen'), ('find', 'amanda', None), ('exit', None, None)]
         >>> CommandExtractor().getActions('bring me a drink')
         [('bring', 'drink', None)]
         >>> CommandExtractor().getActions('carry a drink to table')
@@ -112,6 +118,8 @@ class CommandExtractor(object):
         [('navigate', None, 'shelf')]
         >>> CommandExtractor().getActions('carry a cleaning stuff to table')
         [('carry', 'cleaning stuff', 'table')]
+        >>> CommandExtractor().getActions('bring snacks to seat')
+        [('bring', 'snacks', 'seat')]
         """
         output = []
         words = command.split()
@@ -126,29 +134,66 @@ class CommandExtractor(object):
                 if endSentence == -1:
                     endSentence = len(command)
                 sentence = command[startSentence:endSentence]
-                #output.append(Action(words[i], selfs.getObject(sentence), selfs.getData(sentence)))
                 output.append((words[i],selfs.getObject(sentence),selfs.getData(sentence)))
         return output
 
     #Check whether command is valid or not
     def isValidCommand(self, command):
-        words = command.split()
-        isVerbFound =  False
+        """
+        >>> CommandExtractor().isValidCommand('')
+        False
+        >>> CommandExtractor().isValidCommand('snacks')
+        False
+        >>> CommandExtractor().isValidCommand('bench')
+        False
+        >>> CommandExtractor().isValidCommand('cleaning stuff')
+        False
+        >>> CommandExtractor().isValidCommand('seat')
+        False
+        >>> CommandExtractor().isValidCommand('robot yes')
+        False
+        >>> CommandExtractor().isValidCommand('robot no')
+        False
+        >>> CommandExtractor().isValidCommand('move to bench go to kitchen table and exit apartment')
+        True
+        >>> CommandExtractor().isValidCommand('go to sidetable get milk and exit apartment')
+        True
+        >>> CommandExtractor().isValidCommand('bring peanut butter go to bench and exit apartment')
+        True
+        >>> CommandExtractor().isValidCommand('navigate to bench introduce yourself and exit apartment')
+        True
+        >>> CommandExtractor().isValidCommand('bring me a food')
+        True
+        >>> CommandExtractor().isValidCommand('bring a cleaning stuff')
+        True
+        >>> CommandExtractor().isValidCommand('move to table')
+        True
+        >>> CommandExtractor().isValidCommand('bring cleaning stuff to seat')
+        True
+        """
+        isVerbFound = isIntransitiveVerbFound = False
         isObjectFound = isObjectCategoryFound = False
         isLocationFound = isLocationCategoryFound = False
-        for word in words:
-            if word in self.verbs or word in self.intransitive_verbs:
+        for verb in self.verbs:
+            if verb in command:
                 isVerbFound = True
-            elif word in self.objects:
+        for verb in self.intransitive_verbs:
+            if verb in command:
+                isIntransitiveVerbFound = True
+        for object in self.objects:
+            if object in command:
                 isObjectFound = True
-            elif word in self.locations:
-                isLocationFound = True
-            elif word in self.object_categories:
+        for category in self.object_categories:
+            if category in command:
                 isObjectCategoryFound = True
-            elif word in self.location_categories:
+        for location in self.locations:
+            if location in command:
+                isLocationFound = True
+        for category in self.location_categories:
+            if category in command:
                 isLocationCategoryFound = True
-        return isVerbFound and ((isObjectFound or isObjectCategoryFound) or (isLocationFound or isLocationCategoryFound))
+        return (isVerbFound and ((isObjectFound or isObjectCategoryFound) or (isLocationFound or isLocationCategoryFound))) or isIntransitiveVerbFound
 
 if __name__ == '__main__':
-    import  doctest
+    import doctest
     doctest.testmod()
