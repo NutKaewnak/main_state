@@ -30,6 +30,18 @@ class Publish:
         Publish.base.publish(NavGoalMsg('clear', 'relative', Pose2D(float(x), float(y), 0.0)))
 
     @staticmethod
+    def move_absolute(pose):
+        Publish.base.publish(NavGoalMsg('clear', 'absolute', pose))
+
+    @staticmethod
+    def move_robot(navigate_data):
+        Publish.base.publish(navigate_data)
+
+    @staticmethod
+    def stop_robot():
+        Publish.base.publish(NavGoalMsg('stop', 'absolute', Pose2D(0.0, 0.0, 0.0)))
+
+    @staticmethod
     def set_neck(roll, pitch, yaw):
         Publish.pan_tilt_cmd.publish(get_quaternion(float(roll), float(pitch), float(yaw)))
 
@@ -38,12 +50,5 @@ class Publish:
         Publish.manipulator_action.publish(String(str(action)))
 
     @staticmethod
-    def move_absolute(pose):
-        Publish.base.publish(NavGoalMsg('clear', 'absolute', pose))
-
-    @staticmethod
     def speak(message):
         call(["espeak", "-ven+f4", message, "-s 120"])
-
-    def robot_stop(self):
-        self.base.publish(NavGoalMsg('stop', 'absolute', Pose2D(0.0, 0.0, 0.0)))

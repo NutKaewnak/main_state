@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import rospy
 import roslib
-import time
-import math
-from subprocess import call
+from include.function import *
+from include.publish import *
+from include.base_state import *
 
 roslib.load_manifest('main_state')
 
@@ -15,7 +15,6 @@ from lumyai_navigation_msgs.msg import NavGoalMsg
 from geometry_msgs.msg import Pose2D, Vector3
 from math import pi
 
-state = 'init'
 # predefine
 #object_list = ['green cup','blue cup' ,'pink cup' ,'blue mug' ,'ping mug' ,'cock' ,'frog' ,'owl' ,'green tea' ,'energy drink' ,'banana juice' ,'sprite' ,'coffee' ,'cappucino' ,'max coffee' ,'blue chips' ,'orange chips' ,'pringles' ,'black light' ,'blue light' ,'bottle' ,'blue brush' ,'red brush' ,'pen holder'] 
 #location_list = [ 'drink shelf' ,'snack shelf' ,'food shelf' ,'location one' ,'location two' ,'location three']
@@ -37,56 +36,10 @@ class Command:
         self.locationName = locationName
         self.objectName = objectName
 
-
-def cb_voice(data):
-    main_state('voice', data.data)
-
-
-def cb_base(data):
-    main_state('base', data.data)
-
-
-def cb_base_pos(data):
-    global robot_pos
-    robot_pos = data
-
-
-def cb_follow(data):
-    main_state('follow', data)
-
-
-def cb_manipulator(data):
-    main_state('manipulator', data.data)
-
-
-def cb_object(data):
-    main_state('object', data.data)
-
-
 def main_state(device, data):
     global state, location_list, temp, command_list, location_count, current_command
-    if (delay.isWait()): return None
-    if (device == 'follow'):
-        rospy.loginfo("state:" + state + " from:" + device)
-    else:
-        rospy.loginfo("state:" + state + " from:" + device + " " + data)
-    if (state == 'init'):
-        if (device == 'voice' and ('follow me' in data)):
-            call(["espeak", "-ven+f4", "i will follow you", "-s 110"])
-            state = 'follow_phase_1'
-    elif (state == 'follow_phase_1'):
-        if (device == 'follow'):
-            publish.base.publish(data)
-        elif (device == 'voice' and ('stop' in data)):
-            publish.robot_stop()
-            call(["espeak", "-ven+f4", "where are we", "-s 110"])
-            state = 'waitForLocationName'
-        elif (device == 'voice' and ('halt' in data)):
-            if (location_count >= 5):
-                publish.robot_stop()
-                call(["espeak", "-ven+f4", "wait for command", "-s 110"])
-                state = 'waitForCommand'
-    elif (state == 'waitForLocationName'):
+
+    if (state == 'waitForLocationName'):
         publish.robot_stop()
         if (device == 'voice'):
             for i in location_list.keys():
@@ -169,28 +122,39 @@ def main_state(device, data):
             pub['base'].publish(location_pos[current_location])
             state = 'gotoLocation'
 
+def restaurant(BaseState):
+    def __init__(self):
+        BaseState.__init__(self)
 
-def main():
-    rospy.Subscriber("/base/is_fin", String, cb_base)
-    rospy.Subscriber("/follow/point", NavGoalMsg, cb_follow)
-    rospy.Subscriber("/base/base_pos", Pose2D, cb_base_pos)
-    rospy.Subscriber("/voice/output", String, cb_voice)
-    rospy.Subscriber("/object/output", String, cb_object)
-    rospy.Subscriber("/manipulator/is_fin", String, cb_manipulator)
+        Publish.set_height(1.27)
+        self.reconfig.changeDepthResolution(8)
+        Publish.set_manipulator_action('walking')
 
-    reconfig.changeDepthResolution(8)
-    publish.manipulator_action.publish(String('walking'))
-    rospy.spin()
+        rospy.loginfo('Start restaurant State')
+        rospy.spin()
+
+    def main(self, device, data):
+        rospy.loginfo("state:" + self.state + " from:" + device + " data:" + str(data))
+        if self.state == 'init':
+            if device == Devices.voice and 'follow me' in data:
+                Publish.speak("I will follow you.")
+                self.state = 'follow'
+        elif self.state == 'follow':
+            if device == Devices.follow:
+                Publish.move_robot(data)
+            elif device == Devices.voice and ('robot stop' in data or 'robot halt' in data):
+                Publish.stop_robot()
+                Publish.speak("What is this place?")
+                self.state = 'waitForLocationName'
+            elif device == Devices.voice and 'robot wait' in data:
+                Publish.stop_robot()
+                Publish.speak("Waiting for command.")
+                self.state = 'waitForCommand'
 
 
 if __name__ == '__main__':
     try:
         rospy.init_node('main_state')
-        delay = Delay()
-        publish = Publish()
-        reconfig = Reconfig()
-        readObject(object_list)
-        readLocation(location_list, '/config/restaurant.txt')
-        main()
+        restaurant()
     except rospy.ROSInterruptException:
         pass
