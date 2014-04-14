@@ -34,7 +34,7 @@ class GPSR(BaseState):
         self.command_extractor = CommandExtractor()
         self.current_action_index = 0
         self.current_action = None
-        self.actions = None
+        self.actions = []
         self.verb_categories = readFileToDic(vc_filename)
         self.location_categories = readFileToDic(lc_filename)
         self.object_categories = readFileToDic(oc_filename)
@@ -52,27 +52,27 @@ class GPSR(BaseState):
         return self.object_locations[category][0]
 
     def startMoving(self, action):
-        if action.action in self.verb_categories['go']:
-            self.move_robot(action.object)
+        if action.data in self.verb_categories['go']:
+            self.move_robot(action.data)
         elif action.action in self.verb_categories['bring']:
             self.move_robot(self.findObjectLocation(action.object))
 
     def startAction(self, action):
         if action.action in self.verb_categories['go']:
-            if action.object in [loc for k in self.location_categories.keys() for loc in self.location_categories[k]]:
-                self.move_robot(action.object)
+            if action.data in [loc for k in self.location_categories.keys() for loc in self.location_categories[k]]:
+                self.move_robot(action.data)
                 self.state = 'move'
-                rospy.loginfo(action.action + ',' + action.object + ',' + action.data)
-            elif action.object in self.location_categories.keys():
-                Publish.speak("Please tell me what " + action.object + " to go.")
-                self.state = 'ask_object'
+                rospy.loginfo('%s,%s,%s'%(action.action,action.object if action.object else 'None',action.data if action.data else 'None'))
+            elif action.data in self.location_categories.keys():
+                Publish.speak("Please tell me where %s is." % action.data)
+                self.state = 'ask_data'
         if action.action in self.verb_categories['bring']:
             if action.object in [obj for k in self.object_categories.keys() for obj in self.object_categories[k]]:
                 self.move_robot(self.findObjectLocation(self.current_action.object))
                 self.state = 'move'
-                rospy.loginfo(action.action + ',' + action.object + ',' + action.data)
+                rospy.loginfo('%s,%s,%s'%(action.action,action.object if action.object else 'None',action.data if action.data else 'None'))
             elif action.object in self.object_categories.keys():
-                Publish.speak("Please tell me what " + action.object + " to bring.")
+                Publish.speak("Please tell me what %s to bring." % action.object)
                 self.state = 'ask_object'
 
     def main(self, device, data):
@@ -80,65 +80,61 @@ class GPSR(BaseState):
         if self.state == 'init':
             if device == Devices.voice and self.command_extractor.isValidCommand(data):
                 self.command = data
-                Publish.speak('Do you want me to ' + data)
+                Publish.speak('Do you want me to %s' % data)
                 self.state = 'confirm'
         elif self.state == 'confirm':
             if device == Devices.voice:
-                if 'robot yes' in data:
-                    self.actions = self.command_extractor.extractActions(self.command)
-                    rospy.loginfo('Num action : ' + str(len(self.actions)))
-                    for a in self.actions:
-                        rospy.loginfo(' - ' + a.action + ',' + a.object + ',' + a.data)
+                if 'yes' in data:
+                    actions = self.command_extractor.getActions(self.command)
+                    rospy.loginfo('Num action : ' + str(len(actions)))
+                    for i in xrange(0,len(actions)):
+                        action = Action(actions[i][0], actions[i][1], actions[i][2])
+                        rospy.loginfo(' - %s,%s,%s'%(action.action,action.object if action.object else 'None',action.data if action.data else 'None'))
+                        self.actions.append(action)
                     self.current_action = self.actions[self.current_action_index]
-                    Publish.speak('I will ' + self.current_action.action + ' ' + self.current_action.object)
+                    Publish.speak('I will %s.' % self.command)
                     self.startAction(self.current_action)
-                elif 'robot no' in data:
+                elif 'no' in data:
                     Publish.speak('Please repeat your command.')
                     self.state = 'init'
         elif self.state == 'ask_object':
-            if device == Devices.voice:
-                if self.current_action.object in self.location_categories.keys() and data in self.location_categories[self.current_action.object]:
-                    Publish.speak(self.current_action.object + ' is at ' + data + ' yes or no.')
-                    self.ask_data = data
-                    self.state = 'ask_object_confirm'
-                elif self.current_action.object in self.object_categories.keys() and data in self.object_categories[self.current_action.object]:
-                    Publish.speak(self.current_action.object + ' you want' + ' is ' + data + ' yes or no.')
-                    self.ask_data = data
-                    self.state = 'ask_object_confirm'
+            if device == Devices.voice and data in self.object_categories[self.current_action.object]:
+                Publish.speak('%s you want is %s yes or no.' % (self.current_action.object,data))
+                self.ask_data = data
+                self.state = 'ask_object_confirm'
         elif self.state == 'ask_object_confirm':
             if device == Devices.voice:
-                if 'robot yes' in data:
+                if 'yes' in data:
                     self.current_action.object = self.ask_data
-                    Publish.speak('I will '+ self.current_action.action + " " + self.current_action.object)
-                    if self.current_action.data != '' or self.current_action.data in self.location_categories.keys():
-                        Publish.speak('Please tell me where ' + self.current_action.data + ' is.')
+                    if self.current_action.data in self.location_categories.keys():
+                        Publish.speak('Please tell me where %s is.' % self.current_action.data)
                         self.state = 'ask_data'
                     else:
+                        rospy.loginfo('I will %s %s' % (self.current_action.action,self.current_action.object))
+                        Publish.speak('I will %s %s' % (self.current_action.action,self.current_action.object))
                         self.startMoving(self.current_action)
                         self.state = 'move'
-                        rospy.loginfo(self.current_action.action + ',' + self.current_action.object + ',' + self.current_action.data)
-                elif 'robot no' in data:
+                        rospy.loginfo('%s,%s,%s'%(self.current_action.action,self.current_action.object if self.current_action.object else 'None', self.current_action.data if self.current_action.data else 'None'))
+                elif 'no' in data:
                     if self.current_action.object in self.object_categories.keys():
-                        Publish.speak('Please tell me what ' + self.current_action.object + ' to bring.')
-                    elif self.current_action.object in self.location_categories.keys():
-                        Publish.speak('Please tell me what ' + self.current_action.object + ' to go.')
+                        Publish.speak('Please tell me what %s to bring.' % self.current_action.object)
                     self.state = 'ask_object'
         elif self.state == 'ask_data':
-            if device == Devices.voice:
-                if data in self.location_categories[self.current_action.data]:
-                    Publish.speak(self.current_action.data + ' is at ' + data + ' yes or no.')
-                    self.ask_data = data
-                    self.state = 'ask_data_confirm'
+            if device == Devices.voice and data in self.location_categories[self.current_action.data]:
+                Publish.speak('%s is at %s yes or no.' % (self.current_action.data,data))
+                self.ask_data = data
+                self.state = 'ask_data_confirm'
         elif self.state == 'ask_data_confirm':
             if device == Devices.voice:
-                if 'robot yes' in data:
+                if 'yes' in data:
                     self.current_action.data = self.ask_data
-                    Publish.speak('I will ' + self.current_action.action + ' ' + self.current_action.object + ' to ' + self.current_action.data)
+                    rospy.loginfo('I will %s %s to %s' % (self.current_action.action,self.current_action.object if self.current_action.object else '',self.current_action.data if self.current_action.data else ''))
+                    Publish.speak('I will %s %s to %s' % (self.current_action.action,self.current_action.object if self.current_action.object else '',self.current_action.data if self.current_action.data else ''))
                     self.startMoving(self.current_action)
                     self.state = 'move'
-                    rospy.loginfo(self.current_action.action + ',' + self.current_action.object + ',' + self.current_action.data)
-                elif 'robot no' in data:
-                    Publish.speak('Please tell mo what ' + self.current_action.data + ' to go.')
+                    rospy.loginfo('%s,%s,%s'%(self.current_action.action,self.current_action.object if self.current_action.object else 'None', self.current_action.data if self.current_action.data else 'None'))
+                elif 'no' in data:
+                    Publish.speak('Please tell me where %s is' % self.current_action.data)
                     self.state = 'ask_data'
         elif self.state == 'move':
             if device == Devices.base and data == 'SUCCEEDED':
