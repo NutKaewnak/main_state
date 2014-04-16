@@ -1,0 +1,33 @@
+<location_list>
+	<location name="bench" position="-12.782, 4.220" rotation="-1.561" height="1.29"/>
+	<locaiton name="hallway table" position="-12.382, 5.421" rotation="2.445" height="1.29"/>
+	<location name="hanger" position="-11.528, 3.888" rotation="-0.750" height="1.29"/>
+	<location name="umbrella stand" position="-11.465, 5.294" rotation="0.067" height="1.29"/>
+	<location name="bar" position="-14.638, 11.524" rotation="3.129" height="1.29"/>
+	<location name="sidetable" position="-13.955, 11.911" rotation="1.774" height="1.29"/>
+	<location name="kitchen table" position="-14.563, 10.791" rotation="0.036" height="1.29"/>
+	<location name="kitchen counter" position="-11.595, 11.985" rotation="-0.007" height="1.29"/>
+	<location name="stove" position="-11.578, 10.173" rotation="-0.030" height="1.29"/>
+	<location name="trash bin" position="-13.427, 12.056" rotation="1.575" height="1.29"/>
+	<location name="cupboard" position="-12.630, 11.665" rotation="1.567" height="1.29"/>
+	<location name="sink" position="-11.566, 10.927" rotation="0.045" height="1.29"/>
+	<location name="fridge" position="-11.948, 9.404" rotation="0.009" height="1.29"/>
+	<location name="bed" position="-17.520, 11.085" rotation="-3.088" height="1.29"/>
+	<location name="dresser" position="-17.030, 12.295" rotation="1.514" height="1.29"/>
+	<location name="sideboard" position="-16.764, 11.416" rotation="0.009" height="1.29"/>
+	<location name="bedsied table" position="-19.383, 12.532" rotation="3.091" height="1.29"/>
+	<location name="bookshelf" position="-14.356, 5.883" rotation="0.017" height="1.29"/>
+	<location name="pantry" position="-14.955, 7.951" rotation="1.560" height="1.29"/>
+	<location name="cabinet" position="-15.954, 4.163" rotation="-1.614" height="1.29"/>
+	<location name="dinner table" position="-16.139, 4.506" rotation="1.512" height="1.29"/>
+	<location name="couch table" position="-18.510, 6.080" rotation="3.114" height="1.29"/>
+	<location name="arm chair" position="-18.325, 4.414" rotation="-2.613" height="1.29"/>
+	<location name="sofa" position="-19.672, 7.786" rotation="-1.958" height="1.29"/>
+	<location name="TV counter" position="-18.309, 8.101" rotation="2.172" height="1.29"/>
+	<location name="plant" position="-14.498, 3.976" rotation="-0.875" height="1.29"/>
+	<location name="start_post" position="-17.343, 3.907" rotation="1.575" height="1.29"/>
+	<location name="kitchen" position="-15.221, 9.783" rotation="3.103" height="1.29"/>
+	<location name="living room" position="-17.671, 5.001" rotation="-1.575" height="1.29"/>
+    <location name="register_pos" position="-12.782, 4.220" rotation="-1.561" height="1.29"/>
+    <location name="outside_pos" position="-12.782, 4.220" rotation="-1.561" height="1.29"/>
+</location_list>
