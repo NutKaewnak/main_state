@@ -18,6 +18,8 @@ def readFileToList(filename):
     output = []
     file = open(filename)
     for line in file:
+        if line.startswith('#'):
+            continue
         output.append(line.strip().lower())
     return output
 
