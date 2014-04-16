@@ -1,27 +1,27 @@
 bench
 hallway table
 hanger
-umbrella stand
+#umbrella stand
 bar
 sidetable
-kitchen table
-kitchen counter
+#kitchen table
+#kitchen counter
 stove
-trash bin
-cupboard
+#trash bin
+#cupboard
 sink
-fridge
+#fridge
 bed
-dresser
-sideboard
-bedside table
+#dresser
+#sideboard
+#bedside table
 bookshelf
-pantry
-cabinet
-dinner table
-couch table
-arm chair
-sofa
-TV counter
+#pantry
+#cabinet
+#dinner table
+#couch table
+#arm chair
+#sofa
+#TV counter
 plant
-kitchen
+#kitchen
