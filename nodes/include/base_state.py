@@ -13,6 +13,7 @@ from std_msgs.msg import String
 from lumyai_navigation_msgs.msg import NavGoalMsg
 from geometry_msgs.msg import Pose2D
 
+
 class Devices:
     door = 'door'
     base = 'base'
@@ -37,22 +38,27 @@ class BaseState:
         self.state = 'init'
 
     def callback_door(self, data):
-        self.main(Devices.door, data.data)
+        self.perform_state(Devices.door, data.data)
 
     def callback_base(self, data):
-        self.main(Devices.base, data.data)
+        self.perform_state(Devices.base, data.data)
 
     def callback_manipulator(self, data):
-        self.main(Devices.manipulator, data.data)
+        self.perform_state(Devices.manipulator, data.data)
 
     def callback_voice(self, data):
-        self.main(Devices.voice, data.data)
+        self.perform_state(Devices.voice, data.data)
 
     def callback_follow(self, data):
-        self.main(Devices.follow, data)
+        self.perform_state(Devices.follow, data)
 
     def callback_base_position(self, data):
         self.robot_position = data
+
+    def perform_state(self, device, data):
+        if self.delay.is_waiting():
+            return
+        self.main(device, data)
 
     def main(self, device, data):
         pass
@@ -61,14 +67,19 @@ class BaseState:
         Publish.move_absolute(self.location_list[location].position)
 
     def speak(self, message):
+        self.delay.wait(9999)
         p = Popen(['espeak','-ven+f4',message,'-s 120'])
+        p.wait()
+        self.delay.period = 0
 
     def stop_robot():
         Publish.move_robot(NavGoalMsg('stop', 'absolute', Pose2D(0.0, 0.0, 0.0)))
+
+    def wait(self, period):
+        self.delay.wait(period)
 
 if __name__ == '__main__':
     try:
         BaseState()
     except Exception, error:
         print str(error)
-	
