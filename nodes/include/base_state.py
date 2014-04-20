@@ -5,6 +5,7 @@ from location import *
 from delay import *
 from publish import *
 from reconfig_kinect import *
+from subprocess import Popen
 
 roslib.load_manifest('main_state')
 
@@ -48,7 +49,7 @@ class BaseState:
         self.main(Devices.voice, data.data)
 
     def callback_follow(self, data):
-        self.main(Devices.follow, data.data)
+        self.main(Devices.follow, data)
 
     def callback_base_position(self, data):
         self.robot_position = data
@@ -59,6 +60,11 @@ class BaseState:
     def move_robot(self, location):
         Publish.move_absolute(self.location_list[location].position)
 
+    def speak(self, message):
+        p = Popen(['espeak','-ven+f4',message,'-s 120'])
+
+    def stop_robot():
+        Publish.move_robot(NavGoalMsg('stop', 'absolute', Pose2D(0.0, 0.0, 0.0)))
 
 if __name__ == '__main__':
     try:
