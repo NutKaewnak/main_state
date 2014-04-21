@@ -23,6 +23,10 @@ class Publish:
         pass
 
     @staticmethod
+    def set_manipulator_point(data):
+        Publish.manipulator_point.publish(Vector3(data))
+
+    @staticmethod
     def find_object(data):
         Publish.findObjectPointPublisher.publish(String(data))
 
