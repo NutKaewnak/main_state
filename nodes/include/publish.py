@@ -17,9 +17,14 @@ class Publish:
     pan_tilt_cmd = rospy.Publisher('/pan_tilt_cmd', Quaternion)
     follow_init = rospy.Publisher('/follow/init', Bool)
     height_cmd = rospy.Publisher('/height_cmd', Float64)
-
+    findObjectPointPublisher = rospy.Publisher('/localization', String)
+ 
     def __init__(self):
         pass
+
+    @staticmethod
+    def find_object(data):
+        Publish.findObjectPointPublisher.publish(String(data))
 
     @staticmethod
     def set_height(data):
