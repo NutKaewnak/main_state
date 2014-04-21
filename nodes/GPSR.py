@@ -58,12 +58,16 @@ class GPSR(BaseState):
     def startMoving(self, action):
         if action.action in self.verb_categories['exit']:
             self.move_robot('outside_pos')
+            self.wait(2)
+            self.state = 'move'
         if action.action in self.verb_categories['go']:
             self.move_robot(action.data)
+            self.wait(2)
+            self.state = 'move'
         elif action.action in self.verb_categories['bring']:
             self.move_robot(self.findObjectLocation(action.object))
-        self.delay.waiting(2)
-        self.state = 'move'
+            self.wait(2)
+            self.state = 'move'
 
     def startAction(self, action):
         if action.action in self.verb_categories['go']:
@@ -82,6 +86,9 @@ class GPSR(BaseState):
                 self.state = 'ask_object'
         elif action.action in self.verb_categories['follow']:
             self.state = 'follow'
+        elif action.action in self.verb_categories['introduce']:
+            self.speak('Hello My name is lumlai from Kasetsart University.')
+            self.state = 'introduce'
 
     def finishAction(self):
         if self.current_action_index + 1 < len(self.actions):
@@ -103,6 +110,7 @@ class GPSR(BaseState):
         elif self.state == 'pass_door':
             if device == Devices.base and data == 'SUCCEEDED':
                 self.move_robot('start_pos')
+                self.wait(2)
                 self.state = 'go_to_start'
         elif self.state == 'go_to_start':
             if device == Devices and data == 'SUCCEEDED':
@@ -192,6 +200,15 @@ class GPSR(BaseState):
                 else:
                     self.speak('I reach the %s'%self.current_action.data)
                     self.finishAction()
+        elif self.state == 'follow':
+            if device == Devices.follow:
+                if data.text_msg == 'lost':
+                    data.text_msg = 'stop'
+                self.move_robot(data)
+            elif device == Devices.voice and 'stop' in data:
+                self.state = 'stop_follow'
+                self.stop_robot()
+                self.finishAction()
         elif self.state == 'object_search':
             if device == 'object':
                 if data == 'yes':
@@ -220,6 +237,8 @@ class GPSR(BaseState):
         elif self.state == 'give':
             if device == Devices.manipulator and data == 'finish':
                 self.finishAction()
+        elif self.state == 'introduce':
+            self.finishAction()
         elif self.state == 'return':
             if device == Devices.base and data == 'SUCCEEDED':
                 self.speak('Return to starting point')
