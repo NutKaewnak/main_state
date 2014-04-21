@@ -11,7 +11,8 @@ from geometry_msgs.msg import Quaternion
 class a_object:
     def __init__(self, name, category, place):
         self.name = name
-        self.category = category
+        #self.category = category
+        self.catagory = category
         self.place = place
 
     def __repr__(self):
