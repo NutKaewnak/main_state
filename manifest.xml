@@ -1,0 +1,21 @@
+<package>
+  <description brief="main_state">
+
+     main_state
+
+  </description>
+  <author>Skuba</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/main_state</url>
+  <depend package="rospy"/>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="tf"/>
+  <depend package="dynamic_reconfigure"/>
+  <depend package="lumyai_navigation_msgs"/>
+  <depend package="object_perception"/>
+
+</package>
+
+
