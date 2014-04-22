@@ -1,31 +1,31 @@
 seat
 -bench
 -bed
-#-arm chair
-#-sofa
+-arm chair
+-sofa
 table
 -hallway table
 -sidetable
-#-kitchen table
-#-bedside table
-#-dinner table
-#-couch table
+-kitchen table
+-bedside table
+-dinner table
+-couch table
 utensil
 -hanger
-#-umbrella stand
-#-trash bin
+-umbrella stand
+-trash bin
 -plant
 appliance
 -stove
 -sink
-#-fridge
-#-tv counter
+-fridge
+-tv counter
 shelf
 -bar
-#-kitchen counter
-#-cupboard
-#-dresser
-#-sideboard
+-kitchen counter
+-cupboard
+-dresser
+-sideboard
 -bookshelf
-#-pantry
-#-cabinet
+-pantry
+-cabinet
