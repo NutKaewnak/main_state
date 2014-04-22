@@ -11,6 +11,7 @@ roslib.load_manifest('main_state')
 
 from std_msgs.msg import String
 from lumyai_navigation_msgs.msg import NavGoalMsg
+from geometry_msgs.msg import Vector3
 from geometry_msgs.msg import Pose2D
 from object_perception.msg import Object
 from object_perception.msg import ObjectContainer
@@ -22,6 +23,7 @@ class Devices:
     voice = 'voice'
     follow = 'follow'
     recognition = 'recognition'
+    color_detector = 'color_detector'
 
 class BaseState:
     def __init__(self):
@@ -31,16 +33,20 @@ class BaseState:
         rospy.Subscriber('/voice/output', String, self.callback_voice)
         rospy.Subscriber('/follow/point', NavGoalMsg, self.callback_follow)
         rospy.Subscriber('/base/base_pos', Pose2D, self.callback_base_position)
-        rospy.Subscriber('/detect_object',ObjectContainer,self.callback_findobject)
+        rospy.Subscriber('/detect_object', ObjectContainer, self.callback_findobject)
+        rospy.Subscriber('/color_detect', Vector3,self.callback_colorDetector)
         self.delay = Delay()
         self.reconfig = Reconfig()
         self.robot_position = None
         self.location_list = {}
         read_location(self.location_list)
         self.state = 'init'
-        
+
+    def callback_colorDetector(self, data):
+        self.perform_state(self, data)
+
     def callback_findobject(self, data):
-        self.perform_state(Devices.recognition, data.data)
+        self.perform_state(Devices.recognition, data)
 
     def callback_door(self, data):
         self.perform_state(Devices.door, data.data)
