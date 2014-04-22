@@ -32,6 +32,7 @@ class GPSR(BaseState):
         lc_filename = roslib.packages.get_pkg_dir('main_state') + '/config/command_config/location_categories.txt'
         oc_filename = roslib.packages.get_pkg_dir('main_state') + '/config/command_config/object_categories.txt'
         ol_filename = roslib.packages.get_pkg_dir('main_state') + '/config/command_config/object_locations.txt'
+        self.state = 'wait'
         self.command = ''
         self.command_extractor = CommandExtractor()
         self.current_action_index = 0
@@ -61,7 +62,7 @@ class GPSR(BaseState):
             self.move_robot(action.data)
         elif action.action in self.verb_categories['bring']:
             self.move_robot(self.object_location)
-        self.delay.waiting(2)
+        self.wait(2)
         self.state = 'move'
 
     def startAction(self, action):
@@ -79,6 +80,8 @@ class GPSR(BaseState):
             elif action.object in self.object_categories.keys():
                 self.speak("Please tell me what %s to %s." % (action.object,action.action))
                 self.state = 'ask_object'
+        elif action.action in self.verb_categories['exit']:
+            self.startMoving(action)
         elif action.action in self.verb_categories['follow']:
             self.speak('I will follow you.')
             self.state = 'follow'
@@ -94,7 +97,7 @@ class GPSR(BaseState):
             self.startAction(self.current_action)
         else:
             self.move_robot('start_pos')
-            self.delay.waiting(2)
+            self.wait(2)
             self.state = 'return'
 
     def main(self, device, data):
@@ -102,12 +105,10 @@ class GPSR(BaseState):
         if self.state == 'init':
             if device == Devices.door and data == 'open':
                 Publish.move_relative(1.5,0)
-                self.wait(2)
                 self.state = 'pass_door'
         elif self.state == 'pass_door':
             if device == Devices.base and data == 'SUCCEEDED':
                 self.move_robot('start_pos')
-                self.wait(2)
                 self.state = 'go_to_start'
         elif self.state == 'go_to_start':
             if device == Devices.base and data == 'SUCCEEDED':
@@ -131,7 +132,7 @@ class GPSR(BaseState):
                     self.startAction(self.current_action)
                 elif 'no' in data:
                     self.speak('Please repeat your command.')
-                    self.state = 'init'
+                    self.state = 'wait'
         elif self.state == 'ask_object':
             if device == Devices.voice and data in self.object_categories[self.current_action.object]:
                 self.speak('%s you want is %s yes or no.' % (self.current_action.object,data))
@@ -158,8 +159,8 @@ class GPSR(BaseState):
                     self.speak('Please tell me where %s is.'%self.current_action.data)
                     self.state = 'ask_data'
                 else:
-                    rospy.loginfo('%s %s %s %s'%(self.current_action.action,self.current_action.object,self.current_action.data,self.object_location))
                     self.speak('I will %s %s'%(self.current_action.action,self.current_action.object))
+                    rospy.loginfo('%s is at %s'%(self.current_action.object,self.object_location))
                     self.move_robot(self.object_location)
                     self.wait(2)
                     self.state = 'move'
@@ -171,14 +172,12 @@ class GPSR(BaseState):
         elif self.state == 'ask_data_confirm':
             if device == Devices.voice:
                 if 'yes' in data:
-                    rospy.loginfo('%s %s %s %s'%(self.current_action.action,self.current_action.object,self.current_action.data,self.object_location))
                     self.current_action.data = self.ask_data
-                    #rospy.loginfo('I will %s %s to %s' % (self.current_action.action,self.current_action.object if self.current_action.object else '',self.current_action.data if self.current_action.data else ''))
                     self.speak('I will %s %s to %s' % (self.current_action.action,self.current_action.object if self.current_action.object else '',self.current_action.data if self.current_action.data else ''))
+                    rospy.loginfo('%s is at %s'%(self.current_action.object,self.object_location))
                     self.move_robot(self.object_location)
                     self.wait(2)
                     self.state = 'move'
-                    #rospy.loginfo('%s,%s,%s'%(self.current_action.action,self.current_action.object if self.current_action.object else 'None', self.current_action.data if self.current_action.data else 'None'))
                 elif 'no' in data:
                     self.speak('Please tell me where %s is' % self.current_action.data)
                     self.state = 'ask_data'
@@ -187,10 +186,10 @@ class GPSR(BaseState):
                 if self.current_action.action in self.verb_categories['bring']:
                     if self.current_action.data:
                         self.move_robot(self.current_action.data)
-                        self.delay.waiting(2)
+                        self.wait(2)
                     else:
                         self.move_robot('start_pos')
-                        self.delay.waiting(2)
+                        self.wait(2)
                     #self.state = 'object_search'
                     #Publish.object_search.publish(self.current_action.object) # Search object
                     #self.state = 'object_search'
@@ -204,12 +203,12 @@ class GPSR(BaseState):
                 if data == 'yes':
                     name, x, y, z = data.split(',')
                     Publish.manipulator_point(Vector3(float(x), float(y), float(z)))
-                    self.delay.waiting(2)
+                    self.wait(2)
                     self.state = 'get_object'
                 elif data == 'no':
                     self.speak(self.current_action.object + ' not found.')
                     self.move_robot('start_pos')
-                    self.delay.waiting(2)
+                    self.wait(2)
                     self.state = 'return'
         elif self.state == 'get_object':
             if device == Devices.manipulator and data == 'finish':
