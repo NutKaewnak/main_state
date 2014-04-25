@@ -28,7 +28,7 @@
 	<location name="start_post" position="-17.343, 3.907" rotation="1.575" height="1.29"/>
 	<location name="kitchen" position="-15.221, 9.783" rotation="3.103" height="1.29"/>
 	<location name="living room" position="-17.671, 5.001" rotation="-1.575" height="1.29"/>
-    	<location name="register_pos" position="-6.577, -1.922" rotation="1.492" height="1.29"/>
-    	<location name="outside_pos" position="-7.425, 14.325" rotation="1.695" height="1.29"/>
+    <location name="register_pos" position="-6.577, -1.922" rotation="1.492" height="1.29"/>
+    <location name="outside_pos" position="-7.425, 14.325" rotation="1.695" height="1.29"/>
 	<location name="start_pos" position="-7.425, 10.325" rotation="-1.695" height="1.29"/>
 </location_list>
