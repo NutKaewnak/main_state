@@ -13,14 +13,24 @@ class Publish:
     base = rospy.Publisher('/base/set_pos', NavGoalMsg)
     manipulator_point = rospy.Publisher('/manipulator/object_point_split', Vector3)
     manipulator_action = rospy.Publisher('/manipulator/action', String)
+    manipulator_action_grasp = rospy.Publisher('manipulator/grasp', Vector3)
+    manipulator_action_pour = rospy.Publisher('manipulator/pour', Vector3)
     object_search = rospy.Publisher('/object/search', String)
     pan_tilt_cmd = rospy.Publisher('/pan_tilt_cmd', Quaternion)
     follow_init = rospy.Publisher('/follow/init', Bool)
     height_cmd = rospy.Publisher('/height_cmd', Float64)
     findObjectPointPublisher = rospy.Publisher('/localization', String)
- 
+    
     def __init__(self):
         pass
+
+    @staticmethod
+    def set_manipulator_action_grasp(data):
+        Publish.manipulator_action_grasp.publish(Vector3(data))
+
+    @staticmethod
+    def set_manipulator_action_pour(data):
+        Publish.manipulator_action_pour.publish(Vector3(data))
 
     @staticmethod
     def set_manipulator_point(data):
