@@ -110,6 +110,8 @@ class CommandExtractor(object):
         [('go', None, 'bar'), ('find', 'milk', None), ('take', None, None)]
         >>> CommandExtractor().getActions('go to stove identify peanut butter and take it')
         [('go', None, 'stove'), ('identify', 'peanut butter', None), ('take', None, None)]
+        >>> CommandExtractor().getActions('go to bench go to bar and introduce yourself')
+        [('go', None, 'bench'), ('go', None, 'bar'), ('introduce', None, None)]
         >>> CommandExtractor().getActions('go to kitchen find amanda and exit')
         [('go', None, 'kitchen'), ('find', 'amanda', None), ('exit', None, None)]
         >>> CommandExtractor().getActions('bring me a drink')
@@ -131,11 +133,12 @@ class CommandExtractor(object):
                 endSentence = -1
                 for j in xrange(i+1,len(words)):
                     if selfs.isVerb(words[j]):
-                        endSentence = command.find(words[j],command.find(words[j]))
+                        endSentence = command.find(words[j],startSentence + len(words[i]) - 1)
                         break
                 if endSentence == -1:
                     endSentence = len(command)
                 sentence = command[startSentence:endSentence]
+                command = command[endSentence:-1]
                 output.append((words[i],selfs.getObject(sentence),selfs.getData(sentence)))
         return output
 
