@@ -130,8 +130,16 @@ class FINALDEMO(BaseState):
 
         elif self.state == 'serve':
             if device == Devices.manipulate and data == 'finish':
-                Publish.speak("the breakfast is ready served.")
-                self.state = 'finish'
+                self.state = 'goToAlert'
+
+        elif self.state == 'goToAlert':
+                Publish.base_move('bed')
+                self.state = 'alert'
+
+        elif self.state == 'alert':
+                if(device == Devices.base and data == 'SUCCEEDDED'):
+                        Publish.speak("the breakfast is ready to serve.")
+                        self.state = 'finish'
 
         elif self.state == 'finish':
             pass
