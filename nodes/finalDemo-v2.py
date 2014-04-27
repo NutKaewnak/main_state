@@ -22,11 +22,40 @@ class FINALDEMO(BaseState):
         rospy.loginfo("state:" + self.state + " from:" + device + " data:" + str(data))
 
         if self.state == 'init':
-            if (device == Devices.voice and (data == 'i need breakfast'or data =='i am hugry'):
-                Publish.speak("I will make you a breakfast.")
-                Publish.find_object(String("start"))
-                self.state = 'searchingCornflake'
+                Publish.move_robot('bed')#Go to master bed
+                self.state = 'wakeMasterUp'
 
+        elif self.state == 'wakeMasterUp':
+                if(device == Devices.base and data =='SUCCEEDED'):
+                        Publish.speak("Good Morning Master.What I can do for you?")#TODO Additional Speak date & time
+                        self.state = 'choice'
+        
+        elif self.state == 'choice':
+                if(device == Devices.voice and data in 'need breakfast, want breakfast , i am hungry'):#TODO add another menu
+                        Publish.speak("Now I can cook cornflake,Which menu do you want me to cook?")
+                        self.state = 'select'
+
+        elif self.state == 'select':
+                if(device == Devices.voice and (data =='cornflake' or data == 'anything' or data == 'whatever')):
+                        Publish.speak("Do you want me to cook CORNFLAKE isn\'t it?")
+                        self.state = 'confirmMenu'
+              
+        elif self.state == 'confirmMenu':
+                if(device == Devices.voice and (data =='confirm' or data =='yes' or data =='alright')):
+                        self.state = 'goToCook'
+                elif(device == Devices.voice and (data == 'no' or data =='i change my mind')):
+                        self.state = 'wakeMasterUp'
+
+        elif self.state == 'goToCook':
+                Publish.speak("I will go kitchen and make you a breakfast.")
+                Publish.move_robot('kitchen table')
+                self.state = 'readyToCook'
+
+        elif self.state == 'readyToCook':
+                if(device == Devices.base and data =='SUCCEEDED'):
+                        Publish.find_object(String("start"))
+                        self.state = 'searchingCornflake'
+        
         elif self.state == 'searchingCornflake':
             if device == Devices.recognition:
                 Publish.speak("Searching cornflake.")
