@@ -54,7 +54,9 @@ class FINALDEMO(BaseState):
         elif self.state == 'readyToCook':
                 if(device == Devices.base and data =='SUCCEEDED'):
                         Publish.find_object(String("start"))
-                        self.state = 'searchingCornflake'
+                        Publish.speak("Finding ingrediants.")
+                        self.state = 'serve'
+                        #self.state = 'searchingCornflake' #NOTE DEBUG
         
         elif self.state == 'searchingCornflake':
             if device == Devices.recognition:
@@ -65,13 +67,12 @@ class FINALDEMO(BaseState):
                 else:
                     objects = data.objects
                     for obj in objects:
-                        if obj.category == self.desiredObject: #NOTE If found cornflakes if not loop until found
+                        if obj.category == self.desiredObject: 
                             centroidVector = Vector3()
                             centroidVector.x = obj.point.x
                             centroidVector.y = obj.point.y
                             centroidVector.z = obj.point.z
                             Publish.set_manipulate_grasp(centroidVector)
-                            #NOTE debug by push out of 'if state'
                             self.state = 'graspingCornflake'
 
         elif self.state == 'graspingCornflake':
@@ -129,7 +130,7 @@ class FINALDEMO(BaseState):
                 self.state = 'serve'
 
         elif self.state == 'serve':
-            if device == Devices.manipulate and data == 'finish':
+            #if device == Devices.manipulate and data == 'finish': NOTE DEBUG
                 self.state = 'goToAlert'
 
         elif self.state == 'goToAlert':
