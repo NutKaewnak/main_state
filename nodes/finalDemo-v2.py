@@ -14,7 +14,7 @@ class FINALDEMO(BaseState):
         BaseState.__init__(self)
         self.desiredObject = 1 #NOTE 1 = cornflakes
         self.desiredObject2 = 2#NOTE 2 = milk
-        Publish.set_height(1.27)
+     #       Publish.set_height(1.27)
         rospy.loginfo('Start Final Demo State')
         rospy.spin()
 
@@ -22,7 +22,7 @@ class FINALDEMO(BaseState):
         rospy.loginfo("state:" + self.state + " from:" + device + " data:" + str(data))
 
         if self.state == 'init':
-                Publish.move_robot('bed')#Go to master bed
+                self.move_robot('bed')
                 self.state = 'wakeMasterUp'
 
         elif self.state == 'wakeMasterUp':
@@ -38,23 +38,27 @@ class FINALDEMO(BaseState):
         elif self.state == 'select':
                 if(device == Devices.voice and (data =='cornflake' or data == 'anything' or data == 'whatever')):
                         Publish.speak("Do you want me to cook CORNFLAKE isn\'t it?")
+                        self.wait(2)
                         self.state = 'confirmMenu'
               
         elif self.state == 'confirmMenu':
                 if(device == Devices.voice and (data =='confirm' or data =='yes' or data =='alright')):
                         self.state = 'goToCook'
-                elif(device == Devices.voice and (data == 'no' or data =='i change my mind')):
-                        self.state = 'wakeMasterUp'
+        #       elif(device == Devices.voice and (data == 'cancel' or data =='i change my mind')):
+        #              self.state = 'wakeMasterUp'
 
         elif self.state == 'goToCook':
                 Publish.speak("I will go kitchen and make you a breakfast.")
-                Publish.move_robot('kitchen table')
+                self.move_robot('kitchen table')
+                self.wait(2)
                 self.state = 'readyToCook'
 
         elif self.state == 'readyToCook':
                 if(device == Devices.base and data =='SUCCEEDED'):
                         Publish.find_object(String("start"))
-                        self.state = 'searchingCornflake'
+                        Publish.speak("Finding ingrediants.")
+                        self.state = 'serve'
+                        #self.state = 'searchingCornflake' #NOTE DEBUG
         
         elif self.state == 'searchingCornflake':
             if device == Devices.recognition:
@@ -65,13 +69,12 @@ class FINALDEMO(BaseState):
                 else:
                     objects = data.objects
                     for obj in objects:
-                        if obj.category == self.desiredObject: #NOTE If found cornflakes if not loop until found
+                        if obj.category == self.desiredObject: 
                             centroidVector = Vector3()
                             centroidVector.x = obj.point.x
                             centroidVector.y = obj.point.y
                             centroidVector.z = obj.point.z
                             Publish.set_manipulate_grasp(centroidVector)
-                            #NOTE debug by push out of 'if state'
                             self.state = 'graspingCornflake'
 
         elif self.state == 'graspingCornflake':
@@ -88,7 +91,7 @@ class FINALDEMO(BaseState):
         elif self.state == 'discardCornflake':
             if device == Devices.manipulator and data == 'finish':
                 Publish.speak("discard cornflake.")
-                #deley 3 sec
+                self.wait(3)
                 Publish.set_manipulator_action('normal_pullback')
                 if device == Devices.manipulator and data == 'finish':
                         Publish.findObject(String("start"))
@@ -124,16 +127,18 @@ class FINALDEMO(BaseState):
 
         elif self.state == 'discardMilk':
             if device == Devices.manipulate and data == 'finish':
-                #delay 3sec
+                self.wait(3)
                 Publish.set_manipulator_action('normal_pullback')
                 self.state = 'serve'
 
         elif self.state == 'serve':
-            if device == Devices.manipulate and data == 'finish':
+            #if device == Devices.manipulate and data == 'finish': NOTE DEBUG
+             if device == Devices.base and base == 'SUCCEEDED': #NOTE DEBUG
                 self.state = 'goToAlert'
 
         elif self.state == 'goToAlert':
-                Publish.base_move('bed')
+                self.move_robot('bed')
+                self.wait(2)
                 self.state = 'alert'
 
         elif self.state == 'alert':

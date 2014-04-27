@@ -4,6 +4,6 @@
  <!-- <node name="gesture" pkg="gesture" type="testo" output="screen">
     <param name="path_file" value="$(find gesture)"/>
   </node>-->
-  <include file="$(find pocketsphinx)/launch/RIPS.launch" /> 
+  <include file="$(find pocketsphinx)/launch/followme.launch" /> 
 
 </launch>
