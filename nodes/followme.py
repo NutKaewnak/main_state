@@ -19,10 +19,12 @@ class followme(BaseState):
     def __init__(self):
         BaseState.__init__(self)
         self.robot_pos = []
-        self.robot_pos.append(0)
+        #self.robot_pos.append(0)
         #self.state = 'init'
         rospy.loginfo('Start Follow Me State')
         rospy.Subscriber("/base/base_pos", Pose2D, self.cb_base_pos)
+
+        self.publish = Publish()
         rospy.spin()
 
     def cb_base_pos(self,data):
@@ -43,8 +45,8 @@ class followme(BaseState):
     
     
     def main(self,device,data):
-        rospy.loginfo("state:" + self.state + " from:" + device + " data:" + str(data))
-        if self.state == 'init' :
+        rospy.loginfo("state:" + self.state + " from:" + device + " data:")
+        if self.state == 'init':
 #    global state,startTime
             if(device == Devices.voice and ('follow me' in data)):
                 Publish.speak("I will follow you.")
@@ -52,24 +54,26 @@ class followme(BaseState):
         elif(self.state == 'follow_phase_1'):
             if(device == Devices.follow):
                 if(data.text_msg == 'lost'):
+                   # rospy.loginfo("robot_move" + data.x + data.y)
                     data.text_msg = 'stop'
-                    Publish.move_robot(data)
+                Publish.move_robot(data)
             #if(data.text_msg == 'stop'):
             #    data.text_msg = 'clear'
                         #    pub['base'].publish(data)
-            elif(device == Devices.voice and ('get out' in data)):
+            elif(device == Devices.voice and ('leave the elevator' in data)):
                 self.state = 'get_out_lift'
                 Publish.move_absolute(self.robot_pos[0])
                 #Publish.move_robot(NavGoalMsg('clear','absolute',self.robot_pos[0]))
         elif(self.state == 'get_out_lift'):
             if(device == Devices.base and data == 'SUCCEEDED'):
                 self.state = 're_calibrate'
-                Publish.speak("please come in front of me.")
+            #    Publish.speak("please come in front of me.")
                 self.wait(5)
         elif(self.state == 're_calibrate'):
             #if(delay.isWaitFinish()):
+            Publish.speak("please come in front of me.")
             self.state = 'follow_phase_2'
-            publish.follow_init.publish(Bool(True))
+            self.publish.follow_init.publish(Bool(True))
         elif(self.state == 'follow_phase_2'):
             if(device == Devices.follow):
                 if(data.text_msg == 'lost'):
