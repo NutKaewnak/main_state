@@ -112,11 +112,12 @@ class GPSR(BaseState):
                 self.state = 'go_to_start'
         elif self.state == 'go_to_start':
             if device == Devices.base and data == 'SUCCEEDED':
+                self.speak('hello, my name is lumyai please tell me what you want.')
                 self.state = 'wait'
         elif self.state == 'wait':
             if device == Devices.voice and self.command_extractor.isValidCommand(data):
                 self.command = data
-                self.speak('Do you want me to %s' % data)
+                self.speak('did you say %s.' % data)
                 self.state = 'confirm'
         elif self.state == 'confirm':
             if device == Devices.voice:
@@ -199,17 +200,20 @@ class GPSR(BaseState):
                     self.speak('I reach the %s'%self.current_action.data)
                     self.finishAction()
         elif self.state == 'object_search':
-            if device == 'object':
-                if data == 'yes':
-                    name, x, y, z = data.split(',')
-                    Publish.manipulator_point(Vector3(float(x), float(y), float(z)))
-                    self.wait(2)
-                    self.state = 'get_object'
-                elif data == 'no':
-                    self.speak(self.current_action.object + ' not found.')
-                    self.move_robot('start_pos')
-                    self.wait(2)
-                    self.state = 'return'
+            if device == Devices.recognition:
+                if data.isMove:
+                    # go closer to object
+                    pass
+                else:
+                    for object in data.objects:
+                        if object == self.current_action.object:
+                            objCentroid = Vector3()
+                            objCentroid.x = object.point.x
+                            objCentroid.y = object.point.y
+                            objCentroid.z = object.point.z
+                            Publish.set_manipulator_point(objCentroid)
+                            rospy.loginfo('%s is at x:%f y:%f z:%f'%(self.current_action.object,objCentroid.x,objCentroid.y,objCentroid.z))
+                            self.state = 'get_object'
         elif self.state == 'get_object':
             if device == Devices.manipulator and data == 'finish':
                 if self.current_action.data:
@@ -221,8 +225,8 @@ class GPSR(BaseState):
         elif self.state == 'deliver':
             if device == Devices.base and data == 'SUCCEEDED':
                 self.speak('This is %s.'%self.current_action.object)
-                #Publish.set_manipulator_action('rips_out')
-                #self.state = 'give'
+                Publish.set_manipulator_action('rips_out')
+                self.state = 'give'
                 self.finishAction()
         elif self.state == 'give':
             if device == Devices.manipulator and data == 'finish':
