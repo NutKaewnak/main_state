@@ -86,7 +86,7 @@ class GPSR(BaseState):
             self.speak('I will follow you.')
             self.state = 'follow'
         elif action.action in self.verb_categories['introduce']:
-            self.speak('My name is lumyai, I come from Kasetsart University.')
+            self.speak('My name is lumyai, I come from Kasetsart University. Nice to meet you.')
             self.state = 'introduce'
 
     def finishAction(self):
@@ -123,10 +123,10 @@ class GPSR(BaseState):
             if device == Devices.voice:
                 if 'yes' in data:
                     actions = self.command_extractor.getActions(self.command)
-                    #rospy.loginfo('Num action : ' + str(len(actions)))
+                    rospy.loginfo('Num action : ' + str(len(actions)))
                     for i in xrange(0,len(actions)):
                         action = Action(actions[i][0], actions[i][1], actions[i][2])
-                        #rospy.loginfo(' - %s,%s,%s'%(action.action,action.object if action.object else 'None',action.data if action.data else 'None'))
+                        rospy.loginfo(' - %s,%s,%s'%(action.action,action.object if action.object else 'None',action.data if action.data else 'None'))
                         self.actions.append(action)
                     self.current_action = self.actions[self.current_action_index]
                     self.speak('I will %s.' % self.command)
@@ -176,7 +176,10 @@ class GPSR(BaseState):
                     self.current_action.data = self.ask_data
                     self.speak('I will %s %s to %s' % (self.current_action.action,self.current_action.object if self.current_action.object else '',self.current_action.data if self.current_action.data else ''))
                     rospy.loginfo('%s is at %s'%(self.current_action.object,self.object_location))
-                    self.move_robot(self.object_location)
+                    if self.current_action.action in self.verb_categories['go']:
+                        self.move_robot(self.current_action.data)
+                    elif self.current_action.action in self.verb_categories['bring']:
+                        self.move_robot(self.object_location)
                     self.wait(2)
                     self.state = 'move'
                 elif 'no' in data:

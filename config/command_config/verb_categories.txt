@@ -13,7 +13,7 @@ go
 -head
 -point
 -navigate
-tell
+introduce
 -tell
 -introduce
 find
