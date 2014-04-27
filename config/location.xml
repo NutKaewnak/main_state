@@ -5,14 +5,14 @@
 	<location name="umbrella stand" position="-11.465, 5.294" rotation="0.067" height="1.29"/>
 	<location name="bar" position="-9.302, -1.238" rotation="-1.75" height="1.29"/>
 	<location name="sidetable" position="1.381, -0.816" rotation="0.125" height="1.29"/>
-	<location name="kitchen table" position="-14.563, 10.791" rotation="0.036" height="1.29"/>
+	<location name="kitchen table" position="-5.728, -0.590" rotation="1.711" height="1.29"/>
 	<location name="kitchen counter" position="-11.595, 11.985" rotation="-0.007" height="1.29"/>
 	<location name="stove" position="-6.108, 6.584" rotation="-1.472" height="1.29"/>
 	<location name="trash bin" position="-13.427, 12.056" rotation="1.575" height="1.29"/>
 	<location name="cupboard" position="-12.630, 11.665" rotation="1.567" height="1.29"/>
 	<location name="sink" position="-9.931, -1.010" rotation="1.729" height="1.29"/>
 	<location name="fridge" position="-11.948, 9.404" rotation="0.009" height="1.29"/>
-	<location name="bed" position="-6.192, 3.933" rotation="-1.485" height="1.29"/>
+	<location name="bed" position="2.893, -2.013" rotation="-1.431" height="1.29"/>
 	<location name="dresser" position="-17.030, 12.295" rotation="1.514" height="1.29"/>
 	<location name="sideboard" position="1.381, -0.816" rotation="0.009" height="1.29"/>
 	<location name="bedsied table" position="-19.383, 12.532" rotation="3.091" height="1.29"/>

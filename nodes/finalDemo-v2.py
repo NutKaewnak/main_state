@@ -22,7 +22,7 @@ class FINALDEMO(BaseState):
         rospy.loginfo("state:" + self.state + " from:" + device + " data:" + str(data))
 
         if self.state == 'init':
-                Publish.move_robot('bed')#Go to master bed
+                self.move_robot('bed')
                 self.state = 'wakeMasterUp'
 
         elif self.state == 'wakeMasterUp':
@@ -48,7 +48,7 @@ class FINALDEMO(BaseState):
 
         elif self.state == 'goToCook':
                 Publish.speak("I will go kitchen and make you a breakfast.")
-                Publish.move_robot('kitchen table')
+                self.move_robot('kitchen table')
                 self.state = 'readyToCook'
 
         elif self.state == 'readyToCook':
