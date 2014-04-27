@@ -39,8 +39,8 @@ class followme(BaseState):
         temp = self.robot_pos
         for _pos in self.robot_pos:
             dif = math.sqrt((_pos.x-pos.x)**2 + (_pos.y-pos.y)**2)
-        if(dif >= 2.0):
-            temp = temp[1:]
+            if(dif >= 2.0):
+                temp = temp[1:]
         self.robot_pos = temp
     
     
