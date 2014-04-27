@@ -14,7 +14,7 @@ class FINALDEMO(BaseState):
         BaseState.__init__(self)
         self.desiredObject = 1 #NOTE 1 = cornflakes
         self.desiredObject2 = 2#NOTE 2 = milk
-        Publish.set_height(1.27)
+     #       Publish.set_height(1.27)
         rospy.loginfo('Start Final Demo State')
         rospy.spin()
 
@@ -43,8 +43,8 @@ class FINALDEMO(BaseState):
         elif self.state == 'confirmMenu':
                 if(device == Devices.voice and (data =='confirm' or data =='yes' or data =='alright')):
                         self.state = 'goToCook'
-                elif(device == Devices.voice and (data == 'no' or data =='i change my mind')):
-                        self.state = 'wakeMasterUp'
+         #       elif(device == Devices.voice and (data == 'no' or data =='i change my mind')):
+          #              self.state = 'wakeMasterUp'
 
         elif self.state == 'goToCook':
                 Publish.speak("I will go kitchen and make you a breakfast.")
@@ -134,7 +134,7 @@ class FINALDEMO(BaseState):
                 self.state = 'goToAlert'
 
         elif self.state == 'goToAlert':
-                Publish.base_move('bed')
+                self.move_robot('bed')
                 self.state = 'alert'
 
         elif self.state == 'alert':
