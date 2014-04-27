@@ -31,14 +31,14 @@ class followme(BaseState):
             self.robot_pos.append(pos)
         else:
             last_pos = self.robot_pos[-1]
-            dif = math.sqrt((last_pos.x-pos.x)**2 + (last_pos.y-pos.y)**2)
-            if(dif >= 0.15):
-                self.robot_pos.append(pos)
+        dif = math.sqrt((last_pos.x-pos.x)**2 + (last_pos.y-pos.y)**2)
+        if(dif >= 0.15):
+            self.robot_pos.append(pos)
         temp = self.robot_pos
         for _pos in self.robot_pos:
             dif = math.sqrt((_pos.x-pos.x)**2 + (_pos.y-pos.y)**2)
-            if(dif >= 2.0):
-                temp = temp[1:]
+        if(dif >= 2.0):
+            temp = temp[1:]
         self.robot_pos = temp
     
     
@@ -53,7 +53,7 @@ class followme(BaseState):
             if(device == Devices.follow):
                 if(data.text_msg == 'lost'):
                     data.text_msg = 'stop'
-                Publish.move_robot(data)
+                    Publish.move_robot(data)
             #if(data.text_msg == 'stop'):
             #    data.text_msg = 'clear'
                         #    pub['base'].publish(data)
@@ -65,18 +65,17 @@ class followme(BaseState):
             if(device == Devices.base and data == 'SUCCEEDED'):
                 self.state = 're_calibrate'
                 Publish.speak("please come in front of me.")
-                self.delay.waiting(5)
+                self.wait(5)
         elif(self.state == 're_calibrate'):
-            if(self.delay.isWaitFinish()):
-                self.state = 'follow_phase_2'
-                publish.follow_init.publish(Bool(True))
-            
-            elif(self.state == 'follow_phase_2'):
-                if(device == Devices.follow):
-                    if(data.text_msg == 'lost'):
-                        data.text_msg = 'stop'
+            #if(delay.isWaitFinish()):
+            self.state = 'follow_phase_2'
+            publish.follow_init.publish(Bool(True))
+        elif(self.state == 'follow_phase_2'):
+            if(device == Devices.follow):
+                if(data.text_msg == 'lost'):
+                     data.text_msg = 'stop'
                                #pub['base'].publish(data)
-                    Publish.move_robot(data)
+                Publish.move_robot(data)
 
 
 #state = 'init'
