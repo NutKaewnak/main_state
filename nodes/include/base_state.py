@@ -13,8 +13,8 @@ from std_msgs.msg import String
 from lumyai_navigation_msgs.msg import NavGoalMsg
 from geometry_msgs.msg import Vector3
 from geometry_msgs.msg import Pose2D
-from object_perception.msg import Object
-from object_perception.msg import ObjectContainer
+from object_recognition.msg import Object
+from object_recognition.msg import ObjectContainer
 
 class Devices:
     door = 'door'
