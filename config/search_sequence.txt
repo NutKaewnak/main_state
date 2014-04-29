@@ -1,0 +1,8 @@
+dinner_table_1
+dinner_table_2
+pantry_1
+pantry_2
+tv_counter
+couch_table_2
+couch_table_1
+

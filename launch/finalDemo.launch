@@ -1,0 +1,9 @@
+<launch>
+
+  <node name="manipulator" pkg="manipulator" type="manipulator.py" output="screen" />
+  <node name="detector" pkg="color_detection" type="color_detector"  />
+  <node name="main_state" pkg="main_state" type="finalDemo-v2.py" />
+  <!--<node name="main_state" pkg="main_state" type="finalDemo-v2.py" output="screen" />-->
+  <include file="$(find pocketsphinx)/launch/final.launch" />
+
+</launch>
