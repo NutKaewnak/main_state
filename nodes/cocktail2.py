@@ -68,7 +68,7 @@ class CockTailParty(BaseState):
 
         elif self.state == 'passDoor':
             if device == Devices.base and data == 'SUCCEEDED':
-                self.move_robot('bed')
+                self.move_robot('kitchen')
                 self.state = 'gotoKitchenRoom'
 
         elif self.state == 'gotoKitchenRoom':
@@ -91,7 +91,7 @@ class CockTailParty(BaseState):
             if not self.timer.is_waiting():
                 self.currentAngle += 0.3
                 print self.currentAngle
-                self.timer.wait(3)
+                self.timer.wait(5)
                 if self.currentAngle >= 90*math.pi/180:
                     self.speak("I did not found anyone.")
                     self.state = 'error'
@@ -138,7 +138,7 @@ class CockTailParty(BaseState):
                 if self.currentObject == self.totalObject:
                     self.currentAngle = -90*math.pi/180
                     self.currentObject  = 0
-                    self.move_robot('hallway table')
+                    self.move_robot('bar')
                     self.state = "MOVE_BASE"
                 else:
                     self.move_robot('kitchen')
@@ -202,7 +202,7 @@ class CockTailParty(BaseState):
         elif self.state == "PICK_OBJECT":
             if device == Devices.manipulator and data == 'finish':
                 self.speak("I got it.")
-                self.move_robot('stove')
+                self.move_robot('living room')
                 self.state = 'GO_TO_LIVING_ROOM_WITH_OBJECT'
 
         elif self.state == "GO_TO_LIVING_ROOM_WITH_OBJECT":
@@ -248,7 +248,7 @@ class CockTailParty(BaseState):
             if device == Devices.manipulator and data == 'finish':
                 self.currentObject += 1
                 if self.currentObject == self.totalObject:
-                    self.move_robot('bed')
+                    self.move_robot('outside_pos')
                     self.state = 'get out'
                 else:
                     self.move_robot('bar')
