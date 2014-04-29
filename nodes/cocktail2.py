@@ -31,8 +31,8 @@ class CockTailParty(BaseState):
         self.object_mapping['orange juice'] = 9
         self.object_mapping['milo'] = 10
 
-        self.people_name = ['richard','rishard','richart','philip' ,'emma' ,'danial' ,'tina','steve' ,'henry' ,'peter','peeter' ,'robert' ,'sarah' ,'brian' ,'thomas','britney' ,'justin','tony' ,'kevin' ,'joseph','michael' ,'michelle' ,'donna']
-        self.object_list = ['pringles','lay','water','orange juice','green tea','milk','s','fanta','corn flakes','corn']
+        self.people_name = ['michael','christopher','matthew','joshua','daniel','david','andrew','james','justin','joseph','jessica','ashley','brittany','amanda','samantha','sarah','stephanie','jennifer','elizabeth','lauren']
+        self.object_list = ['pringles','lay','water','apple juice','green tea','milk','s','fanta','corn flakes','corn']
 
         self.publish = Publish()
         self.isInit  = False
@@ -80,7 +80,7 @@ class CockTailParty(BaseState):
         elif self.state == 'searchGesture':
             if device == 'gesture':
                 self.speak("I see you.")
-                x,y,z = data.split(',') # x,y = from gesture
+                x,y,z = data.split(',') # x,y = from gesture 
                 #print 'Kinect angle : ' + str(self.currentAngle)
                 x = float(z) * math.cos(self.currentAngle)
                 y = float(z) * math.sin(self.currentAngle)
@@ -132,7 +132,7 @@ class CockTailParty(BaseState):
         elif self.state == 'ConfirmObject':
             if device == Devices.voice and 'yes' in data:
                 self.objectName.append(self.temp)
-                self.desiredObject = self.object_mapping[self.temp]
+                #self.desiredObject = self.object_mapping[self.temp]
                 self.currentObject += 1
                 if self.currentObject == self.totalObject:
                     self.currentObject  = 0
