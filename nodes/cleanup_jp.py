@@ -4,7 +4,7 @@ import roslib
 from include.function import *
 from include.publish import *
 from include.base_state import *
-from math import pi
+import math
 
 roslib.load_manifest('main_state')
 
@@ -58,7 +58,7 @@ class Cleanup_jp(BaseState):
 
         if(self.state == 'INIT'):
             if(device == Devices.door and data == 'open'):
-                Publish.move_relative(1.5, 0)
+                Publish.move_relative(1.5, 0, 0)
                 self.state = 'PASS_DOOR'
                 #Publish.set_manipulator_action('walking')
 
@@ -137,7 +137,7 @@ class Cleanup_jp(BaseState):
                         self.move_robot(self.locations[self.cleaning_location][self.index])
                         self.speak('I see nothing. I will go to ' + self.locations[self.cleaning_location][self.index])
                         self.delay(1)
-                        #self.index+=1
+                        self.index+=1
                         print 'self.index',self.index,'self.number_of_position',self.number_of_position
                         self.state = 'GO_TO_OBJECT_LOCATION'
                     else:
@@ -170,6 +170,7 @@ class Cleanup_jp(BaseState):
                 # go to next pos
                 if self.index < self.number_of_position:
                     self.move_robot(self.locations[self.cleaning_location][self.index])
+                    self.speak("I am moving to " + self.locations[self.cleaning_location][self.index])
                     self.wait(1)
                     #self.index+=1
                     print 'self.index',self.index,'self.number_of_position',self.number_of_position

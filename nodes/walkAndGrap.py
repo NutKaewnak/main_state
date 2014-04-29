@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 import rospy
 import roslib
+import math
 from include.function import *
 from include.publish import *
 from include.base_state import *
-from math import pi
 
 roslib.load_manifest('main_state')
 
@@ -17,6 +17,8 @@ class WalkAndGrap(BaseState):
         self.intermediate_pos = "bar"
         self.index = 0
         self.max_index = 2
+        self.LIMIT_MANIPULATED_DISTANCE = 0.78
+        self.go_closer_method = 'FORWARD'
         rospy.loginfo('Start Cleanup_jp State')
         rospy.spin()
 
@@ -31,7 +33,7 @@ class WalkAndGrap(BaseState):
 
         if(self.state == 'INIT'):
             if(device == Devices.door and data == 'open'):
-                Publish.move_relative(1.0, 0)
+                Publish.move_relative(1.0, 0, 0)
                 Publish.set_manipulator_action('walking')
                 self.state = 'PASS_DOOR'
 
@@ -55,46 +57,68 @@ class WalkAndGrap(BaseState):
         elif(self.state == 'GET_SEARCHING_RESULT'):
             if(device == Devices.recognition):
                 objects = []
-                if(data.isMove):
-                    Publish.move_relative(0.32, 0)
-                    self.wait(2)
-                    self.speak('step close to objects')
-                    self.state = 'STEP_TO_OBJECT'
-                    return None
-                else:
-                    objects = data.objects
-                    for obj in objects:
-                        print 'category : ' + obj.category + ' centroid : (' + str(obj.point.x) + "," + str(obj.point.y) + "," + str(obj.point.z) + ")"
-                    for obj in objects:
-                        if obj.isManipulable == True and obj.category != "unknown":
-                            self.speak('I will graps ' + obj.category)
-                            centroidVector = Vector3()
-                            centroidVector.x = obj.point.x
-                            centroidVector.y = obj.point.y
-                            centroidVector.z = obj.point.z
-                            Publish.set_manipulator_point(centroidVector.x,centroidVector.y,centroidVector.z+0.01)
-                            self.state = 'GET_OBJECT'
-                            self.index = 0
-                            return None
-                        elif obj.isManipulable == False and obj.category != "unknown":
-                            self.speak("I can not reach " + obj.category)
-                            #do something ?
-                            pass
-                    #self.index+=1
-                    if self.index < self.max_index:
-                        self.move_robot(self.table_pos[self.index])
-                        self.wait(2)
-                        self.speak('see nothing, and go to ' + self.table_pos[self.index])
-                        self.state = 'GO_TO_TABLE'
-                    else:
-                        self.index = 0
+                objects = data.objects
+                for obj in objects:
+                    print 'category : ' + obj.category + ' centroid : (' + str(obj.point.x) + "," + str(obj.point.y) + "," + str(obj.point.z) + ")"
+                for obj in objects:
+                    if obj.isManipulable == True and obj.category != "unknown":
+                        self.speak('I will graps ' + obj.category)
+                        centroidVector = Vector3()
+                        centroidVector.x = obj.point.x
+                        centroidVector.y = obj.point.y
+                        centroidVector.z = obj.point.z
+                        #Publish.set_manipulator_point(centroidVector.x,centroidVector.y,centroidVector.z)
+                        self.go_closer_method = 'FORWARD'
+                        #self.state = 'GET_OBJECT'
                         self.move_robot(self.intermediate_pos)
-                        self.wait(2)
-                        self.speak('see nothing, and go to ' + self.intermediate_pos)
                         self.state = 'GO_TO_INTERMEDIATE_POS'
+                        self.index = 0
+                        return None
+
+                for obj in objects:
+                    if obj.isManipulable == False and obj.category != "unknown":
+                        #self.speak("I will go closer to " + obj.category)
+                        if self.go_closer_method == 'FORWARD':
+                            move_distance = obj.point.x - self.LIMIT_MANIPULATED_DISTANCE + 0.3
+                            print '----------------------------------',move_distance
+                            #move_distance = 0.40
+                            Publish.move_relative(move_distance, 0, 0)
+                            self.wait(2)
+                            self.speak("I will go forward to " + obj.category)
+                            self.go_closer_method = 'ROTATE'
+                            self.state = "STEP_TO_OBJECT"
+                            #self.state = 'GO_TO_TABLE'
+                        elif self.go_closer_method == 'ROTATE':
+                            rotation = math.tan(obj.point.y/obj.point.x)
+                            Publish.move_relative(0 ,0 ,rotation)
+                            self.wait(2)
+                            self.speak("I will rotate to " + obj.category)
+                            self.go_closer_method = 'FINISH'
+                            self.state = "STEP_TO_OBJECT"
+                            #self.state = 'GO_TO_TABLE'
+                        elif self.go_closer_method == 'FINISH':
+                            self.move_robot(self.table_pos[self.index])
+                            self.go_closer_method = 'FORWARD'
+                            self.wait(2)
+                            self.speak(obj.category + ' is unreachable, I will  go to ' + self.table_pos[self.index])
+                            self.state = 'GO_TO_INTERMEDIATE_POS'
+                        return None
+                #use this to go to base location back and forth
+                #self.index+=1
+                if self.index < self.max_index:
+                    self.move_robot(self.table_pos[self.index])
+                    self.wait(2)
+                    self.speak('see nothing, and go to ' + self.table_pos[self.index])
+                    self.state = 'GO_TO_TABLE'
+                else:
+                    self.index = 0
+                    self.move_robot(self.intermediate_pos)
+                    self.wait(2)
+                    self.speak('see nothing, and go to ' + self.intermediate_pos)
+                    self.state = 'GO_TO_INTERMEDIATE_POS'
 
         elif(self.state == 'STEP_TO_OBJECT'):
-            if(device == Devices.base and data == 'SUCCEEDED'):
+            if(device == Devices.base and (data == 'SUCCEEDED' or data == 'ABORTED')):
                 Publish.find_object(0.7)
                 self.state = 'GET_SEARCHING_RESULT'
 
