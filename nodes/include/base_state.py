@@ -42,6 +42,7 @@ class BaseState:
         self.robot_position = None
         self.location_list = {}
         read_location_information(self.location_list)
+        self.object_info = read_object_info()
         self.state = 'init'
 
     def callback_colorDetector(self, data):
