@@ -6,8 +6,11 @@ import xml.etree.ElementTree as ET
 roslib.load_manifest('main_state')
 
 class Object:
-    def __init__(self, object_node):
+    def __init__(self, object_node, category):
         self.name = object_node.attrib['name']
+        self.category = category.name
+        self.location = category.location
+        self.action_place = category.action_place
         if 'isManipulate' in object_node.attrib:
             self.isManipulate = bool(object_node.attrib['isManipulate'])
         else:
@@ -18,6 +21,9 @@ class Object:
 
     def __str__(self):
         return '\n(Object name: ' + self.name + \
+               ', category: ' + self.category + \
+               ', location: ' + self.location + \
+               ', action_place: ' + self.action_place + \
                ', isManipulate: ' + str(self.isManipulate) + ')'
 
 class Category:
@@ -30,7 +36,7 @@ class Category:
             self.action_place = 'place_object'
         self.objects = []
         for object_node in category_node:
-            object_instance = Object(object_node)
+            object_instance = Object(object_node, self)
             self.objects.append(object_instance)
 
     def __repr__(self):
@@ -54,7 +60,6 @@ class ObjectInfo:
         object_name = [(len(key),key) for key in self.object_data]
         object_name = sorted(object_name, reverse=True)
         self.object_list = [key for tmp,key in object_name]
-        print self.object_list
 
     def get_category(self, category_name):
         return self.category_data[category_name]
