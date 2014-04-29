@@ -1,7 +1,7 @@
 <location_information>
 	<room name="living room" position="-17.671, 5.001" rotation="-1.575" height="1.29">
 		<location name="bench" position="-7.708, -1.665" rotation="-1.409" height="1.29"/>
-		<locaiton name="hallway table" position="-12.039, -1.838" rotation="-2.977" height="1.29"/>
+		<locaiton name="hallway table" position="-12.183, -1.70" rotation="-3.121" height="1.29"/>
 		<location name="hanger" position="-6.992, 4.092" rotation="-1.432" height="1.29"/>
 		<location name="umbrella stand" position="-11.465, 5.294" rotation="0.067" height="1.29"/>
 		<location name="bar" position="-9.302, -1.238" rotation="-1.75" height="1.29"/>
@@ -13,7 +13,7 @@
 		<location name="cupboard" position="-12.630, 11.665" rotation="1.567" height="1.29"/>
 		<location name="sink" position="-9.931, -1.010" rotation="1.729" height="1.29"/>
 		<location name="fridge" position="-11.948, 9.404" rotation="0.009" height="1.29"/>
-		<location name="bed" position="2.893, -2.013" rotation="-1.431" height="1.29"/>
+		<location name="bed" position="-6.955, -0.753" rotation="0.130" height="1.29"/>
 	</room>
 	<room name="kitchen" position="3.041, 0.62" rotation="-2.998" height="1.29">
 		<location name="dresser" position="-17.030, 12.295" rotation="1.514" height="1.29"/>
