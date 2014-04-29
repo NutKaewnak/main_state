@@ -67,13 +67,11 @@ class followme(BaseState):
         elif(self.state == 'get_out_lift'):
             if(device == Devices.base and data == 'SUCCEEDED'):
                 self.state = 're_calibrate'
-            #    Publish.speak("please come in front of me.")
-                self.wait(5)
+                self.speak("please come in front of me.")
         elif(self.state == 're_calibrate'):
             #if(delay.isWaitFinish()):
-            Publish.speak("please come in front of me.")
-            self.state = 'follow_phase_2'
             self.publish.follow_init.publish(Bool(True))
+            self.state = 'follow_phase_2'
         elif(self.state == 'follow_phase_2'):
             if(device == Devices.follow):
                 if(data.text_msg == 'lost'):
