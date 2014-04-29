@@ -1,7 +1,8 @@
 #!usr/bin/env python
 import rospy
 import roslib
-from location import *
+from location_information import *
+from object_information import *
 from delay import *
 from publish import *
 from reconfig_kinect import *
@@ -35,11 +36,12 @@ class BaseState:
         rospy.Subscriber('/base/base_pos', Pose2D, self.callback_base_position)
         rospy.Subscriber('/detected_object', ObjectContainer, self.callback_findobject)
         rospy.Subscriber('/color_detect', Vector3,self.callback_colorDetector)
+
         self.delay = Delay()
         self.reconfig = Reconfig()
         self.robot_position = None
         self.location_list = {}
-        read_location(self.location_list)
+        read_location_information(self.location_list)
         self.state = 'init'
 
     def callback_colorDetector(self, data):

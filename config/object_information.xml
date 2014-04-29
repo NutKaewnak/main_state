@@ -1,0 +1,23 @@
+<object_information>
+
+    <category name="cleaning stuff" location="hallway table">
+        <object name="deodorant" />
+        <object name="tooth paste" />
+        <object name="cleaner" />
+        <object name="fresh discs" isManipulate="False" />
+    </category>
+
+    <category name="drink" location="bar">
+        <object name="beer bottle" />
+        <object name="beer can" />
+        <object name="coke" />
+        <object name="fanta" />
+        <object name="milk" />
+        <object name="chocolate milk" />
+    </category>
+
+    <category name="unknown" location="trash" action_place="place_trash">
+        <object name="unknown" />
+    </category>
+
+</object_information>
