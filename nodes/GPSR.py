@@ -47,6 +47,9 @@ class GPSR(BaseState):
         self.object_location = None
         self.starting_point = 'bed'
         self.exit_point = 'outside_pos'
+        self.current_angle = 0.0
+        self.angle_step = 0.2
+        self.neck_counter = 0
         rospy.spin()
 
     def findObjectCategory(self, object):
@@ -231,10 +234,17 @@ class GPSR(BaseState):
                             self.state = 'get_object'
                             self.speak('I found %s'%self.current_action.object)
                     if not found:
-                        self.speak('object not found.')
-                        self.move_robot(self.starting_point)
-                        self.wait(2)
-                        self.state = 'deliver'
+                        self.neck_counter += 1
+                        if self.current_action >= 90.0 * math.pi / 180.0:
+                            self.speak('%s not found'%self.current_action.object)
+                            self.move_robot(self.starting_point)
+                            self.wait(2)
+                            self.state = 'deliver'
+                        if self.neck_counter % 2 == 0:
+                            self.current_angle += 0.2
+                            Publish.set_neck(0, 0, self.current_angle)
+                        else:
+                            Publish.set_neck(0, 0, -1.0 * self.current_angle)
         elif self.state == 'get_object':
             if device == Devices.manipulator and data == 'finish':
                 if self.current_action.data:
@@ -247,7 +257,7 @@ class GPSR(BaseState):
         elif self.state == 'deliver':
             if device == Devices.base and data == 'SUCCEEDED':
                 self.speak('This is %s.'%self.current_action.object)
-                Publish.set_manipulator_action('rips_out')
+                Publish.set_manipulator_action('normal')
                 self.state = 'give'
                 self.finishAction()
         elif self.state == 'give':
