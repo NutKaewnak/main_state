@@ -39,16 +39,7 @@ class Command:
 def main_state(device, data):
     global state, location_list, temp, command_list, location_count, current_command
 
-    elif (state == 'confirmLocationName'):
-        publish.robot_stop()
-        if (device == 'voice' and ('robot yes' in data)):
-            location_list[temp] = NavGoalMsg('clear', 'absolute', robot_pos)
-            call(["espeak", "-ven+f4", "i remember " + temp, "-s 110"])
-            location_count += 1
-            state = 'follow_phase_1'
-        elif (device == 'voice' and ('robot no' in data)):
-            call(["espeak", "-ven+f4", "where are we", "-s 110"])
-            state = 'waitForLocationName'
+
     elif (state == 'waitForCommand'):
         publish.robot_stop()
         if (len(command_list) == 3):
@@ -142,15 +133,23 @@ def restaurant(BaseState):
         elif self.state == 'waitForLocationName':
             self.robot_stop()
             if device == Devices.voice:
-                
                 for i in self.location_list.keys():
-                if (i in data):
-                    temp = i
-                    call(["espeak", "-ven+f4", "this is " + i + " yes or no ", "-s 110"])
-                    state = 'confirmLocationName'
-        elif (device == 'voice' and ('follow me' in data)):
-            call(["espeak", "-ven+f4", "i will follow you", "-s 110"])
-            state = 'follow_phase_1'
+                    if i in data:
+                        self.temp = i
+                        self.speak("This is " + i + ",yes or no?")
+                        state = 'confirmLocationName'
+            elif device == Devices.voice and 'follow me' in data:
+                self.speak("I will follow you.")
+                self.state = 'follow'
+        elif self.state == 'confirmLocationName':
+            self.robot_stop()
+            if device == Devices.voice and 'robot yes' in data:
+                self.location_list[self.temp] = NavGoalMsg('clear', 'absolute', self.robot_position)
+                self.speak("I remember " + self.temp)
+                self.state = 'waitForLocationName'
+            elif device == Devices.voice and 'robot no' in data:
+                self.speak("What is this place?")
+                self.state = 'waitForLocationName'
 
 
 if __name__ == '__main__':
