@@ -46,8 +46,8 @@ class Publish:
         Publish.height_cmd.publish(Float64(data))
 
     @staticmethod
-    def move_relative(x, y):
-        Publish.base.publish(NavGoalMsg('clear', 'relative', Pose2D(float(x), float(y), 0.0)))
+    def move_relative(x, y, z):
+        Publish.base.publish(NavGoalMsg('clear', 'relative', Pose2D(float(x), float(y), float(z))))
 
     @staticmethod
     def move_absolute(pose):
