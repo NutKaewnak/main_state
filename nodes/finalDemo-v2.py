@@ -22,7 +22,7 @@ class FINALDEMO(BaseState):
         rospy.loginfo("state:" + self.state + " from:" + device + " data:" + str(data))
 
         if self.state == 'init':
-            if (device == Devices.voice and (data == 'i need breakfast'or data =='i am hugry'):
+            if (device == Devices.voice and (data in 'i need breakfast , i am hungry')):
                 Publish.speak("I will make you a breakfast.")
                 Publish.find_object(String("start"))
                 self.state = 'searchingCornflake'

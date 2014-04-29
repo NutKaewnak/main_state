@@ -19,7 +19,7 @@ class Publish:
     pan_tilt_cmd = rospy.Publisher('/pan_tilt_cmd', Quaternion)
     follow_init = rospy.Publisher('/follow/init', Bool)
     height_cmd = rospy.Publisher('/height_cmd', Float64)
-    findObjectPointPublisher = rospy.Publisher('/localization', String)
+    findObjectPointPublisher = rospy.Publisher('/search_object', Float64)
     
     def __init__(self):
         pass
@@ -33,12 +33,13 @@ class Publish:
         Publish.manipulator_action_pour.publish(Vector3(data))
 
     @staticmethod
-    def set_manipulator_point(data):
-        Publish.manipulator_point.publish(Vector3(data))
+    def set_manipulator_point(x, y, z):
+        Publish.manipulator_point.publish(Vector3(float(x), float(y), float(z)))
+        #Publish.manipulator_point.publish(Vector3(data[0],data[1],data[2]))
 
     @staticmethod
     def find_object(data):
-        Publish.findObjectPointPublisher.publish(String(data))
+        Publish.findObjectPointPublisher.publish(Float64(data))
 
     @staticmethod
     def set_height(data):

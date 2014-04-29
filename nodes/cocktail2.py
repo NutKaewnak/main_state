@@ -5,10 +5,10 @@ import math
 from include.function import *
 from include.publish import *
 from include.base_state import *
-#from math import pi
+from include.delay import *
 
-from object_perception.msg import Object
-from object_perception.msg import ObjectContainer
+#from object_perception.msg import Object
+#from object_perception.msg import ObjectContainer
 
 roslib.load_manifest('main_state')
 
@@ -31,22 +31,20 @@ class CockTailParty(BaseState):
         self.object_mapping['orange juice'] = 9
         self.object_mapping['milo'] = 10
 
-        self.people_name = ['richard','rishard','richart','philip' ,'emma' ,'danial' ,'tina','steve' ,'henry' ,'peter','peeter' ,'robert' ,'sarah' ,'brian' ,'thomas','britney' ,'justin','tony' ,'kevin' ,'joseph','michael' ,'michelle' ,'donna']
-
+        self.people_name = ['michael','christopher','matthew','joshua','daniel','david','andrew','james','justin','joseph','jessica','ashley','brittany','amanda','samantha','sarah','stephanie','jennifer','elizabeth','lauren']
+        self.object_list = ['pringles','lay','water','apple juice','green tea','milk','s','fanta','corn flakes','corn']
 
         self.publish = Publish()
-        self.object_list = ['pringles','lay','water','orange juice','green tea','milk','s','fanta','corn flakes','corn']
-        #self.publish.set_height(1.27)
         self.isInit  = False
         self.currentAngle = -90*math.pi/180
         self.temp = ''
-        self.currentObjectNumber = 0
+        self.currentObject = 0
+        self.totalObject = 1
         self.currentTime = 0
-        #self.state = 'init'
-        self.state = 'getCommand'
-        self.peopleName = ''
+        self.peopleName = []
+        self.objectName = []
         self.desiredObject = ''
-
+        #self.state = 'searchGesture'
 
         rospy.loginfo('Cocktail state starts.')
         rospy.spin()
@@ -56,153 +54,110 @@ class CockTailParty(BaseState):
 
     def cb_gesture(self,data):
         print 'in cb_gesture cb'
-        #call(["aplay","/home/skuba/skuba_athome/main_state/sound/accept.wav"])
-    #    print "delay.isWait() = " + str(delay.isWait())
-    #    print "GESTURE at %f,%f,%f" % (data.point.x,data.point.y,data.point.z)
-        #main_state('gesture',"%f,%f,%f" % (data.point.x,data.point.y,data.point.z))
         self.main('gesture',"%f,%f,%f" % (data.point.x,data.point.y,data.point.z))
 
     def main(self, device, data):
         rospy.loginfo("state:" + self.state + " from:" + device + " data:" + str(data))
-        if(self.delay.isWait()): return None
-
         if self.state == 'init':
             if device == Devices.door and data == 'open':
-                # move pass door
-                #self.publish.pan_tilt_command(getQuaternion(0,50*math.pi/180,0))
-                #self.publish.base.publish(NavGoalMsg('clear','relative',Pose2D(1.5,0,0)))
-                Publish.move_relative(1.5, 0)
-                self.delay.delay(1)
+                self.publish.move_relative(1.5, 0)
                 self.state = 'passDoor'
-            if(not self.isInit):
-                #normalInitialize()
-                self.publish.manipulator_action.publish(String('walking'))
-                Publish.set_manipulator_action('walking')
+            if not self.isInit:
+                self.publish.set_manipulator_action('walking')
                 self.isInit = True
 
         elif self.state == 'passDoor':
             if device == Devices.base and data == 'SUCCEEDED':
-                # send to base
-                self.move_robot('kitchen')
-                #self.publish.base.publish(location_list['kitchen_room'])
-                self.delay.delay(3)
+                self.move_robot('bed')
                 self.state = 'gotoKitchenRoom'
 
         elif self.state == 'gotoKitchenRoom':
-            if(device == Devices.base and data == 'SUCCEEDED'):
-                #self.publish.pan_tilt_command(getQuaternion(0,0,self.currentAngle))
-
-                Publish.speak("Please wave your hand.")
-                #call(['espeak','Please wave your hand.','-ven+f4','-s 150'])
-                self.delay.waiting(7)
-                #delay.delay(3)
+            if device == Devices.base and data == 'SUCCEEDED':
+                self.publish.set_neck(0, 0, self.currentAngle)
+                self.speak("Please wave your hand.")
+                self.timer = Delay()
                 self.state = 'searchGesture'
-                #call(['espeak','change state to search gesture.','-ven+f4','-s 150'])
-
 
         elif self.state == 'searchGesture':
-            print 'device : ' + device + ', data : ' + data
-            if(device == 'gesture'):
-                Publish.speak("I see you.")
-                #call(['espeak','I see you.','-ven+f4','-s 150'])
-                # x,y = from gesture
-                x,y,z = data.split(',')
+            if device == 'gesture':
+                self.speak("I see you.")
+                x,y,z = data.split(',') # x,y = from gesture
                 #print 'Kinect angle : ' + str(self.currentAngle)
                 x = float(z) * math.cos(self.currentAngle)
                 y = float(z) * math.sin(self.currentAngle)
-                Publish.move_relative(float(x),float(y))
-                #self.publish.base.publish(NavGoalMsg('clear','relative',Pose2D(float(x),float(y),self.currentAngle)))
-                #self.publish.pan_tilt_command(getQuaternion(0,50*math.pi/180,0))
-                self.delay.delay(1)
+                self.publish.move_relative(float(x),float(y))
+                ###self.publish.set_neck(getQuaternion(0,50*math.pi/180,0))
                 self.state = 'getCommand'
-            if(self.delay.isWaitFinish()):
+            if not self.timer.is_waiting():
                 self.currentAngle += 0.3
-                #self.publish.pan_tilt_command(getQuaternion(0,0,self.currentAngle))
-                self.delay.waiting(7)
-                if(self.currentAngle >= 90*math.pi/180):
-                    #self.publish.pan_tilt_command(getQuaternion(0,50*math.pi/180,0))
-                    selfdelay.delay(1)
-                    Publish.speak("I did not found anyone.")
-                    #call(['espeak','I did not found anyone.','-ven+f4','-s 150'])
-                    #self.publish.base.publish(location_list['bar'])			
+                print self.currentAngle
+                self.timer.wait(3)
+                if self.currentAngle >= 90*math.pi/180:
+                    self.speak("I did not found anyone.")
                     self.state = 'error'
+                else:
+                    self.publish.set_neck(0, 0, self.currentAngle)
 
         elif self.state == 'getCommand':
-            if device == Devices.base and data == 'SUCCEEDED' :
-                #self.publish.pan_tilt_command(getQuaternion(0,0,0))
-                self.delay.delay(1)
-                Publish.speak("Hello, What is your name.")
-                #call(['espeak','Hello, What is your name.','-ven+f4','-s 150'])
+            if device == Devices.base and data == 'SUCCEEDED':
+                self.speak("Hello, What is your name?")
                 self.state = 'waitForName'
-    
-
 
         elif self.state == 'waitForName':
             if device == Devices.voice:
                 for i in self.people_name:
-                    if(i in data):
-                        Publish.speak("Are you " + i)
-                        #call(['espeak','Are you ' + i,'-ven+f4','-s 150'])
+                    if i in data:
+                        self.speak("Are you " + i + "?")
                         self.temp = i
                         self.state = 'ConfirmName'
                         break
 
-
         elif self.state == 'ConfirmName':
             if device == Devices.voice and 'yes' in data:
-                self.peopleName = self.temp
-                Publish.speak('Hello '+self.temp +' what do you want')
-                #call(['espeak','Hello '+self.temp +' what do you want','-ven+f4','-s 150'])
+                self.peopleName.append(self.temp)
+                self.speak('Hello ' + self.temp + ', what do you want?')
                 self.state = 'waitForObject'
-            elif(device == Devices.voice and 'no' in data):
-
-                Publish.speak('Hello,What is your name')
-                #call(['espeak','Hello,What is your name','-ven+f4','-s 150'])
+            elif device == Devices.voice and 'no' in data:
+                self.speak('Hello, What is your name?')
                 self.state = 'waitForName'
-
 
         elif self.state == 'waitForObject':
             if device == Devices.voice:
                 for i in self.object_list:
-                    if(i in data):
-                        Publish.speak('you want ' + i +' yes or no ')
-                        #call(['espeak','you want ' + i +' yes or no ','-ven+f4','-s 150'])
-                        self.objectName = i
+                    if i in data:
+                        self.speak('you want ' + i +' yes or no?')
+                        self.temp = i
                         self.state = 'ConfirmObject'
                         break
 
-
-
         elif self.state == 'ConfirmObject':
-            if(device == Devices.voice and 'yes' in data):
-                self.desiredObject = self.object_mapping[self.objectName]
-                self.objectName = self.temp
-                #self.publish.base.publish(location_list['bar_table_pos_'+str(self.currentTime)])
-                self.move_robot('bar')
-                self.delay.delay(1)
-                #state  = "waitForLocation"
-                self.state  = "MOVE_BASE"
-            elif(device == 'voice' and 'no' in data):
-                Publish.speak('Hello '+self.peopleName +' what do you want')
-                #call(['espeak','Hello '+self.peopleName +' what do you want','-ven+f4','-s 150'])
+            if device == Devices.voice and 'yes' in data:
+                self.objectName.append(self.temp)
+                #self.desiredObject = self.object_mapping[self.temp]
+                self.currentObject += 1
+                if self.currentObject == self.totalObject:
+                    self.currentAngle = -90*math.pi/180
+                    self.currentObject  = 0
+                    self.move_robot('hallway table')
+                    self.state = "MOVE_BASE"
+                else:
+                    self.move_robot('kitchen')
+                    self.state = "gotoKitchenRoom"
+            elif device == 'voice' and 'no' in data:
+                self.speak('Hello ' + self.peopleName[self.currentObject] + ' what do you want?')
                 self.state = 'waitForObject'
 
-
-        elif self.state == 'MOVE_BASE':	
-            if(device == Devices.base and data == 'SUCCEEDED'):
-                Publish.speak('I reach the destination.')
-                #call(['espeak','I reach the destination.','-ven+f4','-s 150'])
-                self.currentObjectNumber  = 0
-                self.state = "GET_OBJECT"
-                self.delay.delay(2)
-                self.findObjectPointPublisher.publish(String("start"));
+        elif self.state == 'MOVE_BASE':
+            if device == Devices.base and data == 'SUCCEEDED':
+                self.speak('I reach the destination.')
+                self.state = "PICK_OBJECT"
+                #self.state = "GET_OBJECT"
+                #self.findObjectPointPublisher.publish(String("start"))
 
         elif self.state == 'GET_OBJECT':
-            #if(device == Devices.recognition):
-            if(device == "recognition"):
+            if device == "recognition":
                 objects = []
-                #call(["aplay","/home/skuba/skuba_athome/main_state/sound/accept.wav"])
-                if(data.isMove):
+                if data.isMove:
                     #go closer
                     pass
                 else:
@@ -229,7 +184,7 @@ class CockTailParty(BaseState):
                         print "type : " + str(obj.category) + " x : " + str(centroidVector.x) + " y : " + str(centroidVector.y) + " z : " + str(centroidVector.z)
 
                     if( self.currentTime < movingTime):
-                        Publish.speak("go to next position.")
+                        self.speak("go to next position.")
                         #call(["espeak","-ven+f4","go to next position.","-s 150"])
                         rospy.loginfo("go to next position")
 
@@ -245,64 +200,62 @@ class CockTailParty(BaseState):
                         self.state = "ERROR"
 
         elif self.state == "PICK_OBJECT":
-            if(device == Devices.manipulator and data == 'finish'):
-                #call(["espeak","-ven+f4","I got it","-s 150"])
-                Publish.speak("I got it.")
-                #heightCmdPublisher.publish(Float64(1.1))
-                #normalInitialize()
-                #heightCmdPublisher.publish(Float64(1.21))
-                #tiltKinectCmdPublisher.publish(Float64(-0.40))
-                self.move_robot('living room')
-                self.delay.delay(1)
+            if device == Devices.manipulator and data == 'finish':
+                self.speak("I got it.")
+                self.move_robot('stove')
                 self.state = 'GO_TO_LIVING_ROOM_WITH_OBJECT'
 
-
-
         elif self.state == "GO_TO_LIVING_ROOM_WITH_OBJECT":
-            if(device == Devices.base and data == 'SUCCEEDED'):
-                #call(["espeak","-ven+f4",self.peopleName + ". please wave your hand.","-s 150"])
-                Publish.speak(self.peopleName + ". please wave your hand.")
-                #self.publish.pan_tilt_command(getQuaternion(0,0,currentAngle))
-                self.delay.waiting(3)
+            if device == Devices.base and data == 'SUCCEEDED':
+                self.publish.set_neck(0, 0, self.currentAngle)
+                self.speak(self.peopleName[self.currentObject] + ". please wave your hand.")
                 self.state = 'SEARCH_GESTURE_WITH_OBJECT'
 
-
         elif self.state == 'SEARCH_GESTURE_WITH_OBJECT':
-            if(device == 'gesture'):
-                # x,y = from gesture
-                x,y,z = data.split(',')
-                x = float(z) * math.cos(currentAngle)
-                y = float(z) * math.sin(currentAngle)
-                Publish.move_relative(float(x),float(y))
-                #self.publish.base.publish(NavGoalMsg('clear','relative',Pose2D(float(x),float(y),currentAngle)))
-                #self.publish.pan_tilt_command(getQuaternion(0,50*math.pi/180,0))
-                self.delay.delay(1)
+            if device == 'gesture':
+                self.speak("I see you.")
+                x,y,z = data.split(',') # x,y = from gesture
+                #print 'Kinect angle : ' + str(self.currentAngle)
+                x = float(z) * math.cos(self.currentAngle)
+                y = float(z) * math.sin(self.currentAngle)
+                self.publish.move_relative(float(x),float(y))
+                ###self.publish.set_neck(getQuaternion(0,50*math.pi/180,0))
                 self.state = 'SERVE_ORDER'
-            if(self.delay.isWaitFinish()):
-                currentAngle += 0.3
-                self.publish.pan_tilt_command(getQuaternion(0,0,currentAngle))
-                self.delay.waiting(7)
-                if(currentAngle >= 90*math.pi/180):
-                    #self.publish.pan_tilt_command(getQuaternion(0,50*math.pi/180,0))
-                    self.delay.delay(1)
-                    call(["espeak","-ven+f4","lost master","-s 150"])
-                    #self.publish.base.publish(location_list['bar'])			
+            if not self.timer.is_waiting():
+                self.currentAngle += 0.3
+                print self.currentAngle
+                self.timer.wait(5)
+                if self.currentAngle >= 90*math.pi/180:
+                    self.speak("I did not found anyone.")
+                    self.state = 'error'
+                else:
+                    self.publish.set_neck(0, 0, self.currentAngle)
 
         elif self.state == 'SERVE_ORDER':
-            if(device == Devices.base and data == 'SUCCEEDED'):
-                #self.publish.pan_tilt_command(getQuaternion(0,0,0))
-                self.delay.delay(1)
-                Publish.speak('This is your order. please take it.')
-                #call(['espeak','This is your order. please take it.','-ven+f4','-s 150'])
-                self.delay.delay(5)
-                self.publish.manipulator_action.publish(String('walking'))
-                self.delay.delay(3)
-                self.move_robot('outside_pos')
-                #self.publish.base.publish(location_list['out_side'])			
-                self.state = 'get out'
+            if device == Devices.base and data == 'SUCCEEDED':
+                self.speak('This is your order. please take it.')
+                self.publish.set_manipulator_action('normal_pullback')
+                self.wait(7)
+                self.state = 'WAIT_FOR_SERVE'
+
+        elif self.state == 'WAIT_FOR_SERVE':
+            self.publish.set_manipulator_action('grip_open')
+            self.publish.set_manipulator_action('walking')
+            self.wait(2)
+            self.state = 'CHECK_OBJECT'
+
+        elif self.state == 'CHECK_OBJECT':
+            if device == Devices.manipulator and data == 'finish':
+                self.currentObject += 1
+                if self.currentObject == self.totalObject:
+                    self.move_robot('bed')
+                    self.state = 'get out'
+                else:
+                    self.move_robot('bar')
+                    self.state = "MOVE_BASE"
 
         elif self.state == 'get out':
-            if(device == Device.base and data == 'SUCCEEDED'):
+            if device == Devices.base and data == 'SUCCEEDED':
                 self.state = 'finish'
 
 if __name__ == '__main__':

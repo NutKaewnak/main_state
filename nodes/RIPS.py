@@ -12,7 +12,7 @@ class RIPS(BaseState):
     def __init__(self):
         BaseState.__init__(self)
 
-        Publish.set_height(1.27)
+        Publish.set_height(1.0)
         rospy.loginfo('Start RIPS State')
         rospy.spin()
 
@@ -27,15 +27,23 @@ class RIPS(BaseState):
             Publish.set_manipulator_action('walking')
         elif self.state == 'passDoor':
             if device == Devices.base and data == 'SUCCEEDED':
+                self.move_robot('hallway table')
                 self.state = 'goToTable'
-                # send to base
-                self.move_robot('register_pos')
         elif self.state == 'goToTable':
             if device == Devices.base and data == 'SUCCEEDED':
-                self.state = 'moveArm'
                 # send to arm
-                Publish.set_manipulator_action('rips_out')
-                Publish.set_neck(0, 0, 0)
+                #Publish.set_manipulator_action('rips_out')
+                #Publish.set_neck(0, 0, 0)
+                self.speak('I will go closer')
+                #Publish.move_relative(0.6,0)
+                self.wait(2)
+                #self.state = 'goCloser'
+        elif self.state == 'goCloser':
+            if device == Devices.base and data == 'SUCCEEDED':
+                self.speak('succeeded')
+            elif device == Devices.base and data == 'ABORTED':
+                self.speak('aborted')
+                self.state = 'error'
         elif self.state == 'moveArm':
             if device == Devices.manipulator and data == 'finish':
                 Publish.speak("Hello Sir, My name is Lumyai. I came from Kasetsart University Thailand. I am a robot from planet earth, came here to service you. Please accept this registration.")

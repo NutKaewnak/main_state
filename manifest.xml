@@ -14,7 +14,7 @@
   <depend package="tf"/>
   <depend package="dynamic_reconfigure"/>
   <depend package="lumyai_navigation_msgs"/>
-  <depend package="object_perception"/>
+  <depend package="object_recognition"/>
 
 </package>
 

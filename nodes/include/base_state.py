@@ -13,8 +13,8 @@ from std_msgs.msg import String
 from lumyai_navigation_msgs.msg import NavGoalMsg
 from geometry_msgs.msg import Vector3
 from geometry_msgs.msg import Pose2D
-from object_perception.msg import Object
-from object_perception.msg import ObjectContainer
+from object_recognition.msg import Object
+from object_recognition.msg import ObjectContainer
 
 class Devices:
     door = 'door'
@@ -33,7 +33,7 @@ class BaseState:
         rospy.Subscriber('/voice/output', String, self.callback_voice)
         rospy.Subscriber('/follow/point', NavGoalMsg, self.callback_follow)
         rospy.Subscriber('/base/base_pos', Pose2D, self.callback_base_position)
-        rospy.Subscriber('/detect_object', ObjectContainer, self.callback_findobject)
+        rospy.Subscriber('/detected_object', ObjectContainer, self.callback_findobject)
         rospy.Subscriber('/color_detect', Vector3,self.callback_colorDetector)
         self.delay = Delay()
         self.reconfig = Reconfig()
