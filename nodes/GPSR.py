@@ -33,6 +33,7 @@ class GPSR(BaseState):
         lc_filename = roslib.packages.get_pkg_dir('main_state') + '/config/command_config/location_categories.txt'
         oc_filename = roslib.packages.get_pkg_dir('main_state') + '/config/command_config/object_categories.txt'
         ol_filename = roslib.packages.get_pkg_dir('main_state') + '/config/command_config/object_locations.txt'
+        self.state = 'wait'
         self.command = ''
         self.command_extractor = CommandExtractor()
         self.current_action_index = 0
@@ -73,6 +74,7 @@ class GPSR(BaseState):
     def prepareManipulate(self, height):
         Publish.set_height(height)
         Publish.set_manipulator_action('prepare')
+        Publish.set_neck(0,-0.70,0)
 
     def startAction(self, action):
         if action.action in self.verb_categories['go']:

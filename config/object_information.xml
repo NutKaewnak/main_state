@@ -1,19 +1,33 @@
 <object_information>
 
     <category name="cleaning stuff" location="hallway table">
-        <object name="deodorant" />
-        <object name="tooth paste" />
-        <object name="cleaner" />
-        <object name="fresh discs" isManipulate="False" />
+        <object name="vaseline" />
+        <object name="loreal" />
+        <object name="wd" />
+        <object name="silicone" isManipulate="False" />
+	<object name="sunlight" />
     </category>
 
     <category name="drink" location="bar">
-        <object name="beer bottle" />
-        <object name="beer can" />
-        <object name="coke" />
-        <object name="fanta" />
-        <object name="milk" />
-        <object name="chocolate milk" />
+        <object name="fanta green" />
+        <object name="fanta red" />
+        <object name="minute maid" />
+        <object name="nescafe" />
+        <object name="milo" />
+        <object name="lactasoy" />
+    </category>
+
+    <category name="snacks" location="sidetable">
+        <object name="pringles" />
+        <object name="meter" />
+        <object name="blaster" />
+    </category>
+
+    <category name="food" location="stove">
+        <object name="knorr" />
+        <object name="redondo" />
+        <object name="quick" />
+	<object name="peter pan" />
     </category>
 
     <category name="unknown" location="trash" action_place="place_trash">
