@@ -33,7 +33,6 @@ class GPSR(BaseState):
         lc_filename = roslib.packages.get_pkg_dir('main_state') + '/config/command_config/location_categories.txt'
         oc_filename = roslib.packages.get_pkg_dir('main_state') + '/config/command_config/object_categories.txt'
         ol_filename = roslib.packages.get_pkg_dir('main_state') + '/config/command_config/object_locations.txt'
-        self.state = 'wait'
         self.command = ''
         self.command_extractor = CommandExtractor()
         self.current_action_index = 0
@@ -45,6 +44,8 @@ class GPSR(BaseState):
         self.object_locations = readFileToDic(ol_filename)
         self.ask_data = None
         self.object_location = None
+        self.starting_point = 'bed'
+        self.exit_point = 'outside_pos'
         rospy.spin()
 
     def findObjectCategory(self, object):
@@ -58,12 +59,12 @@ class GPSR(BaseState):
 
     def startMoving(self, action):
         if action.action in self.verb_categories['exit']:
-            self.move_robot('outside_pos')
+            self.move_robot(self.exit_point)
         if action.action in self.verb_categories['go']:
             if action.data:
                 self.move_robot(action.data)
             else:
-                self.move_robot('outside_pos')
+                self.move_robot(self.exit_point)
         elif action.action in self.verb_categories['bring']:
             self.move_robot(self.object_location)
         self.wait(2)
@@ -104,7 +105,7 @@ class GPSR(BaseState):
             #rospy.loginfo('Current action : %s,%s,%s'%(self.current_action.action,self.current_action if self.current_action.object else 'None',self.current_action.data if self.current_action.data else 'None'))
             self.startAction(self.current_action)
         else:
-            self.move_robot('start_pos')
+            self.move_robot(self.starting_point)
             self.wait(2)
             self.state = 'return'
 
@@ -116,7 +117,7 @@ class GPSR(BaseState):
                 self.state = 'pass_door'
         elif self.state == 'pass_door':
             if device == Devices.base and data == 'SUCCEEDED':
-                self.move_robot('start_pos')
+                self.move_robot(self.starting_point)
                 self.state = 'go_to_start'
         elif self.state == 'go_to_start':
             if device == Devices.base and data == 'SUCCEEDED':
@@ -229,7 +230,7 @@ class GPSR(BaseState):
                             self.speak('I found %s'%self.current_action.object)
                     if not found:
                         self.speak('object not found.')
-                        self.move_robot('start_pos')
+                        self.move_robot(self.starting_point)
                         self.wait(2)
                         self.state = 'deliver'
         elif self.state == 'get_object':
@@ -238,7 +239,7 @@ class GPSR(BaseState):
                     self.move_robot(self.current_action.data)
                     self.wait(2)
                 else:
-                    self.move_robot('start_pos')
+                    self.move_robot(self.starting_point)
                     self.wait(2)
                 self.state = 'deliver'
         elif self.state == 'deliver':
