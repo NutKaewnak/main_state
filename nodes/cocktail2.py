@@ -80,7 +80,7 @@ class CockTailParty(BaseState):
         elif self.state == 'searchGesture':
             if device == 'gesture':
                 self.speak("I see you.")
-                x,y,z = data.split(',') # x,y = from gesture 
+                x,y,z = data.split(',') # x,y = from gesture
                 #print 'Kinect angle : ' + str(self.currentAngle)
                 x = float(z) * math.cos(self.currentAngle)
                 y = float(z) * math.sin(self.currentAngle)
