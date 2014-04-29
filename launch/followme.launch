@@ -1,0 +1,9 @@
+<launch>
+
+  <node name="main_state" pkg="main_state" type="followme.py" output="screen" />
+ <!-- <node name="gesture" pkg="gesture" type="testo" output="screen">
+    <param name="path_file" value="$(find gesture)"/>
+  </node>-->
+  <include file="$(find pocketsphinx)/launch/followme.launch" /> 
+
+</launch>
