@@ -133,7 +133,7 @@ class CockTailParty(BaseState):
         elif self.state == 'MOVE_BASE':
             if device == Devices.base and data == 'SUCCEEDED':
                 self.speak('I reach the destination.')
-                Publish.set_height(1.1)
+                Publish.set_height(self.location_list['bar'].height + 0.3)
                 Publish.set_manipulator_action('prepare')
                 Publish.set_neck(0,-0.70,0)
                 self.state = "PREPARE"
@@ -162,9 +162,7 @@ class CockTailParty(BaseState):
                     self.neck_counter += 1
                     if self.current_action >= 90.0 * math.pi / 180.0:
                         self.speak('%s not found'%self.current_action.object)
-                        #self.move_robot(self.starting_point)
                         self.wait(2)
-                        #self.state = 'deliver'
                     if self.neck_counter % 2 == 0:
                         self.current_angle += 0.2
                         Publish.set_neck(0, 0, self.current_angle)
