@@ -1,6 +1,6 @@
 <object_information>
 
-    <category name="cleaning stuff" location="hallway table">
+    <category name="cleaning stuff" location="bench">
         <object name="vaseline" />
         <object name="loreal" />
         <object name="wd" />
@@ -8,7 +8,7 @@
 	<object name="sunlight" />
     </category>
 
-    <category name="drink" location="bar">
+    <category name="drink" location="bench">
         <object name="fanta green" />
         <object name="fanta red" />
         <object name="minute maid" />
@@ -17,13 +17,13 @@
         <object name="lactasoy" />
     </category>
 
-    <category name="snacks" location="sidetable">
+    <category name="snacks" location="bench">
         <object name="pringles" />
         <object name="meter" />
         <object name="blaster" />
     </category>
 
-    <category name="food" location="stove">
+    <category name="food" location="bench">
         <object name="knorr" />
         <object name="redondo" />
         <object name="quick" />

@@ -1,8 +1,8 @@
 <location_list>
-	<location name="bench" position="-7.708, -1.665" rotation="-1.409" height="1.29"/>
 	<locaiton name="hallway table" position="-12.183, -1.70" rotation="-3.121" height="0.75"/>
-	<location name="hanger" position="-6.992, 4.092" rotation="-1.432" height="1.29"/>
-	<location name="umbrella stand" position="-11.465, 5.294" rotation="0.067" height="1.29"/>
+	<location name="umbrella stand" position="-12.183, -1.70" rotation="-3.121" height="0.75"/>
+	<location name="bench" position="-12.118, -2.493" rotation="-3.019" height="0.75"/>
+	<location name="hanger" position="-10.374, -1.60" rotation="-3.132" height="1.29"/>
 	<location name="bar" position="-9.302, -1.238" rotation="-1.75" height="1.29"/>
 	<location name="sidetable" position="1.381, -0.816" rotation="0.125" height="1.29"/>
 	<location name="kitchen table" position="-5.728, -0.590" rotation="1.711" height="1.29"/>
@@ -13,10 +13,10 @@
 	<location name="sink" position="-9.931, -1.010" rotation="1.729" height="1.29"/>
 	<location name="fridge" position="-11.948, 9.404" rotation="0.009" height="1.29"/>
 	<location name="bed" position="-6.955, -0.753" rotation="0.130" height="1.29"/>
-	<location name="dresser" position="-17.030, 12.295" rotation="1.514" height="1.29"/>
-	<location name="sideboard" position="1.381, -0.816" rotation="0.009" height="1.29"/>
-	<location name="bedsied table" position="-19.383, 12.532" rotation="3.091" height="1.29"/>
-	<location name="bookshelf" position="-7.210, 6.765" rotation="0.017" height="1.29"/>
+	<location name="dresser" position="7.357, -5.238" rotation="-2.099" height="0.82"/>
+	<location name="sideboard" position="7.667, -2.735" rotation="-2.094" height="0.82"/>
+	<location name="bedsied table" position="8.606, -4.995" rotation="-0.509" height="0.82"/>
+	<location name="bookshelf" position="8.651, -1.938" rotation="-2.036" height="0.82"/>
 	<location name="pantry" position="-14.955, 7.951" rotation="1.560" height="1.29"/>
 	<location name="cabinet" position="0.139, 0.217" rotation="1.756" height="1.29"/>
 	<location name="dinner table" position="-16.139, 4.506" rotation="1.512" height="1.29"/>
