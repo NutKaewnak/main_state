@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import rospy
 import roslib
+import math
 from include.function import *
 from include.publish import *
 from include.base_state import *
@@ -32,7 +33,6 @@ class GPSR(BaseState):
         vc_filename = roslib.packages.get_pkg_dir('main_state') + '/config/command_config/verb_categories.txt'
         lc_filename = roslib.packages.get_pkg_dir('main_state') + '/config/command_config/location_categories.txt'
         oc_filename = roslib.packages.get_pkg_dir('main_state') + '/config/command_config/object_categories.txt'
-        ol_filename = roslib.packages.get_pkg_dir('main_state') + '/config/command_config/object_locations.txt'
         self.state = 'wait'
         self.command = ''
         self.command_extractor = CommandExtractor()
@@ -42,24 +42,16 @@ class GPSR(BaseState):
         self.verb_categories = readFileToDic(vc_filename)
         self.location_categories = readFileToDic(lc_filename)
         self.object_categories = readFileToDic(oc_filename)
-        self.object_locations = readFileToDic(ol_filename)
         self.ask_data = None
         self.object_location = None
         self.starting_point = 'bed'
         self.exit_point = 'outside_pos'
-        self.current_angle = 0.0
-        self.angle_step = 0.2
+        self.current_angle = -60 * math.pi / 180
+        self.max_pan_angle = 60 * math.pi / 180
+        self.angle_step = 0.42
         self.neck_counter = 0
+        self.height_offset = 0.05
         rospy.spin()
-
-    def findObjectCategory(self, object):
-        for c in self.object_categories.keys():
-            if object in self.object_categories[c]:
-                return c
-
-    def findObjectLocation(self, object):
-        category = self.findObjectCategory(object)
-        return self.object_locations[category][0]
 
     def startMoving(self, action):
         if action.action in self.verb_categories['exit']:
@@ -132,6 +124,7 @@ class GPSR(BaseState):
             if device == Devices.voice and self.command_extractor.isValidCommand(data):
                 self.command = data
                 Publish.set_height(1.0)
+                Publish.set_neck(0.0, 0.0, 0.0)
                 self.speak('did you say %s.' % data)
                 self.state = 'confirm'
         elif self.state == 'confirm':
@@ -208,7 +201,8 @@ class GPSR(BaseState):
             if device == Devices.base and data == 'SUCCEEDED':
                 if self.current_action.action in self.verb_categories['bring']:
                     self.speak('I will get %s'%self.current_action.object)
-                    self.prepareManipulate(1.1)
+                    rospy.loginfo(self.location_list[self.object_location].height)
+                    self.prepareManipulate(self.location_list[self.object_location].height + self.height_offset)
                     self.state = 'prepare'
                 elif self.current_action.action in self.verb_categories['go']:
                     self.speak('I reach the %s'%self.current_action.data)
@@ -216,13 +210,13 @@ class GPSR(BaseState):
         elif self.state == 'prepare':
             if device == Devices.manipulator and data == 'finish':
                 self.state = 'object_search'
-                Publish.find_object(0.7)
+                Publish.find_object(self.location_list[self.object_location].height)
         elif self.state == 'object_search':
             if device == Devices.recognition:
                 found = False
                 for object in data.objects:
-                    rospy.loginfo(object.category)
-                    if object.category == self.current_action.object:
+                    #if object.category == self.current_action.object:
+                    if object.category == 'quick':
                         found = True
                         objCentroid = Vector3()
                         objCentroid.x = object.point.x
@@ -233,17 +227,16 @@ class GPSR(BaseState):
                         self.state = 'get_object'
                         self.speak('I found %s'%self.current_action.object)
                 if not found:
-                    self.neck_counter += 1
-                    if self.current_action >= 90.0 * math.pi / 180.0:
-                        self.speak('%s not found'%self.current_action.object)
+                    if self.current_angle >= self.max_pan_angle:
+                        self.speak('Object not found')
                         self.move_robot(self.starting_point)
                         self.wait(2)
                         self.state = 'deliver'
-                    if self.neck_counter % 2 == 0:
-                        self.current_angle += 0.2
-                        Publish.set_neck(0, 0, self.current_angle)
+                        Publish.set_neck(0, -0.7, 0.0)
                     else:
-                        Publish.set_neck(0, 0, -1.0 * self.current_angle)
+                        self.current_angle += self.angle_step
+                        Publish.set_neck(0, -0.7, self.current_angle)
+                        Publish.find_object(self.location_list[self.object_location].height)
         elif self.state == 'get_object':
             if device == Devices.manipulator and data == 'finish':
                 if self.current_action.data:
@@ -278,6 +271,7 @@ class GPSR(BaseState):
                 self.actions = []
                 self.current_action_index = 0
                 self.current_action = None
+                self.object_location = None
                 self.state = 'wait'
 
 if __name__ == '__main__':
