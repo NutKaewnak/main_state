@@ -142,7 +142,7 @@ class FINALDEMO(BaseState):
                 self.state = 'goToAlert'
 
         elif self.state == 'goToAlert':
-                #self.move_robot('bed')
+                self.move_robot('bed')
                 self.wait(2)
                 self.speak("walking g g g ")
                 self.state = 'alert'
