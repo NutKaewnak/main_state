@@ -1,0 +1,6 @@
+<launch>
+
+  <node name="main_state" pkg="main_state" type="restaurant.py" output="screen" />
+  <include file="$(find pocketsphinx)/launch/restaurant.launch" /> 
+
+</launch>
