@@ -12,14 +12,16 @@ roslib.load_manifest('main_state')
 class FINALDEMO(BaseState):
     def __init__(self):
         BaseState.__init__(self)
-        self.desiredObject = 1 #NOTE 1 = cornflakes
-        self.desiredObject2 = 2#NOTE 2 = milk
-     #       Publish.set_height(1.27)
+        self.desiredObject = "kokokrunch" #NOTE 1 = cornflakes
+        self.desiredObject2 = "dutchmilk"#NOTE 2 = milk
+        self.state = "readyToCook"
         rospy.loginfo('Start Final Demo State')
         rospy.spin()
 
     def main(self, device, data):
-        rospy.loginfo("state:" + self.state + " from:" + device + " data:" + str(data))
+        if(device != Devices.color_detector):
+            rospy.loginfo("state:" + self.state + " from:" + device + " data:" + str(data))
+        #rospy.loginfo("state:" + self.state + " from:" + device)
 
         if self.state == 'init':
                 self.move_robot('bed')
@@ -54,34 +56,38 @@ class FINALDEMO(BaseState):
                 self.state = 'readyToCook'
 
         elif self.state == 'readyToCook':
-                if(device == Devices.base and data =='SUCCEEDED'):
-                        Publish.find_object(String("start"))
-                        Publish.speak("Finding ingrediants.")
-                        self.state = 'serve'
-                        #self.state = 'searchingCornflake' #NOTE DEBUG
-        
+                #if(device == Devices.base and data =='SUCCEEDED'):#debug
+                        #self.state = 'serve'
+                        Publish.set_manipulator_action('prepare')
+                        Publish.set_height(1.1)
+                        Publish.set_neck(0,-0.7,0)
+                        self.state = 'setRobotEnvironment' #NOTE DEBUG
+
+        elif self.state == 'setRobotEnvironment':
+                if(device == Devices.manipulator and data == 'finish'):
+                    Publish.find_object( 0.75 )
+                    Publish.speak("Finding ingrediants.")
+                    self.state = 'searchingCornflake'
+
         elif self.state == 'searchingCornflake':
             if device == Devices.recognition:
-                Publish.speak("Searching cornflake.")
-                object = []
-                if data.isMove:
-                    pass
-                else:
-                    objects = data.objects
-                    for obj in objects:
-                        if obj.category == self.desiredObject: 
-                            centroidVector = Vector3()
-                            centroidVector.x = obj.point.x
-                            centroidVector.y = obj.point.y
-                            centroidVector.z = obj.point.z
-                            Publish.set_manipulate_grasp(centroidVector)
-                            self.state = 'graspingCornflake'
+                self.speak("Searching cornflake.")
+                objects = data.objects
+                for obj in objects:
+                    if obj.category == self.desiredObject:
+                        centroidVector = Vector3()
+                        centroidVector.x = obj.point.x
+                        centroidVector.y = obj.point.y
+                        centroidVector.z = obj.point.z
+                        Publish.set_manipulator_action_grasp(centroidVector)
+                        self.state = 'graspingCornflake'
 
         elif self.state == 'graspingCornflake':
             if device == Devices.manipulator and data == 'finish':
                 self.state = 'trackingBowl'
 
         elif self.state == 'trackingBowl':
+            self.speak("Track a bowl")
             if device == Devices.color_detector:
                 Publish.speak("searching a bowl.")
                 Publish.set_manipulator_action_pour(data)
@@ -92,30 +98,29 @@ class FINALDEMO(BaseState):
             if device == Devices.manipulator and data == 'finish':
                 Publish.speak("discard cornflake.")
                 self.wait(3)
-                Publish.set_manipulator_action('normal_pullback')
-                if device == Devices.manipulator and data == 'finish':
-                        Publish.findObject(String("start"))
-                        self.state = 'searchingMilk'
+                Publish.set_manipulator_action('cornflake_pullback')
+                self.state = 'discarding'
+
+        elif self.state =='discarding':
+            if device == Devices.manipulator and data == 'finish':
+                    Publish.find_object( 0.75 )
+                    self.state = 'searchingMilk'
 
         elif self.state == 'searchingMilk':
                 if device == Devices.recognition:
                     Publish.speak("Searching milk")
-                    object = []
-                    if data.isMove:
-                        pass
-                    else:
-                        objects = data.objects
-                        for obj in objects:
-                            if obj.category == desiredObject2:
-                                centroidVector = Vector3()
-                                centroidVector.x = obj.point.x
-                                centroidVector.y = obj.point.y
-                                centroidVector.z = obj.point.z
-                                Publish.set_manipulator_action_grasp(centroidVector)
-                                self.state = 'graspingMilk'
+                    objects = data.objects
+                    for obj in objects:
+                        if obj.category == self.desiredObject2:
+                            centroidVector = Vector3()
+                            centroidVector.x = obj.point.x
+                            centroidVector.y = obj.point.y
+                            centroidVector.z = obj.point.z
+                            Publish.set_manipulator_action_grasp(centroidVector)
+                            self.state = 'graspingMilk'
 
         elif self.state == 'graspingMilk':
-            if device == Devices.manipulate and data == 'finish':
+            if device == Devices.manipulator and data == 'finish':
                 self.state = 'trackingBowl_2'
 
         elif self.state == 'trackingBowl_2':
@@ -126,23 +131,24 @@ class FINALDEMO(BaseState):
                 self.state = 'discardMilk'
 
         elif self.state == 'discardMilk':
-            if device == Devices.manipulate and data == 'finish':
+            if device == Devices.manipulator and data == 'finish':
                 self.wait(3)
-                Publish.set_manipulator_action('normal_pullback')
+                Publish.set_manipulator_action('cornflake_pullback')
                 self.state = 'serve'
 
         elif self.state == 'serve':
-            #if device == Devices.manipulate and data == 'finish': NOTE DEBUG
-             if device == Devices.base and base == 'SUCCEEDED': #NOTE DEBUG
+             if device == Devices.manipulator and data == 'finish': #NOTE DEBUG
+             #if device == Devices.base and base == 'SUCCEEDED': #NOTE DEBUG
                 self.state = 'goToAlert'
 
         elif self.state == 'goToAlert':
-                self.move_robot('bed')
+                #self.move_robot('bed')
                 self.wait(2)
+                self.speak("walking g g g ")
                 self.state = 'alert'
 
         elif self.state == 'alert':
-                if(device == Devices.base and data == 'SUCCEEDDED'):
+                if(device == Devices.base and data == 'SUCCEEDED'):
                         Publish.speak("the breakfast is ready to serve.")
                         self.state = 'finish'
 
