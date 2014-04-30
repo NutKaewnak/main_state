@@ -6,9 +6,8 @@ from include.function import *
 from include.publish import *
 from include.base_state import *
 from include.delay import *
-
-#from object_perception.msg import Object
-#from object_perception.msg import ObjectContainer
+from geometry_msgs.msg import Vector3, Pose2D
+from lumyai_navigation_msgs.msg import NavGoalMsg
 
 roslib.load_manifest('main_state')
 
@@ -19,27 +18,14 @@ class CockTailParty(BaseState):
 
         rospy.Subscriber("/gesture/point", PointStamped, self.cb_gesture)
         rospy.Subscriber("/detected_object", ObjectContainer, self.cb_detectedObject)
-        self.object_mapping = {}
-        self.object_mapping['green tea'] = 1
-        self.object_mapping['water'] = 2
-        self.object_mapping['est'] = 3
-        self.object_mapping['fanta'] = 4
-        self.object_mapping['corn flakes'] = 5
-        self.object_mapping['lay'] = 6
-        self.object_mapping['pringles'] = 7
-        self.object_mapping['milk'] = 8
-        self.object_mapping['orange juice'] = 9
-        self.object_mapping['milo'] = 10
 
         self.people_name = ['michael','christopher','matthew','joshua','daniel','david','andrew','james','justin','joseph','jessica','ashley','brittany','amanda','samantha','sarah','stephanie','jennifer','elizabeth','lauren']
-        self.object_list = ['pringles','lay','water','apple juice','green tea','milk','s','fanta','corn flakes','corn']
 
         self.isInit  = False
         self.currentAngle = -90*math.pi/180
         self.temp = ''
         self.currentObject = 0
-        self.totalObject = 3 
-        self.currentTime = 0
+        self.totalObject = 3
         self.peopleName = []
         self.objectName = []
         self.desiredObject = ''
@@ -58,10 +44,10 @@ class CockTailParty(BaseState):
         rospy.loginfo("state:" + self.state + " from:" + device + " data:" + str(data))
         if self.state == 'init':
             if device == Devices.door and data == 'open':
-                self.publish.move_relative(1.5, 0)
+                Publish.move_relative(1.5, 0, 0)
                 self.state = 'passDoor'
             if not self.isInit:
-                self.publish.set_manipulator_action('walking')
+                Publish.set_manipulator_action('walking')
                 self.isInit = True
 
         elif self.state == 'passDoor':
@@ -81,10 +67,9 @@ class CockTailParty(BaseState):
             if device == 'gesture':
                 self.speak("I see you.")
                 x,y,z = data.split(',')
-                #print 'Kinect angle : ' + str(self.currentAngle)
                 x = float(z) * math.cos(self.currentAngle)
                 y = float(z) * math.sin(self.currentAngle)
-                self.publish.move_relative(float(x),float(y))
+                Publish.move_relative(float(x),float(y), 0)
                 self.state = 'getCommand'
             if not self.timer.is_waiting():
                 self.currentAngle += 0.3
@@ -121,18 +106,16 @@ class CockTailParty(BaseState):
 
         elif self.state == 'waitForObject':
             if device == Devices.voice:
-                object_found = object_info.get_object_from_str(data)
+                object_found = self.object_info.get_object_from_str(data)
                 if len(object_found) >= 1:
                     i = object_found[0]
                     self.speak('you want ' + i +',yes or no?')
                     self.temp = i
                     self.state = 'ConfirmObject'
-                    break
 
         elif self.state == 'ConfirmObject':
             if device == Devices.voice and 'robot yes' in data:
                 self.objectName.append(self.temp)
-                #self.desiredObject = self.object_mapping[self.temp]
                 self.currentObject += 1
                 if self.currentObject == self.totalObject:
                     self.currentObject  = 0
@@ -150,55 +133,45 @@ class CockTailParty(BaseState):
         elif self.state == 'MOVE_BASE':
             if device == Devices.base and data == 'SUCCEEDED':
                 self.speak('I reach the destination.')
-                self.state = "GET_OBJECT"
-                self.findObjectPointPublisher.publish(String("start"))
+                Publish.set_height(1.1)
+                Publish.set_manipulator_action('prepare')
+                Publish.set_neck(0,-0.70,0)
+                self.state = "PREPARE"
+
+        elif self.state == 'PREPARE':
+            if device == Devices.manipulator and data == 'finish':
+                self.state = 'OBJECT_SEARCH'
+                Publish.find_object(0.7)
+
+        elif self.state == 'OBJECT_SEARCH':
+            if device == Devices.recognition:
+                found = False
+                for object in data.objects:
+                    rospy.loginfo(object.category)
+                    if object.category == self.objectName[self.currentObject]:
+                        found = True
+                        objCentroid = Vector3()
+                        objCentroid.x = object.point.x
+                        objCentroid.y = object.point.y
+                        objCentroid.z = object.point.z
+                        Publish.set_manipulator_point(objCentroid.x, objCentroid.y, objCentroid.z)
+                        rospy.loginfo('%s is at x:%f y:%f z:%f'%(self.objectName[self.currentObject],objCentroid.x,objCentroid.y,objCentroid.z))
+                        self.state = 'GET_OBJECT'
+                        self.speak('I found %s' % self.objectName[self.currentObject])
+                if not found:
+                    self.neck_counter += 1
+                    if self.current_action >= 90.0 * math.pi / 180.0:
+                        self.speak('%s not found'%self.current_action.object)
+                        #self.move_robot(self.starting_point)
+                        self.wait(2)
+                        #self.state = 'deliver'
+                    if self.neck_counter % 2 == 0:
+                        self.current_angle += 0.2
+                        Publish.set_neck(0, 0, self.current_angle)
+                    else:
+                        Publish.set_neck(0, 0, -1.0 * self.current_angle)
 
         elif self.state == 'GET_OBJECT':
-            if device == "recognition":
-                objects = []
-                if data.isMove:
-                    #go closer
-                    pass
-                else:
-                    print '--------len(data.objects) : ' +str(len(data.objects)) +  '-------'
-                    objects = data.objects
-                    for obj in objects:
-                        if obj.category == self.desiredObject:
-                            centroidVector = Vector3()
-                            centroidVector.x = obj.point.x
-                            centroidVector.y = obj.point.y
-                            centroidVector.z = obj.point.z
-
-                            self.publish.manipulator_point.publish(centroidVector)
-                            return None
-                            #manipulateInitialize()
-                            #heightCmdPublisher.publish(Float64(1.3))
-                            #heightCmdPublisher.publish(Float64(1.41))
-                            #delay.delay(2)
-
-                            #publihser sending Vector3 to manipulator node to perform manipulation
-                            #pickObjectPublisher.publish(centroidVector)
-                            #state = "PICK_OBJECT"
-                            #return None
-                        print "type : " + str(obj.category) + " x : " + str(centroidVector.x) + " y : " + str(centroidVector.y) + " z : " + str(centroidVector.z)
-
-                    if( self.currentTime < movingTime):
-                        self.speak("go to next position.")
-                        #call(["espeak","-ven+f4","go to next position.","-s 150"])
-                        rospy.loginfo("go to next position")
-
-                        #state = 'ERROR'
-                        #self.publish.base.publish(NavGoalMsg('clear','relative',Pose2D(0,0.2,0)))
-
-                        #self.publish.base.publish(location_list['bar_table_pos_'+str(self.currentTime)])
-
-                        self.delay.delay(1)
-                        self.currentTime += 1
-                        self.state = 'MOVE_BASE'
-                    else:
-                        self.state = "ERROR"
-
-        elif self.state == "PICK_OBJECT":
             if device == Devices.manipulator and data == 'finish':
                 self.speak("I got it.")
                 self.move_robot('stove')
@@ -207,7 +180,7 @@ class CockTailParty(BaseState):
         elif self.state == "GO_TO_LIVING_ROOM_WITH_OBJECT":
             if device == Devices.base and data == 'SUCCEEDED':
                 self.currentAngle = -90*math.pi/180
-                self.publish.set_neck(0, 0, self.currentAngle)
+                Publish.set_neck(0, 0, self.currentAngle)
                 self.speak(self.peopleName[self.currentObject] + ". please wave your hand.")
                 self.state = 'SEARCH_GESTURE_WITH_OBJECT'
 
@@ -215,10 +188,9 @@ class CockTailParty(BaseState):
             if device == 'gesture':
                 self.speak("I see you.")
                 x,y,z = data.split(',')
-                #print 'Kinect angle : ' + str(self.currentAngle)
                 x = float(z) * math.cos(self.currentAngle)
                 y = float(z) * math.sin(self.currentAngle)
-                self.publish.move_relative(float(x),float(y))
+                Publish.move_relative(float(x),float(y), 0)
                 self.state = 'SERVE_ORDER'
             if not self.timer.is_waiting():
                 self.currentAngle += 0.3
@@ -228,21 +200,29 @@ class CockTailParty(BaseState):
                     self.speak("I did not found anyone.")
                     self.state = 'error'
                 else:
-                    self.publish.set_neck(0, 0, self.currentAngle)
+                    Publish.set_neck(0, 0, self.currentAngle)
 
         elif self.state == 'SERVE_ORDER':
             if device == Devices.base and data == 'SUCCEEDED':
                 self.speak('This is your order. please take it.')
-                self.publish.set_manipulator_action('normal_pullback')
-                self.wait(7)
+                Publish.set_manipulator_action('normal_pullback')
                 self.state = 'WAIT_FOR_SERVE'
 
         elif self.state == 'WAIT_FOR_SERVE':
-            self.speak('gripper open.')
-            self.publish.set_manipulator_action('grip_open')
-            self.publish.set_manipulator_action('walking')
-            self.wait(2)
-            self.state = 'CHECK_OBJECT'
+            if device == Devices.manipulator and data == 'finish':
+                self.wait(2)
+                self.state = 'GRIP_OPEN'
+
+        elif self.state == 'GRIP_OPEN':
+            if device == Devices.manipulator and data == 'finish':
+                self.speak('gripper open.')
+                Publish.set_manipulator_action('grip_open')
+                self.state = 'WALKING'
+
+        elif self.state == 'WALKING':
+            if device == Devices.manipulator and data == 'finish':
+                Publish.set_manipulator_action('walking')
+                self.state = 'CHECK_OBJECT'
 
         elif self.state == 'CHECK_OBJECT':
             if device == Devices.manipulator and data == 'finish':
