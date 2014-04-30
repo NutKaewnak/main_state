@@ -131,6 +131,7 @@ class GPSR(BaseState):
         elif self.state == 'wait':
             if device == Devices.voice and self.command_extractor.isValidCommand(data):
                 self.command = data
+                Publish.set_height(1.0)
                 self.speak('did you say %s.' % data)
                 self.state = 'confirm'
         elif self.state == 'confirm':
@@ -207,7 +208,7 @@ class GPSR(BaseState):
             if device == Devices.base and data == 'SUCCEEDED':
                 if self.current_action.action in self.verb_categories['bring']:
                     self.speak('I will get %s'%self.current_action.object)
-                    self.prepareManipulate(1.27)
+                    self.prepareManipulate(1.1)
                     self.state = 'prepare'
                 elif self.current_action.action in self.verb_categories['go']:
                     self.speak('I reach the %s'%self.current_action.data)
@@ -215,36 +216,34 @@ class GPSR(BaseState):
         elif self.state == 'prepare':
             if device == Devices.manipulator and data == 'finish':
                 self.state = 'object_search'
-                Publish.find_object('start')
+                Publish.find_object(0.7)
         elif self.state == 'object_search':
             if device == Devices.recognition:
-                if data.isMove:
-                   pass
-                else:
-                    found = False
-                    for object in data.objects:
-                        if object == self.current_action.object:
-                            found = True
-                            objCentroid = Vector3()
-                            objCentroid.x = object.point.x
-                            objCentroid.y = object.point.y
-                            objCentroid.z = object.point.z
-                            Publish.set_manipulator_point(objCentroid)
-                            rospy.loginfo('%s is at x:%f y:%f z:%f'%(self.current_action.object,objCentroid.x,objCentroid.y,objCentroid.z))
-                            self.state = 'get_object'
-                            self.speak('I found %s'%self.current_action.object)
-                    if not found:
-                        self.neck_counter += 1
-                        if self.current_action >= 90.0 * math.pi / 180.0:
-                            self.speak('%s not found'%self.current_action.object)
-                            self.move_robot(self.starting_point)
-                            self.wait(2)
-                            self.state = 'deliver'
-                        if self.neck_counter % 2 == 0:
-                            self.current_angle += 0.2
-                            Publish.set_neck(0, 0, self.current_angle)
-                        else:
-                            Publish.set_neck(0, 0, -1.0 * self.current_angle)
+                found = False
+                for object in data.objects:
+                    rospy.loginfo(object.category)
+                    if object.category == self.current_action.object:
+                        found = True
+                        objCentroid = Vector3()
+                        objCentroid.x = object.point.x
+                        objCentroid.y = object.point.y
+                        objCentroid.z = object.point.z
+                        Publish.set_manipulator_point(objCentroid.x, objCentroid.y, objCentroid.z)
+                        rospy.loginfo('%s is at x:%f y:%f z:%f'%(self.current_action.object,objCentroid.x,objCentroid.y,objCentroid.z))
+                        self.state = 'get_object'
+                        self.speak('I found %s'%self.current_action.object)
+                if not found:
+                    self.neck_counter += 1
+                    if self.current_action >= 90.0 * math.pi / 180.0:
+                        self.speak('%s not found'%self.current_action.object)
+                        self.move_robot(self.starting_point)
+                        self.wait(2)
+                        self.state = 'deliver'
+                    if self.neck_counter % 2 == 0:
+                        self.current_angle += 0.2
+                        Publish.set_neck(0, 0, self.current_angle)
+                    else:
+                        Publish.set_neck(0, 0, -1.0 * self.current_angle)
         elif self.state == 'get_object':
             if device == Devices.manipulator and data == 'finish':
                 if self.current_action.data:
