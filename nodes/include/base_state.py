@@ -46,7 +46,7 @@ class BaseState:
         self.state = 'init'
 
     def callback_colorDetector(self, data):
-        self.perform_state(self, data)
+        self.perform_state(Devices.color_detector, data)
 
     def callback_findobject(self, data):
         self.perform_state(Devices.recognition, data)
