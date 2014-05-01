@@ -29,6 +29,7 @@ class CockTailParty(BaseState):
         self.peopleName = []
         self.objectName = []
         self.desiredObject = ''
+        #self.state = 'MOVE_BASE'
 
         rospy.loginfo('Cocktail state starts.')
         rospy.spin()
@@ -52,7 +53,8 @@ class CockTailParty(BaseState):
 
         elif self.state == 'passDoor':
             if device == Devices.base and data == 'SUCCEEDED':
-                self.move_robot('bench')
+                self.move_robot('kitchen counter')
+                self.wait(2)
                 self.state = 'gotoKitchenRoom'
 
         elif self.state == 'gotoKitchenRoom':
@@ -124,7 +126,7 @@ class CockTailParty(BaseState):
                     self.state = "MOVE_BASE"
                 else:
                     self.speak('I go to the kitchen.')
-                    self.move_robot('bench')
+                    self.move_robot('kitchen counter')
                     self.state = "gotoKitchenRoom"
             elif device == Devices.voice and 'robot no' in data:
                 self.speak('Hello ' + self.peopleName[self.currentObject] + ' what do you want?')
@@ -148,14 +150,13 @@ class CockTailParty(BaseState):
                 found = False
                 for object in data.objects:
                     rospy.loginfo(object.category)
-                    if object.category == self.objectName[self.currentObject]:
+                    if object.category == 'quick':#self.objectName[self.currentObject]:
                         found = True
                         objCentroid = Vector3()
                         objCentroid.x = object.point.x
                         objCentroid.y = object.point.y
                         objCentroid.z = object.point.z
                         Publish.set_manipulator_point(objCentroid.x, objCentroid.y, objCentroid.z)
-                        rospy.loginfo('%s is at x:%f y:%f z:%f'%(self.objectName[self.currentObject],objCentroid.x,objCentroid.y,objCentroid.z))
                         self.state = 'GET_OBJECT'
                         self.speak('I found %s' % self.objectName[self.currentObject])
                 if not found:
@@ -172,7 +173,7 @@ class CockTailParty(BaseState):
         elif self.state == 'GET_OBJECT':
             if device == Devices.manipulator and data == 'finish':
                 self.speak("I got it.")
-                self.move_robot('bench')
+                self.move_robot('bar')
                 self.state = 'GO_TO_LIVING_ROOM_WITH_OBJECT'
 
         elif self.state == "GO_TO_LIVING_ROOM_WITH_OBJECT":
@@ -230,7 +231,7 @@ class CockTailParty(BaseState):
                     self.state = 'get out'
                 else:
                     self.speak('I go to the destination.')
-                    self.move_robot('bench')
+                    self.move_robot('outside_pos')
                     self.state = "MOVE_BASE"
 
         elif self.state == 'get out':

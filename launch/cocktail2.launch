@@ -7,5 +7,6 @@
     <remap from="/gesture_raw" to="/gesture/point" />
   </node>
   <include file="$(find pocketsphinx)/launch/cocktail.launch" /> 
+  <include file="$(find object_recognition)/launch/search_object.launch"/>
 
 </launch>
