@@ -23,33 +23,7 @@ def main_state(device, data):
     global state, location_list, temp, command_list, location_count, current_command
 
 
-    if (state == 'waitForCommand'):
-        publish.robot_stop()
-        if (len(command_list) == 3):
-            current_command = 0
-            publish.base.publish(
-                location_list[catagory_list[object_list[command_list[current_command].objectName].catagory]])
-            delay.delay(3)
-            state = 'gotoObjectLocation'
-        elif (device == 'voice'):
-            for i in location_list.keys():
-                if (i in data):
-                    for j in object_list.keys():
-                        if (j in data):
-                            temp = Command(i, j)
-                            call(["espeak", "-ven+f4", "bring " + j + " to " + i + " yes or no ", "-s 110"])
-                            state = 'confirmCommand'
-                            return None
-    elif (state == 'confirmCommand'):
-        publish.robot_stop()
-        if (device == 'voice' and ('robot yes' in data)):
-            command_list.append(temp)
-            call(["espeak", "-ven+f4", "i will bring " + temp.objectName + " to " + temp.locationName, "-s 110"])
-            state = 'waitForCommand'
-        elif (device == 'voice' and ('robot no' in data)):
-            call(["espeak", "-ven+f4", "please say again", "-s 110"])
-            state = 'waitForCommand'
-    elif (state == 'gotoObjectLocation'):
+    if (state == 'gotoObjectLocation'):
         if (device == 'base' and data == 'SUCCEEDED'):
             call(["espeak", "-ven+f4",
                   "i am at " + catagory_list[object_list[command_list[current_command].objectName].catagory], "-s 110"])
@@ -152,10 +126,10 @@ class restaurant(BaseState):
             self.stop_robot()
             if device == Devices.voice and 'robot yes' in data:
                 if self.temp[1] in 'left':
-                    self.master_position.theta += pi/2.0
-                elif self.temp[1] in 'right':
                     self.master_position.theta -= pi/2.0
-                self.location_list[self.temp[0]] = NavGoalMsg('clear', 'absolute', self.master_position)
+                elif self.temp[1] in 'right':
+                    self.master_position.theta += pi/2.0
+                self.location_list[self.temp[0]] = LocationInfo(self.temp[0], self.master_position, 0.7)
                 self.speak("I remember " + self.temp[0])
                 self.state = 'waitForLocationName'
             elif device == Devices.voice and 'robot no' in data:
@@ -184,6 +158,13 @@ class restaurant(BaseState):
             elif device == Devices.voice and 'robot no' in data:
                 self.speak("Waiting for command.")
                 self.state = 'waitForCommand'
+        elif self.state == 'gotoObjectLocation':
+            if device == Devices.base and 'SUCCEEDED' in data:
+                self.speak('I am at location one. I will go to location two.')
+                self.move_robot('location two')
+                self.wait(2)
+                self.state = 'gotoServeLocation'
+
 
 
 if __name__ == '__main__':
