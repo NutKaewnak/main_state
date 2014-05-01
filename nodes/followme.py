@@ -24,7 +24,7 @@ class followme(BaseState):
         rospy.loginfo('Start Follow Me State')
         rospy.Subscriber("/base/base_pos", Pose2D, self.cb_base_pos)
         rospy.Subscriber("/scan/wall_people", Pose2D, self.cb_wall_people)
-
+        self.robot_pos_wall = None
         self.publish = Publish()
         rospy.spin()
 
@@ -43,14 +43,15 @@ class followme(BaseState):
             if(dif >= 2.0):
                 temp = temp[1:]
         self.robot_pos = temp
-    
+
     def cb_wall_people(self,data):
-        pos_ = data
-        pos_.x+=1.5
-        pos_.y=0.5
+        pos_ = Pose2D()
+        pos_.x = data.x + 1.5
+        pos_.y = data.y + 0.5
         pos_.theta =3.14/2
         self.robot_pos_wall = pos_
-    
+        self.main(Devices.foot_detect,pos_)
+
     def main(self,device,data):
         rospy.loginfo("state:" + self.state + " from:" + device + " data:")
         if self.state == 'init':
@@ -86,9 +87,19 @@ class followme(BaseState):
                                #pub['base'].publish(data)
                 Publish.move_robot(data)
             elif(device == Devices.foot_detect):
-                rospy.loginfo('%f %f'%(self.robot_pos_wall.x, self.robot_pos_wall.y))
-                Publish.move_absolute(NavGoalMsg('clear','absolute',self.robot_pos_wall))
-
+                rospy.loginfo(type(data))
+                rospy.loginfo(str(data))
+                Publish.move_absolute(data)
+                self.state = 're_calibrate_2'
+                self.wait(3)
+        elif(self.state == 're_calibrate_2'):
+            if(device == Devices.base and data == 'SUCCEEDED'):
+                self.speak("please come in front of me.")
+                self.publish.follow_init.publish(Bool(True))
+                self.state = 'follow_phase_3'
+        elif(self.state == 'follow_phase_3'):
+            if(device == Devices.follow):
+                Publish.move_robot(data)
 
 #state = 'init'
 #self.robot_pos = []
