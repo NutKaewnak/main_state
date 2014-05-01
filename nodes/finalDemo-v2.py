@@ -14,7 +14,7 @@ class FINALDEMO(BaseState):
         BaseState.__init__(self)
         self.desiredObject = "kokokrunch" #NOTE 1 = cornflakes
         self.desiredObject2 = "dutchmilk"#NOTE 2 = milk
-        self.state = "readyToCook"
+        self.state = "init"
         rospy.loginfo('Start Final Demo State')
         rospy.spin()
 
@@ -29,22 +29,22 @@ class FINALDEMO(BaseState):
 
         elif self.state == 'wakeMasterUp':
                 if(device == Devices.base and data =='SUCCEEDED'):
-                        Publish.speak("Good Morning Master.What I can do for you?")#TODO Additional Speak date & time
+                        self.speak("Good Morning Master.What I can do for you?")#TODO Additional Speak date & time
                         self.state = 'choice'
         
         elif self.state == 'choice':
                 if(device == Devices.voice and data in 'need breakfast, want breakfast , i am hungry'):#TODO add another menu
-                        Publish.speak("Now I can cook cornflake,Which menu do you want me to cook?")
+                        self.speak("Now I can cook cornflake,Which menu do you want me to cook?")
                         self.state = 'select'
 
         elif self.state == 'select':
                 if(device == Devices.voice and (data =='cornflake' or data == 'anything' or data == 'whatever')):
-                        Publish.speak("Do you want me to cook CORNFLAKE isn\'t it?")
+                        self.speak("Do you want me to cook CORNFLAKE isn\'t it?")
                         self.wait(2)
                         self.state = 'confirmMenu'
               
         elif self.state == 'confirmMenu':
-                if(device == Devices.voice and (data =='confirm' or data =='yes' or data =='alright')):
+                if(device == Devices.voice and (data =='confirm' or data =='robot yes' or data =='alright')):
                         self.state = 'goToCook'
         #       elif(device == Devices.voice and (data == 'cancel' or data =='i change my mind')):
         #              self.state = 'wakeMasterUp'
@@ -56,7 +56,7 @@ class FINALDEMO(BaseState):
                 self.state = 'readyToCook'
 
         elif self.state == 'readyToCook':
-                #if(device == Devices.base and data =='SUCCEEDED'):#debug
+                if(device == Devices.base and data =='SUCCEEDED'):#debug
                         #self.state = 'serve'
                         Publish.set_manipulator_action('prepare')
                         Publish.set_height(1.1)
@@ -144,7 +144,7 @@ class FINALDEMO(BaseState):
         elif self.state == 'goToAlert':
                 self.move_robot('bed')
                 self.wait(2)
-                self.speak("walking g g g ")
+                #self.speak("walking g g g ")
                 self.state = 'alert'
 
         elif self.state == 'alert':
