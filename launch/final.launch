@@ -1,0 +1,10 @@
+<launch>
+
+  <node name="manipulator" pkg="manipulator" type="manipulator.py" output="screen" />
+  <node name="door_detection" pkg="door_detection" type="door_detection" output="screen" />
+  <node name="main_state" pkg="main_state" type="final.py" output="screen" />
+  <node name="gesture_naja" pkg="Gesture" type="NiHandTracker" output="screen" />
+  <node name="robot_serial_2" pkg="robot_connect_modify" type="robot_serial.py" output="screen" />
+  <include file="$(find pocketsphinx)/demo/final.launch" /> 
+
+</launch>
