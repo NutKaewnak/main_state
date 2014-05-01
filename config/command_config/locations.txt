@@ -25,3 +25,6 @@ sofa
 TV counter
 plant
 kitchen
+location one
+location two
+location three

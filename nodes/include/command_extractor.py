@@ -104,12 +104,12 @@ class CommandExtractor(object):
         []
         >>> CommandExtractor().getActions('move to bar go to bed and leave apartment')
         [('move', None, 'bar'), ('go', None, 'bed'), ('leave', None, None)]
-        >>> CommandExtractor().getActions('navigate to kitchen table bring coke and exit apartment')
-        [('navigate', None, 'kitchen table'), ('bring', 'coke', None), ('exit', None, None)]
-        >>> CommandExtractor().getActions('go to bar find milk and take it')
-        [('go', None, 'bar'), ('find', 'milk', None), ('take', None, None)]
-        >>> CommandExtractor().getActions('go to stove identify peanut butter and take it')
-        [('go', None, 'stove'), ('identify', 'peanut butter', None), ('take', None, None)]
+        >>> CommandExtractor().getActions('navigate to kitchen table bring fanta red and exit apartment')
+        [('navigate', None, 'kitchen table'), ('bring', 'fanta red', None), ('exit', None, None)]
+        >>> CommandExtractor().getActions('go to bar find lactasoy and take it')
+        [('go', None, 'bar'), ('find', 'lactasoy', None), ('take', None, None)]
+        >>> CommandExtractor().getActions('go to stove identify wd and take it')
+        [('go', None, 'stove'), ('identify', 'wd', None), ('take', None, None)]
         >>> CommandExtractor().getActions('go to bench go to bar and introduce yourself')
         [('go', None, 'bench'), ('go', None, 'bar'), ('introduce', None, None)]
         >>> CommandExtractor().getActions('go to kitchen find amanda and exit')
