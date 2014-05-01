@@ -5,6 +5,7 @@ from include.function import *
 from include.publish import *
 from include.base_state import *
 from include.object_information import *
+from include.location_information import *
 from include.command_extractor import *
 
 roslib.load_manifest('main_state')
@@ -22,7 +23,7 @@ def main_state(device, data):
     global state, location_list, temp, command_list, location_count, current_command
 
 
-    elif (state == 'waitForCommand'):
+    if (state == 'waitForCommand'):
         publish.robot_stop()
         if (len(command_list) == 3):
             current_command = 0
@@ -84,7 +85,7 @@ def main_state(device, data):
             pub['base'].publish(location_pos[current_location])
             state = 'gotoLocation'
 
-def restaurant(BaseState):
+class restaurant(BaseState):
     def __init__(self):
         BaseState.__init__(self)
 
@@ -94,6 +95,8 @@ def restaurant(BaseState):
 
         self.direction = ['left', 'right', 'back']
         self.command_extractor = CommandExtractor()
+
+        read_location_information_file(self.location_list, roslib.packages.get_pkg_dir('main_state') + '/config/restaurant_location_information.xml')
 
         rospy.loginfo('Start restaurant State')
         rospy.spin()
@@ -122,7 +125,7 @@ def restaurant(BaseState):
                 self.speak("Waiting for command.")
                 self.state = 'waitForCommand'
         elif self.state == 'waitForLocationName':
-            self.robot_stop()
+            self.stop_robot()
             if device == Devices.voice:
                 for location in self.location_list.keys():
                     if location in data:
@@ -136,10 +139,10 @@ def restaurant(BaseState):
                 self.speak("I will follow you.")
                 self.state = 'follow'
         elif self.state == 'confirmLocationName':
-            self.robot_stop()
+            self.stop_robot()
             if device == Devices.voice and 'robot yes' in data:
-                self.location_list[self.temp] = NavGoalMsg('clear', 'absolute', self.robot_position)
-                self.speak("I remember " + self.temp)
+                self.location_list[self.temp[0]] = NavGoalMsg('clear', 'absolute', self.robot_position)
+                self.speak("I remember " + self.temp[0])
                 self.state = 'waitForLocationName'
             elif device == Devices.voice and 'robot no' in data:
                 self.speak("What is this place?")

@@ -86,7 +86,7 @@ class BaseState:
         p.wait()
         self.delay.period = 0
 
-    def stop_robot():
+    def stop_robot(self):
         Publish.move_robot(NavGoalMsg('stop', 'absolute', Pose2D(0.0, 0.0, 0.0)))
 
     def wait(self, period):
