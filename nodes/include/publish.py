@@ -26,11 +26,11 @@ class Publish:
 
     @staticmethod
     def set_manipulator_action_grasp(data):
-        Publish.manipulator_action_grasp.publish(Vector3(data))
+        Publish.manipulator_action_grasp.publish(data)
 
     @staticmethod
     def set_manipulator_action_pour(data):
-        Publish.manipulator_action_pour.publish(Vector3(data))
+        Publish.manipulator_action_pour.publish(data)
 
     @staticmethod
     def set_manipulator_point(x, y, z):
