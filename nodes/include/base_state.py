@@ -25,6 +25,7 @@ class Devices:
     follow = 'follow'
     recognition = 'recognition'
     color_detector = 'color_detector'
+    foot_detect = 'foot_detect'
 
 class BaseState:
     def __init__(self):
@@ -36,7 +37,7 @@ class BaseState:
         rospy.Subscriber('/base/base_pos', Pose2D, self.callback_base_position)
         rospy.Subscriber('/detected_object', ObjectContainer, self.callback_findobject)
         rospy.Subscriber('/color_detect', Vector3,self.callback_colorDetector)
-
+        rospy.Subscriber('/scan/wall_people', Pose2D, self.callback_footDetect)
         self.delay = Delay()
         self.reconfig = Reconfig()
         self.robot_position = None
@@ -44,9 +45,11 @@ class BaseState:
         read_location_information(self.location_list)
         self.object_info = read_object_info()
         self.state = 'init'
+    def callback_footDetect(self, data):
+        self.perform_state(Devices.foot_detect, data)
 
     def callback_colorDetector(self, data):
-        self.perform_state(self, data)
+        self.perform_state(Devices.color_detector, data)
 
     def callback_findobject(self, data):
         self.perform_state(Devices.recognition, data)

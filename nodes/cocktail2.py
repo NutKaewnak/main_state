@@ -52,7 +52,7 @@ class CockTailParty(BaseState):
 
         elif self.state == 'passDoor':
             if device == Devices.base and data == 'SUCCEEDED':
-                self.move_robot('bed')
+                self.move_robot('bench')
                 self.state = 'gotoKitchenRoom'
 
         elif self.state == 'gotoKitchenRoom':
@@ -124,7 +124,7 @@ class CockTailParty(BaseState):
                     self.state = "MOVE_BASE"
                 else:
                     self.speak('I go to the kitchen.')
-                    self.move_robot('kitchen')
+                    self.move_robot('bench')
                     self.state = "gotoKitchenRoom"
             elif device == Devices.voice and 'robot no' in data:
                 self.speak('Hello ' + self.peopleName[self.currentObject] + ' what do you want?')
@@ -133,7 +133,7 @@ class CockTailParty(BaseState):
         elif self.state == 'MOVE_BASE':
             if device == Devices.base and data == 'SUCCEEDED':
                 self.speak('I reach the destination.')
-                Publish.set_height(1.1)
+                Publish.set_height(self.location_list['bar'].height + 0.3)
                 Publish.set_manipulator_action('prepare')
                 Publish.set_neck(0,-0.70,0)
                 self.state = "PREPARE"
@@ -162,9 +162,7 @@ class CockTailParty(BaseState):
                     self.neck_counter += 1
                     if self.current_action >= 90.0 * math.pi / 180.0:
                         self.speak('%s not found'%self.current_action.object)
-                        #self.move_robot(self.starting_point)
                         self.wait(2)
-                        #self.state = 'deliver'
                     if self.neck_counter % 2 == 0:
                         self.current_angle += 0.2
                         Publish.set_neck(0, 0, self.current_angle)
@@ -174,7 +172,7 @@ class CockTailParty(BaseState):
         elif self.state == 'GET_OBJECT':
             if device == Devices.manipulator and data == 'finish':
                 self.speak("I got it.")
-                self.move_robot('stove')
+                self.move_robot('bench')
                 self.state = 'GO_TO_LIVING_ROOM_WITH_OBJECT'
 
         elif self.state == "GO_TO_LIVING_ROOM_WITH_OBJECT":
@@ -210,14 +208,13 @@ class CockTailParty(BaseState):
 
         elif self.state == 'WAIT_FOR_SERVE':
             if device == Devices.manipulator and data == 'finish':
-                self.wait(2)
+                self.wait(3)
                 self.state = 'GRIP_OPEN'
 
         elif self.state == 'GRIP_OPEN':
-            if device == Devices.manipulator and data == 'finish':
-                self.speak('gripper open.')
-                Publish.set_manipulator_action('grip_open')
-                self.state = 'WALKING'
+            self.speak('gripper open.')
+            Publish.set_manipulator_action('grip_open')
+            self.state = 'WALKING'
 
         elif self.state == 'WALKING':
             if device == Devices.manipulator and data == 'finish':
@@ -229,11 +226,11 @@ class CockTailParty(BaseState):
                 self.currentObject += 1
                 if self.currentObject == self.totalObject:
                     self.speak('I am leaving.')
-                    self.move_robot('bed')
+                    self.move_robot('hallway table')
                     self.state = 'get out'
                 else:
                     self.speak('I go to the destination.')
-                    self.move_robot('bar')
+                    self.move_robot('bench')
                     self.state = "MOVE_BASE"
 
         elif self.state == 'get out':

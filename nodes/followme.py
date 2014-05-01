@@ -23,6 +23,7 @@ class followme(BaseState):
         #self.state = 'init'
         rospy.loginfo('Start Follow Me State')
         rospy.Subscriber("/base/base_pos", Pose2D, self.cb_base_pos)
+        rospy.Subscriber("/scan/wall_people", Pose2D, self.cb_wall_people)
 
         self.publish = Publish()
         rospy.spin()
@@ -43,6 +44,12 @@ class followme(BaseState):
                 temp = temp[1:]
         self.robot_pos = temp
     
+    def cb_wall_people(self,data):
+        pos_ = data
+        pos_.x+=1.5
+        pos_.y=0.5
+        pos_.theta =3.14/2
+        self.robot_pos_wall = pos_
     
     def main(self,device,data):
         rospy.loginfo("state:" + self.state + " from:" + device + " data:")
@@ -50,7 +57,7 @@ class followme(BaseState):
 #    global state,startTime
             if(device == Devices.voice and ('follow me' in data)):
                 Publish.speak("I will follow you.")
-                self.state = 'follow_phase_1'
+                self.state = 'follow_phase_2'
         elif(self.state == 'follow_phase_1'):
             if(device == Devices.follow):
                 if(data.text_msg == 'lost'):
@@ -78,6 +85,9 @@ class followme(BaseState):
                      data.text_msg = 'stop'
                                #pub['base'].publish(data)
                 Publish.move_robot(data)
+            elif(device == Devices.foot_detect):
+                rospy.loginfo('%f %f'%(self.robot_pos_wall.x, self.robot_pos_wall.y))
+                Publish.move_absolute(NavGoalMsg('clear','absolute',self.robot_pos_wall))
 
 
 #state = 'init'
