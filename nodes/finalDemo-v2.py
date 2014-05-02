@@ -12,13 +12,12 @@ roslib.load_manifest('main_state')
 class FINALDEMO(BaseState):
     def __init__(self):
         BaseState.__init__(self)
-        self.object_information = read_object_info()
         self.go_closer_method = 'FORWARD'
         self.LIMIT_MANIPULATED_DISTANCE = 0.78
 
         self.desiredObject = "kokokrunch" #NOTE 1 = cornflakes
         self.desiredObject2 = "dutchmilk"#NOTE 2 = milk
-        self.state = "init"
+        self.state = "readyToCook"
         rospy.loginfo('Start Final Demo State')
         rospy.spin()
 
@@ -32,11 +31,11 @@ class FINALDEMO(BaseState):
 
         elif self.state == 'wakeMasterUp':
                 if(device == Devices.base and data =='SUCCEEDED'):
-                        self.speak("Good Morning Master.What I can do for you?")#TODO Additional Speak date & time
+                        self.speak("Good Morning Master.What I can do for you?")
                         self.state = 'choice'
         
         elif self.state == 'choice':
-                if(device == Devices.voice and data in 'i need breakfast,i want breakfast , i am hungry'):#TODO add another menu
+                if(device == Devices.voice and data in 'i need breakfast,i want breakfast , i am hungry'):
                         self.speak("Now I can cook cornflake,Which menu do you want me to cook?")
                         self.state = 'select'
 
@@ -59,12 +58,11 @@ class FINALDEMO(BaseState):
                 self.state = 'readyToCook'
 
         elif self.state == 'readyToCook':
-                if(device == Devices.base and data =='SUCCEEDED'):#debug
-                        #self.state = 'serve'
+#                if(device == Devices.base and data =='SUCCEEDED'):#debug
                         Publish.set_manipulator_action('prepare')
                         Publish.set_height(1.1)
                         Publish.set_neck(0,-0.7,0)
-                        self.state = 'setRobotEnvironment' #NOTE DEBUG
+                        self.state = 'setRobotEnvironment'
 
         elif self.state == 'setRobotEnvironment':
                 if(device == Devices.manipulator and data == 'finish'):
@@ -85,48 +83,46 @@ class FINALDEMO(BaseState):
 #                        Publish.set_manipulator_action_grasp(centroidVector)
 #                        self.state = 'graspingCornflake'
         elif(self.state == 'searchingCornflake'):
-            if(device == devices.recognition):
+            if(device == Devices.recognition):
                 objects = []
                 print '--------len(data.objects) : ' +str(len(data.objects)) +  '-------'
                 objects = data.objects
                 for obj in objects:
                     print 'category : ' + obj.category + ' centroid : (' + str(obj.point.x) + "," + str(obj.point.y) + "," + str(obj.point.z) + ")"
                 for obj in objects:
-                    if obj.ismanipulable == true and obj.category != "unknown" and obj.categort == self.desiredObject:
+                    if obj.isManipulable == True and obj.category == self.desiredObject:
                         self.speak(obj.category)
-                        centroidvector = vector3()
-                        centroidvector.x = obj.point.x
-                        centroidvector.y = obj.point.y
-                        centroidvector.z = obj.point.z
+                        centroidVector = Vector3()
+                        centroidVector.x = obj.point.x
+                        centroidVector.y = obj.point.y
+                        centroidVector.z = obj.point.z
                         self.carried_object = obj.category
-                        publish.set_manipulator_action_grasp(centroidvector)
-                        self.state = 'graspingcornflake'
-                        return none
+                        Publish.set_manipulator_action_grasp(centroidVector)
+                        self.state = 'graspCornflake'
+                        return None
 
                 for obj in objects:
-                    if obj.ismanipulable == false and obj.category != "unknown":
-                        self.speak("i will go closer to " + obj.category)
-                        if self.go_closer_method == 'forward':
-                            move_distance = obj.point.x - self.limit_manipulated_distance + 0.3
+                    if obj.isManipulable == False and obj.category != "unknown":
+                        self.speak("I will go closer to " + obj.category)
+                        if self.go_closer_method == 'FORWARD':
+                            move_distance = obj.point.x - self.LIMIT_MANIPULATED_DISTANCE + 0.3
                             print '----------------------------------',move_distance
-                            publish.move_relative(move_distance, 0, 0)
+                            Publish.move_relative(move_distance, 0, 0)
                             self.wait(2)
-                            self.speak("i will go forward to " + obj.category)
-                            self.go_closer_method = 'rotate'
-                            self.state = "step_to_object"
-                        elif self.go_closer_method == 'rotate':
+                            self.speak("I will go forward to " + obj.category)
+                            self.go_closer_method = 'ROTATE'
+                            self.state = "STEP_TO_OBJECT"
+                        elif self.go_closer_method == 'ROTATE':
                             rotation = math.tan(obj.point.y/obj.point.x)
-                            publish.move_relative(0 ,0 ,rotation)
+                            Publish.move_relative(0 ,0 ,rotation)
                             self.wait(2)
-                            self.speak("i will rotate to " + obj.category)
-                            self.go_closer_method = 'finish'
-                            self.state = "step_to_object"
-                        elif self.go_closer_method == 'finish':
-                            self.index+=1
-                            self.move_robot(self.location_list[self.cleaning_location].locations[self.index])
-                            self.go_closer_method = 'forward'
+                            self.speak("I will rotate to " + obj.category)
+                            self.go_closer_method = 'FINISH'
+                            self.state = "STEP_TO_OBJECT"
+                        elif self.go_closer_method == 'FINISH':
+                            self.go_closer_method = 'FORWARD'
                             self.wait(2)
-                        return none
+                        return None
 
         elif(self.state == 'STEP_TO_OBJECT'):
             if(device == Devices.base and (data == 'SUCCEEDED' or data == 'ABORTED')):
@@ -154,7 +150,7 @@ class FINALDEMO(BaseState):
 
         elif self.state =='discarding':
             if device == Devices.manipulator and data == 'finish':
-                    Publish.find_object( 0.75 )
+                    Publish.find_object( 0.65 )
                     self.state = 'searchingMilk'
 
 #        elif self.state == 'searchingMilk':
@@ -170,54 +166,52 @@ class FINALDEMO(BaseState):
 #                            Publish.set_manipulator_action_grasp(centroidVector)
 #                            self.state = 'graspingMilk'
        
-	elif(self.state == 'searchingMilk'):
-            if(device == devices.recognition):
+	    elif(self.state == 'searchingMilk'):
+             if(device == Devices.recognition):
                 objects = []
                 print '--------len(data.objects) : ' +str(len(data.objects)) +  '-------'
                 objects = data.objects
                 for obj in objects:
                     print 'category : ' + obj.category + ' centroid : (' + str(obj.point.x) + "," + str(obj.point.y) + "," + str(obj.point.z) + ")"
                 for obj in objects:
-                    if obj.ismanipulable == true and obj.category != "unknown" and obj.categort == self.desiredObject2:
+                    if obj.isManipulable == True and obj.category == self.desiredObject_2:
                         self.speak(obj.category)
-                        centroidvector = vector3()
-                        centroidvector.x = obj.point.x
-                        centroidvector.y = obj.point.y
-                        centroidvector.z = obj.point.z
+                        centroidVector = Vector3()
+                        centroidVector.x = obj.point.x
+                        centroidVector.y = obj.point.y
+                        centroidVector.z = obj.point.z
                         self.carried_object = obj.category
-                        publish.set_manipulator_action_grasp(centroidvector)
-                        self.state = 'graspingcornflake'
-                        return none
+                        Publish.set_manipulator_action_grasp(centroidVector)
+                        self.state = 'graspingMilk'
+                        return None
 
                 for obj in objects:
-                    if obj.ismanipulable == false and obj.category != "unknown":
-                        self.speak("i will go closer to " + obj.category)
-                        if self.go_closer_method == 'forward':
-                            move_distance = obj.point.x - self.limit_manipulated_distance + 0.3
+                    if obj.isManipulable == False and obj.category != "unknown":
+                        self.speak("I will go closer to " + obj.category)
+                        if self.go_closer_method == 'FORWARD':
+                            move_distance = obj.point.x - self.LIMIT_MANIPULATED_DISTANCE + 0.3
                             print '----------------------------------',move_distance
-                            publish.move_relative(move_distance, 0, 0)
+                            Publish.move_relative(move_distance, 0, 0)
                             self.wait(2)
-                            self.speak("i will go forward to " + obj.category)
-                            self.go_closer_method = 'rotate'
-                            self.state = "step_to_object"
-                        elif self.go_closer_method == 'rotate':
+                            self.speak("I will go forward to " + obj.category)
+                            self.go_closer_method = 'ROTATE'
+                            self.state = "STEP_TO_OBJECT_2"
+                        elif self.go_closer_method == 'ROTATE':
                             rotation = math.tan(obj.point.y/obj.point.x)
-                            publish.move_relative(0 ,0 ,rotation)
+                            Publish.move_relative(0 ,0 ,rotation)
                             self.wait(2)
-                            self.speak("i will rotate to " + obj.category)
-                            self.go_closer_method = 'finish'
-                            self.state = "step_to_object"
-                        elif self.go_closer_method == 'finish':
-                            self.index+=1
-                            self.move_robot(self.location_list[self.cleaning_location].locations[self.index])
-                            self.go_closer_method = 'forward'
+                            self.speak("I will rotate to " + obj.category)
+                            self.go_closer_method = 'FINISH'
+                            self.state = "STEP_TO_OBJECT_2"
+                        elif self.go_closer_method == 'FINISH':
+                            self.go_closer_method = 'FORWARD'
                             self.wait(2)
-                        return none
+                        return None
 
         elif(self.state == 'STEP_TO_OBJECT_2'):
             if(device == Devices.base and (data == 'SUCCEEDED' or data == 'ABORTED')):
                 Publish.find_object(0.7)
-		self.state = 'searchingMilk'
+                self.state = 'searchingMilk'
 
         elif self.state == 'graspingMilk':
             if device == Devices.manipulator and data == 'finish':
@@ -238,14 +232,12 @@ class FINALDEMO(BaseState):
                 self.state = 'serve'
 
         elif self.state == 'serve':
-             if device == Devices.manipulator and data == 'finish': #NOTE DEBUG
-             #if device == Devices.base and base == 'SUCCEEDED': #NOTE DEBUG
+             if device == Devices.manipulator and data == 'finish':
                 self.state = 'goToAlert'
 
         elif self.state == 'goToAlert':
                 self.move_robot('bed')
                 self.wait(2)
-                #self.speak("walking g g g ")
                 self.state = 'alert'
 
         elif self.state == 'alert':
