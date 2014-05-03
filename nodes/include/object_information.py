@@ -11,8 +11,10 @@ class Object:
         self.category = category.name
         self.location = category.location
         self.action_place = category.action_place
+        print object_node.attrib
         if 'isManipulate' in object_node.attrib:
             self.isManipulate = bool(object_node.attrib['isManipulate'])
+            print self.isManipulate
         else:
             self.isManipulate = True
 
