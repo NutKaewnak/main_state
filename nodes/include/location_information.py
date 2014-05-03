@@ -48,10 +48,33 @@ class RoomInfo(LocationInfo):
                '], Height: ' + str(self.height) + \
                ', locations: [' + str(self.locations) + '])'
 
+class LocationCategory():
+    def __init__(self,location_info_node):
+        self.location_categories = {}
+        for category in location_info_node:
+            self.location_categories[category.attrib['name']] = []
+            for location in category:
+                self.location_categories[category.attrib['name']].append(location.attrib['name'])
+
+    def get_all_category_names(self):
+        return self.location_categories.keys()
+
+    def get_all_location_names(self):
+        return [location for c in self.get_all_category_names() for location in self.location_categories[c]]
+
+    def get_location_in_category(self, category_name):
+        return self.location_categories[category_name]
 
 def read_location_information(location_list):
     read_location_information_file(location_list, roslib.packages.get_pkg_dir('main_state') + '/config/location_information.xml')
 
+def read_location_category():
+    return read_location_category_file(roslib.packages.get_pkg_dir('main_state') + '/config/location_category.xml')
+
+def read_location_category_file(filename):
+    rospy.loginfo('location_information.py : Read Location Category XML')
+    location_category_file = ET.parse(filename)
+    return LocationCategory(location_category_file.getroot())
 
 def read_location_information_file(location_list, filename):
     rospy.loginfo('location_information.py : Read Location Information XML')
@@ -70,8 +93,7 @@ def read_location_information_file(location_list, filename):
             location_info.init_from_node(location)
             location_list[location.attrib['name']] = location_info
 
-
 if __name__ == "__main__":
     location_list = {}
     read_location_information(location_list)
-    print location_list
+    #print location_list

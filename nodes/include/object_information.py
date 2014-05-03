@@ -75,6 +75,18 @@ class ObjectInfo:
                 sentence = sentence.replace(object_name, "")
         return result
 
+    def get_all_object_names(self):
+        objects = []
+        for object in self.object_list:
+            objects.append(object)
+        return objects
+
+    def get_all_category_names(self):
+        categories = []
+        for category in self.category_data:
+            categories.append(category)
+        return categories
+
     def __repr__(self):
         return self.__str__()
 
