@@ -58,7 +58,7 @@ class followme(BaseState):
 #    global state,startTime
             if(device == Devices.voice and ('follow me' in data)):
                 Publish.speak("I will follow you.")
-                self.state = 'follow_phase_2'
+                self.state = 'follow_phase_1'
         elif(self.state == 'follow_phase_1'):
             if(device == Devices.follow):
                 if(data.text_msg == 'lost'):
@@ -69,6 +69,7 @@ class followme(BaseState):
             #    data.text_msg = 'clear'
                         #    pub['base'].publish(data)
             elif(device == Devices.voice and ('leave the elevator' in data)):
+                self.speak("i will get out elevator")
                 self.state = 'get_out_lift'
                 Publish.move_absolute(self.robot_pos[0])
                 #Publish.move_robot(NavGoalMsg('clear','absolute',self.robot_pos[0]))
