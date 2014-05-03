@@ -5,6 +5,9 @@ Action tuples : (verb,<object>,<data>)
 """
 
 import roslib
+from location_information import *
+from object_information import *
+from people_information import *
 
 roslib.load_manifest('main_state')
 
@@ -66,12 +69,15 @@ class CommandExtractor(object):
         return None
 
     def __init__(self):
-        # Read config file
-        self.object_categories = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/object_categories.txt')
-        self.objects = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/objects.txt')
-        self.locations = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/locations.txt')
-        self.names = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/names.txt')
-        self.location_categories = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/location_categories.txt')
+        #Read config file
+        object_info = read_object_info()
+        location_info = read_location_category()
+        people_info = read_people_information()
+        self.objects = object_info.get_all_object_names()
+        self.object_categories = object_info.get_all_category_names()
+        self.locations = location_info.get_all_location_names()
+        self.location_categories = location_info.get_all_category_names()
+        self.names = people_info.get_people_names()
         self.verbs = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/verbs.txt')
         self.intransitive_verbs = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/intransitive_verbs.txt')
 
@@ -112,8 +118,8 @@ class CommandExtractor(object):
         [('go', None, 'stove'), ('identify', 'wd', None), ('take', None, None)]
         >>> CommandExtractor().getActions('go to bench go to bar and introduce yourself')
         [('go', None, 'bench'), ('go', None, 'bar'), ('introduce', None, None)]
-        >>> CommandExtractor().getActions('go to kitchen find amanda and exit')
-        [('go', None, 'kitchen'), ('find', 'amanda', None), ('exit', None, None)]
+        >>> CommandExtractor().getActions('go to bedside table find amanda and exit')
+        [('go', None, 'bedside table'), ('find', 'amanda', None), ('exit', None, None)]
         >>> CommandExtractor().getActions('bring me a drink')
         [('bring', 'drink', None)]
         >>> CommandExtractor().getActions('carry a drink to table')
