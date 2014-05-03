@@ -1,0 +1,5 @@
+<launch>
+
+  <node name="main_state" pkg="main_state" type="RIPS.py" output="screen" />
+
+</launch>
