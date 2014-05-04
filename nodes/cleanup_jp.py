@@ -25,12 +25,22 @@ class Cleanup_jp(BaseState):
         self.go_closer_method = 'FORWARD'
         self.LIMIT_MANIPULATED_DISTANCE = 0.78
 
+        print '---------------------------------------------'
+        for name in self.search_seqeunce:
+            print 'name:',name
+        print '---------------------------------------------'
+
         self.table_mapping = {}
-        self.table_mapping['hallway table']  = 'table_1'
-        self.table_mapping['umbrella stand']  = 'table_1'
-        self.table_mapping['hanger']  = 'table_2'
-        self.table_mapping['bench']  = 'table_2'
-        self.table_mapping['bar']  = 'table_3'
+        self.table_mapping['white shelf']  = 'shelf_1'
+        self.table_mapping['white shelf 2']  = 'shelf_1'
+        self.table_mapping['white shelf 3']  = 'shelf_1'
+        self.table_mapping['showcase']  = 'showcase_1'
+        self.table_mapping['showcase 2']  = 'showcase_1'
+        self.table_mapping['showcase 3']  = 'showcase_1'
+        self.table_mapping['kitchen board']  = 'board_1'
+        self.table_mapping['kitchen board 2']  = 'board_1'
+        #self.table_mapping['bench']  = 'table_2'
+        #self.table_mapping['bar']  = 'table_3'
 #
 #        print '--------------------------'
 #        print self.object_information.get_object('silicone').name
@@ -42,7 +52,6 @@ class Cleanup_jp(BaseState):
 
         #print type(self.location_list['living room'].locations)
         #name = self.location_list['living room'].locations[0]
-        #print self.location_list[self.location_list['living room'].locations[self.index]].height
 
 #        print self.location_list['living room'].locations
 #        print self.location_list['living room'].locations[0].height
@@ -199,12 +208,14 @@ class Cleanup_jp(BaseState):
                             self.state = "STEP_TO_OBJECT"
                         elif self.go_closer_method == 'FINISH':
                             self.index+=1
-                            if(self.table_mapping[self.location_list[self.cleaning_location].locations[self.index]] == self.table_mapping[self.location_list[self.cleaning_location].locations[self.index-1]]):
-                                Publish.move_relative(-1.0, 0, 0)
-                                self.wait(1)
-                                #self.speak(obj.category + ' is unreachable, I will  go to ' + self.location_list[self.cleaning_location].locations[self.index])
-                                self.speak("I see nothing, I am moving back.")
-                                self.state = 'MOVE_BACK'
+
+                            if(self.table_mapping.has_key(self.location_list[self.cleaning_location].locations[self.index]) and self.table_mapping.has_key(self.location_list[self.cleaning_location].locations[self.index-1])):
+                                if(self.table_mapping[self.location_list[self.cleaning_location].locations[self.index]] == self.table_mapping[self.location_list[self.cleaning_location].locations[self.index-1]]):
+                                    Publish.move_relative(-1.0, 0, 0)
+                                    self.wait(1)
+                                    #self.speak(obj.category + ' is unreachable, I will  go to ' + self.location_list[self.cleaning_location].locations[self.index])
+                                    self.speak("I see nothing, I am moving back.")
+                                    self.state = 'MOVE_BACK'
                             else:
                                 self.move_robot(self.location_list[self.cleaning_location].locations[self.index])
                                 self.wait(1)
@@ -226,12 +237,14 @@ class Cleanup_jp(BaseState):
                 else:
                     self.index = 0
 
-                if(self.table_mapping[self.location_list[self.cleaning_location].locations[self.index]] == self.table_mapping[self.location_list[self.cleaning_location].locations[self.index-1]]):
-                    Publish.move_relative(-1.0, 0, 0)
-                    self.speak("I see nothing, I am moving back.")
-                    #self.speak('I see nothing. I will go to ' + self.location_list[self.cleaning_location].locations[self.index])
-                    self.wait(1)
-                    self.state = 'MOVE_BACK'
+
+                if(self.table_mapping.has_key(self.location_list[self.cleaning_location].locations[self.index]) and self.table_mapping.has_key(self.location_list[self.cleaning_location].locations[self.index-1])):
+                    if(self.table_mapping[self.location_list[self.cleaning_location].locations[self.index]] == self.table_mapping[self.location_list[self.cleaning_location].locations[self.index-1]]):
+                        Publish.move_relative(-1.0, 0, 0)
+                        self.speak("I see nothing, I am moving back.")
+                        #self.speak('I see nothing. I will go to ' + self.location_list[self.cleaning_location].locations[self.index])
+                        self.wait(1)
+                        self.state = 'MOVE_BACK'
                 else:
                     self.move_robot(self.location_list[self.cleaning_location].locations[self.index])
                     self.speak('I see nothing. I will go to ' + self.location_list[self.cleaning_location].locations[self.index])
