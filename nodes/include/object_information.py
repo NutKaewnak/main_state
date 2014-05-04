@@ -11,10 +11,10 @@ class Object:
         self.category = category.name
         self.location = category.location
         self.action_place = category.action_place
-        print object_node.attrib
+        #print object_node.attrib
         if 'isManipulate' in object_node.attrib:
             self.isManipulate = bool(object_node.attrib['isManipulate'])
-            print self.isManipulate
+            #print self.isManipulate
         else:
             self.isManipulate = True
 
@@ -88,6 +88,15 @@ class ObjectInfo:
         for category in self.category_data:
             categories.append(category)
         return categories
+
+    def get_category_map(self):
+        categories = {}
+        for category in self.category_data:
+            categories[category] = []
+            for object in self.get_category(category).objects:
+                categories[category].append(object.name)
+        return categories
+
 
     def __repr__(self):
         return self.__str__()
