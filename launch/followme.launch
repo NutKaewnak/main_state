@@ -1,9 +1,9 @@
 <launch>
 
   <node name="main_state" pkg="main_state" type="followme.py" output="screen" />
- <!-- <node name="gesture" pkg="gesture" type="testo" output="screen">
-    <param name="path_file" value="$(find gesture)"/>
-  </node>-->
+  <node name="gesture_detection" pkg="gesture_detection" type="NiHandTracker" output="screen">
+    <remap from="/gesture_raw" to="/gesture/point" />
+  </node>
   <include file="$(find pocketsphinx)/launch/followme.launch" /> 
 
 </launch>
