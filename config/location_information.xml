@@ -1,6 +1,4 @@
 <location_information>
-Position(6.216, -11.504, 0.000), Orientation(0.000, 0.000, 0.680, 0.733) = Angle: 1.495
-
 	<room name="visitor room" position="1.921, -7.228" rotation="3.107" height="0.70">
 		<location name="reception table" position="1.065, -7.221" rotation="-3.136" height="0.70"/>
 		<location name="shoe box" position="1.055, -5.542" rotation="1.540" height="0.70"/>
