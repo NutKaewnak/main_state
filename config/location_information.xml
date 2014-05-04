@@ -15,10 +15,9 @@
 		<locaiton name="showcase" position="4.463, -11.410" rotation="1.495" height="0.70"/>
 		<locaiton name="showcase 2" position="5.359, -11.459" rotation="1.560" height="0.70"/>
 		<locaiton name="showcase 3" position="6.216, -11.504" rotation="1.495" height="0.70"/>
-		<locaiton name="sofa" position="-12.183, -1.70" rotation="-3.121" height="0.70"/>
-		<locaiton name="tv board" position="6.154, -13.615" rotation="-0.062" height="0.70"/>
-		<locaiton name="sofa" position="3.907, -11.998" rotation="-1.647" height="0.70"/>
-		<locaiton name="dust bin" position="1.548, -15.512" rotation="-1.682" height="0.70"/>		
+		<locaiton name="sofa" position="3.732, -11.939" rotation="-1.578" height="0.70"/>
+		<locaiton name="tv board" position="5.862, -13.615" rotation="-0.095" height="0.70"/>
+		<locaiton name="dust bin" position="1.506, -15.283" rotation="-1.595" height="0.70"/>		
 	</room>
 	<room name="dining room" position="4.535, -17.982" rotation="-1.613" height="0.75">
 		<location name="dining table" position="3.462, -20.000" rotation="-0.013" height="0.75"/>
