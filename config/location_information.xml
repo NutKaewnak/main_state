@@ -6,10 +6,10 @@
 		<location name="brown shelf" position="-2.373, -11.028" rotation="1.522" height="0.70"/>	
 	</room>
 	<room name="library" position="0.330, -14.052" rotation="-3.135" height="0.75">
-		<location name="library table" position="-0.282, -14.140" rotation="1.495" height="0.70"/>
-		<location name="white shelf" position="-1.449, -15.342" rotation="-1.647" height="0.70"/>
-		<location name="white shelf 2" position="-1.008, -15.454" rotation="-1.627" height="0.70"/>
-		<location name="white shelf 3" position="-0.573, -15.389" rotation="-1.628" height="0.70"/>
+		<location name="library table" position="-0.067, -13.995" rotation="1.495" height="0.70"/>
+		<location name="white shelf" position="-2.034, -15.346" rotation="-1.610" height="0.90"/>
+		<location name="white shelf 2" position="-0.978, -15.348" rotation="-1.632" height="0.90"/>
+		<location name="white shelf 3" position="-0.561, -15.311" rotation="-1.653" height="0.90"/>
 	</room>
 	<room name="living room" position="4.245, -15.171" rotation="0.890" height="0.70">
 		<locaiton name="living table" position="4.463, -11.410" rotation="1.495" height="0.70"/>
@@ -31,6 +31,6 @@
 		<location name="kitchen board" position="-7.396, 8.682" rotation="-1.459" height="1.29"/>
 		<location name="kitchen board 2" position="-7.396, 8.682" rotation="-1.459" height="1.29"/>
 	</room>
-	<location name="entrance" position="-3.267, -0.748" rotation="1.773" height="1.29"/>
+	<location name="entrance" position="2.656, -7.349" rotation="3.126" height="1.29"/>
     	<location name="exit" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
 </location_information>
