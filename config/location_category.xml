@@ -1,0 +1,38 @@
+<location_category>	
+	<category name="seat">
+		<location name="bench"/>
+		<location name="bed"/>
+		<location name="arm chair"/>
+		<location name="sofa"/>
+	</category>
+	<category name="table">
+		<location name="hallway table"/>
+		<location name="sidetable"/>
+		<location name="kitchen table"/>
+		<location name="bedside table"/>
+		<location name="dinner table"/>
+		<location name="couch table"/>
+	</category>
+	<category name="utensil">
+		<location name="hanger"/>
+		<location name="umbrella stand"/>
+		<location name="trash bin"/>
+		<location name="plant"/>
+	</category>
+	<category name="appliance">
+		<location name="stove"/>
+		<location name="sink"/>
+		<location name="fridge"/>
+		<location name="tv counter"/>
+	</category>
+	<category name="shelf">
+		<location name="bar"/>
+		<location name="kitchen counter"/>
+		<location name="cupboard"/>
+		<location name="dresser"/>
+		<location name="sideboard"/>
+		<location name="bookshelf"/>
+		<location name="pantry"/>
+		<location name="cabinet"/>
+	</category>
+</location_category>
