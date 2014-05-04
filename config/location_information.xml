@@ -1,4 +1,6 @@
 <location_information>
+Position(6.216, -11.504, 0.000), Orientation(0.000, 0.000, 0.680, 0.733) = Angle: 1.495
+
 	<room name="visitor room" position="1.921, -7.228" rotation="3.107" height="0.70">
 		<location name="reception table" position="1.065, -7.221" rotation="-3.136" height="0.70"/>
 		<location name="shoe box" position="1.055, -5.542" rotation="1.540" height="0.70"/>
@@ -14,7 +16,7 @@
 	<room name="living room" position="4.245, -15.171" rotation="0.890" height="0.70">
 		<locaiton name="showcase" position="4.463, -11.410" rotation="1.495" height="0.70"/>
 		<locaiton name="showcase 2" position="5.359, -11.459" rotation="1.560" height="0.70"/>
-		<locaiton name="showcase 3" position="6.213, -11.219" rotation="1.541" height="0.70"/>
+		<locaiton name="showcase 3" position="6.216, -11.504" rotation="1.495" height="0.70"/>
 		<locaiton name="sofa" position="-12.183, -1.70" rotation="-3.121" height="0.70"/>
 		<locaiton name="tv board" position="6.154, -13.615" rotation="-0.062" height="0.70"/>
 		<locaiton name="sofa" position="3.907, -11.998" rotation="-1.647" height="0.70"/>
