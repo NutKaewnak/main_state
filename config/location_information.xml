@@ -1,0 +1,35 @@
+<location_information>
+	<room name="visitor room" position="1.921, -7.228" rotation="3.107" height="0.70">
+		<location name="reception table" position="1.065, -7.221" rotation="-3.136" height="0.70"/>
+		<location name="shoe box" position="1.055, -5.542" rotation="1.540" height="0.70"/>
+		<location name="desk" position="-1.427, -9.379" rotation="3.040" height="0.70"/>
+		<location name="brown shelf" position="-2.373, -11.028" rotation="1.522" height="0.70"/>	
+	</room>
+	<room name="library" position="0.330, -14.052" rotation="-3.135" height="0.75">
+		<location name="library table" position="-0.067, -13.995" rotation="1.495" height="0.70"/>
+		<location name="white shelf" position="-2.034, -15.346" rotation="-1.610" height="0.90"/>
+		<location name="white shelf 2" position="-0.978, -15.348" rotation="-1.632" height="0.90"/>
+		<location name="white shelf 3" position="-0.561, -15.311" rotation="-1.653" height="0.90"/>
+	</room>
+	<room name="living room" position="4.245, -15.171" rotation="0.890" height="0.70">
+		<locaiton name="showcase" position="4.463, -11.410" rotation="1.495" height="0.70"/>
+		<locaiton name="showcase 2" position="5.359, -11.459" rotation="1.560" height="0.70"/>
+		<locaiton name="showcase 3" position="6.216, -11.504" rotation="1.495" height="0.70"/>
+		<locaiton name="sofa" position="3.732, -11.939" rotation="-1.578" height="0.70"/>
+		<locaiton name="tv board" position="5.862, -13.615" rotation="-0.095" height="0.70"/>
+		<locaiton name="dust bin" position="1.506, -15.283" rotation="-1.595" height="0.70"/>		
+	</room>
+	<room name="dining room" position="4.535, -17.982" rotation="-1.613" height="0.75">
+		<location name="dining table" position="3.462, -20.000" rotation="-0.013" height="0.75"/>
+		<location name="dining shelf" position="4.209, -22.608" rotation="-1.459" height="0.75"/>
+	</room>
+	<room name="kitchen" position="0.987, -17.963" rotation="-1.558" height="1.29">
+		<location name="bar" position="1.935, -19.727" rotation="-2.491" height="1.29"/>
+		<location name="kitchen table" position="-7.396, 8.682" rotation="-1.459" height="1.29"/>
+		<location name="fridge" position="-2.034, -22.446" rotation="3.126" height="1.29"/>
+		<location name="kitchen board" position="-7.396, 8.682" rotation="-1.459" height="1.29"/>
+		<location name="kitchen board 2" position="-7.396, 8.682" rotation="-1.459" height="1.29"/>
+	</room>
+	<location name="entrance" position="2.656, -7.349" rotation="3.126" height="1.29"/>
+    	<location name="exit" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
+</location_information>
