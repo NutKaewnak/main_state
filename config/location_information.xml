@@ -16,7 +16,8 @@
 		<locaiton name="showcase" position="4.463, -11.410" rotation="1.495" height="0.70"/>
 		<locaiton name="showcase 2" position="5.359, -11.459" rotation="1.560" height="0.70"/>
 		<locaiton name="showcase 3" position="6.216, -11.504" rotation="1.495" height="0.70"/>
-		<locaiton name="sofa" position="3.732, -11.939" rotation="-1.578" height="0.70"/>
+		<locaiton name="sofa" position="2.875, -13.435" rotation="-0.004" height="0.70"/>
+		<locaiton name="sofa 2" position="3.930, -15.167" rotation="0.677" height="0.70"/>
 		<locaiton name="tv board" position="5.862, -13.615" rotation="-0.095" height="0.70"/>
 		<locaiton name="dust bin" position="1.506, -15.283" rotation="-1.595" height="0.70"/>		
 	</room>
@@ -25,7 +26,7 @@
 		<location name="dining shelf" position="4.209, -22.608" rotation="-1.459" height="0.75"/>
 	</room>
 	<room name="kitchen" position="0.987, -17.963" rotation="-1.558" height="1.29">
-		<location name="bar" position="1.935, -19.727" rotation="-2.491" height="1.29"/>
+		<location name="bar" position="2.146, -19.780" rotation="-2.506" height="1.29"/>
 		<location name="kitchen table" position="-7.396, 8.682" rotation="-1.459" height="1.29"/>
 		<location name="fridge" position="-2.034, -22.446" rotation="3.126" height="1.29"/>
 		<location name="kitchen board" position="-7.396, 8.682" rotation="-1.459" height="1.29"/>
