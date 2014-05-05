@@ -19,57 +19,20 @@ from geometry_msgs.msg import Pose2D, Vector3
 from math import pi, sqrt, sin, cos
 
 
-def main_state(device, data):
-    global state, location_list, temp, command_list, location_count, current_command
-
-    if (state == 'gotoObjectLocation'):
-        if (device == 'base' and data == 'SUCCEEDED'):
-            call(["espeak", "-ven+f4",
-                  "i am at " + catagory_list[object_list[command_list[current_command].objectName].catagory], "-s 110"])
-            publish.object_search.publish(command_list[current_command].objectName)
-            reconfig.changeDepthResolution(2)
-            state = 'searchObject'
-    elif (state == 'searchObject'):
-        reconfig.changeDepthResolution(2)
-        if (device == 'object'):
-            if (data == 'no'):
-                publish.object_search.publish(command_list[current_command].objectName)
-            else:
-                objectName, x, y, z = data.split(',')
-                call(['espeak', 'i found' + command_list[current_command].objectName, '-ven+f4', '-s 120'])
-                publish.manipulator_point.publish(Vector3(float(x), float(y), float(z)))
-                delay.delay(3)
-                state = 'getObject'
-    elif (state == 'getObject'):
-        if (device == 'manipulator' and data == 'finish'):
-            reconfig.changeDepthResolution(8)
-    elif (state == 'finishGrasp'):
-        stopTime = time.localtime()
-        if (time.mktime(stopTime) - time.mktime(startTime) >= 10.0):
-            current_location = command_list[current_command][0]
-            pub['base'].publish(location_pos[current_location])
-            state = 'gotoTable'
-    elif (state == 'gotoTable'):
-        if (device == 'base' and data == 'SUCCEEDED'):
-            call(["espeak", "-ven+f4", "i am at " + current_location, "-s 110"])
-            # grasp
-            current_command += 1
-            current_location = object_location[command_list[current_command][1]]
-            pub['base'].publish(location_pos[current_location])
-            state = 'gotoLocation'
-
-
 class restaurant(BaseState):
     def __init__(self):
         BaseState.__init__(self)
 
         Publish.set_height(0.85)
+        Publish.set_neck(0,0,0)
         self.reconfig.changeDepthResolution(8)
         Publish.set_manipulator_action('walking')
 
         self.direction = ['left', 'right', 'back']
         self.command_extractor = CommandExtractor()
         self.command_list = []
+
+        rospy.Subscriber("pan_tilt_main_state",Quaternion, self.cb_pan_tilt_main)
 
         read_location_information_file(self.location_list, roslib.packages.get_pkg_dir(
             'main_state') + '/config/restaurant_location_information.xml')
@@ -81,6 +44,9 @@ class restaurant(BaseState):
 
         rospy.loginfo('Start restaurant State')
         rospy.spin()
+
+    def cb_pan_tilt_main(self, data):
+        self.perform_state('pan_tilt', data)
 
     def remember_master(self, data):
         if self.robot_position == None:
@@ -117,9 +83,13 @@ class restaurant(BaseState):
             if device == Devices.voice and 'follow me' in data:
                 self.speak("I will follow you.")
                 self.state = 'follow'
+            if device == 'pan_tilt':
+                Publish.pan_tilt_cmd.publish(data)
         elif self.state == 'follow':
             if device == Devices.follow:
                 Publish.move_robot(data)
+            if device == 'pan_tilt':
+                Publish.pan_tilt_cmd.publish(data)
             elif device == Devices.voice and any(s in data for s in ['robot stop', 'robot halt', 'robot halting']):
                 self.stop_robot()
                 self.speak("What is this place?")
@@ -152,7 +122,7 @@ class restaurant(BaseState):
                     self.master_position.theta += pi / 2.0
                 self.location_list[self.temp[0]] = LocationInfo(self.temp[0], self.master_position, 1.05)
                 self.speak("I remember " + self.temp[0])
-                self.state = 'waitForLocationName'
+                self.state = 'follow'
             elif device == Devices.voice and 'robot no' in data:
                 self.speak("What is this place?")
                 self.state = 'waitForLocationName'
@@ -160,6 +130,7 @@ class restaurant(BaseState):
             self.stop_robot()
             if device == Devices.voice:
                 actions = self.command_extractor.getActions(data)[0]
+                print actions
                 self.speak("You want me to " + actions[0] + " " + actions[1] + " to " + actions[2] + ".")
                 self.temp = actions
                 self.state = "confirmOrder"
@@ -180,6 +151,7 @@ class restaurant(BaseState):
                 self.speak("Waiting for command.")
                 self.state = 'waitForCommand'
         elif self.state == 'gotoObjectLocation':
+            Publish.set_neck(0,-0.70,0)
             if device == Devices.base and 'SUCCEEDED' in data:
                 self.speak('I am at ' + self.get_object_location_from_current_command() + '.')
                 self.prepare_manipulate(self.get_location_height(self.get_object_location_from_current_command()))
@@ -190,22 +162,23 @@ class restaurant(BaseState):
                 Publish.find_object(self.get_location_height(self.get_object_location_from_current_command()))
             elif device == Devices.recognition:
                 found = False
-                for object_instance in data.objects:
-                    if object_instance.category in self.get_object_name_from_current_command():
-                        found = True
-                        if not object_instance.isManipulable:
-                            # move
-                            self.not_found = True
-                            self.state = 'grasping'
-                            self.wait(1)
-                        else:
-                            # grasp
-                            self.not_found = False
-                            Publish.set_manipulator_point(object_instance.point.x,
-                                                          object_instance.point.y,
-                                                          object_instance.point.z)
-                            self.wait(1)
-                            self.state = 'grasping'
+                if len(data.objects) > 0:
+                    for object_instance in data.objects:
+                        if object_instance.category in self.get_object_name_from_current_command():
+                            found = True
+                            if not object_instance.isManipulable:
+                                # move
+                                self.not_found = True
+                                self.state = 'grasping'
+                                self.wait(1)
+                            else:
+                                # grasp
+                                self.not_found = False
+                                Publish.set_manipulator_point(object_instance.point.x,
+                                                              object_instance.point.y,
+                                                              object_instance.point.z)
+                                self.wait(1)
+                                self.state = 'grasping'
                 if not found:
                     self.not_found = True
                     self.state = 'grasping'

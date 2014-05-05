@@ -24,8 +24,13 @@
 		<location name="kitchen table" position="-1.484, -20.327" rotation="2.315" height="1.29"/>
 		<location name="fridge" position="-1.859, -22.723" rotation="-3.121" height="1.29"/>
 		<location name="kitchen board" position="-1.923, -22.129" rotation="-3.134" height="1.29"/>
-		<location name="bar" position="2.286,-20.063" rotation="-2.413" height="1.29">
+        <location name="bar" position="2.286,-20.063" rotation="-2.413" height="1.29"/>
 	</room>
 	<location name="entrance" position="2.656, -7.349" rotation="3.126" height="1.29"/>
-    	<location name="exit" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
+    <location name="exit" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
+    <location name="location one" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
+    <location name="location two" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
+    <location name="location three" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
+    <location name="snack shelf" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
+    <location name="drink shelf" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
 </location_information>
