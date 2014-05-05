@@ -173,6 +173,7 @@ class restaurant(BaseState):
             if device == Devices.voice and 'robot yes' in data:
                 self.command_list.append(self.temp)
                 actions = self.temp
+                print actions
                 self.speak("I will " + actions[0] + " " + actions[1] + " to " + actions[2] + ".")
                 self.state = 'waitForCommand'
             elif device == Devices.voice and 'robot no' in data:

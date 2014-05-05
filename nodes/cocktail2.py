@@ -29,7 +29,7 @@ class CockTailParty(BaseState):
         self.peopleName = []
         self.objectName = []
         self.desiredObject = ''
-        #self.state = 'MOVE_BASE'
+        #self.state = 'gotoKitchenRoom'
 
         rospy.loginfo('Cocktail state starts.')
         rospy.spin()
@@ -71,7 +71,7 @@ class CockTailParty(BaseState):
                 x,y,z = data.split(',')
                 x = float(z) * math.cos(self.currentAngle)
                 y = float(z) * math.sin(self.currentAngle)
-                Publish.move_relative(float(x),float(y), 0)
+                Publish.move_relative(float(x),float(y), self.currentAngle)
                 self.state = 'getCommand'
             if not self.timer.is_waiting():
                 self.currentAngle += 0.3
@@ -189,7 +189,7 @@ class CockTailParty(BaseState):
                 x,y,z = data.split(',')
                 x = float(z) * math.cos(self.currentAngle)
                 y = float(z) * math.sin(self.currentAngle)
-                Publish.move_relative(float(x),float(y), 0)
+                Publish.move_relative(float(x),float(y), self.currentAngle)
                 self.state = 'SERVE_ORDER'
             if not self.timer.is_waiting():
                 self.currentAngle += 0.3
