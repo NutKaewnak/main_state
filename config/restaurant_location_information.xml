@@ -1,0 +1,9 @@
+<location_information>
+    <location name="location one" position="-6.577, -1.922" rotation="1.492" height="1.29"/>
+    <location name="location two" position="7.963, 0.510" rotation="0.125" height="1.29"/>
+	<location name="location three" position="-3.267, -0.748" rotation="1.773" height="1.29"/>
+
+    <location name="food shelf" position="-3.267, -0.748" rotation="1.773" height="1.29"/>
+    <location name="snack shelf" position="-3.267, -0.748" rotation="1.773" height="1.29"/>
+    <location name="drink shelf" position="-3.267, -0.748" rotation="1.773" height="1.29"/>
+</location_information>
