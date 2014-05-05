@@ -167,6 +167,7 @@ class GPSR(BaseState):
                 self.command = data
         elif self.state == 'wait_more_command':
             if device == Devices.voice and self.command_extractor.isValidCommand(data):
+                rospy.loginfo(self.command)
                 if self.isCategoryOne(data):
                     self.num_command += 1
                     self.command += ' ' + data
