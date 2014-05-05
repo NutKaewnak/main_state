@@ -201,7 +201,8 @@ class GPSR(BaseState):
                 if 'yes' in data:
                     self.current_action.object = self.ask_data
                     self.speak('Please tell me where %s is.'%self.current_action.object)
-                    self.state = 'ask_object_location'
+                    self.state = 'ask_data'
+                    #self.state = 'ask_object_location'
                 elif 'no' in data:
                     self.speak('Please tell me what %s to bring.' % self.current_action.object)
                     self.state = 'ask_object'
@@ -235,12 +236,12 @@ class GPSR(BaseState):
             if device == Devices.voice:
                 if 'yes' in data:
                     self.current_action.data = self.ask_data
-                    self.speak('I will %s %s to %s' % (self.current_action.action,self.current_action.object if self.current_action.object else '',self.current_action.data if self.current_action.data else ''))
+                    self.speak('I will %s %s from %s' % (self.current_action.action,self.current_action.object if self.current_action.object else '',self.current_action.data if self.current_action.data else ''))
                     rospy.loginfo('%s'%(self.current_action.data))
                     if self.current_action.action in self.verb_categories['go']:
                         self.move_robot(self.current_action.data)
                     elif self.current_action.action in self.verb_categories['bring']:
-                        self.move_robot(self.object_location)
+                        self.move_robot(self.current_action.data)
                     self.wait(2)
                     self.state = 'move'
                 elif 'no' in data:
@@ -249,7 +250,7 @@ class GPSR(BaseState):
         elif self.state == 'move':
             if device == Devices.base and data == 'SUCCEEDED':
                 if self.current_action.action in self.verb_categories['bring']:
-                    self.speak('I reach the %s'%self.object_location)
+                    self.speak('I reach the %s'%self.current_action.data)
                     self.speak('I will get %s'%self.current_action.object)
                     rospy.loginfo(self.location_list[self.object_location].height + self.height_offset)
                     self.prepareManipulate(self.location_list[self.object_location].height + self.height_offset)
@@ -273,6 +274,7 @@ class GPSR(BaseState):
                         found = True
                         if not object.isManipulable:
                             self.speak('Object not reachable')
+                            self.move_robot(self.starting_point)
                             self.state = 'deliver'
                         else:
                             objCentroid = Vector3()
@@ -296,12 +298,12 @@ class GPSR(BaseState):
                         Publish.find_object(self.location_list[self.object_location].height)
         elif self.state == 'get_object':
             if device == Devices.manipulator and data == 'finish':
-                if self.current_action.data:
-                    self.move_robot(self.current_action.data)
-                    self.wait(2)
-                else:
-                    self.move_robot(self.starting_point)
-                    self.wait(2)
+                #if self.current_action.data:
+                #    self.move_robot(self.current_action.data)
+                #    self.wait(2)
+                #else:
+                self.move_robot(self.starting_point)
+                self.wait(2)
                 self.state = 'deliver'
                 Publish.set_neck(0.0, 0.0, 0.0)
         elif self.state == 'deliver':
