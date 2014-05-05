@@ -217,6 +217,7 @@ class restaurant(BaseState):
                 self.wait(1)
                 self.state = 'gotoServeLocation'
             elif self.not_found:
+                self.speak('I will go to ' + self.get_serve_location_from_current_command() + '.')
                 self.move_robot(self.get_serve_location_from_current_command())
                 self.wait(1)
                 self.state = 'gotoServeLocation'
