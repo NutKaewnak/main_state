@@ -97,8 +97,6 @@ class BaseState:
         Publish.set_manipulator_action('prepare')
         Publish.set_neck(0.0, -0.7, 0.0)
 
-    def approach_object(self, object_point):
-        if object_point.x >
 
 if __name__ == '__main__':
     try:
