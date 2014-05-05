@@ -28,4 +28,8 @@
 	</room>
 	<location name="entrance" position="2.656, -7.349" rotation="3.126" height="1.29"/>
     	<location name="exit" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
+	<location name="start1" position="1.083,-7.403" rotation="-0.001" height="0.0" />
+	<location name="start2" position="5.391,-14.873" rotation="3.141" height="0.0" />
+	<location name="start3" position="6.053,-19.818" rotation="3.095" height="0.00" />
 </location_information>
+
