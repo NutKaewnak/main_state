@@ -14,10 +14,12 @@ class FINALDEMO(BaseState):
         BaseState.__init__(self)
         self.go_closer_method = 'FORWARD'
         self.LIMIT_MANIPULATED_DISTANCE = 0.78
-
+        self.TABLE_HEIGTH = 0.7
         self.desiredObject = "kokokrunch" #NOTE 1 = cornflakes
         self.desiredObject2 = "dutchmilk"#NOTE 2 = milk
         self.state = "readyToCook"
+        self.milk_offset = 0.0
+        self.cornflake_offset = 0.0
         rospy.loginfo('Start Final Demo State')
         rospy.spin()
 
@@ -31,7 +33,7 @@ class FINALDEMO(BaseState):
 
         elif self.state == 'wakeMasterUp':
                 if(device == Devices.base and data =='SUCCEEDED'):
-                        self.speak("Good Morning Master.What I can do for you?")
+                        self.speak("Good Morning Master.May I help you?")
                         self.state = 'choice'
         
         elif self.state == 'choice':
@@ -66,7 +68,7 @@ class FINALDEMO(BaseState):
 
         elif self.state == 'setRobotEnvironment':
                 if(device == Devices.manipulator and data == 'finish'):
-                    Publish.find_object( 0.75 )
+                    Publish.find_object( self.TABLE_HEIGTH )
                     Publish.speak("Finding ingrediants.")
                     self.state = 'searchingCornflake'
 
@@ -82,6 +84,7 @@ class FINALDEMO(BaseState):
 #                        centroidVector.z = obj.point.z
 #                        Publish.set_manipulator_action_grasp(centroidVector)
 #                        self.state = 'graspingCornflake'
+ 
         elif(self.state == 'searchingCornflake'):
             if(device == Devices.recognition):
                 objects = []
@@ -98,11 +101,11 @@ class FINALDEMO(BaseState):
                         centroidVector.z = obj.point.z
                         self.carried_object = obj.category
                         Publish.set_manipulator_action_grasp(centroidVector)
-                        self.state = 'graspCornflake'
+                        self.state = 'graspingCornflake'
                         return None
 
                 for obj in objects:
-                    if obj.isManipulable == False and obj.category != "unknown":
+                    if obj.isManipulable == False and obj.category == self.desiredObject:
                         self.speak("I will go closer to " + obj.category)
                         if self.go_closer_method == 'FORWARD':
                             move_distance = obj.point.x - self.LIMIT_MANIPULATED_DISTANCE + 0.3
@@ -126,7 +129,7 @@ class FINALDEMO(BaseState):
 
         elif(self.state == 'STEP_TO_OBJECT'):
             if(device == Devices.base and (data == 'SUCCEEDED' or data == 'ABORTED')):
-                Publish.find_object(0.7)
+                Publish.find_object(self.TABLE_HEIGTH)
                 self.state = 'searchingCornflake'
 
         elif self.state == 'graspingCornflake':
@@ -134,7 +137,7 @@ class FINALDEMO(BaseState):
                 self.state = 'trackingBowl'
 
         elif self.state == 'trackingBowl':
-            self.speak("Try to find a bowl")
+            #self.speak("Try to find a bowl")
             if device == Devices.color_detector:
                 Publish.speak("searching a bowl.")
                 Publish.set_manipulator_action_pour(data)
@@ -150,7 +153,7 @@ class FINALDEMO(BaseState):
 
         elif self.state =='discarding':
             if device == Devices.manipulator and data == 'finish':
-                    Publish.find_object( 0.65 )
+                    Publish.find_object( self.TABLE_HEIGTH )
                     self.state = 'searchingMilk'
 
 #        elif self.state == 'searchingMilk':
@@ -174,7 +177,7 @@ class FINALDEMO(BaseState):
                 for obj in objects:
                     print 'category : ' + obj.category + ' centroid : (' + str(obj.point.x) + "," + str(obj.point.y) + "," + str(obj.point.z) + ")"
                 for obj in objects:
-                    if obj.isManipulable == True and obj.category == self.desiredObject_2:
+                    if obj.isManipulable == True and obj.category == self.desiredObject2:
                         self.speak(obj.category)
                         centroidVector = Vector3()
                         centroidVector.x = obj.point.x
@@ -186,7 +189,7 @@ class FINALDEMO(BaseState):
                         return None
 
                 for obj in objects:
-                    if obj.isManipulable == False and obj.category != "unknown":
+                    if obj.isManipulable == False and obj.category == self.desiredObject2:
                         self.speak("I will go closer to " + obj.category)
                         if self.go_closer_method == 'FORWARD':
                             move_distance = obj.point.x - self.LIMIT_MANIPULATED_DISTANCE + 0.3
@@ -210,7 +213,7 @@ class FINALDEMO(BaseState):
 
         elif(self.state == 'STEP_TO_OBJECT_2'):
             if(device == Devices.base and (data == 'SUCCEEDED' or data == 'ABORTED')):
-                Publish.find_object(0.7)
+                Publish.find_object(self.TABLE_HEIGTH)
                 self.state = 'searchingMilk'
 
         elif self.state == 'graspingMilk':
@@ -227,6 +230,7 @@ class FINALDEMO(BaseState):
         elif self.state == 'discardMilk':
             if device == Devices.manipulator and data == 'finish':
                 self.wait(3)
+
 		self.speak("discard milk")
                 Publish.set_manipulator_action('cornflake_pullback')
                 self.state = 'serve'
