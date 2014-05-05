@@ -48,7 +48,7 @@ class GPSR(BaseState):
         self.object_categories = self.object_info.get_category_map()
         self.ask_data = None
         self.object_location = None
-        self.starting_point = 'entrance'
+        self.starting_point = 'start1'
         self.exit_point = 'exit'
         self.current_angle = -60 * math.pi / 180
         self.max_pan_angle = 60 * math.pi / 180
@@ -306,11 +306,11 @@ class GPSR(BaseState):
         elif self.state == 'deliver':
             if device == Devices.base and data == 'SUCCEEDED':
                 self.speak('This is %s. Please take it.'%self.current_action.object)
-                Publish.set_manipulator_action('normal')
+                Publish.set_manipulator_action('normal_pullback')
                 self.state = 'give'
         elif self.state == 'give':
             if device == Devices.manipulator and data == 'finish':
-                self.wait(5)
+                Publish.set_manipulator_action('grip_open')
                 self.state = 'grip_open'
         elif self.state == 'grip_open':
             if device == Devices.manipulator and data == 'finish':

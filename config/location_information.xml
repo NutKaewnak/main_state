@@ -24,7 +24,7 @@
 		<location name="kitchen table" position="-1.484, -20.327" rotation="2.315" height="0.7"/>
 		<location name="fridge" position="-1.859, -22.723" rotation="-3.121" height="1.21"/>
 		<location name="kitchen board" position="-1.923, -22.129" rotation="-3.134" height="0.61"/>
-		<location name="bar" position="2.286,-20.063" rotation="-2.413" height="0.905">
+        <location name="bar" position="2.286,-20.063" rotation="-2.413" height="0.905"/>
 	</room>
 	<location name="entrance" position="2.656, -7.349" rotation="3.126" height="1.29"/>
     	<location name="exit" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
