@@ -56,6 +56,8 @@ class GPSR(BaseState):
         self.neck_counter = 0
         self.height_offset = 0.3
         self.num_command = 0
+        Publish.set_height(1.0)
+        Publish.set_neck(0.0, 0.0, 0.0)
         rospy.spin()
 
     def isCategoryOne(self, command):
@@ -126,7 +128,7 @@ class GPSR(BaseState):
             self.state = 'follow'
         elif action.action in self.verb_categories['introduce']:
             self.speak('Hello my name is lumyai. I am robot from Kasetsart University Thailand. Nice to meet you.')
-            self.state = 'introduce'
+            self.finishAction()
 
     def finishAction(self):
         if self.current_action_index + 1 < len(self.actions):
@@ -160,8 +162,6 @@ class GPSR(BaseState):
                     self.num_command += 1
                 elif self.isCategoryTwo(data):
                     self.command = data
-                    Publish.set_height(1.0)
-                    Publish.set_neck(0.0, -0.7, 0.0)
                     self.speak('did you say %s.' % data)
                     self.state = 'confirm'
                 self.command = data
@@ -185,6 +185,8 @@ class GPSR(BaseState):
                     self.current_action = self.actions[self.current_action_index]
                     self.speak('I will %s.' % self.command)
                     self.startAction(self.current_action)
+                    Publish.set_neck(0.0, -0.7, 0.0)
+                    Publish.set_height(1.0)
                 elif 'no' in data:
                     self.speak('Please repeat your command.')
                     self.state = 'wait'
@@ -254,6 +256,9 @@ class GPSR(BaseState):
                 elif self.current_action.action in self.verb_categories['go']:
                     self.speak('I reach the %s'%self.current_action.data)
                     self.finishAction()
+                elif self.current_action.action in self.verb_categories['exit']:
+                    self.move_robot(self.exit_point)
+                    self.state = 'return'
         elif self.state == 'prepare':
             if device == Devices.manipulator and data == 'finish':
                 self.state = 'object_search'
@@ -265,14 +270,18 @@ class GPSR(BaseState):
                 for object in data.objects:
                     if object.category == self.current_action.object:
                         found = True
-                        objCentroid = Vector3()
-                        objCentroid.x = object.point.x
-                        objCentroid.y = object.point.y
-                        objCentroid.z = object.point.z
-                        Publish.set_manipulator_point(objCentroid.x, objCentroid.y, objCentroid.z)
-                        #rospy.loginfo('%s is at x:%f y:%f z:%f'%(self.current_action.object,objCentroid.x,objCentroid.y,objCentroid.z))
-                        self.state = 'get_object'
-                        self.speak('I found %s.'%self.current_action.object)
+                        if not object.isManipulable:
+                            self.speak('Object not reachable')
+                            self.state = 'deliver'
+                        else:
+                            objCentroid = Vector3()
+                            objCentroid.x = object.point.x
+                            objCentroid.y = object.point.y
+                            objCentroid.z = object.point.z
+                            Publish.set_manipulator_point(objCentroid.x, objCentroid.y, objCentroid.z)
+                            #rospy.loginfo('%s is at x:%f y:%f z:%f'%(self.current_action.object,objCentroid.x,objCentroid.y,objCentroid.z))
+                            self.state = 'get_object'
+                            self.speak('I found %s.'%self.current_action.object)
                 if not found:
                     if self.current_angle >= self.max_pan_angle:
                         self.speak('%s not found'%self.current_action.object)
@@ -302,6 +311,9 @@ class GPSR(BaseState):
         elif self.state == 'give':
             if device == Devices.manipulator and data == 'finish':
                 self.wait(5)
+                self.state = 'grip_open'
+        elif self.state == 'grip_open':
+            if device == Devices.manipulator and data == 'finish':
                 self.finishAction()
         elif self.state == 'introduce':
             self.finishAction()
