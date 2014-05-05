@@ -6,6 +6,8 @@ from include.function import *
 from include.publish import *
 from include.base_state import *
 from include.command_extractor import *
+from include.location_information import *
+from include.object_information import *
 from geometry_msgs.msg import Vector3, Pose2D
 from lumyai_navigation_msgs.msg import NavGoalMsg
 
@@ -33,6 +35,8 @@ class GPSR(BaseState):
         vc_filename = roslib.packages.get_pkg_dir('main_state') + '/config/command_config/verb_categories.txt'
         lc_filename = roslib.packages.get_pkg_dir('main_state') + '/config/command_config/location_categories.txt'
         oc_filename = roslib.packages.get_pkg_dir('main_state') + '/config/command_config/object_categories.txt'
+        self.location_info = read_location_category()
+        self.object_info = read_object_info()
         self.state = 'wait'
         self.command = ''
         self.command_extractor = CommandExtractor()
@@ -40,18 +44,46 @@ class GPSR(BaseState):
         self.current_action = None
         self.actions = []
         self.verb_categories = readFileToDic(vc_filename)
-        self.location_categories = readFileToDic(lc_filename)
-        self.object_categories = readFileToDic(oc_filename)
+        self.location_categories = self.location_info.location_categories
+        self.object_categories = self.object_info.get_category_map()
         self.ask_data = None
         self.object_location = None
-        self.starting_point = 'bed'
-        self.exit_point = 'outside_pos'
+        self.starting_point = 'entrance'
+        self.exit_point = 'exit'
         self.current_angle = -60 * math.pi / 180
         self.max_pan_angle = 60 * math.pi / 180
         self.angle_step = 0.42
         self.neck_counter = 0
         self.height_offset = 0.3
+        self.num_command = 0
         rospy.spin()
+
+    def isCategoryOne(self, command):
+        for object in self.object_info.get_all_object_names():
+            if object in command:
+                return True
+
+        for location in self.location_info.get_all_location_names():
+            if location in command:
+                return True
+
+        intransitive_verb = ['exit','leave','tell','introduce']
+        for verb in intransitive_verb:
+            if verb in command:
+                return True
+
+        return False
+
+    def isCategoryTwo(self, command):
+        if not self.isCategoryOne(command):
+            for object_category in self.object_info.get_all_category_names():
+                if object_category in command:
+                    return True
+
+            for location_category in self.location_info.get_all_category_names():
+                if location_category in command:
+                    return True
+        return False
 
     def startMoving(self, action):
         if action.action in self.verb_categories['exit']:
@@ -123,11 +155,24 @@ class GPSR(BaseState):
                 self.state = 'wait'
         elif self.state == 'wait':
             if device == Devices.voice and self.command_extractor.isValidCommand(data):
+                if self.isCategoryOne(data):
+                    self.state = 'wait_more_command'
+                    self.num_command += 1
+                elif self.isCategoryTwo(data):
+                    self.command = data
+                    Publish.set_height(1.0)
+                    Publish.set_neck(0.0, -0.7, 0.0)
+                    self.speak('did you say %s.' % data)
+                    self.state = 'confirm'
                 self.command = data
-                Publish.set_height(1.0)
-                Publish.set_neck(0.0, 0.0, 0.0)
-                self.speak('did you say %s.' % data)
-                self.state = 'confirm'
+        elif self.state == 'wait_more_command':
+            if device == Devices.voice and self.command_extractor.isValidCommand(data):
+                if self.isCategoryOne(data):
+                    self.num_command += 1
+                    self.command += ' ' + data
+                    if self.num_command == 3:
+                        self.state = 'confirm'
+                        self.speak('Did you say %s.'%self.command)
         elif self.state == 'confirm':
             if device == Devices.voice:
                 if 'yes' in data:
@@ -276,6 +321,7 @@ class GPSR(BaseState):
                 self.current_action = None
                 self.object_location = None
                 self.state = 'wait'
+                self.num_command = 0
 
 if __name__ == '__main__':
     try:

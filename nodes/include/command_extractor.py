@@ -5,6 +5,9 @@ Action tuples : (verb,<object>,<data>)
 """
 
 import roslib
+from location_information import *
+from object_information import *
+from people_information import *
 
 roslib.load_manifest('main_state')
 
@@ -66,12 +69,15 @@ class CommandExtractor(object):
         return None
 
     def __init__(self):
-        # Read config file
-        self.object_categories = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/object_categories.txt')
-        self.objects = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/objects.txt')
-        self.locations = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/locations.txt')
-        self.names = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/names.txt')
-        self.location_categories = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/location_categories.txt')
+        #Read config file
+        object_info = read_object_info()
+        location_info = read_location_category()
+        people_info = read_people_information()
+        self.objects = object_info.get_all_object_names()
+        self.object_categories = object_info.get_all_category_names()
+        self.locations = location_info.get_all_location_names()
+        self.location_categories = location_info.get_all_category_names()
+        self.names = people_info.get_people_names()
         self.verbs = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/verbs.txt')
         self.intransitive_verbs = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/intransitive_verbs.txt')
 
@@ -102,28 +108,28 @@ class CommandExtractor(object):
         """
         >>> CommandExtractor().getActions('')
         []
-        >>> CommandExtractor().getActions('move to bar go to bed and leave apartment')
-        [('move', None, 'bar'), ('go', None, 'bed'), ('leave', None, None)]
-        >>> CommandExtractor().getActions('navigate to kitchen table bring fanta red and exit apartment')
-        [('navigate', None, 'kitchen table'), ('bring', 'fanta red', None), ('exit', None, None)]
-        >>> CommandExtractor().getActions('go to bar find lactasoy and take it')
-        [('go', None, 'bar'), ('find', 'lactasoy', None), ('take', None, None)]
-        >>> CommandExtractor().getActions('go to stove identify wd and take it')
-        [('go', None, 'stove'), ('identify', 'wd', None), ('take', None, None)]
-        >>> CommandExtractor().getActions('go to bench go to bar and introduce yourself')
-        [('go', None, 'bench'), ('go', None, 'bar'), ('introduce', None, None)]
-        >>> CommandExtractor().getActions('go to kitchen find amanda and exit')
-        [('go', None, 'kitchen'), ('find', 'amanda', None), ('exit', None, None)]
+        >>> CommandExtractor().getActions('move to show case go to desk and leave apartment')
+        [('move', None, 'show case'), ('go', None, 'desk'), ('leave', None, None)]
+        >>> CommandExtractor().getActions('navigate to kitchen table bring soda and exit apartment')
+        [('navigate', None, 'kitchen table'), ('bring', 'soda', None), ('exit', None, None)]
+        >>> CommandExtractor().getActions('go to bar find coffee and take it')
+        [('go', None, 'bar'), ('find', 'coffee', None), ('take', None, None)]
+        >>> CommandExtractor().getActions('go to reception table identify green cup and take it')
+        [('go', None, 'reception table'), ('identify', 'green cup', None), ('take', None, None)]
+        >>> CommandExtractor().getActions('go to library table go to bar and introduce yourself')
+        [('go', None, 'library table'), ('go', None, 'bar'), ('introduce', None, None)]
+        >>> CommandExtractor().getActions('go to desk find amanda and exit')
+        [('go', None, 'desk'), ('find', 'amanda', None), ('exit', None, None)]
         >>> CommandExtractor().getActions('bring me a drink')
         [('bring', 'drink', None)]
         >>> CommandExtractor().getActions('carry a drink to table')
         [('carry', 'drink', 'table')]
         >>> CommandExtractor().getActions('navigate to shelf')
         [('navigate', None, 'shelf')]
-        >>> CommandExtractor().getActions('carry a cleaning stuff to table')
-        [('carry', 'cleaning stuff', 'table')]
-        >>> CommandExtractor().getActions('bring snacks to seat')
-        [('bring', 'snacks', 'seat')]
+        >>> CommandExtractor().getActions('carry a toy to table')
+        [('carry', 'toy', 'table')]
+        >>> CommandExtractor().getActions('bring snack to appliance')
+        [('bring', 'snack', 'appliance')]
         """
         output = []
         words = command.split()
@@ -147,33 +153,27 @@ class CommandExtractor(object):
         """
         >>> CommandExtractor().isValidCommand('')
         False
-        >>> CommandExtractor().isValidCommand('snacks')
-        False
-        >>> CommandExtractor().isValidCommand('bench')
-        False
-        >>> CommandExtractor().isValidCommand('cleaning stuff')
-        False
-        >>> CommandExtractor().isValidCommand('seat')
+        >>> CommandExtractor().isValidCommand('snack')
         False
         >>> CommandExtractor().isValidCommand('robot yes')
         False
         >>> CommandExtractor().isValidCommand('robot no')
         False
-        >>> CommandExtractor().isValidCommand('move to bench go to kitchen table and exit apartment')
+        >>> CommandExtractor().isValidCommand('move to bar go to kitchen table and exit apartment')
         True
-        >>> CommandExtractor().isValidCommand('go to sidetable get milk and exit apartment')
+        >>> CommandExtractor().isValidCommand('go to fridge get soda and exit apartment')
         True
-        >>> CommandExtractor().isValidCommand('bring peanut butter go to bench and exit apartment')
+        >>> CommandExtractor().isValidCommand('bring red chips go to bench and exit apartment')
         True
-        >>> CommandExtractor().isValidCommand('navigate to bench introduce yourself and exit apartment')
+        >>> CommandExtractor().isValidCommand('navigate to white shelf introduce yourself and exit apartment')
         True
-        >>> CommandExtractor().isValidCommand('bring me a food')
+        >>> CommandExtractor().isValidCommand('bring me a cup')
         True
-        >>> CommandExtractor().isValidCommand('bring a cleaning stuff')
+        >>> CommandExtractor().isValidCommand('bring a tool')
         True
         >>> CommandExtractor().isValidCommand('move to table')
         True
-        >>> CommandExtractor().isValidCommand('bring cleaning stuff to seat')
+        >>> CommandExtractor().isValidCommand('bring toy to seat')
         True
         """
         isVerbFound = isIntransitiveVerbFound = False
