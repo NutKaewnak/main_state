@@ -19,5 +19,8 @@
 		<location name="tv board"/>
 		<location name="kitchen board"/>
 		<location name="fridge"/>
+		<location name="location one"/>
+		<location name="location two"/>
+		<location name="location three"/>
 	</category>
 </location_category>

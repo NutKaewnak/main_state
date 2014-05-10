@@ -56,6 +56,12 @@ class GPSR(BaseState):
         self.neck_counter = 0
         self.height_offset = 0.3
         self.num_command = 0
+        self.timer = Delay()
+        self.LIMIT_MANIPULATED_DISTANCE = 0.78
+        self.COOK_TABLE_HEIGTH          = 0.68
+        self.ROBOT_HEIGHT               = 1.10
+        self.desiredObject              = "kokokrunch"
+        self.desiredObject_2            = "dutchmilk"
         Publish.set_height(1.0)
         Publish.set_neck(0.0, 0.0, 0.0)
         rospy.spin()
@@ -96,7 +102,7 @@ class GPSR(BaseState):
             else:
                 self.move_robot(self.exit_point)
         elif action.action in self.verb_categories['bring']:
-            self.move_robot(self.object_location)
+            self.move_robot(self.current_action.data)
         self.wait(2)
         self.state = 'move'
 
@@ -129,6 +135,11 @@ class GPSR(BaseState):
         elif action.action in self.verb_categories['introduce']:
             self.speak('Hello my name is lumyai. I am robot from Kasetsart University Thailand. Nice to meet you.')
             self.finishAction()
+        elif action.action in self.verb_categories['make']:
+            self.state = 'PREPARE_FOR_ACTION'
+        elif action.action in self.verb_categories['notify']:
+            self.move_robot(action.data)
+            self.state = 'move'
 
     def finishAction(self):
         if self.current_action_index + 1 < len(self.actions):
@@ -157,14 +168,27 @@ class GPSR(BaseState):
                 self.state = 'wait'
         elif self.state == 'wait':
             if device == Devices.voice and self.command_extractor.isValidCommand(data):
-                if self.isCategoryOne(data):
-                    self.state = 'wait_more_command'
-                    self.num_command += 1
-                elif self.isCategoryTwo(data):
-                    self.command = data
-                    self.speak('did you say %s.' % data)
-                    self.state = 'confirm'
+                self.state = 'confirm'
                 self.command = data
+                self.speak('did you say %s'%self.command)
+            #    self.timer.wait(3)
+            #    self.command = self.command + data
+            #    action = self.command_extractor.getActions(data)
+            #    print(action)
+            #    new_action = Action(action[0][0], action[0][1], action[0][2])
+            #    self.actions.append(new_action)
+            #if not self.timer.is_waiting():
+                #self.state = 'confirm'
+                #self.speak('Did you say ' + self.command)
+                #if self.isCategoryOne(data):
+                #    self.state = 'wait_more_command'
+                #    self.num_command += 1
+                #elif self.isCategoryTwo(data):
+                #    self.command = data
+                #    self.speak('did you say %s.' % data)
+                #    self.state = 'confirm'
+                #self.command = data
+
         elif self.state == 'wait_more_command':
             if device == Devices.voice and self.command_extractor.isValidCommand(data):
                 rospy.loginfo(self.command)
@@ -178,6 +202,7 @@ class GPSR(BaseState):
             if device == Devices.voice:
                 if 'yes' in data:
                     actions = self.command_extractor.getActions(self.command)
+                    print(actions)
                     rospy.loginfo('Num action : ' + str(len(actions)))
                     for i in xrange(0,len(actions)):
                         action = Action(actions[i][0], actions[i][1], actions[i][2])
@@ -261,6 +286,8 @@ class GPSR(BaseState):
                 elif self.current_action.action in self.verb_categories['exit']:
                     self.move_robot(self.exit_point)
                     self.state = 'return'
+                elif self.current_action.action in self.verb_categories['notify']:
+                    self.speak('your command is complete')
         elif self.state == 'prepare':
             if device == Devices.manipulator and data == 'finish':
                 self.state = 'object_search'
@@ -327,6 +354,133 @@ class GPSR(BaseState):
                 Publish.move_robot(data)
             elif device == Devices.voice:
                 self.stop_robot()
+                self.finishAction()
+        elif self.state == 'PREPARE_FOR_ACTION':
+            Publish.set_manipulator_action('prepare')
+            Publish.set_height(self.ROBOT_HEIGHT)
+            Publish.set_neck(0,-0.7,0)
+            Publish.move_relative(0,0,-0.5)
+            self.state = 'READY_FOR_ACTION'
+        elif self.state == 'READY_FOR_ACTION':
+            if device == Devices.manipulator and data == 'finish':
+                Publish.speak("Searching breakfast ingredients.")
+                Publish.find_object(self.COOK_TABLE_HEIGTH)
+                self.state = 'SEARCHING_CORNFLAKE'
+        elif(self.state == 'SEARCHING_CORNFLAKE'):
+            if(device == Devices.recognition):
+                objects = []
+                print '--------len(data.objects) : ' +str(len(data.objects)) +  '-------'
+                objects = data.objects
+                for obj in objects:
+                    print 'category : ' + obj.category + ' centroid : (' + str(obj.point.x) + "," + str(obj.point.y) + "," + str(obj.point.z) + ")"
+                for obj in objects:
+                    if  obj.category == "milo":#obj.category == self.desiredObject:
+                        self.speak(obj.category)
+                        centroidVector = Vector3()
+                        centroidVector.x = obj.point.x
+                        centroidVector.y = obj.point.y
+                        centroidVector.z = obj.point.z
+                        Publish.set_manipulator_action_grasp(centroidVector)
+                        self.state = 'GRASPING_CORNFLAKE'
+                        return None
+
+        elif self.state == 'GRASPING_CORNFLAKE':
+            if device == Devices.manipulator and data == 'finish':
+                self.speak("I got it.")
+                Publish.set_manipulator_action("prepare_pullback")
+                self.state = 'SET_PREPARE'
+
+        elif self.state == 'SET_PREPARE':
+            if device == Devices.manipulator and data == 'finish':
+                self.state = 'SEARCHING_BOWL'
+                #self.state = 'TURN_TO_CENTER_FROM_CORNFLAKE'
+                #Publish.move_relative(0,0,0.5)
+
+        elif self.state == 'TURN_TO_CENTER_FROM_CORNFLAKE':
+            if device == Devices.base and data == 'SUCCEEDED':
+                self.state = 'SEARCHING_BOWL'
+                self.wait(2)
+                #Publish.move_relative(0,0,0.5)
+
+        elif self.state == 'SEARCHING_BOWL':
+                if device == Devices.color_detector:
+                    Publish.speak("searching a bowl.")
+                    data.x -= 0.12
+                    data.y -= 0.09
+                    data.z += 0.30
+                    Publish.set_manipulator_action_pour(data)
+                    Publish.speak("pouring.")
+                    self.state = 'DISCARD_CORNFLAKE'
+
+        elif self.state == 'DISCARD_CORNFLAKE':
+            if device == Devices.manipulator and data == 'finish':
+                Publish.speak("discard cornflake.")
+                self.wait(3)
+                Publish.set_manipulator_action('cornflake_pullback')
+                self.state = 'DISCARDING'
+
+        elif self.state == 'DISCARDING':
+            if device == Devices.manipulator and data == 'finish':
+                #Publish.move_relative(0,0,0.5)
+                Publish.find_object(self.COOK_TABLE_HEIGTH)
+                self.state = 'SEARCHING_MILK'
+                #self.state = 'TURN_TO_MILK'
+
+        elif self.state == 'TURN_TO_MILK':
+            if device == Devices.base and data == 'SUCCEEDED':
+                Publish.find_object(self.COOK_TABLE_HEIGTH)
+                self.state = 'SEARCHING_MILK'
+                #self.state = 'TURN_TO_MILK'
+
+        elif self.state == 'SEARCHING_MILK':
+            if device == Devices.recognition:
+                objects = []
+                print '--------len(data.objects) : ' +str(len(data.objects)) + '-------'
+                objects = data.objects
+                for obj in objects:
+                    print 'category : ' + obj.category + ' centroid : (' + str(obj.point.x) + "," + str(obj.point.y) + "," + str(obj.point.z) + ")"
+                for obj in objects:
+                    if obj.category == self.desiredObject_2:
+                        self.speak(obj.category)
+                        centroidVector = Vector3()
+                        centroidVector.x = obj.point.x
+                        centroidVector.y = obj.point.y
+                        centroidVector.z = obj.point.z
+                        Publish.set_manipulator_action_grasp(centroidVector)
+                        self.state = 'GRASPING_MILK'
+                        return None
+
+        elif self.state == 'GRASPING_MILK':
+            if device == Devices.manipulator and data == 'finish':
+                self.speak("I got it.")
+                Publish.set_manipulator_action("prepare_pullback")
+                self.state = 'SET_PREPARE_MILK'
+
+        elif self.state == 'SET_PREPARE_MILK':
+            if device == Devices.manipulator and data == 'finish':
+                self.state = 'SEARCHING_BOWL_2'
+                #Publish.move_relative(0,0,-0.5)
+
+        elif self.state == 'TURN_TO_CENTER_FROM_MILK':
+            if device == Devices.base and data == 'SUCCEEDED':
+                self.state = 'SEARCHING_BOWL_2'
+                self.wait(2)
+                #Publish.move_relative(0,0,0.5)
+
+        elif self.state == 'SEARCHING_BOWL_2':
+            if device == Devices.color_detector:
+                Publish.speak("searching a bowl.")
+                data.x -= 0.12
+                data.y -= 0.09
+                data.z += 0.30
+                Publish.set_manipulator_action_pour(data)
+                Publish.speak("pouring.")
+                self.state = 'DISCARD_MILK'
+
+        elif self.state == 'DISCARD_MILK':
+            if device == Devices.manipulator and data == 'finish':
+                self.wait(3)
+                Publish.set_manipulator_action('cornflake_pullback')
                 self.finishAction()
         elif self.state == 'return':
             if device == Devices.base and data == 'SUCCEEDED':
