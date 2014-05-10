@@ -1,35 +1,36 @@
 <location_information>
 	<room name="visitor room" position="1.921, -7.228" rotation="3.107" height="0.70">
 		<location name="reception table" position="1.093, -7.359" rotation="-3.134" height="0.70"/>
-		<location name="shoe box" position="1.198, -5.954" rotation="1.564" height="0.89"/>
+		<location name="shoe box" position="1.198, -5.954" rotation="1.564" height="0.70"/>
 		<location name="desk" position="-1.371, -9.397" rotation="3.135" height="0.70"/>
-		<location name="brown shelf" position="-2.313, -11.277" rotation="1.556" height="0.88"/>	
+		<location name="brown shelf" position="-2.313, -11.277" rotation="1.556" height="0.70"/>	
 	</room>
 	<room name="library" position="0.330, -14.052" rotation="-3.135" height="0.75">
-		<location name="library table" position="0.125, -14.054" rotation="1.848" height="0.72"/>
-		<location name="white shelf" position="-1.313, -15.486" rotation="-1.588" height="0.89"/>
+		<location name="library table" position="0.125, -14.054" rotation="1.848" height="0.70"/>
+		<location name="white shelf" position="-1.313, -15.486" rotation="-1.588" height="0.90"/>
 	</room>
 	<room name="living room" position="4.245, -15.171" rotation="0.890" height="0.70">
-		<locaiton name="living table" position="6.092, -13.962" rotation="-3.136" height="0.36"/>
-		<locaiton name="showcase" position="5.477, -11.492" rotation="1.566" height="0.875"/>
-		<locaiton name="sofa" position="4.727, -13.145" rotation="3.136" height="0.38"/>
+		<locaiton name="living table" position="6.092, -13.962" rotation="-3.136" height="0.70"/>
+		<locaiton name="showcase" position="5.477, -11.492" rotation="1.566" height="0.70"/>
+		<locaiton name="sofa" position="4.727, -13.145" rotation="3.136" height="0.70"/>
 		<locaiton name="tv board" position="6.178, -14.143" rotation="-0.005" height="0.70"/>
-		<locaiton name="dust bin" position="1.585, -15.479" rotation="-1.574" height="0.61"/>		
+		<locaiton name="dust bin" position="1.585, -15.479" rotation="-1.574" height="0.70"/>		
 	</room>
 	<room name="dining room" position="4.535, -17.982" rotation="-1.613" height="0.75">
-		<location name="dining table" position="3.237, -19.734" rotation="-0.011" height="0.705"/>
-		<location name="dining shelf" position="5.200, -22.342" rotation="-1.564" height="0.795"/>
+		<location name="dining table" position="3.237, -19.734" rotation="-0.011" height="0.75"/>
+		<location name="dining shelf" position="5.200, -22.342" rotation="-1.564" height="0.75"/>
 	</room>
-	<room name="kitchen" position="0.987, -17.963" rotation="-1.558" height="1.29">
-		<location name="kitchen table" position="-1.484, -20.327" rotation="2.315" height="0.7"/>
-		<location name="fridge" position="-1.859, -22.723" rotation="-3.121" height="1.21"/>
-		<location name="kitchen board" position="-1.923, -22.129" rotation="-3.134" height="0.61"/>
-        <location name="bar" position="2.286,-20.063" rotation="-2.413" height="0.905"/>
+	<room name="kitchen" position="0.987, -17.963" rotation="-1.558" height="1.29">a
+		<location name="kitchen table" position="-1.484, -20.327" rotation="2.315" height="1.29"/>
+		<location name="fridge" position="-1.859, -22.723" rotation="-3.121" height="1.29"/>
+		<location name="kitchen board" position="-1.923, -22.129" rotation="-3.134" height="1.29"/>
+        <location name="bar" position="2.286,-20.063" rotation="-2.413" height="1.29"/>
 	</room>
 	<location name="entrance" position="2.656, -7.349" rotation="3.126" height="1.29"/>
-    	<location name="exit" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
-	<location name="start1" position="1.083,-7.403" rotation="-0.001" height="0.0" />
-	<location name="start2" position="5.391,-14.873" rotation="3.141" height="0.0" />
-	<location name="start3" position="6.053,-19.818" rotation="3.095" height="0.0" />
+    <location name="exit" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
+    <location name="location one" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
+    <location name="location two" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
+    <location name="location three" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
+    <location name="snack shelf" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
+    <location name="drink shelf" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
 </location_information>
-
