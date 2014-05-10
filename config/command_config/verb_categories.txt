@@ -29,3 +29,8 @@ follow
 exit
 -leave
 -exit
+make
+-make
+notify
+-notify
+-tell
