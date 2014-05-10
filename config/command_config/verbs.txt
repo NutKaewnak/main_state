@@ -20,3 +20,4 @@ memorize
 follow
 leave
 exit
+make
