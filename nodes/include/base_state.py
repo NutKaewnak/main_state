@@ -27,6 +27,15 @@ class Devices:
     color_detector = 'color_detector'
     foot_detect = 'foot_detect'
 
+class STATE:
+    INIT = 'init'
+    PASSDOOR = 'passDoor'
+    GOCLOSER = 'goCloser'
+
+    SUCCEEED = 'succeed'
+    ABORTED = 'aborted'
+    ERROR = 'error'
+
 class BaseState:
     def __init__(self):
         rospy.Subscriber('/door/is_open', String, self.callback_door)
@@ -43,7 +52,7 @@ class BaseState:
         self.location_list = {}
         read_location_information(self.location_list)
         self.object_info = read_object_info()
-        self.state = 'init'
+        self.state = STATE.INIT
 
     def callback_colorDetector(self, data):
         self.perform_state(Devices.color_detector, data)
@@ -77,12 +86,9 @@ class BaseState:
     def main(self, device, data):
         pass
 
-    def move_robot(self, location):
-        Publish.move_absolute(self.location_list[location].position)
-
     def speak(self, message):
         self.delay.wait(9999)
-        p = Popen(['espeak','-ven+f4',message,'-s 120'])
+        p = Popen(['espeak', '-ven+f4', message, '-s 120'])
         p.wait()
         self.delay.period = 0
 
