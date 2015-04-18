@@ -35,7 +35,7 @@ class followme(BaseState):
     def cb_pan_tilt_main(self, data):
         self.perform_state('pan_tilt', data)
 
-    def cb_base_pos(self,data):
+    def cb_base_pos(self, data):
         pos = data
         if len(self.robot_pos) == 0:
             self.robot_pos.append(pos)
@@ -51,19 +51,19 @@ class followme(BaseState):
                 temp = temp[1:]
         self.robot_pos = temp
 
-    def cb_wall_people(self,data):
+    def cb_wall_people(self, data):
         pos_ = Pose2D()
         pos_.x = data.x + 2.0
         pos_.y = data.y - 1.0
         pos_.theta = data.theta + 3.14/2
         self.robot_pos_wall = pos_
-        self.main(Devices.foot_detect,pos_)
+        self.main(Devices.foot_detect, pos_)
 
     def cb_gesture(self,data):
         print "in cb_gesture cb"
-        self.main('gesture',"%f,%f,%f" % (data.point.x,data.point.y,data.point.z))
+        self.main('gesture', "%f,%f,%f" % (data.point.x, data.point.y, data.point.z))
 
-    def main(self,device,data):
+    def main(self, device, data):
         rospy.loginfo("state:" + self.state + " from:" + device + " data:")
         if self.state == 'init':
             if device == Devices.voice and ('follow me' in data):
@@ -91,7 +91,7 @@ class followme(BaseState):
         elif self.state == 'follow_phase_2':
             if device == Devices.follow:
                 if data.text_msg == 'lost':
-                     data.text_msg = 'stop'
+                    data.text_msg = 'stop'
                 Publish.move_robot(data)
             elif device == 'pan_tilt':
                 Publish.pan_tilt_cmd.publish(data)
@@ -109,7 +109,7 @@ class followme(BaseState):
         elif self.state == 'Seachgesture':
             if device == 'gesture':
                 self.speak("I see you.")
-                x,y,z = data.split(',')
+                x, y, z = data.split(',')
                 x = float(z) * math.cos(self.currentAngle)
                 y = float(z) * math.sin(self.currentAngle)
                 Publish.move_relative(float(x),float(y), 0)

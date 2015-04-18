@@ -27,6 +27,19 @@ class Devices:
     color_detector = 'color_detector'
     foot_detect = 'foot_detect'
 
+class STATE:
+    INIT = 'init'
+    PASSDOOR = 'passDoor'
+    GOCLOSER = 'goCloser'
+    FOLLOWING = 'following'
+
+    WAITING = 'waiting'
+
+    SUCCEEED = 'succeed'
+    ABORTED = 'abort'
+    ERROR = 'error'
+
+
 class BaseState:
     def __init__(self):
         rospy.Subscriber('/door/is_open', String, self.callback_door)
@@ -36,14 +49,15 @@ class BaseState:
         rospy.Subscriber('/follow/point', NavGoalMsg, self.callback_follow)
         rospy.Subscriber('/base/base_pos', Pose2D, self.callback_base_position)
         rospy.Subscriber('/detected_object', ObjectContainer, self.callback_findobject)
-        rospy.Subscriber('/color_detect', Vector3,self.callback_colorDetector)
+        rospy.Subscriber('/color_detect', Vector3, self.callback_colorDetector)
         self.delay = Delay()
         self.reconfig = Reconfig()
         self.robot_position = None
         self.location_list = {}
         read_location_information(self.location_list)
         self.object_info = read_object_info()
-        self.state = 'init'
+        self.state = STATE.INIT
+        self.prevoius_state = None
 
     def callback_colorDetector(self, data):
         self.perform_state(Devices.color_detector, data)
@@ -77,12 +91,9 @@ class BaseState:
     def main(self, device, data):
         pass
 
-    def move_robot(self, location):
-        Publish.move_absolute(self.location_list[location].position)
-
     def speak(self, message):
         self.delay.wait(9999)
-        p = Popen(['espeak','-ven+f4',message,'-s 120'])
+        p = Popen(['espeak', '-ven+f4', message, '-s 120'])
         p.wait()
         self.delay.period = 0
 
@@ -91,6 +102,10 @@ class BaseState:
 
     def wait(self, period):
         self.delay.wait(period)
+
+    def changeStateTo(self,state):
+        self.prevoius_state = self.state
+        self.state = state
 
     def prepare_manipulate(self, height):
         Publish.set_height(height)
