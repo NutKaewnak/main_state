@@ -27,7 +27,7 @@ class moveToLocation:
 
         elif device == Devices.base and data == 'SUCCEEDED':
             self.speak('succeeded')
-            self.state = STATE.SUCCEEED
+            self.state = STATE.SUCCEED
         elif device == Devices.base and data == 'ABORTED':
             self.speak('aborted')
             self.state = STATE.ABORTED

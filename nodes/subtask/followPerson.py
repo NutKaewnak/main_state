@@ -7,6 +7,7 @@ from include.base_state import Devices, BaseState, STATE
 from factory.neck import *
 from factory.move import *
 
+
 class FollowPerson(BaseState):
     def __init__(self):
         BaseState.__init__(self)
@@ -65,7 +66,7 @@ class FollowPerson(BaseState):
                 Publish.follow_init.publish(Bool(True))
                 self.changeStateTo(STATE.FOLLOWING)
 
-    def start(self):
+    def person(self):
         self.changeStateTo(STATE.INIT)
 
     def stop(self, message):

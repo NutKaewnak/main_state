@@ -35,7 +35,7 @@ class moveRelative:
                 self.z = None
         elif device is Devices.base and data is 'SUCCEEDED':
             self.speak('succeeded')
-            self.state = STATE.SUCCEEED
+            self.state = STATE.SUCCEED
         elif device is Devices.base and data is 'ABORTED':
             self.speak('aborted')
             self.state = STATE.ABORTED

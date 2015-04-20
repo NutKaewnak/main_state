@@ -34,7 +34,7 @@ class followme_v2(BaseState):
         elif self.state is STATE.WAITING:
             if device is Devices.voice and ('follow me' in data):
                 Publish.speak("I will follow you.")
-                Move.follow().start()
+                Move.follow().person()
                 self.changeStateTo(STATE.FOLLOWING)
 
         elif self.state is STATE.FOLLOWING:

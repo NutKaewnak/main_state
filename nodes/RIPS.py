@@ -22,12 +22,12 @@ class  RIPS(BaseState):
             Move.passDoor()
             self.state = STATE.PASSDOOR
 
-        elif self.state == STATE.PASSDOOR and Move.passDoor().state == STATE.SUCCEEED:
+        elif self.state == STATE.PASSDOOR and Move.passDoor().state == STATE.SUCCEED:
             Move.toLocation('hallway table')
             self.state = 'goToTable'
 
         elif self.state == 'goToTable':
-            if Move.toLocation().state == STATE.SUCCEEED:
+            if Move.toLocation().state == STATE.SUCCEED:
                 self.state = 'moveArm'
 
         elif self.state == 'moveArm':
