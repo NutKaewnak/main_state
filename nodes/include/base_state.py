@@ -29,16 +29,20 @@ class Devices:
 
 class STATE:
     INIT = 'init'
+    WAITING = 'waiting'
+    SUCCEED = 'succeed'
+    ABORTED = 'abort'
+    ERROR = 'error'
+    EXIT = 'EXID'
+
     PASSDOOR = 'passDoor'
     GOCLOSER = 'goCloser'
     FOLLOWING = 'following'
 
-    WAITING = 'waiting'
+    GRAB = 'grab'
+    PLACE = 'place'
 
-    SUCCEEED = 'succeed'
-    ABORTED = 'abort'
-    ERROR = 'error'
-
+    DETECT = 'detect'
 
 class BaseState:
     def __init__(self):

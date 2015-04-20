@@ -24,7 +24,7 @@ class MovePassDoor(BaseState):
             Neck.lookDown()
             Publish.set_manipulator_action('walking')
         elif device == Devices.base and data == 'SUCCEEDED':
-            self.state = STATE.SUCCEEED
+            self.state = STATE.SUCCEED
         elif device == Devices.base and data == 'ABORTED':
                 self.speak('aborted')
                 self.state = STATE.ERROR
