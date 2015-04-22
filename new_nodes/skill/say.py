@@ -7,6 +7,9 @@ class Say(AbstractSkill):
         AbstractSkill.__init__(self, control_module)
 
     def say(self, message):
-        if self.state is 'init':
-            self.controlModule.speaker.speak(message)
+        self.controlModule.speaker.speak(message)
+        self.change_state('saying')
+
+    def perform(self, perception_data):
+        if self.state is 'saying':
             self.change_state('succeed')
