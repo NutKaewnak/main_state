@@ -29,7 +29,8 @@ class  RIPS(BaseState):
         elif self.state == 'goToTable':
             if Move.toLocation().state == STATE.SUCCEED:
                 self.state = 'moveArm'
-
+                # Publish.set_manipulator_action('rips_out')
+                # Publish.set_neck(0, 0, 0)
         elif self.state == 'moveArm':
             if device == Devices.manipulator and data == 'finish':
                 Publish.speak(
