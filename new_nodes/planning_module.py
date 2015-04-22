@@ -22,4 +22,4 @@ class PlanningModule:
         self.taskBook.set_perception(perception_module)
 
     def perform(self, perception_data):
-        self.taskBook[self.task].act(perception_data)
+        self.taskBook.book[self.task].act(perception_data)

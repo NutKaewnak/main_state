@@ -8,3 +8,4 @@ class Test(AbstractTask):
     def perform(self, perception_data):
         if self.state is 'init':
             self.subtaskBook.get_subtask(self, 'Introduce')
+            self.change_state('succeed')

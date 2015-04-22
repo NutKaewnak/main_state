@@ -9,6 +9,6 @@ class Introduce(AbstractSubtask):
 
     def perform(self, perception_data):
         if self.state is 'init':
-            self.skill = self.skillBook.get_skill(self, 'say')
-            self.skill.say('Hello, my name is Lamyai.')
-            self.skill.say('I am from Kasetsart university.')
+            self.skill = self.skillBook.get_skill(self, 'Say')
+            self.skill.say('Hello, my name is Lamyai. I am from Kasetsart university.')
+            self.change_state('succeed')
