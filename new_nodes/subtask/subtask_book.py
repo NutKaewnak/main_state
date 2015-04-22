@@ -7,7 +7,7 @@ from introduce import Introduce
 
 class SubtaskBook:
     def __init__(self, planning_module):
-        self.book = {None}
+        self.book = dict()
         self.book['MovePassDoor'] = MovePassDoor(planning_module)
         self.book['MoveToLocation'] = MoveToLocation(planning_module)
         self.book['Introduce'] = Introduce(planning_module)

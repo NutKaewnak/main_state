@@ -7,7 +7,7 @@ from say import Say
 
 class SkillBook:
     def __init__(self, control_module):
-        self.book = {None}
+        self.book = dict()
         self.book['MoveBaseAbsolute'] = MoveBaseAbsolute(control_module)
         self.book['MoveBaseRelative'] = MoveBaseRelative(control_module)
         self.book['Say'] = Say(control_module)
