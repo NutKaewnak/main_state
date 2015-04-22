@@ -5,7 +5,7 @@ from rips import RIPS
 
 class TaskBook:
     def __init__(self, planning_module):
-        self.book = {}
+        self.book = {None}
         self.book['RIPS'] = RIPS(planning_module)
 
     def set_perception(self, perception_module):

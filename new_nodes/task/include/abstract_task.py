@@ -22,6 +22,11 @@ class AbstractTask:
         self.last_state = self.state
         self.state = new_state
 
+    def change_state_with_subtask(self, new_state, new_subtask):
+        if self.current_subtask is None or self.current_subtask.state is 'finish':
+            self.change_state(new_state)
+            self.subtaskBook.get_subtask(self, new_subtask)
+
     def act(self, perception_data):
         if self.current_subtask is not None:
             self.current_subtask.act(perception_data)

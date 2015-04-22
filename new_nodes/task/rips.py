@@ -12,13 +12,20 @@ class RIPS(AbstractTask):
 
     def perform(self, perception_data):
         if self.state is 'init':
-            self.move = self.subtaskBook.get_subtask(self, 'MovePassDoor')
-            self.change_state('movePassDoor')
+            self.change_state_with_subtask('movePassDoor', 'MovePassDoor')
+
         elif self.state is 'movePassDoor':
             if self.move.state is 'finish':
                 self.move = self.subtaskBook.get_subtask(self, 'MoveToLocation')
                 self.move.to_location('hallway table')
                 self.change_state('moveToTable')
+
         elif self.state is 'moveToTable':
-            if self.move.state is 'finish':
-                self.change_state('finish')
+            if self.current_subtask.state is 'finish':
+                self.change_state('moveArm')
+
+        elif self.state is 'moveArm':
+            pass
+
+
+
