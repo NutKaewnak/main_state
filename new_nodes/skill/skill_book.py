@@ -2,6 +2,7 @@ __author__ = "AThousandYears"
 
 from move_base_absolute import MoveBaseAbsolute
 from move_base_relative import MoveBaseRelative
+from rips_out import RipsOut
 from say import Say
 
 
@@ -10,6 +11,7 @@ class SkillBook:
         self.book = dict()
         self.book['MoveBaseAbsolute'] = MoveBaseAbsolute(control_module)
         self.book['MoveBaseRelative'] = MoveBaseRelative(control_module)
+        self.book['RipsOut'] = RipsOut(control_module)
         self.book['Say'] = Say(control_module)
 
     def get_skill(self, subtask, skill_name):

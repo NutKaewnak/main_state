@@ -21,10 +21,11 @@ class RIPS(AbstractTask):
 
         elif self.state is 'moveToTable':
             if self.current_subtask.state is 'finish':
+                self.subtaskBook.get_subtask('Register')
                 self.change_state('moveArm')
 
         elif self.state is 'moveArm':
-            pass
-
-
-
+            subtask = self.change_state_with_subtask('moveToTable', 'MoveToLocation')
+            if subtask is not None:
+                subtask.move.to_location('outside_pos')
+                self.change_state('success')
