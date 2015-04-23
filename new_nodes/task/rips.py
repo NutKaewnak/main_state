@@ -28,4 +28,4 @@ class RIPS(AbstractTask):
             subtask = self.change_state_with_subtask('moveToTable', 'MoveToLocation')
             if subtask is not None:
                 subtask.move.to_location('outside_pos')
-                self.change_state('success')
+                self.change_state('finish')
