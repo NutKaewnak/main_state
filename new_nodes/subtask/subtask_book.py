@@ -5,6 +5,7 @@ from move_to_location import MoveToLocation
 from register import Register
 from introduce import Introduce
 
+
 class SubtaskBook:
     def __init__(self, planning_module):
         self.book = dict()
