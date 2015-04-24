@@ -4,6 +4,7 @@ from move_pass_door import MovePassDoor
 from move_to_location import MoveToLocation
 from register import Register
 from introduce import Introduce
+from leave_arena import LeaveArena
 
 
 class SubtaskBook:
@@ -13,6 +14,7 @@ class SubtaskBook:
         self.book['MoveToLocation'] = MoveToLocation(planning_module)
         self.book['Introduce'] = Introduce(planning_module)
         self.book['Register'] = Register(planning_module)
+        self.book['LeaveArena'] = LeaveArena(planning_module)
 
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()

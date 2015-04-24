@@ -17,7 +17,7 @@ class RIPS(AbstractTask):
         elif self.state is 'movePassDoor':
             subtask = self.change_state_with_subtask('moveToTable', 'MoveToLocation')
             if subtask is not None:
-                subtask.move.to_location('hallway table')
+                subtask.to_location('hallway table')
 
         elif self.state is 'moveToTable':
             if self.current_subtask.state is 'finish':
@@ -27,5 +27,5 @@ class RIPS(AbstractTask):
         elif self.state is 'moveArm':
             subtask = self.change_state_with_subtask('moveToTable', 'MoveToLocation')
             if subtask is not None:
-                subtask.move.to_location('outside_pos')
+                subtask.to_location('outside_pos')
                 self.change_state('finish')
