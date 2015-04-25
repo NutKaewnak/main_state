@@ -25,7 +25,7 @@ class FindPeopleAndGetOrder(AbstractSubtask):
 
         elif self.state is 'moveToLivingRoom':
             if self.subtask.state is 'finish':
-                self.subtask = self.subtaskBook.get_subtask(self, 'FindPeopleUsingGesture')  # must make it
+                self.subtask = self.subtaskBook.get_subtask(self, 'FindPeopleUsingGesture')
                 self.change_state('findPeople')
 
         elif self.state is 'findPeople':
@@ -34,6 +34,9 @@ class FindPeopleAndGetOrder(AbstractSubtask):
                 self.subtask = self.skillBook.get_skill(self, 'MoveBaseAbsolute')
                 self.subtask.setPoint(pos)
                 self.change_state('moveToPeople')
+            elif self.subtask.state is 'notFound':
+                self.skillBook.get_skill('Say').say('I can not found anyone.')
+                self.change_state('notFound')
 
         elif self.change_state('moveToPeople'):
             if self.subtask.state is 'finish':
