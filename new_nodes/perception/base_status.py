@@ -8,8 +8,8 @@ from include.devices import Devices
 
 
 class BaseStatusPerception(AbstractPerception):
-    def __init__(self, planning_module):
-        AbstractPerception.__init__(self, planning_module)
+    def __init__(self, main_state):
+        AbstractPerception.__init__(self, main_state.planningModule)
         rospy.Subscriber('/base/status', String, self.callback_base_status)
 
     def callback_base_status(self, data):
