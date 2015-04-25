@@ -5,6 +5,7 @@ class AbstractTask:
     def __init__(self, planning_module):
         self.state = 'init'
         self.last_state = None
+        self.objective = None
         self.perception_module = None
         self.Devices = None
         self.subtaskBook = planning_module.subtaskBook
@@ -26,6 +27,10 @@ class AbstractTask:
         if self.current_subtask is None or self.current_subtask.state is 'finish':
             self.change_state(new_state)
             return self.subtaskBook.get_subtask(self, new_subtask)
+
+    def roll_back_state_to(self, target_state):
+        self.state = target_state
+
 
     def act(self, perception_data):
         if self.current_subtask is not None:
