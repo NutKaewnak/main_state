@@ -1,6 +1,4 @@
 __author__ = 'nicole'
-
-
 import rospy
 
 from include.abstract_subtask import AbstractSubtask
