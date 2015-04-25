@@ -1,0 +1,49 @@
+<object_information>
+
+    <category name="cup" location="living table">
+        <object name="green cup"  isManipulate="" />
+        <object name="blue cup" />
+        <object name="pink cup"  isManipulate="" />
+        <object name="yellow cup" isManipulate="" />
+        <object name="paper cup"/>
+	<object name="sunlight" />
+    </category>
+
+    <category name="toy" location="desk">
+        <object name="rabbit"  isManipulate="" />
+        <object name="bear" isManipulate="" />
+        <object name="clay" />
+        <object name="fire truck"  isManipulate="" />
+        <object name="mixer truck"  isManipulate="" />
+    </category>
+
+    <category name="drink" location="dining table">
+        <object name="orange juice" />
+        <object name="soda" />
+        <object name="green tea" />
+        <object name="grapefruit juice" />
+        <object name="coffee" />
+        <object name="beer" />
+    </category>
+
+    <category name="snack" location="kitchen table">
+        <object name="potato snack" />
+        <object name="red chips" />
+        <object name="green chips" />
+        <object name="biscuit"  isManipulate="" />
+	<object name="breakfast"/>
+    </category>
+
+    <category name="tool" location="show case">
+        <object name="spray can" />
+        <object name="light" />
+        <object name="watering pot"  isManipulate="" />
+        <object name="pen stand"  isManipulate="" />
+        <object name="shampoo bottle" />
+    </category>
+
+    <category name="unknown" location="trash" action_place="place_trash">
+        <object name="unknown" />
+    </category>
+
+</object_information>
