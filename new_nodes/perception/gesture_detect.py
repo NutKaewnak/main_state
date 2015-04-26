@@ -8,7 +8,7 @@ from geometry_msgs.msg import PointStamped
 class GestureDetection(AbstractPerception):
     def __init__(self, planning_module):
         AbstractPerception.__init__(self, planning_module)
-        rospy.Subscriber("/gesture/point", PointStamped, self.callback_gesture())
+        rospy.Subscriber("/gesture/point", PointStamped, self.callback_gesture_point)
 
-    def callback_gesture(self, data):
-        self.broadcast(Devices.GESTURE, data)
+    def callback_gesture_point(self, data):
+        self.broadcast(Devices.GESTURE, data.data)
