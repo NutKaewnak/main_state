@@ -28,7 +28,7 @@ class FindPeopleUsingGesture(AbstractSubtask):
                 self.neck.stop()
                 self.pos = self.skill.getPos()
                 self.change_state('finish')
-            elif self.neck.state is 'succeed':
+            elif self.neck.state is 'succeeded':
                 self.change_state('notFound')
 
     def getPos(self):

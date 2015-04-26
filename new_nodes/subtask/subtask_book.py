@@ -17,7 +17,7 @@ class SubtaskBook:
         self.book['Register'] = Register(planning_module)
         self.book['LeaveArena'] = LeaveArena(planning_module)
         self.book['FindPeopleAndGetOrder'] = FindPeopleAndGetOrder(planning_module)
-        self.book['FindPeopleUsingGesture'] = FindPeopleUsingGesture(planning_module)
+        # self.book['FindPeopleUsingGesture'] = FindPeopleUsingGesture(planning_module)
 
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()

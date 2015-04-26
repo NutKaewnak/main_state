@@ -16,5 +16,5 @@ class MoveBaseRelative(AbstractSkill):
         if self.state is 'active':
             # check if base succeed
             if perception_data.device is self.Devices.BASE_STATUS:
-                state = MoveBaseStatus.get_state_from_status(perception_data)
+                state = MoveBaseStatus.get_state_from_status(perception_data.input)
                 self.change_state(state)

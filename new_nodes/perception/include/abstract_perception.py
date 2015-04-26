@@ -11,7 +11,7 @@ class AbstractPerception:
         self.current_input = None
 
     def broadcast(self, device, data):
-        rospy.loginfo("Receive " + data + " From " + device)
+        rospy.loginfo("Receive " + str(data) + " From " + str(device))
         perception_data = PerceptionData(device, data)
         self.current_input = perception_data
         self.planningModule.perform(perception_data)

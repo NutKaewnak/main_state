@@ -22,11 +22,12 @@ class MainState:
         # set reference to perception module
         self.planningModule.set_perception(self.perceptionModule)
 
+        rospy.loginfo('initial complete')
         rospy.spin()
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
+    if len(sys.argv) >= 2:
         MainState(sys.argv[1])
     else:
         MainState()
