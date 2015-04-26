@@ -40,14 +40,17 @@ class FindPeopleAndGetOrder(AbstractSubtask):
 
         elif self.change_state('moveToPeople'):
             if self.subtask.state is 'finish':
-                self.subtask = self.subtaskBook.get_subtask(self, 'AskForNameAndCommand')  # must make it
+                # self.subtask = self.subtaskBook.get_subtask(self, 'AskForNameAndCommand')  # must make it
                 self.change_state('askForCommand')
 
         elif self.state is 'askForCommand':
             if self.subtask.state is 'finish':
-                self.order = self.subtask.getOrder()
-                self.people = self.subtask.getPeople()
-                self.change_state('finish')
+                self.order = 'coke'  # self.subtask.getOrder()
+                self.people = 'Amanda'  # self.subtask.getPeople()
+                if self.order is not None and self.people is not None:
+                    self.change_state('finish')
+            else:
+                self.change_state('moveToPeople')
 
     def getPeople(self):
         return self.people

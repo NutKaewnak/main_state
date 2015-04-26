@@ -9,7 +9,8 @@ from include.devices import Devices
 class Neck(AbstractPerception):
     def __init__(self, planning_module):
         AbstractPerception.__init__(self, planning_module)
-        rospy.Subscriber('/pan/tilt/neck/state', String, self.callback_base_status)  # not sure
+        rospy.Subscriber('/pan_kinect/state', String, self.callback_neck_status)
+        rospy.Subscriber('/tilt_kinect/state', String, self.callback_neck_status)
 
-    def callback_base_status(self, data):
+    def callback_neck_status(self, data):
         self.broadcast(Devices.NECK, data)
