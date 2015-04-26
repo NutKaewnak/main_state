@@ -7,11 +7,11 @@ from task.task_book import TaskBook
 
 class PlanningModule:
 
-    def __init__(self, mainState):
-        self.task = mainState.task
+    def __init__(self, main_state):
+        self.task = main_state.task
         self.perceptionModule = None
 
-        self.skillBook = SkillBook(mainState.controlModule)
+        self.skillBook = SkillBook(main_state.controlModule)
         self.subtaskBook = SubtaskBook(self)
         self.subtaskBook.set_subtask_book(self)
         self.taskBook = TaskBook(self)

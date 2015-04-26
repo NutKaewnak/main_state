@@ -36,4 +36,5 @@ class AbstractSubtask:
 
     def perform(self, perception_data):
         # must define your own perform
-        pass
+        if self.state is 'init':
+            self.change_state('finish')

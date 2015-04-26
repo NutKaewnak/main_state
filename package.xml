@@ -1,8 +1,8 @@
 <package>
-  <name>main_stage</name>
+  <name>main_state</name>
   <version>1.2.4</version>
   <description>
-    This package provides main stage for skuba athome robot.
+    This package provides main state for skuba athome robot.
   </description>
   <maintainer email="skuba2002@gmail.com">skuba</maintainer>
   <license>BSD</license>
