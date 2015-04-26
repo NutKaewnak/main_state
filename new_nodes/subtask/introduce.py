@@ -15,4 +15,4 @@ class Introduce(AbstractSubtask):
 
         elif self.state is 'rips_out':
             self.skill = self.skillBook.get_skill(self, 'RipsOut')
-            self.change_state('succeed')
+            self.change_state('finish')

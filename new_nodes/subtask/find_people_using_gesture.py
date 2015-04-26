@@ -18,13 +18,13 @@ class FindPeopleUsingGesture(AbstractSubtask):
 
         elif self.state is 'waitForNeck':
             if self.neck.state is 'waitAtStart':
-                self.skill = self.skillBook.get_skill(self, 'DetectPeopleWithGesture')  # must make it
+                self.skill = self.skillBook.get_skill(self, 'DetectPeopleWithGesture')
                 self.skill.start()
                 self.neck.start()
                 self.change_state('searching')
 
         elif self.state is 'searching':
-            if self.skill.state is 'found':
+            if self.skill.state is 'succeeded':
                 self.neck.stop()
                 self.pos = self.skill.getPos()
                 self.change_state('finish')

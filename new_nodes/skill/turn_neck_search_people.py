@@ -14,7 +14,8 @@ class TurnNeckForSearchPeople(AbstractSkill):
 
     def perform(self, perception_data):
         if self.state is 'waitingForNeck':
-            if perception_data.device is self.Devices.NECK and perception_data.input is 'SUCCEED':
+            if perception_data.device is self.Devices.NECK and perception_data.input is 'SUCCEED':  # <-- here
+                # must check for bugs
                 self.change_state('waitAtStart')
 
         elif self.state is 'start':
@@ -22,9 +23,10 @@ class TurnNeckForSearchPeople(AbstractSkill):
             self.neck.turn(0, self.angle)
             self.timer.wait(3)
             if self.angle >= 90*math.pi/180:
-                self.change_state('succeed')
+                self.change_state('succeeded')
         elif self.state is 'stop':
-            if perception_data.device is self.Devices.NECK and perception_data.input is 'SUCCEED':
+            if perception_data.device is self.Devices.NECK and perception_data.input is 'SUCCEED':  # <-- here
+                # must check for bugs
                 self.change_state('stopped')
 
     def prepare(self):

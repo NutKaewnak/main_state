@@ -1,10 +1,9 @@
 __author__ = 'nicole'
 import rospy
-
 from include.abstract_subtask import AbstractSubtask
 
 
-class template(AbstractSubtask):
+class BringObjectToPerson(AbstractSubtask):
     def __init__(self, planning_module):
         AbstractSubtask.__init__(self, planning_module)
         self.skill = self.current_skill
