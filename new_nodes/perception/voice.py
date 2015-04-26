@@ -13,4 +13,4 @@ class VoicePerception(AbstractPerception):
         rospy.Subscriber('/voice/output', String, self.callback_voice)
 
     def callback_voice(self, data):
-        self.broadcast(Devices.VOICE, data)
+        self.broadcast(Devices.VOICE, data.data)
