@@ -1,19 +1,34 @@
 __author__ = "AThousandYears"
 
 import rospy
-from geometry_msgs.msg import PoseStamped
+import actionlib
+from tf.transformations import quaternion_from_euler
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 
 
 class BaseController:
     def __init__(self):
-        self.set_position_topics = rospy.Publisher('/navigation/set_position', PoseStamped)
+        self.moveBase = actionlib.SimpleActionClient('/navigation/move_base', MoveBaseAction)
 
-    def set_position(self, x, y, theta):
-        rospy.loginfo("Move robot to " + str((x, y)))
+    def set_absolute_position(self, x, y, theta):
+        rospy.loginfo("Move robot to " + str((x, y, theta)) + ' in map')
+        self.set_new_goal(x, y, theta, 'map')
 
-        new_pose = PoseStamped()
-        new_pose.pose.position.x = x
-        new_pose.pose.position.y = y
-        new_pose.pose.orientation.z = theta
+    def set_relative_position(self, x, y, theta):
+        rospy.loginfo("Move robot to " + str((x, y, theta)) + ' from current pose')
+        self.set_new_goal(x, y, theta, 'base_link')
 
-        self.set_position_topics.publish(new_pose)
+    def set_new_goal(self, x, y, theta, frame_id):
+        new_goal = MoveBaseGoal()
+
+        new_goal.target_pose.header.frame_id = frame_id
+        new_goal.target_pose.header.stamp = rospy.Time.now()
+
+        new_goal.target_pose.pose.position.x = x
+        new_goal.target_pose.pose.position.y = y
+
+        quaternion = quaternion_from_euler(0, 0, theta)
+        new_goal.target_pose.pose.orientation.z = quaternion[2]
+        new_goal.target_pose.pose.orientation.w = quaternion[3]
+
+        self.moveBase.send_goal(new_goal)

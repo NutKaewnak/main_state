@@ -12,8 +12,7 @@ class PerceptionModule:
 
     def __init__(self, main_state):
         self.Devices = Devices
-        self.base_status = BaseStatusPerception(main_state)
-        self.base_position = AbstractPerception(main_state.planningModule)
+        self.base_status = BaseStatusPerception(main_state.planningModule)
         self.voice = VoicePerception(main_state.planningModule)
         self.gesture = GestureDetection(main_state.planningModule)
         self.neck = Neck(main_state.planningModule)

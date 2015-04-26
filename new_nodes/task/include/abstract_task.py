@@ -31,7 +31,6 @@ class AbstractTask:
     def roll_back_state_to(self, target_state):
         self.state = target_state
 
-
     def act(self, perception_data):
         if self.current_subtask is not None:
             self.current_subtask.act(perception_data)
