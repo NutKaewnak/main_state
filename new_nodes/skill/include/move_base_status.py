@@ -20,4 +20,7 @@ class MoveBaseStatus:
 
     @staticmethod
     def get_state_from_status(status):
-        return MoveBaseStatus.moveBaseStatus[status]
+        return MoveBaseStatus.moveBaseStatus[int(status)]
+
+if __name__ == "__main__":
+    print MoveBaseStatus.get_state_from_status(4)

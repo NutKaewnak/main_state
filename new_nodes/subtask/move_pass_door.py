@@ -12,12 +12,13 @@ class MovePassDoor(AbstractSubtask):
 
     def perform(self, perception_data):
         if self.state is 'init':
-            self.moveRelative = self.skillBook.get_skill(self, 'MoveBaseRelative')
-            self.moveRelative.set_position(1.5, 0.0, 0.0)
-            self.change_state('move')
+            if perception_data.device is self.Devices.DOOR and perception_data.input == 'open':
+                self.moveRelative = self.skillBook.get_skill(self, 'MoveBaseRelative')
+                self.moveRelative.set_position(1.5, 0.0, 0.0)
+                self.change_state('move')
         elif self.state is 'move':
             # check if base succeed
-            if self.moveRelative.state is 'succeed':
+            if self.moveRelative.state is 'succeeded':
                 self.change_state('finish')
             elif self.moveRelative.state is 'aborted':
                 rospy.loginfo('Aborted at MovePassDoor')

@@ -14,8 +14,8 @@ class LeaveArena(AbstractSubtask):
 
     def perform(self, perception_data):
         if self.state is 'init':
-            self.subtask = self.subtaskBook.get_subtask('MoveToLocation')
-            self.subtask.to_Location('exit')
+            self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
+            self.subtask.to_location('exit')
             self.change_state('MoveToExit')
         elif self.state is 'MoveToExit':
             if self.subtask.state is 'finish':
