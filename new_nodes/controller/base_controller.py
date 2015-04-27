@@ -4,11 +4,13 @@ import rospy
 import actionlib
 from tf.transformations import quaternion_from_euler
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+from std_srvs.srv import Empty
 
 
 class BaseController:
     def __init__(self):
         self.moveBase = actionlib.SimpleActionClient('/navigation/move_base', MoveBaseAction)
+        self.clearCostmap = rospy.ServiceProxy('/navigation/move_base/clear_costmaps', Empty)
 
     def set_absolute_position(self, x, y, theta):
         rospy.loginfo("Move robot to " + str((x, y, theta)) + ' in map')
@@ -19,6 +21,8 @@ class BaseController:
         self.set_new_goal(x, y, theta, 'base_link')
 
     def set_new_goal(self, x, y, theta, frame_id):
+        self.clear_costmaps()
+
         new_goal = MoveBaseGoal()
 
         new_goal.target_pose.header.frame_id = frame_id
@@ -32,3 +36,7 @@ class BaseController:
         new_goal.target_pose.pose.orientation.w = quaternion[3]
 
         self.moveBase.send_goal(new_goal)
+
+    def clear_costmaps(self):
+        rospy.loginfo("Clear Costmaps")
+        self.clearCostmap()
