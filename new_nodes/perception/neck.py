@@ -13,4 +13,4 @@ class Neck(AbstractPerception):
         rospy.Subscriber('/tilt_kinect/state', String, self.callback_neck_status)
 
     def callback_neck_status(self, data):
-        self.broadcast(Devices.NECK, data)
+        self.broadcast(Devices.NECK, data.data)

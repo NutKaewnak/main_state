@@ -1,3 +1,5 @@
+import rospy
+
 __author__ = 'nicole'
 from include.abstract_skill import AbstractSkill
 
@@ -9,17 +11,18 @@ class DetectPeopleWithGesture(AbstractSkill):
         self.pos = None
 
     def perform(self, perception_data):
+        rospy.loginfo(self.state)
         if self.state is 'init':
             self.change_state('searching')
 
         elif self.state is 'searching':
-            if perception_data.device is self.Devices.gesture:
-                self.pos = perception_data.input
+            if perception_data.device is self.Devices.GESTURE:
+                self.pos = perception_data.data
                 self.change_state('succeeded')
 
     def start(self):
         self.pos = None
         self.change_state('init')
 
-    def getPos(self):
+    def get_point(self):
         return self.pos

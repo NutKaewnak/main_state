@@ -37,6 +37,7 @@ class BasicFunctional(AbstractTask):
                 # if Grab.normal().state is STATE.SUCCEED:
                 #   Grab.place().at('bin')
             self.change_state('place')
+            rospy.loginfo('change_state to Place')
 
         elif self.state is 'place':
             # if Grab.place().state is STATE.SUCCEED:
@@ -49,13 +50,17 @@ class BasicFunctional(AbstractTask):
         elif self.state is '10question':
             if self.current_subtask.state is 'finish':
                 self.subtask = None
-                self.subtask = self.change_state_with_subtask('detect', 'SearchAndMoveToPeople')
+                self.subtask = self.change_state_with_subtask('detect', 'DetectAndMoveToPeople')
+                rospy.loginfo('change_state to detects /"SearchAndMoveToPeople/"')
+                self.change_state('detect')
 
         elif self.state is 'detect':
             # answer random question
             # if self.current_subtask.state is 'finish':
                 # self.subtask = self.change_state_with_subtask('exit', 'Answer several question')
             self.change_state('exit')
+            rospy.loginfo('change_state to detects /"finish/"')
+
 
         elif self.state is 'exit':
             if self.current_subtask.state is 'finish':
