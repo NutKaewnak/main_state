@@ -69,17 +69,27 @@ class CommandExtractor(object):
         return None
 
     def __init__(self):
-        #Read config file
-        object_info = read_object_info()
-        location_info = read_location_category()
-        people_info = read_people_information()
-        self.objects = object_info.get_all_object_names()
-        self.object_categories = object_info.get_all_category_names()
-        self.locations = location_info.get_all_location_names()
-        self.location_categories = location_info.get_all_category_names()
-        self.names = people_info.get_people_names()
-        self.verbs = readFileToList(roslib.packages.get_pkg_dir('speech_processing') + '/config/command_config/verbs.txt')
-        self.intransitive_verbs = readFileToList(roslib.packages.get_pkg_dir('main_state') + '/config/command_config/intransitive_verbs.txt')
+        # Read config file
+        self.objects = readFileToList(
+            roslib.packages.get_pkg_dir('speech_processing') + '/command_config/objects.txt')
+
+        self.object_categories = readFileToList(
+            roslib.packages.get_pkg_dir('speech_processing') + '/command_config/object_categories.txt')
+
+        self.locations = readFileToList(
+            roslib.packages.get_pkg_dir('speech_processing') + '/command_config/locations.txt')
+
+        self.location_categories = readFileToList(
+            roslib.packages.get_pkg_dir('speech_processing') + '/command_config/location_categories.txt')
+
+        self.names = readFileToList(
+            roslib.packages.get_pkg_dir('speech_processing') + '/command_config/names.txt')
+
+        self.verbs = readFileToList(
+            roslib.packages.get_pkg_dir('speech_processing') + '/command_config/verbs.txt')
+
+        self.intransitive_verbs = readFileToList(
+            roslib.packages.get_pkg_dir('main_state') + '/command_config/intransitive_verbs.txt')
 
     # Extract action from command and return as tuple(s) of (verb,object,data)
     def extractActions(self, command):

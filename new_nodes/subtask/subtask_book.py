@@ -8,6 +8,8 @@ from leave_arena import LeaveArena
 from find_people_and_get_order import FindPeopleAndGetOrder
 from find_people_using_gesture import FindPeopleUsingGesture
 from grab_object_to_person import GrabObjectToPerson
+from detect_and_move_to_people import DetectAndMoveToPeople
+
 
 class SubtaskBook:
     def __init__(self, planning_module):
@@ -20,6 +22,7 @@ class SubtaskBook:
         self.book['FindPeopleAndGetOrder'] = FindPeopleAndGetOrder(planning_module)
         self.book['FindPeopleUsingGesture'] = FindPeopleUsingGesture(planning_module)
         self.book['GrabObjectToPerson'] = GrabObjectToPerson(planning_module)
+        self.book['DetectAndMoveToPeople'] = DetectAndMoveToPeople(planning_module)
 
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()
