@@ -53,8 +53,9 @@ class BasicFunctional(AbstractTask):
 
         elif self.state is 'detect':
             # answer random question
-            if self.current_subtask.state is 'finish':
-                self.subtask = self.change_state_with_subtask('exit', 'Answer several question')
+            # if self.current_subtask.state is 'finish':
+                # self.subtask = self.change_state_with_subtask('exit', 'Answer several question')
+            self.change_state('exit')
 
         elif self.state is 'exit':
             if self.current_subtask.state is 'finish':

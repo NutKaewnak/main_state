@@ -14,11 +14,15 @@ class DetectAndMoveToPeople(AbstractSubtask):
             self.change_state('findPeople')
 
         elif self.state is 'findPeople':
-            if self.subtask.state is 'finish':
+            if self.current_subtask.state is 'finish':
                 pos = self.subtask.getPos()
                 self.subtask = self.skillBook.get_skill(self, 'MoveBaseAbsolute')
                 self.subtask.setPoint(pos)
                 self.change_state('moveToPeople')
-            elif self.subtask.state is 'notFound':
+            elif self.current_subtask.state is 'notFound':
                 self.skillBook.get_skill('Say').say('I can not found anyone.')
                 self.change_state('notFound')
+
+        elif self.state is 'moveToPeople':
+            if self.current_subtask is 'succeeded':
+                self.change_state('finish')
