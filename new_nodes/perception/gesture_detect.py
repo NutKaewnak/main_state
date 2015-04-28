@@ -11,4 +11,4 @@ class GestureDetection(AbstractPerception):
         rospy.Subscriber("/gesture/point", Vector3, self.callback_gesture_point)
 
     def callback_gesture_point(self, data):
-        self.broadcast(Devices.GESTURE, data.data)
+        self.broadcast(Devices.GESTURE, data)

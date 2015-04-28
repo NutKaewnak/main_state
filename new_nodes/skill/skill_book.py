@@ -5,6 +5,7 @@ from move_base_relative import MoveBaseRelative
 from rips_out import RipsOut
 from say import Say
 from detect_people_with_gesture import DetectPeopleWithGesture
+from turn_neck_search_people import TurnNeckForSearchPeople
 
 
 class SkillBook:
@@ -14,6 +15,7 @@ class SkillBook:
         self.book['MoveBaseRelative'] = MoveBaseRelative(control_module)
         self.book['RipsOut'] = RipsOut(control_module)
         self.book['Say'] = Say(control_module)
+        self.book['TurnNeckForSearchPeople'] = TurnNeckForSearchPeople(control_module)
         self.book['DetectPeopleWithGesture'] = DetectPeopleWithGesture(control_module)
 
     def get_skill(self, subtask, skill_name):

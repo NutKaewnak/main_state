@@ -22,6 +22,8 @@ class MoveToLocation(AbstractSubtask):
         self.LocationList['pickPlace'] = self.pickPlace
         self.LocationList['final'] = self.question
         self.LocationList['exit'] = self.exit
+        self.LocationList['livingRoom'] = self.question
+        self.LocationList['kitchenTable'] = self.exit
 
     def to_location(self, location_name):
         rospy.loginfo('Move to '+location_name)

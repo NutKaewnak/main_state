@@ -12,6 +12,8 @@ class Cocktail(AbstractTask):
         self.orderList = []
 
     def perform(self, perception_data):
+        if self.current_subtask is not None:
+            rospy.loginfo(self.current_subtask.state)
         if self.state is 'init':
             if self.state is 'init':
                 self.change_state_with_subtask('movePassDoor', 'MovePassDoor')
@@ -20,7 +22,8 @@ class Cocktail(AbstractTask):
             self.subtask = self.change_state_with_subtask('findPeopleAndGetOrder', 'FindPeopleAndGetOrder')
 
         elif self.state is 'findPeopleAndGetOrder':
-            if self.current_subtask.stage is 'finish':
+            rospy.loginfo(self.current_subtask.state)
+            if self.current_subtask.state is 'finish':
                 self.personNameList.append(self.subtask.getPeople())
                 self.orderList.append(self.subtask.getOrder())
 
