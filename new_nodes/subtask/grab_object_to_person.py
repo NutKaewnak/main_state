@@ -32,6 +32,7 @@ class GrabObjectToPerson(AbstractSubtask):
                 # except rospy.ServiceException, e:
                 #     print "Service call failed: %s"%e
                 self.change_state('foundObject')
+                rospy.loginfo('foundObject')
                 # elif self.objPos is None:
                 #     self.change_state('objectNotFound')
 
@@ -39,18 +40,21 @@ class GrabObjectToPerson(AbstractSubtask):
             # self.subtask = self.subtaskBook.get_subtask('NormalGrab')
             # self.subtask.grab(self.objPos)
             self.change_state('grabObject')
+            rospy.loginfo('grabObject')
 
         elif self.state is 'grabObject':
             if self.current_subtask.state is 'finish':
                 # self.subtask = self.subtaskBook.get_subtask('BringObjectToPerson') # must make it
                 # self.subtask.start(self.personName)
                 self.change_state('bringObjectToPerson')
+                rospy.loginfo('bringObjectToPerson')
 
         elif self.state is 'bringObjectToPerson':
             if self.current_subtask.state is 'finish':
                 self.object = None
                 self.personName = None
                 self.change_state('finish')
+                rospy.loginfo('Done')
             # Don't forget to add this subtask to subtask book
 
     def start(self, object, person):
