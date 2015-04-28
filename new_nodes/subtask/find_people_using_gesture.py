@@ -12,15 +12,18 @@ class FindPeopleUsingGesture(AbstractSubtask):
         self.pos = None
 
     def perform(self, perception_data):
+        if self.state is not 'finish':
+            rospy.loginfo('FindPeopleUsingGesture state : '+self.state)
         if self.state is 'init':
+            self.neck.reset()
             self.neck.prepare()
             self.change_state('waitForNeck')
 
         elif self.state is 'waitForNeck':
             if self.neck.state is 'waitAtStart':
                 self.skill = self.skillBook.get_skill(self, 'DetectPeopleWithGesture')
-                self.skill.start()
                 self.neck.start()
+                self.skill.start()
                 self.change_state('searching')
 
         elif self.state is 'searching':

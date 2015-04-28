@@ -12,7 +12,8 @@ class DetectAndMoveToPeople(AbstractSubtask):
         self.pos = None
 
     def perform(self, perception_data):
-        rospy.loginfo('DetectAndMoveToPeople state: '+self.state)
+        if self.state is not 'finish':
+            rospy.loginfo('DetectAndMoveToPeople state: '+self.state)
         if self.state is 'init':
             self.pos = None
             self.subtask = self.subtaskBook.get_subtask(self, 'FindPeopleUsingGesture')
@@ -29,10 +30,9 @@ class DetectAndMoveToPeople(AbstractSubtask):
         elif self.state is 'foundPeople':
             if self.current_subtask.state is 'finish':
                 self.skill = self.skillBook.get_skill(self, 'MoveBaseAbsolute')
-                rospy.loginfo(self.pos)
                 self.skill.set_point(self.pos)
                 self.change_state('moveToPeople')
 
         elif self.state is 'moveToPeople':
-            if self.current_skill is 'succeeded':
+            if self.current_skill.state is 'succeeded':
                 self.change_state('finish')

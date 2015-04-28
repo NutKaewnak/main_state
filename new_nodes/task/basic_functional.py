@@ -50,7 +50,7 @@ class BasicFunctional(AbstractTask):
         elif self.state is '10question':
             if self.current_subtask.state is 'finish':
                 self.subtask = None
-                self.subtask = self.change_state_with_subtask('detect', 'DetectAndMoveToPeople')
+                # self.subtask = self.change_state_with_subtask('detect', 'DetectAndMoveToPeople')
                 rospy.loginfo('change_state to detects /"SearchAndMoveToPeople/"')
                 self.change_state('detect')
 
@@ -60,7 +60,6 @@ class BasicFunctional(AbstractTask):
                 # self.subtask = self.change_state_with_subtask('exit', 'Answer several question')
             self.change_state('exit')
             rospy.loginfo('change_state to detects /"finish/"')
-
 
         elif self.state is 'exit':
             if self.current_subtask.state is 'finish':
