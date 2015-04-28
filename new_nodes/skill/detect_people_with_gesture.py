@@ -1,6 +1,7 @@
 __author__ = 'nicole'
 from include.abstract_skill import AbstractSkill
 
+
 class DetectPeopleWithGesture(AbstractSkill):
     def __init__(self, control_module):
         AbstractSkill.__init__(self, control_module)
