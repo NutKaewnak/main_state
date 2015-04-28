@@ -16,7 +16,8 @@ class FindPeopleAndGetOrder(AbstractSubtask):
         self.people = None
 
     def perform(self, perception_data):
-        rospy.loginfo('FindPeopleAndGetOrder'+self.state)
+        # if self.state is not 'finish':
+        #     rospy.loginfo('FindPeopleAndGetOrder '+self.state)
         if self.state is 'init':
             self.order = None
             self.people = None
@@ -28,7 +29,6 @@ class FindPeopleAndGetOrder(AbstractSubtask):
             if self.current_subtask.state is 'finish':
                 self.subtask = self.subtaskBook.get_subtask(self, 'DetectAndMoveToPeople')
                 self.change_state('detectAndMoveToPeople')
-                rospy.loginfo('detectAndMoveToPeople')
 
         elif self.state is 'detectAndMoveToPeople':
             if self.current_subtask.state is 'finish':

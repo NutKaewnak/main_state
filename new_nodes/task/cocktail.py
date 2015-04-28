@@ -12,8 +12,6 @@ class Cocktail(AbstractTask):
         self.orderList = []
 
     def perform(self, perception_data):
-        if self.current_subtask is not None:
-            rospy.loginfo(self.current_subtask.state)
         if self.state is 'init':
             if self.state is 'init':
                 self.change_state_with_subtask('movePassDoor', 'MovePassDoor')
@@ -22,7 +20,6 @@ class Cocktail(AbstractTask):
             self.subtask = self.change_state_with_subtask('findPeopleAndGetOrder', 'FindPeopleAndGetOrder')
 
         elif self.state is 'findPeopleAndGetOrder':
-            rospy.loginfo(self.current_subtask.state)
             if self.current_subtask.state is 'finish':
                 self.personNameList.append(self.subtask.getPeople())
                 self.orderList.append(self.subtask.getOrder())
@@ -31,14 +28,17 @@ class Cocktail(AbstractTask):
                     self.change_state('error')
                     rospy.loginfo('Bug in subtask find people and get order')
 
-                if len(self.personNameList) < 3:
+                if len(self.personNameList) >= 3:
                     self.change_state('prepareToServePerson')
                 else:
-                    self.subtask.change_state('init')
+                    rospy.loginfo('got : '+str(len(self.personNameList))+' persons')
+                    if self.current_subtask.state is 'finish':
+                        self.subtask.change_state('init')
 
         elif self.state is 'prepareToServePerson':
-            self.subtask = self.change_state_with_subtask('getObjectAndServePerson', 'GrabObjectToPerson')
+            # self.subtask = self.change_state_with_subtask('getObjectAndServePerson', 'GrabObjectToPerson')
             # must make it
+            self.change_state('getObjectAndServePerson')
 
         elif self.state is 'getObjectAndServePerson':
             if self.current_subtask.stage is 'finish':

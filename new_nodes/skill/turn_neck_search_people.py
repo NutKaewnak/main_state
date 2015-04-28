@@ -14,7 +14,7 @@ class TurnNeckForSearchPeople(AbstractSkill):
         self.angle = None
 
     def perform(self, perception_data):
-        rospy.loginfo(self.state)
+        rospy.loginfo('Turn Neck state : '+self.state)
         if self.state is 'waitingForNeck':
             if perception_data.device is self.Devices.NECK and perception_data.input == 'succeeded':  # <-- here
                 # must check for bugs
@@ -35,11 +35,16 @@ class TurnNeckForSearchPeople(AbstractSkill):
         self.angle = -90*math.pi/180
         self.neck.set_neck_angle(0, self.angle)
         self.change_state('waitingForNeck')
+        self.timer.wait(0)
+        rospy.loginfo('Neck Preparing')
 
     def start(self):
         if self.state is not 'waitAtStart':
             return
         self.change_state('start')
+        self.timer.wait(0)
+        rospy.loginfo('Neck starting')
 
     def stop(self):
         self.change_state('stop')
+        self.timer.wait(0)

@@ -10,7 +10,8 @@ class DetectPeopleWithGesture(AbstractSkill):
         self.pos = None
 
     def perform(self, perception_data):
-        rospy.loginfo('DetectPeopleWithGesture'+self.state)
+        # if self.state is not 'succeeded':
+        #     rospy.loginfo('DetectPeopleWithGesture : '+self.state)
         if self.state is 'init':
             self.pos = None
             self.change_state('searching')

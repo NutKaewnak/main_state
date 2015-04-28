@@ -20,5 +20,6 @@ class LeaveArena(AbstractSubtask):
         elif self.state is 'MoveToExit':
             if self.current_subtask.state is 'finish':
                 self.change_state('finish')
+                rospy.loginfo('Leave arena Done!!!!')
             elif self.subtask.state is 'error':
                 self.change_state('error')
