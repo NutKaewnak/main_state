@@ -16,13 +16,13 @@ class FindPeopleAndGetOrder(AbstractSubtask):
         self.people = None
 
     def perform(self, perception_data):
+        rospy.loginfo('FindPeopleAndGetOrder'+self.state)
         if self.state is 'init':
             self.order = None
             self.people = None
             self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
             self.subtask.to_location('livingRoom')
             self.change_state('moveToLivingRoom')
-            rospy.loginfo('moveToLivingRoom')
 
         elif self.state is 'moveToLivingRoom':
             if self.current_subtask.state is 'finish':
