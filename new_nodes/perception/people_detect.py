@@ -12,5 +12,4 @@ class PeopleDetection(AbstractPerception):
         rospy.Subscriber("/people_detection/people_array", PersonObjectArray, self.callback_people_array)
 
     def callback_people_array(self, data):
-        print dir(data)
         self.broadcast(Devices.PEOPLE, data.persons)
