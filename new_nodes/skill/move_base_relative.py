@@ -8,6 +8,10 @@ class MoveBaseRelative(AbstractSkill):
     def __init__(self, control_module):
         AbstractSkill.__init__(self, control_module)
 
+    def stop(self):
+        self.change_state('active')
+        self.controlModule.base.set_relative_position(0.0, 0.0, 0.0)
+
     def set_position(self, dx, dy, dtheta):
         self.change_state('active')
         self.controlModule.base.set_relative_position(dx, dy, dtheta)

@@ -6,6 +6,7 @@ from perception.base_status import BaseStatusPerception
 from perception.voice import VoicePerception
 from perception.gesture_detect import GestureDetection
 from perception.neck import Neck
+from perception.people_detect import PeopleDetection
 
 
 class PerceptionModule:
@@ -17,3 +18,4 @@ class PerceptionModule:
         self.gesture = GestureDetection(main_state.planningModule)
         self.neck = Neck(main_state.planningModule)
         self.door = DoorDetection(main_state.planningModule)
+        self.people = PeopleDetection(main_state.planningModule)

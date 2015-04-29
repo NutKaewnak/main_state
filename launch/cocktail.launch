@@ -4,7 +4,7 @@
   <node ns="door" name="door_detection" pkg="door_detection" type="door_detection_node">
     <remap from="/scan" to="/laser/scan"/>
   </node>
-  <node ns="openni_hand_tracker" name="openni_tracker" pkg="gesture_detection" type="door_detection_node">
+  <node ns="gesture" name="gesture_detection" pkg="gesture_detection" type="NIHandtracker">
     <remap from="/scan" to="/gesture/point"/>
   </node>
 </launch>
