@@ -9,6 +9,7 @@ class FollowPerson(AbstractSubtask):
     def __init__(self, planning_module):
         AbstractSubtask.__init__(self, planning_module)
         self.move = self.skillBook.get_skill(self, 'MoveBaseRelative')
+        self.last_point = None
 
     def set_person_id(self, person_id):
         self.person_id = person_id
@@ -24,8 +25,10 @@ class FollowPerson(AbstractSubtask):
             if point is not None:
                 theta = atan(point.x/point.y) 
                 self.move.set_position(point.x, point.y, theta)
+                self.last_point = point
             else:
                 rospy.loginfo("Stop Robot")
+                self.change_state('abort')
                 self.move.stop()
                     
         

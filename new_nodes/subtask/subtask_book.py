@@ -25,6 +25,7 @@ class SubtaskBook:
         self.book['GrabObjectToPerson'] = GrabObjectToPerson(planning_module)
         self.book['DetectAndMoveToPeople'] = DetectAndMoveToPeople(planning_module)
         self.book['FollowPerson'] = FollowPerson(planning_module)
+        self.book['MoveRelative'] = MoveRelative(planning_module)
 
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()
