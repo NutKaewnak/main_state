@@ -24,6 +24,7 @@ class FollowPerson(AbstractSubtask):
                 theta = atan(point.x/point.y) 
                 self.move.set_position(point.x, point.y, theta)
             else:
+                rospy.loginfo("Stop Robot")
                 self.move.stop()
                     
         
