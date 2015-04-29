@@ -16,6 +16,7 @@ class FollowPerson(AbstractSubtask):
 
     def perform(self, perception_data):
         if self.state is 'follow' and perception_data.device is self.Devices.PEOPLE:
+            rospy.loginfo("Track Person id %d", self.person_id)
             point = None
             for person in perception_data.input:
                 if person.id == self.person_id:
