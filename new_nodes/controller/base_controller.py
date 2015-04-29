@@ -10,7 +10,7 @@ from std_srvs.srv import Empty
 class BaseController:
     def __init__(self):
         self.moveBase = actionlib.SimpleActionClient('/navigation/move_base', MoveBaseAction)
-        self.clearCostmap = rospy.ServiceProxy('/navigation/move_base/clear_costmaps', Empty)
+        self.clearCostmap = rospy.ServiceProxy('/navigation/move_base_node/clear_costmaps', Empty)
 
     def set_absolute_position(self, x, y, theta):
         rospy.loginfo("Move robot to " + str((x, y, theta)) + ' in map')

@@ -18,7 +18,7 @@ class BasicFunctional(AbstractTask):
             if self.current_subtask.state is 'finish':
                 self.subtask = self.change_state_with_subtask('moveToPickPlace', 'MoveToLocation')
                 if self.subtask is not None:
-                   self.subtask.to_location('pickPlace')
+                   self.subtask.to_location('exit')
 
         elif self.state is 'moveToPickPlace':
             if self.current_subtask.state is 'finish':

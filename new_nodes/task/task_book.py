@@ -3,6 +3,7 @@ from basic_functional import BasicFunctional
 from cocktail import Cocktail
 from rips import RIPS
 from test import Test
+from follow_me import FollowMe
 
 
 class TaskBook:
@@ -12,6 +13,7 @@ class TaskBook:
         self.book['Test'] = Test(planning_module)
         self.book['BasicFunctional'] = BasicFunctional(planning_module)
         self.book['Cocktail'] = Cocktail(planning_module)
+        self.book['FollowMe'] = FollowMe(planning_module)
 
     def set_perception(self, perception_module):
         for task in self.book:

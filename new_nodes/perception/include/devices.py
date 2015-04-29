@@ -7,6 +7,7 @@ class Devices:
     GESTURE = 'GESTURE'
     NECK = 'NECK'
     DOOR = 'DOOR'
+    PEOPLE = 'PEOPLE'
 
     def __init__(self):
         pass
