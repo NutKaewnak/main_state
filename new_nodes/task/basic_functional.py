@@ -25,7 +25,7 @@ class BasicFunctional(AbstractTask):
                 self.subtask = None
                 rospy.loginfo('done recognize going to grab')
                 self.change_state('grab')
-                # self.subtask = self.change_state_with_subtask('grab', 'Grab')
+                self.subtask = self.change_state_with_subtask('grab', 'Grab')
                 # recognize both object
                 # Grab.normal().grab(self.object)
 

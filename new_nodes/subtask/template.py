@@ -19,4 +19,4 @@ class template(AbstractSubtask):
                 rospy.loginfo('Aborted at MovePassDoor')
                 self.change_state('error')
 
-            # Don't forget to add this subtask to subtask book
+# Don't forget to add this subtask to subtask book
