@@ -10,6 +10,9 @@ from find_people_using_gesture import FindPeopleUsingGesture
 from grab_object_to_person import GrabObjectToPerson
 from detect_and_move_to_people import DetectAndMoveToPeople
 from follow_person import FollowPerson
+from grab import Grab
+from move_relative import MoveRelative
+
 
 
 class SubtaskBook:
@@ -26,6 +29,7 @@ class SubtaskBook:
         self.book['DetectAndMoveToPeople'] = DetectAndMoveToPeople(planning_module)
         self.book['FollowPerson'] = FollowPerson(planning_module)
         self.book['MoveRelative'] = MoveRelative(planning_module)
+        self.book['Grab'] = Grab(planning_module)
 
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()
