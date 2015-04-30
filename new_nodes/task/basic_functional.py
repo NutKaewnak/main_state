@@ -18,7 +18,7 @@ class BasicFunctional(AbstractTask):
             if self.current_subtask.state is 'finish':
                 self.subtask = self.change_state_with_subtask('moveToPickPlace', 'MoveToLocation')
                 if self.subtask is not None:
-                   self.subtask.to_location('exit')
+                    self.subtask.to_location('exit')
 
         elif self.state is 'moveToPickPlace':
             if self.current_subtask.state is 'finish':
@@ -30,6 +30,8 @@ class BasicFunctional(AbstractTask):
                 # Grab.normal().grab(self.object)
 
         elif self.state is 'grab':
+            if self.subtask is not None:
+                self.subtask.grab_point(self.Object.position)
             # if self.object.isKnown is True:
                 # if Grab.normal().state is STATE.SUCCESS:
                 #   Grab.place().at(self.object.location)
