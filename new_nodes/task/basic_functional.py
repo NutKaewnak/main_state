@@ -24,20 +24,17 @@ class BasicFunctional(AbstractTask):
             if self.current_subtask.state is 'finish':
                 self.subtask = None
                 rospy.loginfo('done recognize going to grab')
-                self.change_state('grab')
-                self.subtask = self.change_state_with_subtask('grab', 'Grab')
+                self.subtask = self.change_state('recognize')
                 # recognize both object
                 # Grab.normal().grab(self.object)
+
+        elif self.state is 'recognize':
+            # recognize known object and get it's position
+            self.change_state_with_subtask('grab', 'Grab')
 
         elif self.state is 'grab':
             if self.subtask is not None:
                 self.subtask.grab_point(self.Object.position)
-            # if self.object.isKnown is True:
-                # if Grab.normal().state is STATE.SUCCESS:
-                #   Grab.place().at(self.object.location)
-            # elif self.object.isKnown is False
-                # if Grab.normal().state is STATE.SUCCEED:
-                #   Grab.place().at('bin')
             self.change_state('place')
             rospy.loginfo('change_state to Place')
 

@@ -39,8 +39,7 @@ class Cocktail(AbstractTask):
                 self.change_state('prepareToServePerson')
 
         elif self.state is 'prepareToServePerson':
-            # self.subtask = self.change_state_with_subtask('getObjectAndServePerson', 'GrabObjectToPerson')
-            # must make it
+            self.subtask = self.change_state_with_subtask('getObjectAndServePerson', 'GrabObjectToPerson')
             self.change_state('getObjectAndServePerson')
 
         elif self.state is 'getObjectAndServePerson':
