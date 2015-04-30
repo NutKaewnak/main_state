@@ -37,8 +37,8 @@ class GrabObjectToPerson(AbstractSubtask):
                 #     self.change_state('objectNotFound')
 
         elif self.state is 'foundObject':
-            # self.subtask = self.subtaskBook.get_subtask('NormalGrab')
-            # self.subtask.grab(self.objPos)
+            self.subtask = self.subtaskBook.get_subtask('Grab')
+            self.subtask.grab(self.objPos)
             self.change_state('grabObject')
             rospy.loginfo('grabObject')
 
