@@ -16,13 +16,14 @@ class AskForNameAndCommand(AbstractSubtask):
         if self.state is 'init':
             self.person = None
             self.order = None
-            self.subtask = self.subtaskBook.get_subtask(self, 'AskForName')
-            self.change_state('askForName')
+            if self.current_subtask is None:
+                self.subtask = self.subtaskBook.get_subtask(self, 'AskForName')
+                self.change_state('askForName')
 
         elif self.state is 'askForName':
             if self.current_subtask.state is 'finish':
                 self.person = self.current_subtask.getPerson()
-                self.subtaskBook.get_subtask(self, 'askForCommand')
+                self.subtaskBook.get_subtask(self, 'AskForObject')
                 self.change_state('askForObject')
 
         elif self.state is 'askForObject':

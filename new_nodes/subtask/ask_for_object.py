@@ -19,7 +19,7 @@ class AskForObject(AbstractSubtask):
         self.subtask = self.current_subtask
         self.object = None
         self.data = None
-        self.name = readFileToList(roslib.packages.get_pkg_dir('speech_processing') + '/command_config/objects.txt')
+        self.name = readFileToList(roslib.packages.get_pkg_dir('speech_processing') + '/command_config/COCKTAIL/objects.txt')
 
 
     def perform(self, perception_data):
@@ -33,8 +33,10 @@ class AskForObject(AbstractSubtask):
         elif self.state is 'waitingForName':
             if perception_data.device == 'VOICE':
                 self.data = perception_data.input
-                if self.name in self.data:
-                    self.object = self.data  # This line will bug for sure.
+                for i in self.name:
+                    if i in self.data:
+                        self.object = self.data
+                        self.skill.say('You want to drink '+self.object+ 'right')
 
     def getObject(self):
         return self.object

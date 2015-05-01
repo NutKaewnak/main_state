@@ -4,6 +4,7 @@ from move_base_absolute import MoveBaseAbsolute
 from move_base_relative import MoveBaseRelative
 from rips_out import RipsOut
 from say import Say
+from confirm import Confirm
 from detect_people_with_gesture import DetectPeopleWithGesture
 from turn_neck_search_people import TurnNeckForSearchPeople
 
@@ -17,6 +18,7 @@ class SkillBook:
         self.book['Say'] = Say(control_module)
         self.book['TurnNeckForSearchPeople'] = TurnNeckForSearchPeople(control_module)
         self.book['DetectPeopleWithGesture'] = DetectPeopleWithGesture(control_module)
+        self.book['Confirm'] = Confirm(control_module)
 
     def get_skill(self, subtask, skill_name):
         self.book[skill_name].reset()

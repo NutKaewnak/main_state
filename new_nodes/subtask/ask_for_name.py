@@ -19,7 +19,7 @@ class AskForName(AbstractSubtask):
         self.subtask = self.current_subtask
         self.person = None
         self.data = None
-        self.name = readFileToList(roslib.packages.get_pkg_dir('speech_processing') + '/command_config/persons.txt')
+        self.name = readFileToList(roslib.packages.get_pkg_dir('speech_processing') + '/command_config/COCKTAIL/persons.txt')
 
 
     def perform(self, perception_data):
@@ -33,8 +33,12 @@ class AskForName(AbstractSubtask):
         elif self.state is 'waitingForName':
             if perception_data.device == 'VOICE':
                 self.data = perception_data.input
-                if( self.name in self.data):
-                    self.person = self.data  # This line will bug for sure.
+                for i in self.name:
+                    if i in self.data:
+                        self.person = self.data
+                        self.change_state('finish')
+                        self.skill.say('Your name is'+self.person)
+
 
     def getPerson(self):
         return self.person
