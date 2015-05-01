@@ -15,6 +15,7 @@ from move_relative import MoveRelative
 from ask_for_name import AskForName
 from ask_for_object import AskForObject
 from ask_for_name_and_command import AskForNameAndCommand
+from bring_object_to_person import BringObjectToPerson
 
 
 class SubtaskBook:
@@ -32,6 +33,7 @@ class SubtaskBook:
         self.book['FollowPerson'] = FollowPerson(planning_module)
         self.book['MoveRelative'] = MoveRelative(planning_module)
         self.book['Grab'] = Grab(planning_module)
+        self.book['BringObjectToPerson'] = BringObjectToPerson(planning_module)
         self.book['AskForName'] = AskForName(planning_module)
         self.book['AskForObject'] = AskForObject(planning_module)
         self.book['AskForNameAndCommand'] = AskForNameAndCommand(planning_module)

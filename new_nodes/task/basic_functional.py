@@ -1,3 +1,5 @@
+from include.delay import Delay
+
 __author__ = 'nicole'
 import rospy
 
@@ -24,17 +26,23 @@ class BasicFunctional(AbstractTask):
             if self.current_subtask.state is 'finish':
                 self.subtask = None
                 rospy.loginfo('done recognize going to grab')
+                self.timer = Delay()
+                self.timer.wait(30)
                 self.subtask = self.change_state('recognize')
                 # recognize both object
                 # Grab.normal().grab(self.object)
 
         elif self.state is 'recognize':
             # recognize known object and get it's position
-            self.change_state_with_subtask('grab', 'Grab')
+
+            # self.change_state_with_subtask('grab', 'Grab')
+            if not self.timer.is_waiting():
+                # self.change_state('grab')
+                self.change_state('place')
 
         elif self.state is 'grab':
-            if self.subtask is not None:
-                self.subtask.grab_point(self.Object.position)
+            # if self.subtask is not None:
+                # self.subtask.grab_point(self.Object.position)
             self.change_state('place')
             rospy.loginfo('change_state to Place')
 

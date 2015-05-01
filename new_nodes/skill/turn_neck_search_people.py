@@ -16,6 +16,8 @@ class TurnNeckForSearchPeople(AbstractSkill):
     def perform(self, perception_data):
         rospy.loginfo('Turn Neck state : '+self.state)
         if self.state is 'start':
+            if self.timer.is_waiting():
+                return
             self.angle += 0.3
             self.neck.set_neck_angle(0, self.angle)
             self.timer.wait(3)

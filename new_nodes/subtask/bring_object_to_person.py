@@ -37,4 +37,3 @@ class BringObjectToPerson(AbstractSubtask):
     def start(self, name):
         self.name = name
         self.change_state('start')
-    # Don't forget to add this subtask to subtask book
