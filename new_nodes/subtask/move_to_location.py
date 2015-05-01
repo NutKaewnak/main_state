@@ -17,6 +17,7 @@ class MoveToLocation(AbstractSubtask):
     def __init__(self, planning_module):
         AbstractSubtask.__init__(self, planning_module)
         self.move = None
+        self.location = None
         self.LocationList = dict()  # Must be remove after crysis zone
         self.LocationList['init'] = self.init
         self.LocationList['pickPlace'] = self.pickPlace
@@ -26,6 +27,7 @@ class MoveToLocation(AbstractSubtask):
         self.LocationList['kitchenTable'] = self.exit
 
     def to_location(self, location_name):
+        self.location = location_name
         rospy.loginfo('Move to '+location_name)
         location_point = self.get_location_point(location_name)
         self.move = self.skillBook.get_skill(self, 'MoveBaseAbsolute')
@@ -36,9 +38,11 @@ class MoveToLocation(AbstractSubtask):
         if self.state is 'move':
             # check if base succeed
             if self.move.state is 'succeeded':
+                self.location = None
                 self.change_state('finish')
             elif self.move.state is 'aborted':
                 rospy.loginfo('Aborted at MovePassDoor')
+                self.to_location(self.location)
                 self.change_state('error')
 
     def get_location_point(self, location_name):

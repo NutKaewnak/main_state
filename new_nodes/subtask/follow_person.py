@@ -30,5 +30,3 @@ class FollowPerson(AbstractSubtask):
                 rospy.loginfo("Stop Robot")
                 self.change_state('abort')
                 self.move.stop()
-                    
-        

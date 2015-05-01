@@ -16,12 +16,12 @@ class DetectAndMoveToPeople(AbstractSubtask):
             rospy.loginfo('DetectAndMoveToPeople state: '+self.state)
         if self.state is 'init':
             self.pos = None
-            self.subtask = self.subtaskBook.get_subtask(self, 'FindPeopleUsingGesture')
+            self.subtask = self.subtaskBook.get_subtask(self, 'FindPeople')
             self.change_state('findPeople')
 
         elif self.state is 'findPeople':
-            if self.current_subtask.state is 'finish':
-                self.pos = self.subtask.get_point()
+            if self.current_subtask.point is not None:
+                self.pos = self.subtask.point
                 self.change_state('foundPeople')
             elif self.current_subtask.state is 'notFound':
                 self.skillBook.get_skill('Say').say('I can not found anyone.')
