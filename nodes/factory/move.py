@@ -2,7 +2,6 @@ from skill.moveRelative import moveRelative
 from skill.moveToLocation import moveToLocation
 from subtask.MovePassDoor import MovePassDoor
 from subtask.followPerson import FollowPerson
-
 __author__ = 'nicole'
 
 
