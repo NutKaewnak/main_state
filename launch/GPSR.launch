@@ -1,0 +1,6 @@
+<launch>
+	<node name="manipulator" pkg="manipulator" type="manipulator.py" output="screen" />
+	<node name="main_state" pkg="main_state" type="GPSR.py" output="screen" />
+	<include file="$(find pocketsphinx)/launch/GPSR.launch" /> 
+	<include file="$(find object_recognition)/launch/search_object.launch" /> 
+</launch>
