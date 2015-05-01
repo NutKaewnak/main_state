@@ -16,7 +16,7 @@ from ask_for_name import AskForName
 from ask_for_object import AskForObject
 from ask_for_name_and_command import AskForNameAndCommand
 from bring_object_to_person import BringObjectToPerson
-
+from question_answer import QuestionAnswer
 
 class SubtaskBook:
     def __init__(self, planning_module):
@@ -37,7 +37,7 @@ class SubtaskBook:
         self.book['AskForName'] = AskForName(planning_module)
         self.book['AskForObject'] = AskForObject(planning_module)
         self.book['AskForNameAndCommand'] = AskForNameAndCommand(planning_module)
-
+        self.book['QuestionAnswer'] = QuestionAnswer(planning_module)
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()
         task.current_subtask = self.book[subtask_name]
