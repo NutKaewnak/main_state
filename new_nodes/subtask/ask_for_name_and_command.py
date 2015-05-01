@@ -23,17 +23,17 @@ class AskForNameAndCommand(AbstractSubtask):
             if self.current_subtask.state is 'finish':
                 self.person = self.current_subtask.getPerson()
                 self.subtaskBook.get_subtask(self, 'askForCommand')
-                self.change_state('askForOrder')
+                self.change_state('askForObject')
 
-        elif self.state is 'askForOrder':
+        elif self.state is 'askForObject':
             if self.current_subtask.state is 'finish':
                 self.order = self.current_subtask.getOrder()
                 self.change_state('finish')
 
-    def getOrder(self):
+    def getObject(self):
         return self.order
 
     def getPerson(self):
-        return self.getPerson()
+        return self.person
 
 # Don't forget to add this subtask to subtask book
