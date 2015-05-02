@@ -1,4 +1,5 @@
 from subprocess import call
+from geometry_msgs.msg import Vector3
 from include.delay import Delay
 
 __author__ = 'nicole'
@@ -10,17 +11,24 @@ class BasicFunctional(AbstractTask):
     def __init__(self, planning_module):
         AbstractTask.__init__(self, planning_module)
         self.subtask = None
+        set_neck_angle_topic = rospy.Publisher('/hardware_bridge/set_neck_angle', Vector3)
+        set_neck_angle_topic.publish(Vector3())
+        self.state = 'QuestionAnswer'
+        call(["espeak", "-ven+f4", 'init basic functionality.', "-s 120"])
 
     def perform(self, perception_data):
         if self.state is 'init':
             rospy.loginfo('init BasicFunctional')
             self.change_state_with_subtask('movePassDoor', 'MovePassDoor')
+            call(["espeak", "-ven+f4", 'move pass door.', "-s 120"])
+
 
         elif self.state is 'movePassDoor':
             if self.current_subtask.state is 'finish':
                 self.subtask = self.change_state_with_subtask('moveToPickPlace', 'MoveToLocation')
                 if self.subtask is not None:
-                    self.subtask.to_location('exit')
+                    self.subtask.to_location('PickPlace')
+                    call(["espeak", "-ven+f4", 'going to pick and place.', "-s 120"])
 
         elif self.state is 'moveToPickPlace':
             if self.current_subtask.state is 'finish':
@@ -56,10 +64,11 @@ class BasicFunctional(AbstractTask):
                 self.subtask = self.change_state_with_subtask('QuestionAnswer', 'MoveToLocation')
                 call(["espeak", "-ven+f4", 'I will do What did you say.', "-s 120"])
                 if self.subtask is not None:
-                    self.subtask.to_location('final')
+                    self.subtask.to_location('detect')
 
         elif self.state is 'QuestionAnswer':
             if self.current_subtask.state is 'finish':
+                call(["espeak", "-ven+f4", 'question answering', "-s 120"])
                 self.subtask = self.change_state_with_subtask('detect', 'DetectAndMoveToPeople')
                 rospy.loginfo('change_state to detects /"SearchAndMoveToPeople/"')
                 self.change_state('detect')

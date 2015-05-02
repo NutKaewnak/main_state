@@ -8,8 +8,6 @@ from include.object_information import *
 from include.location_information import *
 from include.command_extractor import *
 
-roslib.load_manifest('main_state')
-
 from include.function import *
 from include.publish import *
 from include.reconfig_kinect import *
