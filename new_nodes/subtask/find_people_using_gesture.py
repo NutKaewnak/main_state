@@ -39,9 +39,10 @@ class FindPeopleUsingGesture(AbstractSubtask):
                 self.change_state('notFound')
 
     def cal_point(self, x, y, z):
-        x = float(z) * math.cos(self.neck.angle)
-        y = float(z) * math.sin(self.neck.angle)
-        pose = Pose2D(float(x), float(y), self.neck.angle)
+        pan_angle = self.perception_module.neck.pan
+        x = float(z) * math.cos(pan_angle)
+        y = float(z) * math.sin(pan_angle)
+        pose = Pose2D(float(x), float(y), pan_angle)
         return pose
 
     def get_point(self):
