@@ -16,6 +16,7 @@ class FindPeople(AbstractSubtask):
 
     def perform(self, perception_data):
         if self.state is 'init' and perception_data.device is self.Devices.PEOPLE:
+            self.skill = self.skillBook.get_skill(self, 'TurnNeckForSearchPeople')
             min_distance = 4.0  # set to maximum
             point = None
             for person in perception_data.input:

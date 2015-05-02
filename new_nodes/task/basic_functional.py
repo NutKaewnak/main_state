@@ -67,11 +67,11 @@ class BasicFunctional(AbstractTask):
                     self.subtask.to_location('detect')
 
         elif self.state is 'QuestionAnswer':
-            if self.current_subtask.state is 'finish':
-                call(["espeak", "-ven+f4", 'question answering', "-s 120"])
-                self.subtask = self.change_state_with_subtask('detect', 'DetectAndMoveToPeople')
-                rospy.loginfo('change_state to detects /"SearchAndMoveToPeople/"')
-                self.change_state('detect')
+            # if self.current_subtask.state is 'finish':
+            call(["espeak", "-ven+f4", 'question answering', "-s 120"])
+            self.subtask = self.change_state_with_subtask('detect', 'DetectAndMoveToPeople')
+            rospy.loginfo('change_state to detects /"SearchAndMoveToPeople/"')
+            self.change_state('detect')
 
         elif self.state is 'detect':
             # answer random question

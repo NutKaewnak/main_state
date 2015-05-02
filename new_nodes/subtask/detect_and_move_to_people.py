@@ -20,8 +20,8 @@ class DetectAndMoveToPeople(AbstractSubtask):
             self.change_state('findPeople')
 
         elif self.state is 'findPeople':
-            if self.current_subtask.point is not None:
-                self.pos = self.subtask.point
+            if self.current_subtask.nearest_people is not None:
+                self.pos = self.subtask.nearest_people
                 self.change_state('foundPeople')
             elif self.current_subtask.state is 'notFound':
                 self.skillBook.get_skill('Say').say('I can not found anyone.')
