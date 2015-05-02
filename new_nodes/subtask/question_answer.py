@@ -19,7 +19,8 @@ class QuestionAnswer(AbstractSubtask):
                 print perception_data.input
                 if 'your name' in perception_data.input:
                     self.skill.say('My name is Lumyai')
-                elif ' day' in perception_data.input:
+                elif ' day' in perception_data.input and 'today' in
+                    :
                     self.skill.say('Today is 2015 may 2nd')
                 elif 'today' in perception_data.input or 'weather' in perception_data.input:
                     self.skill.say('It is sunny day')
@@ -38,10 +39,4 @@ class QuestionAnswer(AbstractSubtask):
                 elif 'legs' in perception_data.input:
                     self.skill.say('Normally, the cow has 4 legs')
 
-
-
-
-
-
-3,776.24
 # Don't forget to add this subtask to subtask book
