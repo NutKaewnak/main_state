@@ -1,3 +1,5 @@
+from include.delay import Delay
+
 __author__ = 'nicole'
 
 from math import sqrt
@@ -11,7 +13,8 @@ class FindPeople(AbstractSubtask):
         self.skill = self.current_skill
         self.subtask = self.current_subtask
         self.move = self.skillBook.get_skill(self, 'MoveBaseRelative')
-
+        self.timer = Delay()
+        self.timer.wait(30)
         self.nearest_people = None
 
     def perform(self, perception_data):
@@ -27,6 +30,10 @@ class FindPeople(AbstractSubtask):
 
             if point is not None:
                 self.nearest_people = self.getUnitVector(point, 0.5)
+
+        elif not self.timer.is_waiting():
+            self.change_state('notFound')
+
 
     def getUnitVector(self, point, extend_distance):
         new_point = Vector3()
