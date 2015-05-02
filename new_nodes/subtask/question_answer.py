@@ -50,4 +50,6 @@ class QuestionAnswer(AbstractSubtask):
                     self.counter += 1
                     self.skill.say('Normally, the cow has 4 legs')
 
+
+
 # Don't forget to add this subtask to subtask book
