@@ -6,6 +6,7 @@ from test import Test
 from follow_me import FollowMe
 from testSpeach import TestSpeach
 from restaurant import Restaurant
+from test_gesture import TestGesture
 
 
 class TaskBook:
@@ -18,6 +19,7 @@ class TaskBook:
         self.book['FollowMe'] = FollowMe(planning_module)
         self.book['TestSpeach'] = TestSpeach(planning_module)
         self.book['Restaurant'] = Restaurant(planning_module)
+        self.book['TestGesture'] = TestGesture(planning_module)
 
     def set_perception(self, perception_module):
         for task in self.book:

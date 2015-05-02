@@ -2,7 +2,8 @@ __author__ = 'AThousandYears'
 import rospy
 
 from include.abstract_subtask import AbstractSubtask
-from math import atan
+from math import atan, sqrt
+from geometry_msgs.msg import Vector3
 
 
 class FollowPerson(AbstractSubtask):
@@ -10,6 +11,7 @@ class FollowPerson(AbstractSubtask):
         AbstractSubtask.__init__(self, planning_module)
         self.move = self.skillBook.get_skill(self, 'MoveBaseRelative')
         self.last_point = None
+        self.set_neck_angle_topic = rospy.Publisher('/hardware_bridge/set_neck_angle', Vector3)
 
     def set_person_id(self, person_id):
         self.person_id = person_id
@@ -23,8 +25,13 @@ class FollowPerson(AbstractSubtask):
                 if person.id == self.person_id:
                     point = person.personpoints
             if point is not None:
-                theta = atan(point.x/point.y) 
-                self.move.set_position(point.x, point.y, theta)
+                theta = atan(point.y/point.x) 
+                size = sqrt(point.x**2 + point.y**2)
+                x, y = point.x/size*(size-0.5), point.y/size*(size-0.5)
+                neck_ang = Vector3()
+                neck_ang.z = theta
+                self.set_neck_angle_topic.publish(neck_ang)
+                self.move.set_position(x, y, theta)
                 self.last_point = point
             else:
                 rospy.loginfo("Stop Robot")

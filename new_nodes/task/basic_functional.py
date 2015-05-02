@@ -18,6 +18,7 @@ class BasicFunctional(AbstractTask):
         #call(["espeak", "-ven+f4", 'init basic functionality.', "-s 120"])
 
     def perform(self, perception_data):
+
         if self.state is 'init':
             rospy.loginfo('init BasicFunctional')
             self.change_state_with_subtask('movePassDoor', 'MovePassDoor')
