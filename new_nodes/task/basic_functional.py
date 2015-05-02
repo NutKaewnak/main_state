@@ -1,8 +1,9 @@
+__author__ = 'nicole'
+
 from subprocess import call
 from geometry_msgs.msg import Vector3
 from include.delay import Delay
 
-__author__ = 'nicole'
 import rospy
 from include.abstract_task import AbstractTask
 
@@ -14,7 +15,7 @@ class BasicFunctional(AbstractTask):
         set_neck_angle_topic = rospy.Publisher('/hardware_bridge/set_neck_angle', Vector3)
         set_neck_angle_topic.publish(Vector3())
         self.state = 'place'
-        call(["espeak", "-ven+f4", 'init basic functionality.', "-s 120"])
+        #call(["espeak", "-ven+f4", 'init basic functionality.', "-s 120"])
 
     def perform(self, perception_data):
         if self.state is 'init':
