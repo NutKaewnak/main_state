@@ -67,6 +67,7 @@ class Restaurant(AbstractTask):
             if perception_data.device is self.Devices.VOICE and 'robot yes' in perception_data.input:
                 call(['espeak', '-ven+f4', 'I remember ' + self.location + '.', '-s 120'])
                 self.location_list[self.location] = self.perception_module.base_status.position
+                self.first = self.perception_module.base_status.position
                 self.change_state('init')
             elif perception_data.device is self.Devices.VOICE and 'robot no' in perception_data.input:
                 call(['espeak', '-ven+f4', 'Sorry , Where is this place ?', '-s 120'])
@@ -74,23 +75,27 @@ class Restaurant(AbstractTask):
 
         elif self.state is 'wait_for_command':
             if perception_data.device is self.Devices.VOICE:
-                self.command = perception_data.input
-                call(['espeak', '-ven+f4', self.command + ' yes or no ?', '-s 120'])
-                self.change_state('confirm_command')
+                for location in self.location_list:
+                    if location in perception_data.input:
+                        self.command = perception_data.input
+                        call(['espeak', '-ven+f4', self.command + ' yes or no ?', '-s 120'])
+                        self.change_state('confirm_command')
 
         elif self.state is 'confirm_command':
             if perception_data.device is self.Devices.VOICE and 'robot yes' in perception_data.input:
                 call(['espeak', '-ven+f4', 'I will do it.', '-s 120'])
                 self.count += 1
-                if self.count == 3:
+                if self.count >= 3:
                     self.change_state('move_to_first')
-                self.change_state('wait_for_command')
+                else:
+                    self.change_state('wait_for_command')
             elif perception_data.device is self.Devices.VOICE and 'robot no' in perception_data.input:
                 call(['espeak', '-ven+f4', 'Sorry , What did you say ?', '-s 120'])
                 self.change_state('wait_for_command')
 
         elif self.state is 'move_to_first':
-
+            self.move = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
+            self.move.set_position(self.first[0], self.first[1], self.first[2])
                 
     def get_distance(self, point_a, point_b):
         return sqrt((point_a.x - point_b.x)**2 + (point_a.y - point_b.y)**2)

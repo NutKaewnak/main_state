@@ -10,7 +10,7 @@ class QuestionAnswer(AbstractSubtask):
         self.skill = self.skillBook.get_skill(self, 'Say')
         self.subtask = self.current_subtask
         self.counter = 0
-        self.skill.say('ready')
+        #self.skill.say('ready')
 
     def perform(self, perception_data):
         if self.state is 'init':
