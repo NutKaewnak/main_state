@@ -11,6 +11,8 @@ class Neck(AbstractPerception):
         AbstractPerception.__init__(self, planning_module)
         rospy.Subscriber('/dynamixel/pan_kinect/state', JointState, self.callback_pan_status)
         rospy.Subscriber('/dynamixel/tilt_kinect/state', JointState, self.callback_tilt_status)
+        self.tilt = None
+        self.pan = None
 
     def callback_pan_status(self, data):
         self.pan = data.current_pos
