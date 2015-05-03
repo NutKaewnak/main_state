@@ -1,3 +1,6 @@
+from geometry_msgs.msg import Vector3
+import math
+
 __author__ = 'nicole'
 from include.abstract_task import AbstractTask
 import rospy
@@ -9,9 +12,11 @@ class TechnicalChallenge(AbstractTask):
         AbstractTask.__init__(self, planning_module)
         self.subtask = None
         self.action = rospy.ServiceProxy('', manipulator)
+        self.set_neck_angle_topic = rospy.Publisher('/hardware_bridge/set_neck_angle', Vector3)
 
     def perform(self, perception_data):
         if self.state is 'init':
+            self.set_neck_angle_topic.publish(Vector3(0, 0, 0))
             if perception_data.device is 'VOICE':
                 if 'introduce yourself' in perception_data.input:
                     self.change_state_with_subtask('introduce', 'Introduce')
@@ -19,6 +24,7 @@ class TechnicalChallenge(AbstractTask):
         elif self.state is 'introduce':
             if perception_data.device is 'VOICE':
                 if 'crack' in perception_data.input and 'egg' in perception_data.input:
+                    self.set_neck_angle_topic.publish(Vector3(0, -0.3, 0))
                     # publish code for crack the egg
                     self.action('crack')
                     self.subtaskBook.get_subtask(self, 'Say').say('I will crack this egg')
