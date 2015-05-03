@@ -20,9 +20,10 @@ class MoveToLocation(AbstractSubtask):
     def to_location(self, location_name):
         self.location = location_name
         rospy.loginfo('Move to '+location_name)
-        location_point = self.location_list(location_name).position
+        location_point = self.location_list[location_name].position
+        #print location_point
         self.move = self.skillBook.get_skill(self, 'MoveBaseAbsolute')
-        self.move.set_point(location_point)
+        self.move.set_position(location_point.x, location_point.y, location_point.theta)
         self.change_state('move')
 
     def perform(self, perception_data):
