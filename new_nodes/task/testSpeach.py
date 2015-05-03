@@ -10,6 +10,6 @@ class TestSpeach(AbstractTask):
     def perform(self, perception_data):
         if self.state is 'init':
             if self.current_subtask is None:
-                self.subtask = self.subtaskBook.get_subtask(self, 'QuestionAnswer')
+                self.subtask = self.subtaskBook.get_subtask(self, 'ExtractObjectLocation')
             self.change_state('finish')
             # Don't forget to add task to task_book

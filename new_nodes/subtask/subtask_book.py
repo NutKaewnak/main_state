@@ -19,7 +19,7 @@ from bring_object_to_person import BringObjectToPerson
 from question_answer import QuestionAnswer
 from find_people import FindPeople
 from move_absolute import MoveAbsolute
-
+from extract_object_location import ExtractObjectLocation
 
 class SubtaskBook:
     def __init__(self, planning_module):
@@ -43,6 +43,7 @@ class SubtaskBook:
         self.book['AskForNameAndCommand'] = AskForNameAndCommand(planning_module)
         self.book['QuestionAnswer'] = QuestionAnswer(planning_module)
         self.book['MoveAbsolute'] = MoveAbsolute(planning_module)
+        self.book['ExtractObjectLocation'] = ExtractObjectLocation(planning_module)
 
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()

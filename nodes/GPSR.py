@@ -111,7 +111,7 @@ class GPSR(BaseState):
         Publish.set_manipulator_action('prepare')
         Publish.set_neck(0.0, -0.7, 0.0)
 
-    def startAction(self, action):
+    def startAction(self, action): #category-one
         rospy.loginfo('%s %s %s'%(action.action, action.object, action.data))
         if action.action in self.verb_categories['go']:
             if action.data in [loc for k in self.location_categories.keys() for loc in self.location_categories[k]] or action.data is None:
@@ -188,6 +188,8 @@ class GPSR(BaseState):
                 #    self.speak('did you say %s.' % data)
                 #    self.state = 'confirm'
                 #self.command = data
+
+
 
         elif self.state == 'wait_more_command':
             if device == Devices.voice and self.command_extractor.isValidCommand(data):
