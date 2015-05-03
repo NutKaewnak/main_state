@@ -22,7 +22,7 @@ class FindPeopleAndGetOrder(AbstractSubtask):
             self.order = None
             self.people = None
             self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
-            self.subtask.to_location('livingRoom')
+            self.subtask.to_location('party room')
             self.change_state('moveToLivingRoom')
 
         elif self.state is 'moveToLivingRoom':
@@ -38,8 +38,8 @@ class FindPeopleAndGetOrder(AbstractSubtask):
 
         elif self.state is 'askForCommand':
             if self.current_subtask.state is 'finish':
-                self.order = 'coke'  # self.subtask.getOrder()
-                self.people = 'Amanda'  # self.subtask.getPerson()
+                self.order = self.subtask.getObject()
+                self.people = self.subtask.getPerson()
                 if self.order is not None and self.people is not None:
                     self.change_state('finish')
                     rospy.loginfo('subtask finish')

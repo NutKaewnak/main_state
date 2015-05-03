@@ -1,6 +1,8 @@
 __author__ = 'nicole'
 import rospy
 from include.abstract_subtask import AbstractSubtask
+from geometry_msgs.msg import Pose2D
+import math
 
 
 class FindPeopleUsingGesture(AbstractSubtask):
@@ -9,7 +11,8 @@ class FindPeopleUsingGesture(AbstractSubtask):
         self.skill = self.current_skill
         self.subtask = self.current_subtask
         self.neck = self.skillBook.get_skill(self, 'TurnNeckForSearchPeople')
-        self.pos = None
+        self.point = None
+        self.pos = Pose2D()
 
     def perform(self, perception_data):
         if self.state is not 'finish':
@@ -29,10 +32,18 @@ class FindPeopleUsingGesture(AbstractSubtask):
         elif self.state is 'searching':
             if self.skill.state is 'succeeded':
                 self.neck.stop()
-                self.pos = self.skill.get_point()
+                self.point = self.skill.get_point()
+                self.pos = self.cal_point(self.point.x, self.point.y, self.point.z)
                 self.change_state('finish')
             elif self.neck.state is 'succeeded':
                 self.change_state('notFound')
+
+    def cal_point(self, x, y, z):
+        pan_angle = self.perception_module.neck.pan
+        x = float(z) * math.cos(pan_angle)
+        y = float(z) * math.sin(pan_angle)
+        pose = Pose2D(float(x), float(y), pan_angle)
+        return pose
 
     def get_point(self):
         return self.pos

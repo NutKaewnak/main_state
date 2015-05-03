@@ -34,7 +34,6 @@ class FindPeople(AbstractSubtask):
         elif not self.timer.is_waiting():
             self.change_state('notFound')
 
-
     def getUnitVector(self, point, extend_distance):
         new_point = Vector3()
         size = sqrt(point.x ** 2 + point.y ** 2)
