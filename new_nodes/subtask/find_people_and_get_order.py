@@ -14,6 +14,7 @@ class FindPeopleAndGetOrder(AbstractSubtask):
         self.subtask = self.current_subtask
         self.order = None
         self.people = None
+        self.state = 'init'
 
     def perform(self, perception_data):
         # if self.state is not 'finish':
@@ -32,6 +33,7 @@ class FindPeopleAndGetOrder(AbstractSubtask):
 
         elif self.state is 'detectAndMoveToPeople':
             if self.current_subtask.state is 'finish':
+                self.neck.set_neck_angle(0, 0)
                 self.subtask = self.subtaskBook.get_subtask(self, 'AskForNameAndCommand')  # must make it
                 self.change_state('askForCommand')
                 rospy.loginfo('askForCommand')

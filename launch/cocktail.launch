@@ -7,4 +7,5 @@
   <node ns="gesture" name="gesture_detection" pkg="gesture_detection" type="NIHandtracker">
     <remap from="/scan" to="/gesture/point"/>
   </node>
+  <include file="$(find speech_processing)/launch/cocktail.launch"/>
 </launch>

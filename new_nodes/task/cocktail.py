@@ -30,12 +30,12 @@ class Cocktail(AbstractTask):
                     self.change_state('error')
                     rospy.loginfo('Bug in subtask find people and get order')
 
-                # if len(self.personNameList) >= 3:
-                #     self.change_state('prepareToServePerson')
-                # else:
-                #     rospy.loginfo('got : '+str(len(self.personNameList))+' persons')
-                #     if self.current_subtask.state is 'finish':
-                #         self.subtask.change_state('init')
+                if len(self.personNameList) >= 3:
+                    self.change_state('prepareToServePerson')
+                else:
+                    rospy.loginfo('got : '+str(len(self.personNameList))+' persons')
+                    if self.current_subtask.state is 'finish':
+                        self.subtask.change_state('init')
                 self.change_state('prepareToServePerson')
 
         elif self.state is 'prepareToServePerson':
