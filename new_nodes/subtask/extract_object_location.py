@@ -1,3 +1,6 @@
+from geometry_msgs.msg import Vector3
+import rospy
+
 __author__ = 'ms.antonio'
 
 import roslib
@@ -30,6 +33,8 @@ class ExtractObjectLocation(AbstractSubtask):
         self.verbs = readFileToList(roslib.packages.get_pkg_dir('speech_processing')+'/command_config/GPSR/verbs.txt')
     def perform(self, perception_data):
         if self.state is 'init':
+            self.set_neck_angle_topic = rospy.Publisher('/hardware_bridge/set_neck_angle', Vector3)
+            self.set_neck_angle_topic.publish(Vector3(0, 0, 0))
             self.object = 'None'
             self.location = 'None'
             self.verb = 'None'
@@ -107,6 +112,7 @@ class ExtractObjectLocation(AbstractSubtask):
                 self.data = perception_data.input
                 for i in self.locations:
                     if i in self.data:
+                    if i in self.data:
                         self.location = i
                         if self.location is not 'None':
                              self.skill.say('Wait a minute , I will'+self.verb+'to'+self.location)
@@ -114,8 +120,6 @@ class ExtractObjectLocation(AbstractSubtask):
                             print  self.object
                             self.skill.say('Wait a minute , I will'+self.verb + self.object+'from'+self.location+'to you')
                         self.change_state('finish')
-                        self.skill.say('object is'+self.object)
-                        self.skill.say('location is'+self.location)
                         break
 
     def getObject(self):

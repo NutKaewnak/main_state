@@ -35,7 +35,7 @@ class AskForName(AbstractSubtask):
                 self.data = perception_data.input
                 for i in self.name:
                     if i in self.data:
-                        self.person = self.data
+                        self.person = i
                         self.change_state('finish')
                         self.skill.say('Your name is'+self.person)
 

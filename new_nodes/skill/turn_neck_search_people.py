@@ -10,8 +10,10 @@ class TurnNeckForSearchPeople(AbstractSkill):
     def __init__(self, control_module):
         AbstractSkill.__init__(self, control_module)
         self.neck = self.controlModule.neck
+        self.minute = Delay()
+        self.minute.wait(60)
         self.timer = Delay()
-        self.angle = None
+        self.angle = -1.57
 
     def perform(self, perception_data):
         print('Angle : '+str(self.angle))
@@ -19,18 +21,22 @@ class TurnNeckForSearchPeople(AbstractSkill):
         if self.state is 'start':
             if self.timer.is_waiting():
                 return
-            # self.angle += 0.3
+            self.angle += 0.3
             self.neck.set_neck_angle(0, self.angle)
-            self.timer.wait(3)
+            self.timer.wait(5)
             if self.angle >= 90*math.pi/180:
+                self.angle = -90*math.pi/180
+                self.neck.set_neck_angle(0, self.angle)
+
+            if not self.minute.is_waiting():
                 self.change_state('succeeded')
         elif self.state is 'stop':
                 self.change_state('stopped')
 
     def prepare(self):
-        self.neck.set_neck_angle(0, 0)
+        # self.neck.set_neck_angle(0, 0)
         self.angle = -90*math.pi/180
-        # self.neck.set_neck_angle(0, self.angle)
+        self.neck.set_neck_angle(0, self.angle)
         self.change_state('waitAtStart')
         self.timer.wait(2)
         rospy.loginfo('Neck Preparing')

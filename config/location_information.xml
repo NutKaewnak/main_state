@@ -37,7 +37,12 @@
     <location name="notFound" position="-1.524, -1.386" rotation="1.561" height="1.29"/>
     <location name="LeaveArena" position="3.524, 3.575" rotation="0.007" height="1.29"/>
     <location name="detect" position="-4.978, 2.268" rotation="0.155" height="1.29"/>
-    <location name="party room" position="-4.455, 2.901" rotation="2.031" height="1.29"/>
+    <location name="party room" position="-3.855, 4.601" rotation="2.632" height="1.29"/>
     <location name="kitchen table" position="-5.655, -4.016" rotation="-3.126" height="0.7"/>
+    <location name="reception table" position="-0.655, -3.996" rotation="-3.133" height="1.29"/>
+    <location name="bar" position="-2.102, -0.4630" rotation="1.557" height="1.29"/>
+    <location name="dining table" position="-5.566, 6.874" rotation="3.137" height="1.29"/>
+    <location name="side table" position="-2.335, 6.438" rotation="0.063" height="1.29"/>
+    <location name="living table" position="1.649, 6.928" rotation="0.026" height="1.29"/>
 
 </location_information>

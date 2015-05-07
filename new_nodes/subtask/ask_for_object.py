@@ -35,7 +35,7 @@ class AskForObject(AbstractSubtask):
                 self.data = perception_data.input
                 for i in self.name:
                     if i in self.data:
-                        self.object = self.data
+                        self.object = i
                         self.skill.say('You want to drink '+self.object+ 'right')
 
     def getObject(self):
