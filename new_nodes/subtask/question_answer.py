@@ -10,12 +10,16 @@ class QuestionAnswer(AbstractSubtask):
         self.skill = self.skillBook.get_skill(self, 'Say')
         self.subtask = self.current_subtask
         self.counter = 0
+        self.limit = 5
         #self.skill.say('ready')
 
     def perform(self, perception_data):
         if self.state is 'init':
             # check if skill is succeed
-            if self.counter < 3:
+            self.counter = 0
+            self.change_state('answering')
+        if self.state is 'answering':
+            if self.counter < self.limit:
                 self.change_state('finish')
             elif perception_data.device == 'VOICE':
                 print perception_data.input
