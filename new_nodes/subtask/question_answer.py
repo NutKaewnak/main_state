@@ -11,7 +11,7 @@ class QuestionAnswer(AbstractSubtask):
         self.subtask = self.current_subtask
         self.counter = 0
         self.limit = 5
-        #self.skill.say('ready')
+        # self.skill.say('ready')
 
     def perform(self, perception_data):
         if self.state is 'init':
@@ -22,6 +22,7 @@ class QuestionAnswer(AbstractSubtask):
             if self.counter < self.limit:
                 self.change_state('finish')
             elif perception_data.device == 'VOICE':
+                self.skill.say('Please ask question number ' + self.counter)
                 print perception_data.input
                 if 'your name' in perception_data.input:
                     self.skill.say('My name is Lumyai')
@@ -53,7 +54,6 @@ class QuestionAnswer(AbstractSubtask):
                 elif 'legs' in perception_data.input:
                     self.counter += 1
                     self.skill.say('Normally, the cow has 4 legs')
-
 
 
 # Don't forget to add this subtask to subtask book
