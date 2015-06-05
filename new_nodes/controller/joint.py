@@ -21,7 +21,6 @@ class Joint:
 
     def move_joint(self, angles):
         goal = FollowJointTrajectoryGoal()
-        char = self.name[0] #either 'f' or 'b'
         goal.trajectory.joint_names = self.joint_names
         point = JointTrajectoryPoint()
         point.positions = angles
