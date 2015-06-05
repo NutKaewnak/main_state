@@ -12,8 +12,8 @@ class ControlModule:
     base = BaseController()
     neck = NeckController()
     torso = TorsoController()
-    left_arm = ArmController("left_arm")
-    right_arm = ArmController("right_arm")
+    left_arm = ArmController("left")
+    right_arm = ArmController("right")
 
     def __init__(self):
         pass
