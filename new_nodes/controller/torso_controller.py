@@ -1,14 +1,13 @@
 __author__ = "AThousandYears"
 
 import rospy
-from std_msgs.msg import Float64
+from joint import Joint
 
 
 class TorsoController:
     def __init__(self):
-        self.set_height = rospy.Publisher('/hardware_bridge/set_height', Float64)
+        self.torso = Joint('torso_controller', ['prismatic_joint'])
 
-    def set_height(self, height):
+    def set_height_relative(self, height):
         rospy.loginfo("Set height to " + str(height))
-
-        self.set_height.publish(Float64(height))
+        self.torso.move_joint(height)

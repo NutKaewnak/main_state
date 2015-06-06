@@ -14,7 +14,8 @@ class Joint:
         # arm_name should be b_arm or f_arm
         self.name = motor_name
         self.joint_names = joint_names
-        self.jta = actionlib.SimpleActionClient('/dynamixel'+self.name+'_controller/follow_joint_trajectory', FollowJointTrajectoryAction)
+        self.jta = actionlib.SimpleActionClient('/dynamixel/'+self.name+'_controller/follow_joint_trajectory'
+                                                , FollowJointTrajectoryAction)
         rospy.loginfo('Waiting for joint trajectory action')
         self.jta.wait_for_server()
         rospy.loginfo('Found joint trajectory action!')
@@ -22,6 +23,7 @@ class Joint:
     def move_joint(self, angles):
         goal = FollowJointTrajectoryGoal()
         goal.trajectory.joint_names = self.joint_names
+        rospy.loginfo('send: '+angles+' to '+self.joint_names)
         point = JointTrajectoryPoint()
         point.positions = angles
         point.time_from_start = rospy.Duration(3)
