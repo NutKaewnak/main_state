@@ -12,5 +12,8 @@ class TurnNeck(AbstrackSkill):
             self.change_state('succeed')
             # Don't to forget to add this skill to skill book
 
-    def turn(self, angle):
-        self.neck.set_neck_angle(0, angle)
+    def turn(self, pitch, yaw):
+        self.neck.set_neck_angle(pitch, yaw)
+
+    def turn_relative(self, pitch, yaw):
+        self.neck.set_neck_angle_relative(pitch, yaw)
