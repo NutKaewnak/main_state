@@ -9,7 +9,7 @@ from control_msgs.msg import JointTrajectoryAction, JointTrajectoryGoal, \
     FollowJointTrajectoryAction, FollowJointTrajectoryGoal
 
 
-class Joint:
+class JointTrajectoryFollow:
     def __init__(self, motor_name, joint_names):
         # arm_name should be b_arm or f_arm
         self.name = motor_name
@@ -28,4 +28,4 @@ class Joint:
         point.positions = angles
         point.time_from_start = rospy.Duration(3)
         goal.trajectory.points.append(point)
-        self.jta.send_goal_and_wait(goal)
+        self.jta.send_goal(goal)
