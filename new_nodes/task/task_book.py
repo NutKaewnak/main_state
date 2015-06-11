@@ -4,12 +4,13 @@ from cocktail import Cocktail
 from rips import RIPS
 from test import Test
 from follow_me import FollowMe
-from testSpeach import TestSpeach
+from testSpeech import TestSpeach
 from restaurant import Restaurant
 from test_gesture import TestGesture
 from technical_challenge import TechnicalChallenge
 from GPSR import GPSR
 from speech_recognition import SpeechRecognition
+from test_object_recog_and_manip import TestObjectRecogAndManip
 
 
 class TaskBook:
@@ -26,6 +27,7 @@ class TaskBook:
         self.book['Technical'] = TechnicalChallenge(planning_module)
         self.book['GPSR'] = GPSR(planning_module)
         self.book['SpeechRecognition'] = SpeechRecognition(planning_module)
+        self.book['TestObjectRecogAndManip'] = TestObjectRecogAndManip(planning_module)
 
     def set_perception(self, perception_module):
         for task in self.book:

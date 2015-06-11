@@ -7,6 +7,7 @@ from say import Say
 from confirm import Confirm
 from detect_people_with_gesture import DetectPeopleWithGesture
 from turn_neck import TurnNeck
+from pick import Pick
 
 
 class SkillBook:
@@ -19,6 +20,7 @@ class SkillBook:
         self.book['DetectPeopleWithGesture'] = DetectPeopleWithGesture(control_module)
         self.book['Confirm'] = Confirm(control_module)
         self.book['TurnNeck'] = TurnNeck(control_module)
+        self.book['pick'] = Pick(control_module)
 
     def get_skill(self, subtask, skill_name):
         self.book[skill_name].reset()
