@@ -21,7 +21,6 @@ from find_people import FindPeople
 from move_absolute import MoveAbsolute
 from say import Say
 from extract_object_location import ExtractObjectLocation
-from mani
 
 
 class SubtaskBook:
@@ -48,7 +47,6 @@ class SubtaskBook:
         self.book['MoveAbsolute'] = MoveAbsolute(planning_module)
         self.book['Say'] = Say(planning_module)
         self.book['ExtractObjectLocation'] = ExtractObjectLocation(planning_module)
-        self.book['Manipulation'] =
 
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()
