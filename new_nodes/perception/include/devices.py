@@ -8,6 +8,7 @@ class Devices:
     NECK = 'NECK'
     DOOR = 'DOOR'
     PEOPLE = 'PEOPLE'
+    OBJECT = 'OBJECT'
 
     def __init__(self):
         pass

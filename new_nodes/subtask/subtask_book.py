@@ -21,6 +21,7 @@ from find_people import FindPeople
 from move_absolute import MoveAbsolute
 from say import Say
 from extract_object_location import ExtractObjectLocation
+from pick_from_point import PickFromPoint
 
 
 class SubtaskBook:
@@ -47,6 +48,7 @@ class SubtaskBook:
         self.book['MoveAbsolute'] = MoveAbsolute(planning_module)
         self.book['Say'] = Say(planning_module)
         self.book['ExtractObjectLocation'] = ExtractObjectLocation(planning_module)
+        self.book['PickFromPoint'] = PickFromPoint(planning_module)
 
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()
