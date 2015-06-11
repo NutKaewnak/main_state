@@ -35,9 +35,10 @@ class Manipulation(AbstractTask):
         elif self.state is 'pick_object':
             if self.number_object_found is 0:
                 self.change_state('finish')
-            self.subtask.pick(self.object_array[self.number_object_found])
-            rospy.loginfo('Picking ' + self.object_array[self.number_object_found])
-            if self.subtask.state is 'finish':
-                self.number_object_found -= 1
+            else:
+                self.subtask.pick(self.object_array[self.number_object_found])
+                rospy.loginfo('Picking ' + self.object_array[self.number_object_found])
+                if self.subtask.state is 'finish':
+                    self.number_object_found -= 1
 
             # Don't forget to add task to task_book
