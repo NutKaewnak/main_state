@@ -23,4 +23,4 @@ class TurnNeck(AbstractSkill):
 
     def turn_relative(self, pitch, yaw):
         self.change_state('init')
-        self.neck.set_neck_angle_relative(pitch, yaw)
+        self.neck.set_neck_angle(pitch + self.tilt, yaw + self.pan)
