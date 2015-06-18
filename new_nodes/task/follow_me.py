@@ -70,7 +70,7 @@ class FollowMe(AbstractTask):
         elif self.state is 'follow_2':
             # recovery follow
             if self.follow.state is 'abort' and perception_data.device is self.Devices.PEOPLE:
-                min_distance = 0.7 # set to maximum
+                min_distance = 0.7  # set to maximum
                 id = None
                 for person in perception_data.input:
                     distance = self.get_distance(person.personpoints, self.follow.last_point)

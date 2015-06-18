@@ -15,6 +15,7 @@ class FindPeople(AbstractSubtask):
         self.move = self.skillBook.get_skill(self, 'MoveBaseRelative')
         self.timer = Delay()
         self.nearest_people = None
+        self.is_found = False
 
     def perform(self, perception_data):
         if self.state is 'init' and perception_data.device is self.Devices.PEOPLE:
@@ -30,6 +31,7 @@ class FindPeople(AbstractSubtask):
 
             if point is not None:
                 self.nearest_people = self.getUnitVector(point, 0.5)
+                self.is_found = True
 
         elif not self.timer.is_waiting():
             self.change_state('notFound')
