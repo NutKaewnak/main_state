@@ -13,9 +13,9 @@ class JointTrajectoryFollow:
         self.joint_names = joint_names
         self.jta = actionlib.SimpleActionClient('/dynamixel/'+self.name+'_controller/follow_joint_trajectory'
                                                 , FollowJointTrajectoryAction)
-        #rospy.loginfo('Waiting for joint trajectory action')
-        #self.jta.wait_for_server()
-        #rospy.loginfo('Found joint trajectory action!')
+        # rospy.loginfo('Waiting for joint trajectory action')
+        # self.jta.wait_for_server()
+        # rospy.loginfo('Found joint trajectory action!')
 
     def move_joint(self, angles):
         goal = FollowJointTrajectoryGoal()
