@@ -27,12 +27,7 @@ class BringObjectToPerson(AbstractSubtask):
         elif self.state is 'detectAndMoveToPeople':
             if self.current_subtask.state is 'finish':
                 # self.subtask = self.subtaskBook.get_subtask(self, 'AskForNameAndCommand')  # must make it
-                self.change_state('askForCommand')
-
-        elif self.state is 'askForCommand':
-            if self.current_subtask.state is 'finish':
-                self.subtask = self.subtaskBook.get_subtask(self, 'AskForCommand')
-                self.change_state('')
+                self.change_state('finish')
 
     def start(self, name):
         self.name = name
