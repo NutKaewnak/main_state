@@ -13,3 +13,4 @@ class template(AbstractTask):
             self.subtask = self.subtaskBook.get_subtask(self, 'Introduce')
             self.change_state('finish')
             # Don't forget to add task to task_book
+            # Don't forget to create launch file

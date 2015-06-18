@@ -4,7 +4,7 @@ from include.abstract_task import AbstractTask
 from include.delay import Delay
 
 
-class Manipulation(AbstractTask):
+class ManipulationTask(AbstractTask):
     # need reportlab to run this task
     def __init__(self, planning_module):
         AbstractTask.__init__(self, planning_module)
@@ -59,8 +59,9 @@ class Manipulation(AbstractTask):
                 if self.subtask.state is 'finish':
                     self.number_object_found -= 1
 
-            # Don't forget to add task to task_book
+            # Don't forget to create launch file
     def to_pdf(self, object):
+        # wait for object P'muk here NOT FINISH
         from reportlab.pdfgen import canvas
         from reportlab.lib.units import cm
         image = object.get_picture()
