@@ -20,13 +20,12 @@ def callback(data):
     position = geometry_msgs.msg.Point()
     position = data.centriod
     framecount += 1
-    print "msg counting " + str(framecount)
-
     if framecount is not 3:
+        print "msg counting " + str(framecount)
         return
     rospy.loginfo('------------start  picking----------')
     print "location : x = " + str(position.x) + "  y= " + str(position.y) + " z= " + str(position.z) 
-    mnplctrl.pick("right_arm",[position.x,position.y,position.z],[0.0,0.0,0.0],"object","table","base_link")
+    mnplctrl.pick("right_arm",[position.x-0.2,position.y,position.z+0.05],[0.0,0.0,0.0],"object","table","base_link")
     #mnplctrl.robot.right_arm.set_support_surface_name("table")
     #mnplctrl.robot.right_arm.pick("object")
 
@@ -42,18 +41,41 @@ def tester():
     mnplctrl = ManipulateController()
     print "hello"
     rospy.init_node('controller_tester')
-    rospy.Subscriber("/object_shape", object_detection.msg.ObjectDetection, callback)
+    #rospy.Subscriber("/object_shape", object_detection.msg.ObjectDetection, callback)
     mnplctrl.static_pose("right_arm","right_normal")
-    #rospy.sleep(5)
-    ##subscribing objects
+    mnplctrl.static_pose("left_arm","left_normal")
+    rospy.sleep(5)
+    ##publishing object
+    # mnplctrl.scene.remove_world_object("pole")
+    # mnplctrl.scene.remove_world_object("table")
+    # mnplctrl.scene.remove_world_object("object")
+
+    # # publish a demo scene
+    # p = geometry_msgs.msg.PoseStamped()
+    # p.header.frame_id = 'base_link'
+    # p.pose.position.x = 0.7
+    # p.pose.position.y = 1
+    # p.pose.position.z = 0.85
+    # p.pose.orientation.w = 1.0
+    # mnplctrl.scene.add_box("pole", p, (0.3, 0.1, 1.0))
+    # p.pose.position.x = 0.725
+    # p.pose.position.y = -0.2
+    # p.pose.position.z = 0.175
+    # mnplctrl.scene.add_box("table", p, (0.5, 1.5, 0.35))
+
+    # p.pose.position.x = 0.7
+    # p.pose.position.y = -0.15
+    # p.pose.position.z = 0.5
+    # mnplctrl.scene.add_box("object", p, (0.15, 0.06, 0.3))
+
+    # ##subscribing objects
     
+    # rospy.sleep(2.0)
+    # print "-----start----"
+    # Manually pick in simulation
+    # mnplctrl.pick("right_arm",[0.50,-0.15,0.55],[0.0,0.0,0.0],"object","table","base_link")
 
-
-    #print "-------start commanding rightarm------"
-    #mnplctrl.manipulate("right_arm",[0.4,-0.3,0.6],[0,0,0],"base_link")
-
-    #mnplctrl.pick("right_arm",[0.43,-0.15,0.5],[0,0,0],"object","table","base_link")
-    #print "-----------finish pick----------"
+    # print "-----------finish pick----------"
     rospy.spin()
     mnplctrl.__del__()
 

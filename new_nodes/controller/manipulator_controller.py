@@ -9,7 +9,18 @@ import geometry_msgs.msg
 import trajectory_msgs.msg
 import tf
 import sys
+from copy import deepcopy
 
+GRIPPER_FRAME = 'right_wrist_3_Link'
+GRIPPER_JOINT_NAMES = ['right_gripper_joint']
+ 
+GRIPPER_OPENED = [0.0]
+GRIPPER_CLOSED = [-0.2]
+GRIPPER_NEUTRAL = [0.0]
+GRASP_OVERTIGHTEN = -0.01
+GRIPPER_EFFORT = [0.6]
+ 
+REFERENCE_FRAME = 'base_link'
 
 class ManipulateController:
     def __init__(self):
@@ -60,7 +71,7 @@ class ManipulateController:
         self.grasp_plan = plan_id
 
     def pick(self, arm_group, position, orientation_rpy=[0, 0, 0], desired_object="part", support_surface_name="table",
-             ref_frame="base_link", planning_time=100.00, grasp_constraint=None):
+             ref_frame="base_link", planning_time=300.00, grasp_constraint=None):
 
         pose_target = geometry_msgs.msg.PoseStamped()
 
@@ -75,47 +86,208 @@ class ManipulateController:
         pose_target.pose.position.x = position[0]
         pose_target.pose.position.y = position[1]
         pose_target.pose.position.z = position[2]
+        # Generate a list of grasps
+        grasp = self.make_grasps(pose_target, desired_object, [-0.2])
+        
+        # if grasp_constraint is None:
+        #     grasp_constraint = moveit_msgs.msg.Grasp()
+        #     grasp_constraint.grasp_pose = pose_target
 
-        if grasp_constraint is None:
-            grasp_constraint = moveit_msgs.msg.Grasp()
-            grasp_constraint.grasp_pose = pose_target
+        #     grasp_constraint.pre_grasp_approach.direction.vector.x = 1.0
+        #     grasp_constraint.pre_grasp_approach.direction.header.frame_id = "right_wrist_3_Link"
+        #     #grasp_constraint.pre_grasp_approach.direction.header.frame_id = "left_wrist_3_Link"
+        #     grasp_constraint.pre_grasp_approach.min_distance = 0.1
+        #     grasp_constraint.pre_grasp_approach.desired_distance = 0.25
 
-            grasp_constraint.pre_grasp_approach.direction.vector.x = 1.0
-            grasp_constraint.pre_grasp_approach.direction.header.frame_id = "right_wrist_3_Link"
-            grasp_constraint.pre_grasp_approach.min_distance = 0.05
-            grasp_constraint.pre_grasp_approach.desired_distance = 0
+        #     # Retreat directly move_back
+        #     grasp_constraint.post_grasp_retreat.direction.header.frame_id = "right_wrist_3_Link"
+        #     #grasp_constraint.post_grasp_retreat.direction.vector.x = -1.0
+        #     grasp_constraint.post_grasp_retreat.direction.vector.z = 1.0
+        #     grasp_constraint.post_grasp_retreat.min_distance = 0.00
+        #     grasp_constraint.post_grasp_retreat.desired_distance = 0.00
 
-            # Retreat directly move_back
-            grasp_constraint.post_grasp_retreat.direction.header.frame_id = "base_link"
-            grasp_constraint.post_grasp_retreat.direction.vector.x = -1.0
-            #grasp_constraint.post_grasp_retreat.direction.vector.z = 1.0
-            grasp_constraint.post_grasp_retreat.min_distance = 0.05
-            grasp_constraint.post_grasp_retreat.desired_distance = 0
+        #     # open_gripper
+        #     grasp_constraint.pre_grasp_posture.joint_names.append("right_gripper_joint")
+        #     #grasp_constraint.pre_grasp_posture.joint_names.append("left_gripper_joint")
+        #     grasp_constraint.pre_grasp_posture.points.append(trajectory_msgs.msg.JointTrajectoryPoint())
+        #     grasp_constraint.pre_grasp_posture.points[0].positions.append(std_msgs.msg.Float64())
+        #     grasp_constraint.pre_grasp_posture.points[0].positions[0] = 0
 
-            # open_gripper
-            grasp_constraint.pre_grasp_posture.joint_names.append("right_gripper_joint")
-            grasp_constraint.pre_grasp_posture.points.append(trajectory_msgs.msg.JointTrajectoryPoint())
-            grasp_constraint.pre_grasp_posture.points[0].positions.append(std_msgs.msg.Float64())
-            grasp_constraint.pre_grasp_posture.points[0].positions[0] = 0
+        #     # close_gripper
+        #     grasp_constraint.grasp_posture.joint_names.append("right_gripper_joint")
+        #     #grasp_constraint.grasp_posture.joint_names.append("left_gripper_joint")
+        #     grasp_constraint.grasp_posture.points.append(trajectory_msgs.msg.JointTrajectoryPoint())
+        #     grasp_constraint.grasp_posture.points[0].positions.append(std_msgs.msg.Float64())
+        #     grasp_constraint.grasp_posture.points[0].positions[0] = -0.2
 
-            # close_gripper
-            grasp_constraint.grasp_posture.joint_names.append("right_gripper_joint")
-            grasp_constraint.grasp_posture.points.append(trajectory_msgs.msg.JointTrajectoryPoint())
-            grasp_constraint.grasp_posture.points[0].positions.append(std_msgs.msg.Float64())
-            grasp_constraint.grasp_posture.points[0].positions[0] = -0.2
-
-            grasp = [grasp_constraint]
+        #     grasp = [grasp_constraint]
 
         if arm_group is "right_arm":
             self.robot.right_arm.set_support_surface_name(support_surface_name)
+            self.robot.right_arm.set_goal_position_tolerance(0.1)
+            self.robot.right_gripper.set_goal_position_tolerance(0.1)
+            self.robot.right_arm.set_goal_orientation_tolerance(0.1)
+            self.robot.right_gripper.set_goal_orientation_tolerance(0.1)
             self.robot.right_arm.set_planning_time(planning_time)
             self.robot.right_arm.pick(desired_object, grasp)
         elif arm_group is "left_arm":
             self.robot.left_arm.set_support_surface_name(support_surface_name)
+            self.robot.left_arm.set_goal_position_tolerance(0.1) 
+            self.robot.left_arm.set_goal_orientation_tolerance(0.1)
             self.robot.left_arm.set_planning_time(planning_time)
             self.robot.left_arm.pick(desired_object, grasp)
         else:
             rospy.logwarn("No specified arm_group")
+
+    def make_gripper_posture(self, joint_positions):
+        # Initialize the joint trajectory for the gripper joints
+        t = trajectory_msgs.msg.JointTrajectory()
+ 
+        # Set the joint names to the gripper joint names
+        t.joint_names = GRIPPER_JOINT_NAMES
+ 
+        # Initialize a joint trajectory point to represent the goal
+        tp = trajectory_msgs.msg.JointTrajectoryPoint()
+ 
+        # Assign the trajectory joint positions to the input positions
+        tp.positions = joint_positions
+ 
+        # Set the gripper effort
+        tp.effort = GRIPPER_EFFORT
+ 
+        tp.time_from_start = rospy.Duration(1.0)
+ 
+        # Append the goal point to the trajectory points
+        t.points.append(tp)
+ 
+        # Return the joint trajectory
+        return t
+ 
+    # Generate a gripper translation in the direction given by vector
+    def make_gripper_translation(self, min_dist, desired, vector,frame):
+        # Initialize the gripper translation object
+        g = moveit_msgs.msg.GripperTranslation()
+ 
+         # Set the direction vector components to the input
+        g.direction.vector.x = vector[0]
+        g.direction.vector.y = vector[1]
+        g.direction.vector.z = vector[2]
+ 
+        # The vector is relative to the gripper frame
+        #g.direction.header.frame_id = GRIPPER_FRAME
+        g.direction.header.frame_id = frame
+        
+        # Assign the min and desired distances from the input
+        g.min_distance = min_dist
+        g.desired_distance = desired
+ 
+        return g
+ 
+    # Generate a list of possible grasps
+    def make_grasps(self, initial_pose_stamped, allowed_touch_objects, grasp_opening=[0]):
+        # Initialize the grasp object
+        g = moveit_msgs.msg.Grasp()
+ 
+        # Set the pre-grasp and grasp postures appropriately;
+        # grasp_opening should be a bit smaller than target width
+        g.pre_grasp_posture = self.make_gripper_posture(GRIPPER_OPENED)
+        g.grasp_posture = self.make_gripper_posture(grasp_opening)
+ 
+        # Set the approach and retreat parameters as desired
+        #g.pre_grasp_approach = self.make_gripper_translation(0.01, 0.1, [1.0, 0.0, 0.0])
+        #g.post_grasp_retreat = self.make_gripper_translation(0.1, 0.15, [-1.0, 0.0, 0.0])
+        
+        g.pre_grasp_approach = self.make_gripper_translation(0.1, 0.25, [1.0, 0.0, 0.0],GRIPPER_FRAME)
+        g.post_grasp_retreat = self.make_gripper_translation(0.0, 0.0, [0.0, 0.0, 1.0],"right_wrist_3_Link") 
+        # Set the first grasp pose to the input pose
+        g.grasp_pose = initial_pose_stamped
+ 
+        # Pitch angles to try
+        pitch_vals = [0, 0.1, -0.1, 0.2, -0.2, 0.4, -0.4]
+ 
+        # Yaw angles to try
+        yaw_vals = [0]
+ 
+        # A list to hold the grasps
+        grasps = []
+ 
+        # Generate a grasp for each pitch and yaw angle
+        for y in yaw_vals:
+            for p in pitch_vals:
+                # Create a quaternion from the Euler angles
+                q = tf.transformations.quaternion_from_euler(0, p, y)
+ 
+                # Set the grasp pose orientation accordingly
+                g.grasp_pose.pose.orientation.x = q[0]
+                g.grasp_pose.pose.orientation.y = q[1]
+                g.grasp_pose.pose.orientation.z = q[2]
+                g.grasp_pose.pose.orientation.w = q[3]
+ 
+                # Set and id for this grasp (simply needs to be unique)
+                g.id = str(len(grasps))
+ 
+                # Set the allowed touch objects to the input list
+                g.allowed_touch_objects = allowed_touch_objects
+ 
+                # Don't restrict contact force
+                g.max_contact_force = 0
+ 
+                # Degrade grasp quality for increasing pitch angles
+                g.grasp_quality = 1.0 - abs(p)
+ 
+                # Append the grasp to the list
+                grasps.append(deepcopy(g))
+ 
+        # Return the list
+        return grasps
+ 
+    # Generate a list of possible place poses
+    def make_places(self, init_pose):
+        # Initialize the place location as a PoseStamped message
+        place = geometry_msgs.msg.PoseStamped()
+ 
+        # Start with the input place pose
+        place = init_pose
+ 
+        # A list of x shifts (meters) to try
+        x_vals = [0, 0.005, 0.01, 0.015, -0.005, -0.01, -0.015]
+ 
+        # A list of y shifts (meters) to try
+        y_vals = [0, 0.005, 0.01, 0.015, -0.005, -0.01, -0.015]
+ 
+        # A list of pitch angles to try
+        # pitch_vals = [0, 0.005, -0.005, 0.01, -0.01, 0.02, -0.02]
+ 
+        pitch_vals = [0]
+ 
+        # A list of yaw angles to try
+        yaw_vals = [0]
+ 
+        # A list to hold the places
+        places = []
+ 
+        # Generate a place pose for each angle and translation
+        for y in yaw_vals:
+            for p in pitch_vals:
+                for y in y_vals:
+                    for x in x_vals:
+                        place.pose.position.x = init_pose.pose.position.x + x
+                        place.pose.position.y = init_pose.pose.position.y + y
+ 
+                        # Create a quaternion from the Euler angles
+                        q = tf.transformations.quaternion_from_euler(0, p, y)
+ 
+                        # Set the place pose orientation accordingly
+                        place.pose.orientation.x = q[0]
+                        place.pose.orientation.y = q[1]
+                        place.pose.orientation.z = q[2]
+                        place.pose.orientation.w = q[3]
+ 
+                        # Append this place pose to the list
+                        places.append(deepcopy(place))
+ 
+        # Return the list
+        return places
 
     def static_pose(self, arm_group, posture):
         if arm_group is "right_arm":
