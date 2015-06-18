@@ -15,7 +15,7 @@ class BasicFunctional(AbstractTask):
         set_neck_angle_topic = rospy.Publisher('/hardware_bridge/set_neck_angle', Vector3)
         set_neck_angle_topic.publish(Vector3())
         self.state = 'place'
-        #call(["espeak", "-ven+f4", 'init basic functionality.', "-s 120"])
+        # call(["espeak", "-ven+f4", 'init basic functionality.', "-s 120"])
 
     def perform(self, perception_data):
 
