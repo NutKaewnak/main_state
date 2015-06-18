@@ -11,6 +11,7 @@ from technical_challenge import TechnicalChallenge
 from GPSR import GPSR
 from speech_recognition import SpeechRecognition
 from test_object_recog_and_manip import TestObjectRecogAndManip
+from manipulation_task import ManipulationTask
 
 
 class TaskBook:
@@ -28,6 +29,7 @@ class TaskBook:
         self.book['GPSR'] = GPSR(planning_module)
         self.book['SpeechRecognition'] = SpeechRecognition(planning_module)
         self.book['TestObjectRecogAndManip'] = TestObjectRecogAndManip(planning_module)
+        self.book['ManipulationTask'] = ManipulationTask(planning_module)
 
     def set_perception(self, perception_module):
         for task in self.book:
