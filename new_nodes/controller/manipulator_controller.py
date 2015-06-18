@@ -8,13 +8,14 @@ import shape_msgs.msg
 import geometry_msgs.msg
 import trajectory_msgs.msg
 import tf
+import sys
 
 
 class ManipulateController:
     def __init__(self):
         # group should be "left_arm" or "right_arm"
         # self.moveit_commander.roscpp_initialize(" ")
-        moveit_commander.roscpp_initialize(" ")
+        moveit_commander.roscpp_initialize(sys.argv)
         self.robot = moveit_commander.RobotCommander()
         self.scene = moveit_commander.PlanningSceneInterface()
 
@@ -58,8 +59,8 @@ class ManipulateController:
     def change_grasp_plan_constraint(self, plan_id):
         self.grasp_plan = plan_id
 
-    def pick(self, arm_group, position, desired_object="part", support_surface_name="table", orientation_rpy=[0, 0, 0],
-             ref_frame="base_link", planning_time=50.00, grasp_constraint=None):
+    def pick(self, arm_group, position, orientation_rpy=[0, 0, 0], desired_object="part", support_surface_name="table",
+             ref_frame="base_link", planning_time=100.00, grasp_constraint=None):
 
         pose_target = geometry_msgs.msg.PoseStamped()
 
@@ -82,25 +83,26 @@ class ManipulateController:
             grasp_constraint.pre_grasp_approach.direction.vector.x = 1.0
             grasp_constraint.pre_grasp_approach.direction.header.frame_id = "right_wrist_3_Link"
             grasp_constraint.pre_grasp_approach.min_distance = 0.05
-            grasp_constraint.pre_grasp_approach.desired_distance = 0.3
+            grasp_constraint.pre_grasp_approach.desired_distance = 0
 
             # Retreat directly move_back
             grasp_constraint.post_grasp_retreat.direction.header.frame_id = "base_link"
             grasp_constraint.post_grasp_retreat.direction.vector.x = -1.0
+            #grasp_constraint.post_grasp_retreat.direction.vector.z = 1.0
             grasp_constraint.post_grasp_retreat.min_distance = 0.05
-            grasp_constraint.post_grasp_retreat.desired_distance = 0.2
+            grasp_constraint.post_grasp_retreat.desired_distance = 0
 
             # open_gripper
             grasp_constraint.pre_grasp_posture.joint_names.append("right_gripper_joint")
             grasp_constraint.pre_grasp_posture.points.append(trajectory_msgs.msg.JointTrajectoryPoint())
             grasp_constraint.pre_grasp_posture.points[0].positions.append(std_msgs.msg.Float64())
-            grasp_constraint.pre_grasp_posture.points[0].positions[0] = 1
+            grasp_constraint.pre_grasp_posture.points[0].positions[0] = 0
 
             # close_gripper
             grasp_constraint.grasp_posture.joint_names.append("right_gripper_joint")
             grasp_constraint.grasp_posture.points.append(trajectory_msgs.msg.JointTrajectoryPoint())
             grasp_constraint.grasp_posture.points[0].positions.append(std_msgs.msg.Float64())
-            grasp_constraint.grasp_posture.points[0].positions[0] = 0.4
+            grasp_constraint.grasp_posture.points[0].positions[0] = -0.2
 
             grasp = [grasp_constraint]
 

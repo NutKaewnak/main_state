@@ -1,8 +1,9 @@
 # Not yet finish
 __author__ = 'Nicole'
+from include.abstract_skill import AbstractSkill
 
 
-class TurnNeck(AbstrackSkill):
+class TurnNeck(AbstractSkill):
     def __init__(self, control_module):
         AbstractSkill.__init__(self, control_module)
         self.neck = self.controlModule.neck
