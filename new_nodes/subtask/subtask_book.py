@@ -35,6 +35,7 @@ class SubtaskBook:
         self.book['Register'] = Register(planning_module)
         self.book['LeaveArena'] = LeaveArena(planning_module)
         self.book['FindPeopleAndGetOrder'] = FindPeopleAndGetOrder(planning_module)
+        self.book['TurnNeckSearching'] = TurnNeckSearching(planning_module)
         self.book['FindPeopleUsingGesture'] = FindPeopleUsingGesture(planning_module)
         self.book['GrabObjectToPerson'] = GrabObjectToPerson(planning_module)
         self.book['DetectAndMoveToPeople'] = DetectAndMoveToPeople(planning_module)
@@ -50,7 +51,6 @@ class SubtaskBook:
         self.book['Say'] = Say(planning_module)
         self.book['ExtractObjectLocation'] = ExtractObjectLocation(planning_module)
         self.book['PickFromPoint'] = PickFromPoint(planning_module)
-        self.book['TurnNeckSearching'] = TurnNeckSearching(planning_module)
 
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()

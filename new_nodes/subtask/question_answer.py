@@ -9,20 +9,21 @@ class QuestionAnswer(AbstractSubtask):
         AbstractSubtask.__init__(self, planning_module)
         self.skill = self.skillBook.get_skill(self, 'Say')
         self.subtask = self.current_subtask
-        self.counter = 0
+        self.counter = 1
         self.limit = 5
-        # self.skill.say('ready')
 
     def perform(self, perception_data):
         if self.state is 'init':
             # check if skill is succeed
-            self.counter = 0
+            self.skill.say('ready')
+            self.counter = 1
             self.change_state('answering')
-        if self.state is 'answering':
-            if self.counter < self.limit:
+
+        elif self.state is 'answering':
+            if self.counter > self.limit:
                 self.change_state('finish')
             elif perception_data.device == 'VOICE':
-                self.skill.say('Please ask question number ' + self.counter)
+                self.skill.say('Please ask question number ' + str(self.counter))
                 print perception_data.input
                 if 'your name' in perception_data.input:
                     self.skill.say('My name is Lumyai')

@@ -1,7 +1,0 @@
-<launch>
-  <include file="$(find speech_processing)/launch/technical.launch"/>
-  <node ns="door" name="door_detection" pkg="door_detection" type="door_detection_node">
-    <remap from="/scan" to="/laser/scan"/>
-  </node>
-  <node name="main_state" pkg="main_state" type="main.py" output="screen" args="Technical" />
-</launch>

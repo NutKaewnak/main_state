@@ -1,5 +1,4 @@
 <launch>
   <node name="main_state" pkg="main_state" type="main.py" output="screen" args="SpeechRecognition" />
-  <include file="$(find speech_processing)/launch/RIPS.launch" />
-
+  <include file="$(find speech_processing)/launch/basic.launch" />
 </launch>
