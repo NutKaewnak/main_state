@@ -12,6 +12,7 @@ from include.abstract_subtask import AbstractSubtask
 class MoveToLocation(AbstractSubtask):
     def __init__(self, planning_module):
         AbstractSubtask.__init__(self, planning_module)
+        self.location = None
         self.move = None
         self.location_list = {}
         read_location_information(self.location_list)
@@ -21,7 +22,7 @@ class MoveToLocation(AbstractSubtask):
         self.location = location_name
         rospy.loginfo('Move to '+location_name)
         location_point = self.location_list[location_name].position
-        #print location_point
+        # print location_point
         self.move = self.skillBook.get_skill(self, 'MoveBaseAbsolute')
         self.move.set_position(location_point.x, location_point.y, location_point.theta)
         self.change_state('move')
@@ -33,6 +34,5 @@ class MoveToLocation(AbstractSubtask):
                 self.location = None
                 self.change_state('finish')
             elif self.move.state is 'aborted':
-                rospy.loginfo('Aborted at MovePassDoor')
                 self.to_location(self.location)
-                self.change_state('error')
+                self.change_state('error aborted')
