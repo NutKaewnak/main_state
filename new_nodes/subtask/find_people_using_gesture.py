@@ -10,7 +10,7 @@ class FindPeopleUsingGesture(AbstractSubtask):
         AbstractSubtask.__init__(self, planning_module)
         self.skill = self.current_skill
         self.subtask = self.current_subtask
-        self.neck = self.skillBook.get_skill(self, 'TurnNeckForSearchPeople')
+        self.neck = None
         self.point = None
         self.pos = Pose2D()
 
@@ -18,6 +18,7 @@ class FindPeopleUsingGesture(AbstractSubtask):
         if self.state is not 'finish':
             rospy.loginfo('FindPeopleUsingGesture state : '+self.state)
         if self.state is 'init':
+            self.neck = self.subtaskBook.get_subtask(self, 'TurnNeckSearching')
             self.neck.reset()
             self.neck.prepare()
             self.change_state('waitForNeck')

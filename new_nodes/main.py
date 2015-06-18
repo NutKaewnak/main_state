@@ -18,7 +18,6 @@ class MainState:
         self.controlModule = ControlModule()
         self.planningModule = PlanningModule(self)
         self.perceptionModule = PerceptionModule(self)
-
         # set reference to perception module
         self.planningModule.set_perception(self.perceptionModule)
 

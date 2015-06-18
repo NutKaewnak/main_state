@@ -112,7 +112,6 @@ class ExtractObjectLocation(AbstractSubtask):
                 self.data = perception_data.input
                 for i in self.locations:
                     if i in self.data:
-                    if i in self.data:
                         self.location = i
                         if self.location is not 'None':
                              self.skill.say('Wait a minute , I will'+self.verb+'to'+self.location)

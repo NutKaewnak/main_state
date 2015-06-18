@@ -1,4 +1,5 @@
 __author__ = 'nicole'
+import rospy
 from include.abstract_skill import AbstractSkill
 
 
@@ -8,6 +9,7 @@ class Say(AbstractSkill):
 
     def say(self, message):
         self.controlModule.speaker.speak(message)
+        rospy.loginfo('saying: ' + message)
         self.change_state('saying')
 
     def perform(self, perception_data):

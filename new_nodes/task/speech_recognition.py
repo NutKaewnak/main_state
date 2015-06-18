@@ -1,5 +1,6 @@
 __author__ = 'Nicole'
 from include.abstract_task import AbstractTask
+import rospy
 
 
 class SpeechRecognition(AbstractTask):
@@ -8,9 +9,14 @@ class SpeechRecognition(AbstractTask):
         self.subtask = None
 
     def perform(self, perception_data):
+        rospy.loginfo(self.state)
         if self.state is 'init':
             self.subtask = self.subtaskBook.get_subtask(self, 'QuestionAnswer')
-            self.change_state('indirect')
+            self.change_state('prepare_for_indirect')
+
+        elif self.state is 'prepare_for_indirect':
+            if self.subtask.state is 'finish':
+                self.change_state('indirect')
 
         elif self.state is 'indirect':
             # face detection here NOT FINISH
