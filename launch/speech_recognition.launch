@@ -1,8 +1,8 @@
 <launch>
   <node name="main_state" pkg="main_state" type="main.py" output="screen" args="SpeechRecognition" />
-  <node ns="door" name="door_detection" pkg="door_detection" type="door_detection_node">
+  <!--<node ns="door" name="door_detection" pkg="door_detection" type="door_detection_node">
     <remap from="/scan" to="/laser/scan"/>
-  </node>
+  </node>-->
   <include file="$(find pocketsphinx)/launch/RIPS.launch" />
 
 </launch>
