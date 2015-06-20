@@ -7,6 +7,7 @@ import rospy
 from geometry_msgs.msg import Vector3
 
 from include.abstract_subtask import AbstractSubtask
+from include.location_information import *
 
 
 class MoveToLocation(AbstractSubtask):
