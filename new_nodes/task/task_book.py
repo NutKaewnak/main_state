@@ -12,6 +12,8 @@ from speech_recognition import SpeechRecognition
 from test_object_recog_and_manip import TestObjectRecogAndManip
 from manipulation_task import ManipulationTask
 from navigation_task import NavigationTask
+from test_detect_and_move_to_person import TestDetectAndMoveToPerson
+from test_find_person import TestFindPerson
 
 
 class TaskBook:
@@ -30,6 +32,8 @@ class TaskBook:
         self.book['TestObjectRecogAndManip'] = TestObjectRecogAndManip(planning_module)
         self.book['ManipulationTask'] = ManipulationTask(planning_module)
         self.book['NavigationTask'] = NavigationTask(planning_module)
+        self.book['TestDetectAndMoveToPerson'] = TestDetectAndMoveToPerson(planning_module)
+        self.book['TestFindPerson'] = TestFindPerson(planning_module)
 
     def set_perception(self, perception_module):
         for task in self.book:
