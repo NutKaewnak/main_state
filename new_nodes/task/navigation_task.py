@@ -4,6 +4,7 @@ from include.abstract_task import AbstractTask
 from include.delay import Delay
 from geometry_msgs.msg import Vector3
 from subprocess import call
+from math import sqrt
 
 
 class NavigationTask(AbstractTask):
@@ -11,6 +12,7 @@ class NavigationTask(AbstractTask):
         AbstractTask.__init__(self, planning_module)
         self.subtask = None
         self.delay = Delay()
+        self.follow = None
 
     def perform(self, perception_data):
         if self.state is 'init':
@@ -21,7 +23,7 @@ class NavigationTask(AbstractTask):
             rospy.loginfo('going to waypoint 1')
             self.delay.wait(90)
             self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
-            self.subtask.to_location('waypoint 1')  # must change
+            self.subtask.to_location('waypoint_1')  # must change
             self.change_state('going_to_waypoint1')
 
         elif self.state is 'going_to_waypoint1':
@@ -92,7 +94,7 @@ class NavigationTask(AbstractTask):
                 min_distance = 0.7  # set to maximum
                 id = None
                 for person in perception_data.input:
-                    distance = self.get_distance(person.personpoints, self.follow.last_point)
+                    distance = get_distance(person.personpoints, self.follow.last_point)
                     if distance < min_distance:
                         min_distance = distance
                         id = person.id
@@ -105,3 +107,7 @@ class NavigationTask(AbstractTask):
             self.change_state('finish')
             # Don't forget to add task to task_book
             # Don't forget to create launch file
+
+
+def get_distance(point_a, point_b):
+    return sqrt((point_a.x - point_b.x)**2 + (point_a.y - point_b.y)**2)
