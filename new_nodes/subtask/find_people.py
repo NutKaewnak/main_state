@@ -14,14 +14,17 @@ class FindPeople(AbstractSubtask):
         self.subtask = self.current_subtask
         self.move = self.skillBook.get_skill(self, 'MoveBaseRelative')
         self.timer = Delay()
+        self.period = 30
         self.nearest_people = None
         self.is_found = False
 
     def perform(self, perception_data):
-        if self.state is 'init' and perception_data.device is self.Devices.PEOPLE:
-
-            self.timer.wait(30)
+        if self.state is 'init':
+            self.timer.wait(self.period)
             self.subtask = self.subtaskBook(self, 'TurnNeckForSearching')
+            self.change_state('finding')
+
+        elif self.state is 'finding' and perception_data.device is self.Devices.PEOPLE:
             min_distance = 4.0  # set to maximum
             point = None
             for person in perception_data.input:
@@ -31,17 +34,22 @@ class FindPeople(AbstractSubtask):
                     point = person.personpoints
 
             if point is not None:
-                self.nearest_people = self.getUnitVector(point, 0.5)
+                self.nearest_people = self.get_unit_vector(point, 0.5)
                 self.is_found = True
 
         elif not self.timer.is_waiting():
             self.change_state('not_found')
 
-    def getUnitVector(self, point, extend_distance):
+    @staticmethod
+    def get_unit_vector(point, extend_distance):
         new_point = Vector3()
         size = sqrt(point.x ** 2 + point.y ** 2)
         new_point.x, new_point.y = point.x/size, point.y/size
         new_point.x, new_point.y = new_point.x * (size-extend_distance), new_point.y * (size-extend_distance)
         return new_point
+
+    def set_timer(self, second):
+        self.period = second
+        self.timer.wait(self.period)
 
 # Don't forget to add this subtask to subtask book
