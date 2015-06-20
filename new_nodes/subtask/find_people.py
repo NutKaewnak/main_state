@@ -19,6 +19,7 @@ class FindPeople(AbstractSubtask):
 
     def perform(self, perception_data):
         if self.state is 'init' and perception_data.device is self.Devices.PEOPLE:
+
             self.timer.wait(30)
             self.subtask = self.subtaskBook(self, 'TurnNeckForSearching')
             min_distance = 4.0  # set to maximum
@@ -34,7 +35,7 @@ class FindPeople(AbstractSubtask):
                 self.is_found = True
 
         elif not self.timer.is_waiting():
-            self.change_state('notFound')
+            self.change_state('not_found')
 
     def getUnitVector(self, point, extend_distance):
         new_point = Vector3()

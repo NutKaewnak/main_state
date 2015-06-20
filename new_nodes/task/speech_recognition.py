@@ -1,6 +1,5 @@
 __author__ = 'Nicole'
 from include.abstract_task import AbstractTask
-import rospy
 
 
 class SpeechRecognition(AbstractTask):
@@ -9,7 +8,6 @@ class SpeechRecognition(AbstractTask):
         self.subtask = None
 
     def perform(self, perception_data):
-        rospy.loginfo(self.state)
         if self.state is 'init':
             self.subtask = self.subtaskBook.get_subtask(self, 'QuestionAnswer')
             self.change_state('prepare_for_indirect')
