@@ -14,30 +14,32 @@ class NavigationTask(AbstractTask):
 
     def perform(self, perception_data):
         if self.state is 'init':
+            rospy.loginfo('NavigationTask init')
             self.change_state_with_subtask('move_pass_door', 'MovePassDoor')
 
         elif self.state is 'move_pass_door':
             rospy.loginfo('going to waypoint 1')
-            self.delay.period(90)
+            self.delay.wait(90)
             self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
-            self.subtask.toLocation('waypoint 1')  # must change
+            self.subtask.to_location('waypoint 1')  # must change
             self.change_state('going_to_waypoint1')
 
         elif self.state is 'going_to_waypoint1':
             if self.subtask.state is 'finish' or self.delay.is_waiting() is False:
                 self.change_state('prepare_to_waypoint2')
             elif self.subtask.state is 'error aborted':
-                self.subtask.toLocation('waypoint 1')  # must change
+                self.subtask.to_location('waypoint_1')  # must change
 
         elif self.state is 'prepare_to_waypoint2':
-            self.delay.period(150)
+            self.delay.wait(150)
             self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
-            self.subtask.toLocation('waypoint 2')  # must change
+            self.subtask.to_location('waypoint_2')  # must change
             self.change_state('going_to_waypoint2')
 
         elif self.state is 'going_to_waypoint2':
             if self.subtask.state is 'finish' or self.delay.is_waiting() is False:
-                self.change_state('prepare_to_waypoint3')
+                # self.change_state('prepare_to_waypoint3')
+                self.change_state('finish')
 
             elif self.subtask.state is 'error aborted':
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveRelative')

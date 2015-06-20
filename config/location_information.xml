@@ -44,5 +44,7 @@
     <location name="dining table" position="-5.566, 6.874" rotation="3.137" height="1.29"/>
     <location name="side table" position="-2.335, 6.438" rotation="0.063" height="1.29"/>
     <location name="living table" position="1.649, 6.928" rotation="0.026" height="1.29"/>
-
+    <location name="waypoint_1" position=" 4.769, 0.358" rotation="-1.415" height="1.29"/>
+    <location name="waypoint_2" position=" 4.621, -13.301" rotation="-2.968" height="1.29"/>
+    <location name="waypoint_3" position="  5.768, -7.461" rotation="1.701" height="1.29"/>
 </location_information>
