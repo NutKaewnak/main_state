@@ -6,7 +6,6 @@ from register import Register
 from introduce import Introduce
 from leave_arena import LeaveArena
 from find_people_and_get_order import FindPeopleAndGetOrder
-from find_people_using_gesture import FindPeopleUsingGesture
 from grab_object_to_person import GrabObjectToPerson
 from detect_and_move_to_people import DetectAndMoveToPeople
 from follow_person import FollowPerson
@@ -17,26 +16,25 @@ from ask_for_object import AskForObject
 from ask_for_name_and_command import AskForNameAndCommand
 from bring_object_to_person import BringObjectToPerson
 from question_answer import QuestionAnswer
-from find_people import FindPeople
+from people_detect import PeopleDetect
 from move_absolute import MoveAbsolute
 from say import Say
 from extract_object_location import ExtractObjectLocation
 from pick_from_point import PickFromPoint
-from turn_neck_searching import TurnNeckSearching
+from detect_waving_people import DetectWavingPeople
+from search_waving_people import SearchWavingPeople
 
 
 class SubtaskBook:
     def __init__(self, planning_module):
         self.book = dict()
-        self.book['FindPeople'] = FindPeople(planning_module)
+        self.book['PeopleDetect'] = PeopleDetect(planning_module)
         self.book['MovePassDoor'] = MovePassDoor(planning_module)
         self.book['MoveToLocation'] = MoveToLocation(planning_module)
         self.book['Introduce'] = Introduce(planning_module)
         self.book['Register'] = Register(planning_module)
         self.book['LeaveArena'] = LeaveArena(planning_module)
         self.book['FindPeopleAndGetOrder'] = FindPeopleAndGetOrder(planning_module)
-        self.book['TurnNeckSearching'] = TurnNeckSearching(planning_module)
-        self.book['FindPeopleUsingGesture'] = FindPeopleUsingGesture(planning_module)
         self.book['GrabObjectToPerson'] = GrabObjectToPerson(planning_module)
         self.book['DetectAndMoveToPeople'] = DetectAndMoveToPeople(planning_module)
         self.book['FollowPerson'] = FollowPerson(planning_module)
@@ -51,6 +49,8 @@ class SubtaskBook:
         self.book['Say'] = Say(planning_module)
         self.book['ExtractObjectLocation'] = ExtractObjectLocation(planning_module)
         self.book['PickFromPoint'] = PickFromPoint(planning_module)
+        self.book['DetectWavingPeople'] = DetectWavingPeople(planning_module)
+        self.book['SearchWavingPeople'] = SearchWavingPeople(planning_module)
 
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()

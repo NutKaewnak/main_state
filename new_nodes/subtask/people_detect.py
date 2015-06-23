@@ -1,18 +1,16 @@
-from include.delay import Delay
-
 __author__ = 'nicole'
 
 from math import sqrt
 from include.abstract_subtask import AbstractSubtask
 from geometry_msgs.msg import Vector3
+from include.delay import Delay
 
 
-class FindPeople(AbstractSubtask):
+class PeopleDetect(AbstractSubtask):
     def __init__(self, planning_module):
         AbstractSubtask.__init__(self, planning_module)
         self.skill = self.current_skill
         self.subtask = self.current_subtask
-        self.move = self.skillBook.get_skill(self, 'MoveBaseRelative')
         self.timer = Delay()
         self.period = 30
         self.nearest_people = None
@@ -21,7 +19,6 @@ class FindPeople(AbstractSubtask):
     def perform(self, perception_data):
         if self.state is 'init':
             self.timer.wait(self.period)
-            self.subtask = self.subtaskBook(self, 'TurnNeckForSearching')
             self.change_state('finding')
 
         elif self.state is 'finding' and perception_data.device is self.Devices.PEOPLE:
@@ -36,6 +33,8 @@ class FindPeople(AbstractSubtask):
             if point is not None:
                 self.nearest_people = self.get_unit_vector(point, 0.5)
                 self.is_found = True
+            else:
+                self.is_found = False
 
         elif not self.timer.is_waiting():
             self.change_state('not_found')
