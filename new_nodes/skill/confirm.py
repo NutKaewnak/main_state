@@ -9,7 +9,6 @@ class Confirm(AbstractSkill):
 
     def perform(self, perception_data):
         if self.state is 'init':
-            self.change_state('succeed')
             if perception_data.input is 'robot yes':
                 self.change_state('confirm')
             elif perception_data.input is 'robot no':

@@ -14,4 +14,4 @@ class Say(AbstractSkill):
 
     def perform(self, perception_data):
         if self.state is 'saying':
-            self.change_state('succeed')
+            self.change_state('succeeded')
