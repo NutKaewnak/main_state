@@ -14,7 +14,7 @@ from dynamixel_controllers.srv import SetTorqueLimit
 
 GRIPPER_FRAME = 'right_wrist_3_Link'
 GRIPPER_JOINT_NAMES = ['right_gripper_joint']
- 
+
 GRIPPER_OPENED = 0.0
 GRIPPER_CLOSED = -0.6
 GRIPPER_NEUTRAL = 0.0
@@ -39,9 +39,11 @@ class ManipulateController:
         self.pickstate["demo"] = False
         self.settorquelimit = {}
         try:
-            self.settorquelimit["right_gripper"] = rospy.ServiceProxy('/dynamixel/right_gripper/set_torque_limit', SetTorqueLimit)
-            self.settorquelimit["left_gripper"] = rospy.ServiceProxy('/dynamixel/left_gripper/set_torque_limit', SetTorqueLimit)
-            #Test if there is service avaliable
+            self.settorquelimit["right_gripper"] = rospy.ServiceProxy('/dynamixel/right_gripper/set_torque_limit',
+                                                                      SetTorqueLimit)
+            self.settorquelimit["left_gripper"] = rospy.ServiceProxy('/dynamixel/left_gripper/set_torque_limit',
+                                                                     SetTorqueLimit)
+            # Test if there is service avaliable
             self.settorquelimit["right_gripper"](GRIPPER_EFFORT)
         except rospy.ServiceException, e:
             rospy.loginfo("Service call failed: Running DEMO MODE")
@@ -85,59 +87,60 @@ class ManipulateController:
         else:
             rospy.logwarn("No specified arm_group")
 
-    def setjoint(self,jointname,jointvalue):
+    def setjoint(self, jointname, jointvalue):
         if (type(jointname) is str) and (type(jointvalue) is float):
             if jointname.find("right") is not -1:
                 if jointname.find("gripper") is not -1:
-                    self.robot.right_gripper.set_joint_value_target(jointname,jointvalue)
+                    self.robot.right_gripper.set_joint_value_target(jointname, jointvalue)
                 else:
-                    self.robot.right_arm.set_joint_value_target(jointname,jointvalue)
-            elif jointname.find("left") is not -1: 
+                    self.robot.right_arm.set_joint_value_target(jointname, jointvalue)
+            elif jointname.find("left") is not -1:
                 if jointname.find("gripper") is not -1:
-                    self.robot.left_gripper.set_joint_value_target(jointname,jointvalue)
+                    self.robot.left_gripper.set_joint_value_target(jointname, jointvalue)
                 else:
-                    self.robot.left_arm.set_joint_value_target(jointname,jointvalue)
+                    self.robot.left_arm.set_joint_value_target(jointname, jointvalue)
             else:
                 rospy.logwarn("Controller : No specified Joint is Found")
                 return False
             return True
         elif (type(jointname) is list) and (type(jointvalue) is list) and (len(jointvalue) == len(jointname)):
-            for i in range(0,len(jointvalue)):
-                success = self.setjoint(jointname[i],jointvalue[i])
+            for i in range(0, len(jointvalue)):
+                success = self.setjoint(jointname[i], jointvalue[i])
                 if success is False:
                     return False
         else:
             rospy.logwarn("Invalid Argument")
 
-    def movejoint(self,jointname,jointvalue):
+    def movejoint(self, jointname, jointvalue):
         if jointname.find("right") is not -1:
             if jointname.find("gripper") is not -1:
                 self.robot.right_gripper.clear_pose_targets()
-                self.setjoint(jointname,jointvalue)
+                self.setjoint(jointname, jointvalue)
                 self.robot.right_gripper.go(False)
             else:
                 self.robot.right_arm.clear_pose_targets(False)
-                self.setjoint(jointname,jointvalue)
+                self.setjoint(jointname, jointvalue)
                 self.robot.right_arm.go(False)
 
-        elif jointname.find("left") is not -1: 
+        elif jointname.find("left") is not -1:
             if jointname.find("gripper") is not -1:
                 self.robot.left_gripper.clear_pose_targets()
-                self.setjoint(jointname,jointvalue)
+                self.setjoint(jointname, jointvalue)
                 self.robot.left_gripper.go(False)
             else:
                 self.robot.left_arm.clear_pose_targets(False)
-                self.setjoint(jointname,jointvalue)
+                self.setjoint(jointname, jointvalue)
                 self.robot.left_arm.go(False)
         else:
             rospy.logwarn("Controller : No specified Joint is Found")
             return False
         return True
-        
+
     ### PICKING PROCEDURE
     ### pregrasp -> opengripper -> reach -> grasp
-   
-    def pickobject_pregrasp(self,arm_group,objectname,objectposition,pregrasp_distance = 0.3,pregrasp_direction = [1.0,0,0],ref_frame = "base_link"):
+
+    def pickobject_pregrasp(self, arm_group, objectname, objectposition, pregrasp_distance=0.3,
+                            pregrasp_direction=[1.0, 0, 0], ref_frame="base_link"):
         ##TODO -- pregrasp in any direction, current x only
         pregraspposition = []
         pregraspposition.append(objectposition[0] - pregrasp_distance)
@@ -147,20 +150,21 @@ class ManipulateController:
         self.pickstate["arm_group"] = arm_group
         self.pickstate["objectposition"] = objectposition
         self.pickstate["laststate"] = "pregrasp"
-        self.manipulate(arm_group,pregraspposition)
-        rospy.loginfo("Moving"+ arm_group + "to x = " + str(pregraspposition[0]) + " ,y = " + str(pregraspposition[1]) + " ,z= " + str(pregraspposition[2]) + "\n respect to " + ref_frame  )
+        self.manipulate(arm_group, pregraspposition)
+        rospy.loginfo("Moving" + arm_group + "to x = " + str(pregraspposition[0]) + " ,y = " + str(
+            pregraspposition[1]) + " ,z= " + str(pregraspposition[2]) + "\n respect to " + ref_frame)
 
 
     def pickobject_opengripper(self):
         ##opengripper
         self.pickstate["laststate"] = "opengripper"
         if self.pickstate["arm_group"] is "right_arm":
-            self.movejoint("right_gripper_joint",GRIPPER_OPENED)
+            self.movejoint("right_gripper_joint", GRIPPER_OPENED)
         elif self.pickstate["arm_group"] is "left_arm":
-            self.movejoint("left_gripper_joint",GRIPPER_OPENED)
+            self.movejoint("left_gripper_joint", GRIPPER_OPENED)
 
 
-    def pickobject_reach(self,step=0.05):
+    def pickobject_reach(self, step=0.05):
         self.pickstate["laststate"] = "reach"
         waypoint = []
         target_pose = geometry_msgs.msg.Pose()
@@ -174,16 +178,14 @@ class ManipulateController:
             self.robot.right_arm.clear_pose_targets()
             self.robot.right_arm.set_goal_position_tolerance(0.01)
             self.robot.right_arm.set_goal_orientation_tolerance(0.1)
-            (path,fraction) = self.robot.right_arm.compute_cartesian_path(waypoint,step,0.00,True)
+            (path, fraction) = self.robot.right_arm.compute_cartesian_path(waypoint, step, 0.00, True)
             self.robot.right_arm.execute(path)
         elif self.pickstate["arm_group"] is "left_arm":
             self.robot.left_arm.clear_pose_targets()
             self.robot.left_arm.set_goal_position_tolerance(0.01)
             self.robot.left_arm.set_goal_orientation_tolerance(0.1)
-            (path,fraction) = self.robot.left_arm.compute_cartesian_path(waypoint,step,0.00,True)
+            (path, fraction) = self.robot.left_arm.compute_cartesian_path(waypoint, step, 0.00, True)
             self.robot.left_arm.execute(path)
-            
-    
 
 
     def pickobject_grasp(self):
@@ -192,11 +194,11 @@ class ManipulateController:
         if self.pickstate["arm_group"] is "right_arm":
             if self.pickstate["demo"] is False:
                 self.settorquelimit["right_gripper"](GRIPPER_EFFORT)
-            self.movejoint("right_gripper_joint",GRIPPER_CLOSED)
+            self.movejoint("right_gripper_joint", GRIPPER_CLOSED)
         elif self.pickstate["arm_group"] is "left_arm":
             if self.pickstate["demo"] is False:
                 self.settorquelimit["left_gripper"](GRIPPER_EFFORT)
-            self.movejoint("left_gripper_joint",GRIPPER_CLOSED)
+            self.movejoint("left_gripper_joint", GRIPPER_CLOSED)
     
     def pick(self, arm_group, position, orientation_rpy=[0, 0, 0], desired_object="part", support_surface_name="table",
              ref_frame="base_link", planning_time=300.00, grasp_constraint=None):

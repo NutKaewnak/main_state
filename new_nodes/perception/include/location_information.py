@@ -93,4 +93,4 @@ def read_location_information_file(location_list, filename):
 if __name__ == "__main__":
     location_list = {}
     read_location_information(location_list)
-    #print location_list
+    # print location_list

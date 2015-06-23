@@ -1,12 +1,14 @@
-import rospy
 __author__ = 'nicole'
-from include.abstract_skill import AbstractSkill
+import rospy
+from include.abstract_subtask import AbstractSubtask
 
-class DetectPeopleWithGesture(AbstractSkill):
-    def __init__(self, control_module):
-        AbstractSkill.__init__(self, control_module)
-        # self.controlModule
+
+class DetectWavingPeople(AbstractSubtask):
+    def __init__(self, planning_module):
+        AbstractSubtask.__init__(self, planning_module)
         self.gesture_pos = None
+        self.skill = self.current_skill
+        self.subtask = self.current_subtask
 
     def perform(self, perception_data):
         # if self.state is not 'succeeded':
@@ -19,7 +21,7 @@ class DetectPeopleWithGesture(AbstractSkill):
             if perception_data.device is self.Devices.GESTURE:
                 rospy.loginfo(type(perception_data.input))
                 self.gesture_pos = perception_data.input
-                self.change_state('succeeded')
+                self.change_state('finish')
 
     def start(self):
         self.gesture_pos = None

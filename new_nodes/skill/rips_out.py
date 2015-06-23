@@ -10,4 +10,4 @@ class RipsOut(AbstractSkill):
         if self.state is 'init':
             controller = self.controlModule.left_arm
             controller.set_action('rips_out')
-            self.change_state('succeed')
+            self.change_state('succeeded')

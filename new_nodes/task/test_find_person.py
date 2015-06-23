@@ -11,7 +11,7 @@ class TestFindPerson(AbstractTask):
     def perform(self, perception_data):
         if self.state is 'init':
             # Do something
-            self.subtask = self.subtaskBook.get_subtask(self, 'findPeople')
+            self.subtask = self.subtaskBook.get_subtask(self, 'PeopleDetect')
             self.change_state('performing')
 
         elif self.state is 'performing':
@@ -19,5 +19,3 @@ class TestFindPerson(AbstractTask):
                 rospy.loginfo('found' + str(self.subtask.nearest_people))
             if self.subtask.state is 'not_found':
                 self.change_state('finish')
-            # Don't forget to add task to task_book
-            # Don't forget to create launch file
