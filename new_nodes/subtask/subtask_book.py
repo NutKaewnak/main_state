@@ -6,10 +6,8 @@ from register import Register
 from introduce import Introduce
 from leave_arena import LeaveArena
 from find_people_and_get_order import FindPeopleAndGetOrder
-from grab_object_to_person import GrabObjectToPerson
 from detect_and_move_to_people import DetectAndMoveToPeople
 from follow_person import FollowPerson
-from grab import Grab
 from move_relative import MoveRelative
 from ask_for_name import AskForName
 from ask_for_object import AskForObject
@@ -35,11 +33,9 @@ class SubtaskBook:
         self.book['Register'] = Register(planning_module)
         self.book['LeaveArena'] = LeaveArena(planning_module)
         self.book['FindPeopleAndGetOrder'] = FindPeopleAndGetOrder(planning_module)
-        self.book['GrabObjectToPerson'] = GrabObjectToPerson(planning_module)
         self.book['DetectAndMoveToPeople'] = DetectAndMoveToPeople(planning_module)
         self.book['FollowPerson'] = FollowPerson(planning_module)
         self.book['MoveRelative'] = MoveRelative(planning_module)
-        self.book['Grab'] = Grab(planning_module)
         self.book['BringObjectToPerson'] = BringObjectToPerson(planning_module)
         self.book['AskForName'] = AskForName(planning_module)
         self.book['AskForObject'] = AskForObject(planning_module)
