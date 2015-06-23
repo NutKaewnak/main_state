@@ -15,3 +15,5 @@ class template(AbstractPerception):
 
     # def callback_base_status(self, data):
     #   self.broadcast(Devices.BASE_STATUS, data)
+
+    # Don't forget to add this perception into perception_module
