@@ -47,19 +47,18 @@ class ManipulationTask(AbstractTask):
             self.change_state('prepare_to_pick_object')
 
         elif self.state is 'prepare_to_pick_object':
-            self.subtask = self.subtaskBook.get_subtask(self, 'PickObject')
+            # self.subtask = self.subtaskBook.get_subtask(self, 'PickObject')
             self.change_state('pick_object')
 
         elif self.state is 'pick_object':
             if self.number_object_found is 0:
                 self.change_state('finish')
             else:
-                self.subtask.pick(self.object_array[self.number_object_found])  # this subtask is not created
+                # self.subtask.pick(self.object_array[self.number_object_found])  # this subtask is not created
                 rospy.loginfo('Picking ' + self.object_array[self.number_object_found])
                 if self.subtask.state is 'finish':
                     self.number_object_found -= 1
 
-            # Don't forget to create launch file
     def to_pdf(self, object_to_pdf):
         # wait for object P'muk here NOT FINISH
         from reportlab.pdfgen import canvas
