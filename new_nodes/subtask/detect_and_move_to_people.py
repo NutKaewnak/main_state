@@ -1,6 +1,6 @@
-import rospy
-
 __author__ = 'nicole'
+
+import rospy
 from include.abstract_subtask import AbstractSubtask
 
 
@@ -16,14 +16,14 @@ class DetectAndMoveToPeople(AbstractSubtask):
             rospy.loginfo('DetectAndMoveToPeople state: '+self.state)
         if self.state is 'init':
             self.pos = None
-            self.subtask = self.subtaskBook.get_subtask(self, 'findPeople')
+            self.subtask = self.subtaskBook.get_subtask(self, 'PeopleDetect')
             self.change_state('find_people')
 
         elif self.state is 'find_people':
-            if self.current_subtask.state is 'finish':
-                self.pos = self.current_subtask.get_point()
-                self.change_state('foundPeople')
-            elif self.current_subtask.state is 'notFound':
+            if self.subtask.is_found():
+                self.pos = self.subtask.get_point()
+                self.change_state('found_people')
+            elif self.subtask.state is 'not_found':
                 self.skillBook.get_skill('Say').say(self, 'I can not found anyone.')
                 self.change_state('not_found')
 

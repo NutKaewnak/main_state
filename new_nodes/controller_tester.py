@@ -32,15 +32,14 @@ def callback(data):
     #mnplctrl.robot.right_arm.pick("object")
 
 
-
 def adding_fake_object():
-    global mnplctrl,pub
+    global mnplctrl, pub
 
     co = moveit_msgs.msg.CollisionObject()
     co.header.stamp = rospy.Time.now()
     co.header.frame_id = "base_link"
 
-    #remove pole
+    # remove pole
     co.id = "table"
     co.operation = moveit_msgs.msg.CollisionObject.REMOVE
     pub.publish(co)
@@ -94,18 +93,16 @@ def adding_fake_object():
     # p.pose.position.y = 0
     # p.pose.position.z = 0.5
     # mnplctrl.scene.add_box("object", p, (0.15, 0.06, 0.3))
-    
 
 
 def tester():
-    global mnplctrl,pub
-    
-    
+    global mnplctrl, pub
+
     mnplctrl = ManipulateController()
 
     rospy.init_node('controller_tester')
 
-    #rospy.Subscriber("/object_shape", object_detection.msg.ObjectDetection, callback)
+    # rospy.Subscriber("/object_shape", object_detection.msg.ObjectDetection, callback)
     pub = rospy.Publisher('collision_object', moveit_msgs.msg.CollisionObject, queue_size=10)
     rospy.loginfo("BUILDING SCENE")
 
@@ -113,21 +110,21 @@ def tester():
     #mnplctrl.scene.remove_world_object("pole")
     #mnplctrl.scene.remove_world_object("table")
     #mnplctrl.scene.remove_world_object("object")
-   
+
     # publish a demo scene
 
 
 
     # rospy.sleep(5)
-    mnplctrl.static_pose("right_arm","right_normal")
+    mnplctrl.static_pose("right_arm", "right_normal")
     #mnplctrl.static_pose("left_arm","left_normal")
-    
-    
+
+
     rospy.sleep(5)
-    
+
     rospy.loginfo("Starting manipulation")
-    mnplctrl.pickobject_pregrasp("right_arm","object",[0.7,0,0.5])
-    
+    mnplctrl.pickobject_pregrasp("right_arm", "object", [0.7, 0, 0.5])
+
     rospy.sleep(5)
     rospy.loginfo("Opening Gripper")
     mnplctrl.pickobject_opengripper()
