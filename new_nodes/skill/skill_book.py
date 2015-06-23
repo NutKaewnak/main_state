@@ -18,7 +18,7 @@ class SkillBook:
         self.book['Say'] = Say(control_module)
         self.book['Confirm'] = Confirm(control_module)
         self.book['TurnNeck'] = TurnNeck(control_module)
-        self.book['pick'] = Pick(control_module)
+        self.book['Pick'] = Pick(control_module)
 
     def get_skill(self, subtask, skill_name):
         self.book[skill_name].reset()
