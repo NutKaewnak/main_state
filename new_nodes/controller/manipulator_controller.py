@@ -36,18 +36,16 @@ class ManipulateController:
         self.pickstate["arm_group"] = None
         self.pickstate["objectposition"] = None
         self.pickstate["laststate"] = None
-        self.pickstate["demo"] = False
+        # self.pickstate["demo"] = False
         self.settorquelimit = {}
-        try:
-            self.settorquelimit["right_gripper"] = rospy.ServiceProxy('/dynamixel/right_gripper/set_torque_limit',
-                                                                      SetTorqueLimit)
-            self.settorquelimit["left_gripper"] = rospy.ServiceProxy('/dynamixel/left_gripper/set_torque_limit',
-                                                                     SetTorqueLimit)
-            # Test if there is service avaliable
-            self.settorquelimit["right_gripper"](GRIPPER_EFFORT)
-        except rospy.ServiceException, e:
-            rospy.loginfo("Service call failed: Running DEMO MODE")
-            self.pickstate["demo"] = True
+        # try:
+        #     self.settorquelimit["right_gripper"] = rospy.ServiceProxy('/dynamixel/right_gripper/set_torque_limit', SetTorqueLimit)
+        #     self.settorquelimit["left_gripper"] = rospy.ServiceProxy('/dynamixel/left_gripper/set_torque_limit', SetTorqueLimit)
+        #     #Test if there is service avaliable
+        #     self.settorquelimit["right_gripper"](GRIPPER_EFFORT)
+        # except rospy.ServiceException, e:
+        #     rospy.loginfo("Service call failed: Running DEMO MODE")
+        #     self.pickstate["demo"] = True
 
 
         # self.group = self.moveit_commander.MoveGroupCommander(arm_group)
@@ -142,8 +140,13 @@ class ManipulateController:
     def pickobject_pregrasp(self, arm_group, objectname, objectposition, pregrasp_distance=0.3,
                             pregrasp_direction=[1.0, 0, 0], ref_frame="base_link"):
         ##TODO -- pregrasp in any direction, current x only
+        
         pregraspposition = []
-        pregraspposition.append(objectposition[0] - pregrasp_distance)
+        pregrasp_value = objectposition[0] - pregrasp_distance
+        if pregrasp_value <= 0.3:
+            pregrasp_value = 0.3
+
+        pregraspposition.append(pregrasp_value)
         pregraspposition.append(objectposition[1])
         pregraspposition.append(objectposition[2])
         self.pickstate["objectname"] = objectname
@@ -192,13 +195,13 @@ class ManipulateController:
         ##closegripper
         self.pickstate["laststate"] = "closegripper"
         if self.pickstate["arm_group"] is "right_arm":
-            if self.pickstate["demo"] is False:
-                self.settorquelimit["right_gripper"](GRIPPER_EFFORT)
-            self.movejoint("right_gripper_joint", GRIPPER_CLOSED)
+            #if self.pickstate["demo"] is False:
+                #self.settorquelimit["right_gripper"](GRIPPER_EFFORT)
+            self.movejoint("right_gripper_joint",GRIPPER_CLOSED)
         elif self.pickstate["arm_group"] is "left_arm":
-            if self.pickstate["demo"] is False:
-                self.settorquelimit["left_gripper"](GRIPPER_EFFORT)
-            self.movejoint("left_gripper_joint", GRIPPER_CLOSED)
+            #if self.pickstate["demo"] is False:
+                #self.settorquelimit["left_gripper"](GRIPPER_EFFORT)
+            self.movejoint("left_gripper_joint",GRIPPER_CLOSED)
     
     def pick(self, arm_group, position, orientation_rpy=[0, 0, 0], desired_object="part", support_surface_name="table",
              ref_frame="base_link", planning_time=300.00, grasp_constraint=None):
