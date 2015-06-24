@@ -1,4 +1,4 @@
 <launch>
+    <include file="$(find object_detection)/launch/object_recognition.launch"/>
     <node name="main_state" pkg="main_state" type="main.py" output="screen" args="TestObjectRecogAndManip" />
-    <include file="$(find object_recognition)/launch/object_recognition.launch"/>
 </launch>
