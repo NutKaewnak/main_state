@@ -14,6 +14,7 @@ class Pick(AbstractSubtask):
         if self.state is 'init':
             self.skill = self.skillBook.get_skill(self, 'Pick')
             self.change_state('wait_object')
+            rospy.loginfo('pick subtask init')
 
         elif self.state is 'receive_object':
             self.skill.pick_object(self.input_object_pos)

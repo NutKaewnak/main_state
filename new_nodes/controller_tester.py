@@ -14,20 +14,26 @@ from controller.manipulator_controller import ManipulateController
 framecount = 0
 
 mnplctrl = None
-
+pos = []
 pub = None
+enable = False
 
 def callback(data):
-    global framecount
+    global framecount,enable,pos
     position = geometry_msgs.msg.Point()
     position = data.centriod
     framecount += 1
-    if framecount is not 3:
-        print "msg counting " + str(framecount)
+    if framecount < 5:
+        #print "msg counting " + str(framecount)
         return
-    rospy.loginfo('------------start  picking----------')
-    print "location : x = " + str(position.x) + "  y= " + str(position.y) + " z= " + str(position.z) 
-    mnplctrl.pick("right_arm",[position.x-0.2,position.y,position.z+0.05],[0.0,0.0,0.0],"object","table","base_link")
+    if framecount is 5:
+        enable = True
+        rospy.loginfo('------------start  picking----------')
+        print "location : x = " + str(position.x) + "  y= " + str(position.y) + " z= " + str(position.z) 
+        pos.append(position.x)
+        pos.append(position.y)
+        pos.append(position.z)
+    #mnplctrl.pick("right_arm",[position.x-0.2,position.y,position.z+0.05],[0.0,0.0,0.0],"object","table","base_link")
     #mnplctrl.robot.right_arm.set_support_surface_name("table")
     #mnplctrl.robot.right_arm.pick("object")
 
@@ -35,11 +41,6 @@ def callback(data):
 
 def adding_fake_object():
     global mnplctrl,pub
-
-    
-
-
-
     ##publishing object
     mnplctrl.scene.remove_world_object("pole")
     mnplctrl.scene.remove_world_object("table")
@@ -66,44 +67,50 @@ def adding_fake_object():
 
 
 def tester():
-    global mnplctrl,pub
+    global mnplctrl,pub,pos
     
     
     mnplctrl = ManipulateController()
 
     rospy.init_node('controller_tester')
 
-    #rospy.Subscriber("/object_shape", object_detection.msg.ObjectDetection, callback)
-    pub = rospy.Publisher('collision_object', moveit_msgs.msg.CollisionObject, queue_size=10)
-    rospy.loginfo("BUILDING SCENE")
     
-    rospy.sleep(5)
-    mnplctrl.scene.remove_world_object("pole")
-    mnplctrl.scene.remove_world_object("table")
-    mnplctrl.scene.remove_world_object("object")
+    #pub = rospy.Publisher('collision_object', moveit_msgs.msg.CollisionObject, queue_size=10)
+    rospy.loginfo("---BUILDING SCENE----")
+    
+    # rospy.sleep(5)
+    # mnplctrl.scene.remove_world_object("pole")
+    # mnplctrl.scene.remove_world_object("table")
+    # mnplctrl.scene.remove_world_object("object")
    
-    adding_fake_object()
-    rospy.sleep(2)
+    # adding_fake_object()
+    #rospy.sleep(2)
     rospy.loginfo("--Normal--")
     mnplctrl.static_pose("right_arm","right_normal")
-    mnplctrl.static_pose("left_arm","left_normal")
-    rospy.sleep(5)
+    #mnplctrl.static_pose("left_arm","left_normal")
+    rospy.sleep(20)
+
+    rospy.loginfo("Complete Normal")
+    #rospy.Subscriber("/object_shape", object_detection.msg.ObjectDetection, callback)
+    #while enable is False:
+    #    pass
+        
     rospy.loginfo("Starting manipulation")
-    mnplctrl.pickobject_pregrasp("right_arm","object",[0.7,0,0.5])
-    
-    rospy.sleep(5)
+    #mnplctrl.pickobject_pregrasp("right_arm","object",[pos[0],pos[1],pos[2]])
+    mnplctrl.pickobject_pregrasp("right_arm","object",[0.72,0.0,0.84+0.0])
+    rospy.sleep(20)
     rospy.loginfo("Opening Gripper")
     mnplctrl.pickobject_opengripper()
 
-    rospy.sleep(5)
+    rospy.sleep(10)
     rospy.loginfo("Reaching to Object")
     mnplctrl.pickobject_reach()
-    rospy.sleep(5)
+    rospy.sleep(15)
     rospy.loginfo("---GRASPING---")
     mnplctrl.pickobject_grasp()
 
     
-    # rospy.sleep(2.0)
+   # rospy.sleep(2.0)
     # print "-----start----"
     # Manually pick in simulation
     # mnplctrl.pick("right_arm",[0.50,-0.15,0.55],[0.0,0.0,0.0],"object","table","base_link")
@@ -112,8 +119,8 @@ def tester():
     rospy.spin()
     mnplctrl.__del__()
 
-if __name__=='__main__':
-    try:
-        tester()
-    except rospy.ROSInterruptException:
-        pass
+# if __name__=='__main__':
+#     try:
+#         tester()
+#     except rospy.ROSInterruptException:
+#         pass

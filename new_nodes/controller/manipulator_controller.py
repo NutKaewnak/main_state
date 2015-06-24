@@ -41,7 +41,7 @@ class ManipulateController:
         # try:
         #     self.settorquelimit["right_gripper"] = rospy.ServiceProxy('/dynamixel/right_gripper/set_torque_limit', SetTorqueLimit)
         #     self.settorquelimit["left_gripper"] = rospy.ServiceProxy('/dynamixel/left_gripper/set_torque_limit', SetTorqueLimit)
-        #     #Test if there is service avaliable
+        #     #Test if there == service avaliable
         #     self.settorquelimit["right_gripper"](GRIPPER_EFFORT)
         # except rospy.ServiceException, e:
         #     rospy.loginfo("Service call failed: Running DEMO MODE")
@@ -61,22 +61,22 @@ class ManipulateController:
         quaternion = tf.transformations.quaternion_from_euler(orientation_rpy[0],
                                                               orientation_rpy[1],
                                                               orientation_rpy[2])
+        pose_target.position.x = position[0]
+        pose_target.position.y = position[1]
+        pose_target.position.z = position[2]
         pose_target.orientation.x = quaternion[0]
         pose_target.orientation.y = quaternion[1]
         pose_target.orientation.z = quaternion[2]
         pose_target.orientation.w = quaternion[3]
-        pose_target.position.x = position[0]
-        pose_target.position.y = position[1]
-        pose_target.position.z = position[2]
 
-        if arm_group is "right_arm":
+        if arm_group == "right_arm":
             self.robot.right_arm.set_planning_time(planning_time)
             self.robot.right_arm.clear_pose_targets()
             self.robot.right_arm.set_pose_reference_frame(ref_frame)
             self.robot.right_arm.set_pose_target(pose_target)
             self.robot.right_arm.go(False)  # async_move
 
-        elif arm_group is "left_arm":
+        elif arm_group == "left_arm":
             self.robot.left_arm.set_planning_time(planning_time)
             self.robot.left_arm.clear_pose_targets()
             self.robot.left_arm.set_pose_reference_frame(ref_frame)
@@ -86,32 +86,32 @@ class ManipulateController:
             rospy.logwarn("No specified arm_group")
 
     def setjoint(self, jointname, jointvalue):
-        if (type(jointname) is str) and (type(jointvalue) is float):
-            if jointname.find("right") is not -1:
-                if jointname.find("gripper") is not -1:
+        if (type(jointname) == str) and (type(jointvalue) == float):
+            if jointname.find("right") != -1:
+                if jointname.find("gripper") != -1:
                     self.robot.right_gripper.set_joint_value_target(jointname, jointvalue)
                 else:
                     self.robot.right_arm.set_joint_value_target(jointname, jointvalue)
-            elif jointname.find("left") is not -1:
-                if jointname.find("gripper") is not -1:
+            elif jointname.find("left") != -1:
+                if jointname.find("gripper") != -1:
                     self.robot.left_gripper.set_joint_value_target(jointname, jointvalue)
                 else:
                     self.robot.left_arm.set_joint_value_target(jointname, jointvalue)
             else:
-                rospy.logwarn("Controller : No specified Joint is Found")
+                rospy.logwarn("Controller : No specified Joint == Found")
                 return False
             return True
-        elif (type(jointname) is list) and (type(jointvalue) is list) and (len(jointvalue) == len(jointname)):
+        elif (type(jointname) == list) and (type(jointvalue) == list) and (len(jointvalue) == len(jointname)):
             for i in range(0, len(jointvalue)):
                 success = self.setjoint(jointname[i], jointvalue[i])
-                if success is False:
+                if success == False:
                     return False
         else:
             rospy.logwarn("Invalid Argument")
 
     def movejoint(self, jointname, jointvalue):
-        if jointname.find("right") is not -1:
-            if jointname.find("gripper") is not -1:
+        if jointname.find("right") != -1:
+            if jointname.find("gripper") != -1:
                 self.robot.right_gripper.clear_pose_targets()
                 self.setjoint(jointname, jointvalue)
                 self.robot.right_gripper.go(False)
@@ -120,8 +120,8 @@ class ManipulateController:
                 self.setjoint(jointname, jointvalue)
                 self.robot.right_arm.go(False)
 
-        elif jointname.find("left") is not -1:
-            if jointname.find("gripper") is not -1:
+        elif jointname.find("left") != -1:
+            if jointname.find("gripper") != -1:
                 self.robot.left_gripper.clear_pose_targets()
                 self.setjoint(jointname, jointvalue)
                 self.robot.left_gripper.go(False)
@@ -130,7 +130,7 @@ class ManipulateController:
                 self.setjoint(jointname, jointvalue)
                 self.robot.left_arm.go(False)
         else:
-            rospy.logwarn("Controller : No specified Joint is Found")
+            rospy.logwarn("Controller : No specified Joint == Found")
             return False
         return True
 
@@ -161,9 +161,9 @@ class ManipulateController:
     def pickobject_opengripper(self):
         ##opengripper
         self.pickstate["laststate"] = "opengripper"
-        if self.pickstate["arm_group"] is "right_arm":
+        if self.pickstate["arm_group"] == "right_arm":
             self.movejoint("right_gripper_joint", GRIPPER_OPENED)
-        elif self.pickstate["arm_group"] is "left_arm":
+        elif self.pickstate["arm_group"] == "left_arm":
             self.movejoint("left_gripper_joint", GRIPPER_OPENED)
 
 
@@ -177,16 +177,18 @@ class ManipulateController:
         start_pose = self.robot.right_arm.get_current_pose().pose
         waypoint.append(start_pose)
         waypoint.append(target_pose)
-        if self.pickstate["arm_group"] is "right_arm":
-            self.robot.right_arm.clear_pose_targets()
+        if self.pickstate["arm_group"] == "right_arm":
+            #self.robot.right_arm.clear_pose_targets()
             self.robot.right_arm.set_goal_position_tolerance(0.01)
-            self.robot.right_arm.set_goal_orientation_tolerance(0.1)
-            (path, fraction) = self.robot.right_arm.compute_cartesian_path(waypoint, step, 0.00, True)
-            self.robot.right_arm.execute(path)
-        elif self.pickstate["arm_group"] is "left_arm":
+            self.robot.right_arm.set_goal_orientation_tolerance(0.05)
+            self.manipulate(self.pickstate["arm_group"], self.pickstate["objectposition"])
+            self.robot.right_arm.go(False)
+            #(path, fraction) = self.robot.right_arm.compute_cartesian_path(waypoint, step, 0.00, True)
+            #self.robot.right_arm.execute(path)
+        elif self.pickstate["arm_group"] == "left_arm":
             self.robot.left_arm.clear_pose_targets()
             self.robot.left_arm.set_goal_position_tolerance(0.01)
-            self.robot.left_arm.set_goal_orientation_tolerance(0.1)
+            self.robot.left_arm.set_goal_orientation_tolerance(0.05)
             (path, fraction) = self.robot.left_arm.compute_cartesian_path(waypoint, step, 0.00, True)
             self.robot.left_arm.execute(path)
 
@@ -194,12 +196,12 @@ class ManipulateController:
     def pickobject_grasp(self):
         ##closegripper
         self.pickstate["laststate"] = "closegripper"
-        if self.pickstate["arm_group"] is "right_arm":
-            #if self.pickstate["demo"] is False:
+        if self.pickstate["arm_group"] == "right_arm":
+            #if self.pickstate["demo"] == False:
                 #self.settorquelimit["right_gripper"](GRIPPER_EFFORT)
             self.movejoint("right_gripper_joint",GRIPPER_CLOSED)
-        elif self.pickstate["arm_group"] is "left_arm":
-            #if self.pickstate["demo"] is False:
+        elif self.pickstate["arm_group"] == "left_arm":
+            #if self.pickstate["demo"] == False:
                 #self.settorquelimit["left_gripper"](GRIPPER_EFFORT)
             self.movejoint("left_gripper_joint",GRIPPER_CLOSED)
     
@@ -222,7 +224,7 @@ class ManipulateController:
         # Generate a list of grasps
         grasp = self.make_grasps(pose_target, desired_object, [-0.2])
         
-        # if grasp_constraint is None:
+        # if grasp_constraint == None:
         #     grasp_constraint = moveit_msgs.msg.Grasp()
         #     grasp_constraint.grasp_pose = pose_target
 
@@ -255,18 +257,18 @@ class ManipulateController:
 
         #     grasp = [grasp_constraint]
 
-        if arm_group is "right_arm":
+        if arm_group == "right_arm":
             self.robot.right_arm.set_support_surface_name(support_surface_name)
-            self.robot.right_arm.set_goal_position_tolerance(0.1)
-            self.robot.right_gripper.set_goal_position_tolerance(0.1)
-            self.robot.right_arm.set_goal_orientation_tolerance(0.1)
-            self.robot.right_gripper.set_goal_orientation_tolerance(0.1)
+            self.robot.right_arm.set_goal_position_tolerance(0.01)
+            self.robot.right_gripper.set_goal_position_tolerance(0.01)
+            self.robot.right_arm.set_goal_orientation_tolerance(0.05)
+            self.robot.right_gripper.set_goal_orientation_tolerance(0.05)
             self.robot.right_arm.set_planning_time(planning_time)
             self.robot.right_arm.pick(desired_object, grasp)
-        elif arm_group is "left_arm":
+        elif arm_group == "left_arm":
             self.robot.left_arm.set_support_surface_name(support_surface_name)
-            self.robot.left_arm.set_goal_position_tolerance(0.1) 
-            self.robot.left_arm.set_goal_orientation_tolerance(0.1)
+            self.robot.left_arm.set_goal_position_tolerance(0.01) 
+            self.robot.left_arm.set_goal_orientation_tolerance(0.05)
             self.robot.left_arm.set_planning_time(planning_time)
             self.robot.left_arm.pick(desired_object, grasp)
         else:
@@ -306,7 +308,7 @@ class ManipulateController:
         g.direction.vector.y = vector[1]
         g.direction.vector.z = vector[2]
  
-        # The vector is relative to the gripper frame
+        # The vector == relative to the gripper frame
         #g.direction.header.frame_id = GRIPPER_FRAME
         g.direction.header.frame_id = frame
         
@@ -423,13 +425,13 @@ class ManipulateController:
         return places
 
     def static_pose(self, arm_group, posture):
-        if arm_group is "right_arm":
+        if arm_group == "right_arm":
             self.robot.right_arm.clear_pose_targets()
             self.robot.right_arm.set_named_target(posture)
             self.robot.right_arm.go(False)  # async_move
-        elif arm_group is "left_arm":
+        elif arm_group == "left_arm":
             self.robot.left_arm.clear_pose_targets()
             self.robot.left_arm.set_named_target(posture)
             self.robot.left_arm.go(False)  # async_move
         else:
-            rospy.logwarn("No specified arm_group")
+            rospy.logwarn("No specified arm_group1")

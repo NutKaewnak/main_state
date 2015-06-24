@@ -13,15 +13,16 @@ class TestObjectRecogAndManip(AbstractTask):
         if self.state is 'init':
             self.subtask = self.subtaskBook.get_subtask(self, 'Pick')
             self.change_state('wait_for_object')
+            rospy.loginfo('test object manip init')
 
         elif self.state is 'wait_for_object':
             if perception_data.device is 'OBJECT':
-                self.point_to_pick = perception_data.input.centroid
-                rospy.loginfo('found object at ' + self.point_to_pick)
+                self.point_to_pick = perception_data.input.centriod
+                rospy.loginfo('found object at ' + str(self.point_to_pick))
                 self.change_state('found_object')
 
         elif self.state is 'found_object':
-            self.subtask.pick_object(self.point_to_pick)
+            self.subtask.pick_object([self.point_to_pick.x, self.point_to_pick.y, self.point_to_pick.z])
             self.change_state('picking_object')
 
         elif self.state is 'picking_object':
