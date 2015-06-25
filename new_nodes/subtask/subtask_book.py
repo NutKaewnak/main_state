@@ -18,7 +18,7 @@ from people_detect import PeopleDetect
 from move_absolute import MoveAbsolute
 from say import Say
 from extract_object_location import ExtractObjectLocation
-from pick_from_point import PickFromPoint
+from pick import Pick
 from detect_waving_people import DetectWavingPeople
 from search_waving_people import SearchWavingPeople
 
@@ -44,7 +44,7 @@ class SubtaskBook:
         self.book['MoveAbsolute'] = MoveAbsolute(planning_module)
         self.book['Say'] = Say(planning_module)
         self.book['ExtractObjectLocation'] = ExtractObjectLocation(planning_module)
-        self.book['PickFromPoint'] = PickFromPoint(planning_module)
+        self.book['Pick'] = Pick(planning_module)
         self.book['DetectWavingPeople'] = DetectWavingPeople(planning_module)
         self.book['SearchWavingPeople'] = SearchWavingPeople(planning_module)
 

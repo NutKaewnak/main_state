@@ -70,7 +70,7 @@ class Pick(AbstractSkill):
             self.gripper.gripper_close()
             self.change_state('succeeded')
 
-    def pick_object(self, goal_name, goal_pose):
+    def pick_object(self, goal_pose, goal_name='unknown'):
         self.change_state('init')
         self.goal_name = goal_name
         self.goal_pose = goal_pose
