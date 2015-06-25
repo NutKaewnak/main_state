@@ -9,8 +9,12 @@ class Pick(AbstractSkill):
     def __init__(self, control_module):
         AbstractSkill.__init__(self, control_module)
         self.manipulator = self.controlModule.manipulator
+        self.gripper = self.controlModule.gripper
         self.side = 'right'
         self.delay = Delay()
+        self.goal_name = None
+        self.goal_pose = None
+        self.device = None
 
     def perform(self, perception_data):
         if self.state is 'init':
@@ -21,45 +25,63 @@ class Pick(AbstractSkill):
             self.change_state('arm_normal')
 
         elif self.state is 'arm_normal':
-            device = None
-            if self.side is 'right':
-                device = 'RIGHT_ARM'
-            elif self.side is 'left':
-                device = 'LEFT_ARM'
-            if device is not None and perception_data.device is device:
+            self.make_device()
+
+            if self.device is not None and perception_data.device is self.device:
                 state = ArmStatus.get_state_from_status(perception_data.input)
                 if state is 'succeeded':
                     self.change_state('prepare_move_hand_to_front_of_object')
 
         elif self.state is 'prepare_move_hand_to_front_of_object':
+            self.manipulator.pickobject_pregrasp(self.side + '_arm', self.goal_name, self.goal_pose)
             self.change_state('move_to_in_front_of_object')
 
         elif self.state is 'move_to_in_front_of_object':
-            self.change_state('prepare_to_open_gripper')
+            if self.device is not None and perception_data.device is self.device:
+                state = ArmStatus.get_state_from_status(perception_data.input)
+                if state is 'succeeded':
+                    self.change_state('prepare_to_open_gripper')
 
         elif self.state is 'prepare_to_open_gripper':
+            self.manipulator.pickobject_opengripper()
             self.change_state('open_gripper')
 
         elif self.state is 'open_gripper':
-            self.change_state('prepare_move_to_object')
+            if self.device is not None and perception_data.device is self.device:
+                state = ArmStatus.get_state_from_status(perception_data.input)
+                if state is 'succeeded':
+                    self.change_state('prepare_move_to_object')
 
         elif self.state is 'prepare_move_to_object':
             # problem here
+            self.manipulator.pickobject_reach()
             self.delay.wait(5)
             self.change_state('move_to_object')
 
         elif self.state is 'move_to_object':
             if not self.delay.is_waiting():  # and device state is succeeded
-                self.change_state('grab_object')
+                if self.device is not None and perception_data.device is self.device:
+                    state = ArmStatus.get_state_from_status(perception_data.input)
+                    if state is 'succeeded':
+                        self.change_state('grab_object')
 
         elif self.state is 'grab_object':
             # close gripper
+            self.gripper.gripper_close()
             self.change_state('succeeded')
 
-    def pick_from_point(self, goal):
+    def pick_object(self, goal_name, goal_pose):
         self.change_state('init')
-        self.controlModule.manipulator.manipulate('right_arm', goal)
+        self.goal_name = goal_name
+        self.goal_pose = goal_pose
+        self.controlModule.manipulator.manipulate('right_arm', self.goal_pose)
         self.change_state('prepare_to_pick')
 
     def set_side(self, side):
         self.side = side
+
+    def make_device(self):
+        if self.side is 'right':
+            self.device = 'RIGHT_ARM'
+        elif self.side is 'left':
+            self.device = 'LEFT_ARM'

@@ -6,6 +6,7 @@ from controller.neck_controller import NeckController
 from controller.torso_controller import TorsoController
 from controller.arm_controller import ArmController
 from controller.manipulator_controller import ManipulateController
+from controller.gripper_controller import GripperController
 
 
 class ControlModule:
@@ -16,6 +17,7 @@ class ControlModule:
     left_arm = ArmController("left")
     right_arm = ArmController("right")
     manipulator = ManipulateController()
+    gripper = GripperController()
 
     def __init__(self):
         pass
