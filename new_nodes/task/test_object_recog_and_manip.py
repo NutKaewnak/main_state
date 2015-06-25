@@ -11,7 +11,7 @@ class TestObjectRecogAndManip(AbstractTask):
 
     def perform(self, perception_data):
         if self.state is 'init':
-            self.subtask = self.subtaskBook.get_subtask(self, 'PickFromPoint')
+            self.subtask = self.subtaskBook.get_subtask(self, 'Pick')
             self.change_state('wait_for_object')
 
         elif self.state is 'wait_for_object':
@@ -21,7 +21,7 @@ class TestObjectRecogAndManip(AbstractTask):
                 self.change_state('found_object')
 
         elif self.state is 'found_object':
-            self.subtask.pick_point(self.point_to_pick)
+            self.subtask.pick_object(self.point_to_pick)
             self.change_state('picking_object')
 
         elif self.state is 'picking_object':
