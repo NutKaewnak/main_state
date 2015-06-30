@@ -27,7 +27,7 @@ class NavigationTask(AbstractTask):
             self.change_state('going_to_waypoint1')
 
         elif self.state is 'going_to_waypoint1':
-            if self.subtask.state is 'finish' or self.delay.is_waiting() is False:
+            if self.subtask.state is 'finish' or not self.delay.is_waiting():
                 self.change_state('prepare_to_waypoint2')
             elif self.subtask.state is 'error aborted':
                 self.subtask.to_location('waypoint_1')  # must change
@@ -39,7 +39,7 @@ class NavigationTask(AbstractTask):
             self.change_state('going_to_waypoint2')
 
         elif self.state is 'going_to_waypoint2':
-            if self.subtask.state is 'finish' or self.delay.is_waiting() is False:
+            if self.subtask.state is 'finish' or not self.delay.is_waiting():
                 # self.change_state('prepare_to_waypoint3')
                 self.change_state('finish')
 
