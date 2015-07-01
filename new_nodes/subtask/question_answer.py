@@ -23,10 +23,10 @@ class QuestionAnswer(AbstractSubtask):
         elif self.state is 'answering':
             if self.counter > self.limit:
                 self.change_state('finish')
-            elif perception_data.device == 'VOICE':
+            else:
                 self.skill.say('Please ask question number ' + str(self.counter))
-                rospy.loginfo(perception_data.input)
-                answer = 'The answer of the question ' + str(perception_data.input) + 'is'
-                answer += str(answers_the_questions.answers(perception_data.input))
-                self.skill.say(answer)
-                self.counter += 1
+                if perception_data.device == 'VOICE':
+                    rospy.loginfo(perception_data.input)
+                    self.skill.say('The answer of the question ' + str(perception_data.input) + ' is ')
+                    self.skill.say(answers_the_questions.answers(perception_data.input))
+                    self.counter += 1
