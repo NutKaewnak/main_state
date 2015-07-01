@@ -9,8 +9,8 @@ from include.delay import Delay
 class Pick(AbstractSkill):
     def __init__(self, control_module):
         AbstractSkill.__init__(self, control_module)
-        self.manipulator = self.controlModule.manipulator
-        self.gripper = self.controlModule.gripper
+        self.manipulator = None
+        self.gripper = None
         self.side = 'right'
         self.delay = Delay()
         self.goal_name = None
@@ -19,6 +19,8 @@ class Pick(AbstractSkill):
 
     def perform(self, perception_data):
         if self.state is 'init':
+            self.manipulator = self.controlModule.manipulator
+            self.gripper = self.controlModule.gripper
             self.change_state('waiting_for_goal')
 
         elif self.state is 'prepare_to_pick': 
