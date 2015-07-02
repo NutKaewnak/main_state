@@ -49,7 +49,7 @@ class NavigationTask(AbstractTask):
                 self.change_state('finding_obstacle_waypoint2')
 
         elif self.state is 'finding_obstacle_waypoint2':
-            self.subtask = self.subtaskBook.get_subtask(self, 'FindPeople')  # detect if people is blocking the way
+            self.subtask = self.subtaskBook.get_subtask(self, 'PeopleDetect')  # detect if people is blocking the way
             if self.subtask.is_found:
                 self.change_state('blocked_by_people')
             else:
