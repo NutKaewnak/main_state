@@ -37,7 +37,7 @@ class Pick(AbstractSkill):
 
         elif self.state is 'prepare_move_hand_to_front_of_object':
             self.manipulator.pickobject_pregrasp(self.side + '_arm', self.goal_name, self.goal_pose)
-            self.delay.wait(20)
+            self.delay.wait(15)
             self.change_state('move_to_in_front_of_object')
 
         elif self.state is 'move_to_in_front_of_object':
@@ -45,7 +45,7 @@ class Pick(AbstractSkill):
                 state = ArmStatus.get_state_from_status(perception_data.input)
                 if state is 'succeeded':
                     self.change_state('prepare_to_open_gripper')
-                elif not delay.is_waiting():
+                elif not self.delay.is_waiting():
                     rospy.logwarn('move_to_in_front_of_object out of time!')
                     self.change_state('prepare_move_hand_to_front_of_object')
 
@@ -56,17 +56,17 @@ class Pick(AbstractSkill):
         elif self.state is 'open_gripper':
             if self.device is not None and perception_data.device is self.device:
                 state = ArmStatus.get_state_from_status(perception_data.input)
-                self.delay.wait(20)
+                self.delay.wait(15)
                 if state is 'succeeded':
                     self.change_state('prepare_move_to_object')
-                elif not delay.is_waiting():
+                elif not self.delay.is_waiting():
                     rospy.logwarn('open_gripper out of time!')
                     self.change_state('prepare_to_open_gripper')
 
         elif self.state is 'prepare_move_to_object':
             # problem here
             self.manipulator.pickobject_reach()
-            self.delay.wait(5)
+            self.delay.wait(25)
             self.change_state('move_to_object')
 
         elif self.state is 'move_to_object':
