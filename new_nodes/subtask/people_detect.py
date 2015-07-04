@@ -21,7 +21,8 @@ class PeopleDetect(AbstractSubtask):
             self.timer.wait(self.period)
             self.change_state('finding')
 
-        elif self.state is 'finding' and perception_data.device is self.Devices.PEOPLE:
+        elif self.state is 'finding' and perception_data.device is self.Devices.PEOPLE \
+                and perception_data.input != []:
             min_distance = 4.0  # set to maximum
             point = None
             for person in perception_data.input:
