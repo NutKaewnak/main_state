@@ -21,6 +21,7 @@ from extract_object_location import ExtractObjectLocation
 from pick import Pick
 from detect_waving_people import DetectWavingPeople
 from search_waving_people import SearchWavingPeople
+from detect_front_person import DetectFrontPerson
 
 
 class SubtaskBook:
@@ -47,6 +48,7 @@ class SubtaskBook:
         self.book['Pick'] = Pick(planning_module)
         self.book['DetectWavingPeople'] = DetectWavingPeople(planning_module)
         self.book['SearchWavingPeople'] = SearchWavingPeople(planning_module)
+        self.book['DetectFrontPerson'] = DetectFrontPerson(planning_module)
 
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()

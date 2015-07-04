@@ -11,11 +11,12 @@ class TestFindPerson(AbstractTask):
     def perform(self, perception_data):
         if self.state is 'init':
             # Do something
-            self.subtask = self.subtaskBook.get_subtask(self, 'PeopleDetect')
+            self.subtask = self.subtaskBook.get_subtask(self, 'DetectFrontPerson')
             self.change_state('performing')
 
         elif self.state is 'performing':
-            if self.subtask.is_found is True:
-                rospy.loginfo('found' + str(self.subtask.nearest_people))
+            if self.subtask.is_in_front is True:
+                rospy.loginfo('detect front person is found')
+                self.change_state('finish')
             if self.subtask.state is 'not_found':
                 self.change_state('finish')

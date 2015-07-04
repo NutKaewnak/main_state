@@ -21,6 +21,7 @@ class NavigationTask(AbstractTask):
 
         elif self.state is 'move_pass_door':
             rospy.loginfo('going to waypoint 1')
+            self.subtaskBook.get_subtask(self, 'Say').say('I will go to waypoint 1.')
             self.delay.wait(90)
             self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
             self.subtask.to_location('waypoint_1')  # must change
@@ -33,6 +34,8 @@ class NavigationTask(AbstractTask):
                 self.subtask.to_location('waypoint_1')  # must change
 
         elif self.state is 'prepare_to_waypoint2':
+            rospy.loginfo('going to waypoint 2')
+            self.subtaskBook.get_subtask(self, 'Say').say('I will go to waypoint 2.')
             self.delay.wait(150)
             self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
             self.subtask.to_location('waypoint_2')  # must change
