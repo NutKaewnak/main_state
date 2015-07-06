@@ -11,7 +11,7 @@ class JointTrajectoryFollow:
         # arm_name should be b_arm or f_arm
         self.name = motor_name
         self.joint_names = joint_names
-        self.jta = actionlib.SimpleActionClient('/dynamixel/'+self.name+'_controller/follow_joint_trajectory'
+        self.jta = actionlib.SimpleActionClient('/dynamixel/'+self.name+'/follow_joint_trajectory'
                                                 , FollowJointTrajectoryAction)
         # rospy.loginfo('Waiting for joint trajectory action')
         # self.jta.wait_for_server()
