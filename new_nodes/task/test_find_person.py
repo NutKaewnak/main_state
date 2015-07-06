@@ -12,6 +12,7 @@ class TestFindPerson(AbstractTask):
         if self.state is 'init':
             # Do something
             self.subtask = self.subtaskBook.get_subtask(self, 'DetectFrontPerson')
+            self.subtask.detect()
             self.change_state('performing')
 
         elif self.state is 'performing':

@@ -7,7 +7,7 @@ from follow_me import FollowMe
 from testSpeech import TestSpeach
 from restaurant import Restaurant
 from test_gesture import TestGesture
-from GPSR import GPSR
+# from GPSR import GPSR
 from speech_recognition import SpeechRecognition
 from test_object_recog_and_manip import TestObjectRecogAndManip
 from manipulation_task import ManipulationTask
@@ -27,7 +27,7 @@ class TaskBook:
         self.book['TestSpeach'] = TestSpeach(planning_module)
         self.book['Restaurant'] = Restaurant(planning_module)
         self.book['TestGesture'] = TestGesture(planning_module)
-        self.book['GPSR'] = GPSR(planning_module)
+        # self.book['GPSR'] = GPSR(planning_module)
         self.book['SpeechRecognition'] = SpeechRecognition(planning_module)
         self.book['TestObjectRecogAndManip'] = TestObjectRecogAndManip(planning_module)
         self.book['ManipulationTask'] = ManipulationTask(planning_module)

@@ -15,14 +15,14 @@ class DetectFrontPerson(AbstractSubtask):
 
     def perform(self, perception_data):
         if self.state is 'start':
-            self.skill = self.skillBook(self, 'TurnNeck')
+            self.skill = self.skillBook.get_skill(self, 'TurnNeck')
             self.skill.turn(0, 0)
             self.is_in_front = False
             self.change_state('turn_neck')
 
         elif self.state is 'turn_neck':
             if self.skill.state is 'succeeded':
-                self.subtask = self.subtaskBook(self, 'PeopleDetect')
+                self.subtask = self.subtaskBook.get_subtask(self, 'PeopleDetect')
                 self.delay = Delay()
                 self.delay.wait(3)
                 self.change_state('detecting')

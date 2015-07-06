@@ -1,4 +1,3 @@
-# Not yet finish
 __author__ = 'Nicole'
 from include.abstract_skill import AbstractSkill
 from include.neck_status import NeckStatus
