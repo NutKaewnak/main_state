@@ -20,4 +20,5 @@ class TestFindPerson(AbstractTask):
                 rospy.loginfo('detect front person is found')
                 self.change_state('finish')
             if self.subtask.state is 'not_found':
-                self.change_state('finish')
+                rospy.loginfo('not_found')
+                self.change_state('init')
