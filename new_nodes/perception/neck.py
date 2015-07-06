@@ -10,14 +10,14 @@ from include.devices import Devices
 class Neck(AbstractPerception):
     def __init__(self, planning_module):
         AbstractPerception.__init__(self, planning_module)
+        self.neck_pos = NeckPos()
         rospy.Subscriber('/dynamixel/neck_controller/state', JointState, self.callback_position)
         rospy.Subscriber('/dynamixel/neck_controller/follow_joint_trajectory/result',
                          FollowJointTrajectoryActionResult, self.callback_status)
-        self.neck_pos = NeckPos
 
     def callback_position(self, data):
-        self.neck_pos.pan = data.actual.position[0]
-        self.neck_pos.tilt = data.actual.position[1]
+        self.neck_pos.pan = data.actual.positions[0]
+        self.neck_pos.tilt = data.actual.positions[1]
         self.broadcast(Devices.NECK, self.neck_pos)
 
     def callback_status(self, data):

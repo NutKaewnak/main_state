@@ -1,6 +1,5 @@
 __author__ = 'Nicole'
 import rospy
-import math
 from include.delay import Delay
 from include.abstract_subtask import AbstractSubtask
 
@@ -22,18 +21,24 @@ class DetectFrontPerson(AbstractSubtask):
 
         elif self.state is 'turn_neck':
             if self.skill.state is 'succeeded':
+                rospy.loginfo('turn_neck succeeded')
                 self.subtask = self.subtaskBook.get_subtask(self, 'PeopleDetect')
                 self.delay = Delay()
                 self.delay.wait(3)
+                rospy.loginfo('DetectFrontPerson: detecting')
                 self.change_state('detecting')
 
         elif self.state is 'detecting':
             if self.subtask.is_found:
-                if math.abs(self.subtask.nearest_people.y) <= 0.05:
+                if abs(self.subtask.nearest_people.y) <= 0.03:
                     self.is_in_front = True
+                    rospy.loginfo('DetectFrontPerson: found')
                     self.change_state('found')
+                else:
+                    self.subtask.is_found = False
             elif not self.delay.is_waiting():
                 self.is_in_front = False
+                rospy.loginfo('DetectFrontPerson: not_found')
                 self.change_state('not_found')
 
     def detect(self):
