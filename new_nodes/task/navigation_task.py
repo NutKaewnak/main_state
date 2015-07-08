@@ -1,10 +1,9 @@
+import math
+
 __author__ = 'Nicole'
 import rospy
 from include.abstract_task import AbstractTask
 from include.delay import Delay
-from geometry_msgs.msg import Vector3
-from subprocess import call
-from math import sqrt
 
 
 class NavigationTask(AbstractTask):
@@ -23,13 +22,17 @@ class NavigationTask(AbstractTask):
             if self.current_subtask.state is 'finish':
                 rospy.loginfo('going to waypoint 1')
                 self.subtaskBook.get_subtask(self, 'Say').say('I will go to waypoint 1.')
-                self.delay.wait(90)
-                self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
-                self.subtask.to_location('waypoint_1')  # must change
-                self.change_state('going_to_waypoint1')
+                self.change_state('prepare_to_waypoint1')
+
+        elif self.state is 'prepare_to_waypoint1':
+            self.delay.wait(90)
+            self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
+            self.subtask.to_location('waypoint_1')  # must change
+            self.change_state('going_to_waypoint1')
 
         elif self.state is 'going_to_waypoint1':
             if self.subtask.state is 'finish' or not self.delay.is_waiting():
+                self.subtaskBook.get_subtask(self, 'Say').say('I reach waypoint 1.')
                 self.change_state('prepare_to_waypoint2')
             elif self.subtask.state is 'error aborted':
                 rospy.loginfo('resend goal in waypoint_1')
@@ -37,7 +40,6 @@ class NavigationTask(AbstractTask):
 
         elif self.state is 'prepare_to_waypoint2':
             rospy.loginfo('going to waypoint 2')
-            self.subtaskBook.get_subtask(self, 'Say').say('I will go to waypoint 2.')
             self.delay.wait(150)
             self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
             self.subtask.to_location('waypoint_2')  # must change
@@ -45,12 +47,13 @@ class NavigationTask(AbstractTask):
 
         elif self.state is 'going_to_waypoint2':
             if self.subtask.state is 'finish' or not self.delay.is_waiting():
-                # self.change_state('prepare_to_waypoint3')
-                self.change_state('finish')
+                self.subtask = self.subtaskBook.get_subtask(self, 'Say')
+                self.subtask.say('I will leaving arena')
+                self.change_state('prepare_leave_arena')
 
             elif self.subtask.state is 'error aborted':
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveRelative')
-                self.subtask.set_postion(-1.5, 0, 0)
+                self.subtask.set_postion(0, 0, math.pi)
                 self.change_state('finding_obstacle_waypoint2')
 
         elif self.state is 'finding_obstacle_waypoint2':
@@ -70,49 +73,10 @@ class NavigationTask(AbstractTask):
             self.subtask.toLocation('waypoint 2')  # must change
             self.change_state('going_to_waypoint2')
 
-        elif self.state is 'prepare_to_waypoint3':
-            # waiting for twist from P'Krit
+        elif self.state is 'prepare_leave_arena':
+            self.subtask = self.subtaskBook(self, 'LeaveArena')
+            self.change_state('leave_arena')
 
-            self.subtask = self.subtaskBook.get_subtask(self, 'FollowPerson')
-            set_neck_angle_topic = rospy.Publisher('/hardware_bridge/set_neck_angle', Vector3)
-            set_neck_angle_topic.publish(Vector3())
-            if perception_data.device is self.Devices.VOICE and 'follow me' in perception_data.input:
-                call(['espeak', '-ven+f4', 'I will follow you.', '-s 120'])
-                self.change_state('follow_init')
-
-        elif self.state is 'follow_init':
-            if perception_data.device is self.Devices.PEOPLE:
-                self.follow = self.subtaskBook.get_subtask(self, 'FollowPerson')
-                distance = 9999.0  # set to maximum
-                id = None
-                for person in perception_data.input:
-                    if person.personpoints.x < distance:
-                        distance = person.personpoints.x
-                        id = person.id
-                if id is not None:
-                    self.follow.set_person_id(id)
-                    self.change_state('follow')
-
-        elif self.state is 'follow':
-            # recovery follow
-            if self.follow.state is 'abort' and perception_data.device is self.Devices.PEOPLE:
-                min_distance = 0.7  # set to maximum
-                id = None
-                for person in perception_data.input:
-                    distance = get_distance(person.personpoints, self.follow.last_point)
-                    if distance < min_distance:
-                        min_distance = distance
-                        id = person.id
-                if id is not None:
-                    self.follow.set_person_id(id)
-            elif perception_data.device is self.Devices.VOICE and 'robot stop' in perception_data.input:
-                self.change_state('prepare_to_waypoint4')
-
-        elif self.state is 'prepare_to_waypoint4':
-            self.change_state('finish')
-            # Don't forget to add task to task_book
-            # Don't forget to create launch file
-
-
-def get_distance(point_a, point_b):
-    return sqrt((point_a.x - point_b.x)**2 + (point_a.y - point_b.y)**2)
+        elif self.state is 'leave_arena':
+            if self.subtask.state is 'finish':
+                self.change_state('finish')
