@@ -12,11 +12,12 @@ class Say(AbstractSubtask):
 
     def say(self, message):
         self.message = message
+        self.speak.say(self.message)
         self.change_state('saying')
 
     def perform(self, perception_data):
         if self.state is 'saying':
-            self.speak.say(self.message)
-            self.change_state('succeed')
+            if self.speak.state is 'succeeded':
+                self.change_state('finish')
 
 # Don't forget to add this subtask to subtask book

@@ -11,7 +11,7 @@ from include.devices import Devices
 class ObjectDetect(AbstractPerception):
     def __init__(self, planning_module):
         AbstractPerception.__init__(self, planning_module)
-        rospy.Subscriber('/object_shape', ObjectDetection, self.callback_object_point)
+        rospy.Subscriber('/tabletop_object_detection', ObjectDetection, self.callback_object_point)
 
     def callback_object_point(self, data):
         self.broadcast(Devices.OBJECT, data)

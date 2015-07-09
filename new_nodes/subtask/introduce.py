@@ -1,6 +1,6 @@
+__author__ = 'nicole'
 from include.abstract_subtask import AbstractSubtask
 
-__author__ = 'nicole'
 
 class Introduce(AbstractSubtask):
     def __init__(self, planning_module):
@@ -11,5 +11,9 @@ class Introduce(AbstractSubtask):
         if self.state is 'init':
             if self.skill is None:
                 self.skill = self.skillBook.get_skill(self, 'Say')
-                self.skill.say('Hello, my name is Lamyai. I am cooking assistance.')
-            self.change_state('finish')
+            self.skill.say('Hello, my name is Lamyai. Please tell me what you want')
+            self.change_state('saying')
+
+        elif self.state is 'saying':
+            if self.skill.state is 'succeeded':
+                self.change_state('finish')

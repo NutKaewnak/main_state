@@ -1,9 +1,11 @@
 __author__ = 'ms.antonio'
 
 import roslib
+from include.command_extractor import CommandExtractor
 from include.abstract_subtask import AbstractSubtask
 
-def readFileToList(filename):
+
+def read_file_to_list(filename):
     output = []
     file = open(filename)
     for line in file:
@@ -12,114 +14,127 @@ def readFileToList(filename):
         output.append(line.strip().lower())
     return output
 
+
 class ExtractObjectLocation(AbstractSubtask):
     def __init__(self, planning_module):
         AbstractSubtask.__init__(self, planning_module)
         self.skill = self.current_skill
         self.subtask = self.current_subtask
-        self.object = 'None'
-        self.location = 'None'
-        self.verb = 'None'
-        self.this_object_category = 'None'
-        self.this_location_category = 'None'
+        self.object = None
+        self.location = None
+        self.verb = None
+        self.object_category = None
+        self.location_category = None
         self.data = None
-        self.object_category = readFileToList(roslib.packages.get_pkg_dir('speech_processing') + '/command_config/GPSR/object_category.txt')
-        self.objects = readFileToList(roslib.packages.get_pkg_dir('speech_processing') + '/command_config/GPSR/objects.txt')
-        self.location_category = readFileToList(roslib.packages.get_pkg_dir('speech_processing') + '/command_config/GPSR/location_category.txt')
-        self.locations = readFileToList(roslib.packages.get_pkg_dir('speech_processing') + '/command_config/GPSR/locations.txt')
-        self.verbs = readFileToList(roslib.packages.get_pkg_dir('speech_processing')+'/command_config/GPSR/verbs.txt')
+        self.object_category_array = read_file_to_list(roslib.packages.get_pkg_dir('main_state') +
+                                                       '/config/object_category.txt')
+        self.object_array = read_file_to_list(roslib.packages.get_pkg_dir('main_state') + '/config/objects.txt')
+        self.location_category_array = read_file_to_list(roslib.packages.get_pkg_dir('main_state') +
+                                                         '/config/location_categories.txt')
+        self.location_array = read_file_to_list(roslib.packages.get_pkg_dir('main_state') + '/config/locations.txt')
+        self.verb_array = read_file_to_list(roslib.packages.get_pkg_dir('main_state') + '/config/verbs.txt')
+        self.command_extractor = CommandExtractor()
+
     def perform(self, perception_data):
         if self.state is 'init':
-            self.object = 'None'
-            self.location = 'None'
-            self.verb = 'None'
-            self.data = None
-            self.this_object_category = 'None'
-            self.this_location_category = 'None'
+            self.object = None
+            self.location = None
+            self.verb = None
+            self.object_category = None
+            self.location_category = None
             self.skill = self.skillBook.get_skill(self, 'Say')
-            self.skill.say('Good day sir, What would you want?')
-            self.change_state('waitingForCommand')
+            self.skill.say('Please say command')
+            self.change_state('wait_for_command')
 
-        elif self.state is 'waitingForCommand':
-            if perception_data.device == 'VOICE':
+        elif self.state is 'wait_for_command':
+            if perception_data.device is 'VOICE':
                 self.data = perception_data.input
-                for i in self.location_category:
-                    if i in self.data:
-                        self.this_location_category = i
-                        break
-                print  'loc_cat :' + self.this_location_category
-                for i in self.object_category:
-                    if i in self.data:
-                        self.this_object_category = i
-                        break
-                print  'obj_cat :' + self.this_object_category
-                for i in self.objects:
-                    if i in self.data:
-                        self.object = i
-                        break
-                print  'obj :' + self.object
-                for i in self.locations:
-                    if i in self.data:
-                        self.location = i
-                        break
-                print  'loc :' + self.location
-                for i in self.verbs:
-                    if i in self.data:
-                        self.verb = i
-                        break
-                print  'loc :' + self.location
-                if self.this_location_category is not 'None' and self.this_object_category is not 'None':
-                    self.skill.say('What'+self.this_object_category+'do you want')
-                    self.change_state('AskForFindObject')
-                elif self.this_location_category is not 'None' and self.this_object_category is 'None':
-                    self.skill.say('What'+self.this_location_category+'do you want')
-                    self.change_state('AskForFindLocation')
-                elif self.this_location_category is 'None' and self.this_object_category is not 'None':
-                    self.skill.say('What'+self.this_object_category+'do you want')
-                    self.change_state('AskForFindObject')
-                elif self.this_location_category is 'None' and self.this_object_category is 'None':
-                    if self.object is not 'None' and self.location is 'None':
+                if self.command_extractor.isValidCommand(self.data):
+                    self.change_state('wait_for_confirm')
+
+        elif self.state is 'wait_for_confirm':
+            if perception_data.device is 'VOICE':
+                if perception_data.input is 'robot yes':
+                    self.extract_command(self.data)
+                    if self.location_category is not None and self.object_category is not None:
+                        self.skill.say('What' + self.object_category + 'do you want')
+                        self.change_state('AskForFindObject')
+
+                    elif self.location_category is not None and self.object_category is None:
+                        self.skill.say('What' + self.location_category + 'do you want')
                         self.change_state('AskForFindLocation')
-                    elif self.object is 'None' and self.location is not 'None':
-                        self.change_state('finish')
+
+                    elif self.location_category is None and self.object_category is not None:
+                        self.skill.say('What' + self.object_category + 'do you want')
+                        self.change_state('AskForFindObject')
+
+                    elif self.location_category is None and self.object_category is None:
+                        if self.object is not None and self.location is None:
+                            self.change_state('AskForFindLocation')
+
+                        elif self.object is None and self.location is not None:
+                            self.change_state('finish')
+
+                elif perception_data.input is 'robot no':
+                    self.skill.say('Canceled. Please say command again.')
+                    self.change_state('wait_for_command')
 
         elif self.state is 'AskForFindObject':
             if perception_data.device == 'VOICE':
                 self.data = perception_data.input
-                for i in self.objects:
+                for i in self.object_array:
                     if i in self.data:
                         self.object = i
-                        #self.skill.say('What'+i+' do you want')
-                        #if self.type is '0':
-                        #    self.change_state('FindLocation')
-                        #elif self.type is '1':
                         self.skill.say('So where'+self.object+'it is')
                         self.change_state('AskForFindLocation')
                         break
 
-        #elif self.state is 'FindLocation':
-        #    self.location = FindLocation(self.object)
-        #    self.skill.say('Wait a minute , I will bring' + self.object + 'from' + self.location +'to you' )
-        #    self.change_state('finish')
-
         elif self.state is 'AskForFindLocation':
             if perception_data.device == 'VOICE':
                 self.data = perception_data.input
-                for i in self.locations:
+                for i in self.location_array:
                     if i in self.data:
                         self.location = i
-                        if self.location is not 'None':
-                             self.skill.say('Wait a minute , I will'+self.verb+'to'+self.location)
-                        elif self.object is not 'None' and self.location is not 'None':
-                            print  self.object
-                            self.skill.say('Wait a minute , I will'+self.verb + self.object+'from'+self.location+'to you')
+                        if self.location is not None:
+                            self.skill.say('Wait a minute , I will' + self.verb + 'to' + self.location)
+                        elif self.object is not None and self.location is not None:
+                            print self.object
+                            self.skill.say('I will' + self.verb + self.object + 'from' + self.location + 'to you')
                         self.change_state('finish')
+
                         self.skill.say('object is'+self.object)
                         self.skill.say('location is'+self.location)
                         break
 
-    def getObject(self):
+    def extract_command(self, data):
+        for i in self.location_category_array:
+            if i in data:
+                self.location_category = i
+                break
+        print 'loc_cat :' + self.location_category
+        for i in self.object_category_array:
+            if i in data:
+                self.object_category = i
+                break
+        print 'obj_cat :' + self.object_category
+        for i in self.object_array:
+            if i in data:
+                self.object = i
+                break
+        print 'obj :' + self.object
+        for i in self.location_array:
+            if i in data:
+                self.location = i
+                break
+        print 'loc :' + self.location
+        for i in self.verb_array:
+            if i in data:
+                self.verb = i
+                break
+        print 'loc :' + self.location
+
+    def get_object(self):
         return self.object
 
-    def getLocation(self):
+    def get_location(self):
         return self.location

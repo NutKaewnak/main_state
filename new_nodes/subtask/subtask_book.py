@@ -9,9 +9,6 @@ from find_people_and_get_order import FindPeopleAndGetOrder
 from detect_and_move_to_people import DetectAndMoveToPeople
 from follow_person import FollowPerson
 from move_relative import MoveRelative
-from ask_for_name import AskForName
-from ask_for_object import AskForObject
-from ask_for_name_and_command import AskForNameAndCommand
 from bring_object_to_person import BringObjectToPerson
 from question_answer import QuestionAnswer
 from people_detect import PeopleDetect
@@ -38,9 +35,6 @@ class SubtaskBook:
         self.book['FollowPerson'] = FollowPerson(planning_module)
         self.book['MoveRelative'] = MoveRelative(planning_module)
         self.book['BringObjectToPerson'] = BringObjectToPerson(planning_module)
-        self.book['AskForName'] = AskForName(planning_module)
-        self.book['AskForObject'] = AskForObject(planning_module)
-        self.book['AskForNameAndCommand'] = AskForNameAndCommand(planning_module)
         self.book['QuestionAnswer'] = QuestionAnswer(planning_module)
         self.book['MoveAbsolute'] = MoveAbsolute(planning_module)
         self.book['Say'] = Say(planning_module)
