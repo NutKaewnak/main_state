@@ -17,7 +17,7 @@ class TestObjectRecogAndManip(AbstractTask):
 
         elif self.state is 'wait_for_object':
             if perception_data.device is 'OBJECT':
-                self.point_to_pick = perception_data.input.centriod
+                self.point_to_pick = perception_data.input.centriods[0]
                 rospy.loginfo('found object at ' + str(self.point_to_pick))
                 self.change_state('found_object')
 
