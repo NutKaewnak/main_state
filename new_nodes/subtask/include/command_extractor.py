@@ -12,10 +12,13 @@ from people_information import *
 roslib.load_manifest('main_state')
 
 class Action:
-    def __init__(self, action, object, data):
+    def __init__(self, action=None, object=None, data=None):
         self.action = action
         self.object = object
         self.data = data
+
+    def __repr__(self):
+        return "(%s, %s, %s)"%(self.action, self.data, self.object)
 
 def readFileToList(filename):
     output = []
@@ -37,7 +40,7 @@ class CommandExtractor(object):
     def isObject(self, word):
         if word in self.objects:
             return True
-        elif word in self.locations:
+        if word in self.other_object:
             return True
         elif word in self.names:
             return True
@@ -47,8 +50,18 @@ class CommandExtractor(object):
             return True
         return False
 
+    def isLocation(self, word):
+        if word in self.rooms:
+            return True
+        elif word in self.places:
+            return True
+        return False
+
     def getObject(self, sentence):
         for obj in self.objects:
+            if obj in sentence:
+                return obj
+        for obj in self.other_object:
             if obj in sentence:
                 return obj
         for category in self.object_categories:
@@ -60,7 +73,10 @@ class CommandExtractor(object):
         return None
 
     def getData(self, sentence):
-        for location in self.locations:
+        for location in self.rooms:
+            if location in sentence:
+                return location
+        for location in self.places:
             if location in sentence:
                 return location
         for category in self.location_categories:
@@ -68,16 +84,76 @@ class CommandExtractor(object):
                 return category
         return None
 
+    def getName(self, sentence):
+        for name in self.names:
+            if name in sentence:
+                return name
+        return None
+
+    def getPronoun(self, sentence):
+        if sentence == None:
+            return None
+        for word in ['me', 'him', 'her', 'it', 'them']:
+            words = sentence.split()
+            if word in words: #and self.getObject(" ".join(words[words.index(word):])) == None:
+                return  word
+        return None
+
+    def hasPronoun(self, sentence):
+        if self.getPronoun(sentence) == None:
+            return False
+        return True
+
+    def isPronoun(self, word):
+        if self.getPronoun(word) == None:
+            return False
+        return True
+
+    def isPreposition(self, word):
+        if word in ['from', 'in', 'at', 'to']:
+            return True
+        return False
+
+    def changeVerb(self, word):
+        if word in ['approach', 'drive', 'enter', 'go', 'head', 'move', 'navigate', 'point']:
+            return 'go'
+        elif word in ['bring', 'carry', 'deliver', 'get', 'give', 'grab', 'grasp', 'hand', 'hold', 'pick', 'pick up', 'take', 'offer']:
+            return 'grasp'
+        elif word in ['announce', 'notify', 'remind', 'speak', 'tell']:
+            return 'tell'
+        elif word in ['ask']:
+            return 'ask'
+        elif word in ['answer']:
+            return 'answer'
+        elif word in ['follow']:
+            return 'follow'
+        elif word in ['detect', 'find', 'identify', 'look for']:
+            return 'find'
+        elif word in ['introduce']:
+            return 'introduce';
+        elif word in ['to']:
+            return 'to'
+        elif word in ['from', 'in', 'at']:
+            return 'go'
+        return None
+
+
     def __init__(self):
         # Read config file
         self.objects = readFileToList(
             roslib.packages.get_pkg_dir('speech_processing') + '/command_config/objects.txt')
 
+        self.other_objects = readFileToList(
+            roslib.packages.get_pkg_dir('speech_processing') + '/command_config/other_objects.txt')
+
         self.object_categories = readFileToList(
             roslib.packages.get_pkg_dir('speech_processing') + '/command_config/object_categories.txt')
 
-        self.locations = readFileToList(
-            roslib.packages.get_pkg_dir('speech_processing') + '/command_config/locations.txt')
+        self.rooms = readFileToList(
+            roslib.packages.get_pkg_dir('speech_processing') + '/command_config/rooms.txt')
+
+        self.places = readFileToList(
+            roslib.packages.get_pkg_dir('speech_processing') + '/command_config/places.txt')
 
         self.location_categories = readFileToList(
             roslib.packages.get_pkg_dir('speech_processing') + '/command_config/location_categories.txt')
@@ -90,73 +166,120 @@ class CommandExtractor(object):
 
         self.intransitive_verbs = readFileToList(
             roslib.packages.get_pkg_dir('main_state') + '/command_config/intransitive_verbs.txt')
-
-    # Extract action from command and return as tuple(s) of (verb,object,data)
-    def extractActions(self, command):
+    # Get actions from command
+    def getActions(self, command):
+        """
+        >>> CommandExtractor().getActions("bring a coke from bathroom to the desk")
+        [(go, bathroom, None), (grasp, desk, coke)]
+        >>> CommandExtractor().getActions("go to the bedroom, find a person and tell the time")
+        [(go, bedroom, None), (find, None, person), (tell, None, time)]
+        >>> CommandExtractor().getActions("go to the dinner-table, grasp the crackers, and take them to the side-table")
+        [(go, dinner-table, None), (grasp, side-table, crackers)]
+        >>> CommandExtractor().getActions("bring a coke to the person in the living room and answer him a question")
+        [(grasp, None, coke), (go, living room, None), (give, person, None), (answer, him, question)]
+        >>> CommandExtractor().getActions("go to the door, ask the person there for her name and tell it to me")
+        [(go, door, None), (ask, person, her name), (tell, me, it)]
+        >>> CommandExtractor().getActions("go to the bedroom, find the waving person and tell the time")
+        [(go, bedroom, None), (find, None, person), (tell, None, time)]
+        >>> CommandExtractor().getActions("go to the kitchen, find a person and follow her")
+        [(go, kitchen, None), (find, None, person), (follow, None, her)]
+        >>> CommandExtractor().getActions("go to the side-table, grasp the coke, and take it to the dinner table")
+        [(go, side-table, None), (grasp, dinner table, coke)]
+        >>> CommandExtractor().getActions("go to the dinner-table, grasp the banana, and take it to the side-table")
+        [(go, dinner-table, None), (grasp, side-table, banana)]
+        >>> CommandExtractor().getActions("take the coke from the sink and carry it to me")
+        [(go, sink, None), (grasp, me, coke)]
+        >>> CommandExtractor().getActions("go to the kitchen, grasp the coke, and take it to the side-table")
+        [(go, kitchen, None), (grasp, side-table, coke)]
+        >>> CommandExtractor().getActions("go to the bathroom, grasp the soap, and take it to the side-table")
+        [(go, bathroom, None), (grasp, side-table, soap)]
+        >>> CommandExtractor().getActions("grasp the coke from the small table and carry it to me")
+        [(go, small table, None), (grasp, me, coke)]
+        >>> CommandExtractor().getActions("deliver a coke to frank in the kitchen")
+        [(grasp, None, coke), (go, kitchen, None), (give, frank, None)]
+        >>> CommandExtractor().getActions("offer a coke to frank in the kitchen")
+        [(grasp, None, coke), (go, kitchen, None), (give, frank, None)]
+        >>> CommandExtractor().getActions("offer a coke to the person at the door")
+        [(grasp, None, coke), (go, door, None), (give, person, None)]
+        """
         output = []
-        commands = command.split()
-        for i in xrange(0, len(commands)):
-            # If commands[i] is verb, then looking for object and data
-            if self.isVerb(commands[i].lower()):
-                action = Action()
-                action.action = commands[i].lower()
-                for j in xrange(i + 1, len(commands)):
-                    if self.isObject(commands[j].lower()):
-                        if action.object == '':  # If object is null assign it to obj
-                            action.object = commands[j].lower()
-                        else:  # If object is not null, then assume it is a data
-                            action.data = commands[j].lower()
-                    if self.isVerb(commands[j].lower()):
-                        break
-                # Append an action to output list
-                output.append(action)
-        #rospy.loginfo(output)
+        for sentence in self.cut_sentence(command):
+            self.extract_sentence(sentence,output)
+
+        self.replace_unknown_noun(output)
         return output
 
-    # Get actions from command
-    def getActions(selfs, command):
-        """
-        >>> CommandExtractor().getActions('')
-        []
-        >>> CommandExtractor().getActions('move to show case go to desk and leave apartment')
-        [('move', None, 'show case'), ('go', None, 'desk'), ('leave', None, None)]
-        >>> CommandExtractor().getActions('navigate to kitchen table bring soda and exit apartment')
-        [('navigate', None, 'kitchen table'), ('bring', 'soda', None), ('exit', None, None)]
-        >>> CommandExtractor().getActions('go to bar find coffee and take it')
-        [('go', None, 'bar'), ('find', 'coffee', None), ('take', None, None)]
-        >>> CommandExtractor().getActions('go to reception table identify green cup and take it')
-        [('go', None, 'reception table'), ('identify', 'green cup', None), ('take', None, None)]
-        >>> CommandExtractor().getActions('go to library table go to bar and introduce yourself')
-        [('go', None, 'library table'), ('go', None, 'bar'), ('introduce', None, None)]
-        >>> CommandExtractor().getActions('go to desk find amanda and exit')
-        [('go', None, 'desk'), ('find', 'amanda', None), ('exit', None, None)]
-        >>> CommandExtractor().getActions('bring me a drink')
-        [('bring', 'drink', None)]
-        >>> CommandExtractor().getActions('carry a drink to table')
-        [('carry', 'drink', 'table')]
-        >>> CommandExtractor().getActions('navigate to shelf')
-        [('navigate', None, 'shelf')]
-        >>> CommandExtractor().getActions('carry a toy to table')
-        [('carry', 'toy', 'table')]
-        >>> CommandExtractor().getActions('bring snack to appliance')
-        [('bring', 'snack', 'appliance')]
-        """
-        output = []
+    def cut_sentence(self, command):
+        commands = []
         words = command.split()
         for i in xrange(0,len(words)):
-            if selfs.isVerb(words[i].lower()):
+            word = words[i].lower()
+            if self.isVerb(word) or self.isPreposition(word):
                 startSentence = command.find(words[i])
                 endSentence = -1
                 for j in xrange(i+1,len(words)):
-                    if selfs.isVerb(words[j]):
+                    if self.isVerb(words[j]) or self.isPreposition(words[j].lower()):
                         endSentence = command.find(words[j],startSentence + len(words[i]) - 1)
                         break
                 if endSentence == -1:
                     endSentence = len(command)
                 sentence = command[startSentence:endSentence]
-                command = command[endSentence:-1]
-                output.append((words[i],selfs.getObject(sentence),selfs.getData(sentence)))
-        return output
+                command = command[endSentence:]
+                commands.append(sentence)
+        return commands
+
+    def extract_sentence(self, sentence ,output):
+        words = sentence.split()
+        word = words[0]
+        object = self.getObject(sentence)
+        data = self.getData(sentence)
+        pronoun = None
+        if object != None:
+            pronoun = self.getPronoun(sentence.replace(object,''))
+            object2 = self.getObject(sentence.replace(object,''))
+            if object2!=None:
+                pronoun = self.getPronoun(sentence.replace(object2,''))
+                if sentence.index("%s"%object) > sentence.index("%s"%object2):
+                    output.append(Action(self.changeVerb(word), object, object2))
+                else:
+                    output.append(Action(self.changeVerb(word), object2, object))
+                return
+        else:
+            pronoun = self.getPronoun(sentence)
+
+
+        if pronoun != None and object == None:
+            object = pronoun
+        elif pronoun != None and data == None:
+            data = pronoun
+        if word == 'from':
+            output.insert(-1,Action(self.changeVerb(word), object, data))
+        elif word == 'to':
+            if data != None:
+                output[-1].data = data
+            elif object != None:
+                output[-1].data = object
+        elif word == 'in' or word == 'at':
+            old_data = output[-1].data
+            output[-1].data = None
+            output.append(Action(self.changeVerb(word), object, data))
+            output.append(Action('give', None, old_data))
+        else:
+            output.append(Action(self.changeVerb(word), object, data))
+
+    def replace_unknown_noun(self, output):
+        action_with_pronoun = None
+        action_with_object = None
+        for action in reversed(output):
+            if self.isPronoun(action.object) and action.data != None:
+                action_with_pronoun = action
+            elif action_with_object != None:
+                break
+            elif self.isObject(action.object) and action.data == None:
+                action_with_object = action
+        if action_with_object != None and action_with_pronoun != None:
+            action_with_pronoun.object = action_with_object.object
+            output.remove(action_with_object)
 
     #Check whether command is valid or not
     def isValidCommand(self, command):
@@ -198,10 +321,16 @@ class CommandExtractor(object):
         for object in self.objects:
             if object in command:
                 isObjectFound = True
+        for object in self.other_object:
+            if object in command:
+                isObjectFound = True
         for category in self.object_categories:
             if category in command:
                 isObjectCategoryFound = True
-        for location in self.locations:
+        for location in self.rooms:
+            if location in command:
+                isLocationFound = True
+        for location in self.places:
             if location in command:
                 isLocationFound = True
         for category in self.location_categories:
