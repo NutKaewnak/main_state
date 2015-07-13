@@ -11,6 +11,7 @@ class Devices:
     OBJECT = 'OBJECT'
     RIGHT_ARM = 'RIGHT_ARM'
     LEFT_ARM = 'LEFT_ARM'
+    HEIGHT = 'HEIGHT'
 
     def __init__(self):
         pass
