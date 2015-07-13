@@ -28,3 +28,6 @@ class AbstractSkill:
         # must define your own perform
         if self.state is 'init':
             self.state = 'succeed'
+
+    def wait(self, time):
+        self.perception_module.delay.set_waiting_time(time)

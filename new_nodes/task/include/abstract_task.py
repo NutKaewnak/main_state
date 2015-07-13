@@ -39,3 +39,6 @@ class AbstractTask:
     def perform(self, perception_data):
         # must define your own perform
         pass
+
+    def wait(self, time):
+        self.perception_module.delay.set_waiting_time(time)

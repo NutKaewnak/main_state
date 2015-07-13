@@ -11,6 +11,8 @@ from perception.object_detect import ObjectDetect
 from perception.right_arm import RightArm
 from perception.left_arm import LeftArm
 
+from perception.delay import Delay
+
 
 class PerceptionModule:
 
@@ -25,3 +27,5 @@ class PerceptionModule:
         self.object = ObjectDetect(main_state.planningModule)
         self.right_arm = RightArm(main_state.planningModule)
         self.left_arm = LeftArm(main_state.planningModule)
+
+        self.delay = Delay()

@@ -38,3 +38,6 @@ class AbstractSubtask:
         # must define your own perform
         if self.state is 'init':
             self.change_state('finish')
+
+    def wait(self, time):
+        self.perception_module.delay.set_waiting_time(time)

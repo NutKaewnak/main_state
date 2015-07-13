@@ -21,5 +21,10 @@ class PlanningModule:
         self.subtaskBook.set_perception(perception_module)
         self.taskBook.set_perception(perception_module)
 
+        self.perceptionModule = perception_module
+
     def perform(self, perception_data):
+        if self.perceptionModule.delay.is_waiting():
+            return
+
         self.taskBook.book[self.task].act(perception_data)
