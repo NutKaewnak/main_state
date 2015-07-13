@@ -1,11 +1,11 @@
 __author__ = 'Nicole'
 import rospy
+import roslib
 from include.abstract_task import AbstractTask
 from include.delay import Delay
 
 
 class ManipulationTask(AbstractTask):
-    # need reportlab to run this task
     def __init__(self, planning_module):
         AbstractTask.__init__(self, planning_module)
         self.subtask = None
@@ -13,11 +13,13 @@ class ManipulationTask(AbstractTask):
         self.number_object_found = 0
         self.pdf_file = None
         self.delay = Delay()
+        self.latex = None
+        self.is_make_latex = False
 
     def perform(self, perception_data):
         if self.state is 'init':
             # self.pdf_file = something
-            self.subtask = self.subtaskBook.get_subtask(self, 'Recognition')  # this subtask is not created
+            self.subtask = self.subtaskBook.get_subtask(self, 'ObjectRecognition')  # this subtask is not created
             self.delay.wait(90)
             self.change_state('recognition_object_on_shelf')
 
@@ -43,6 +45,7 @@ class ManipulationTask(AbstractTask):
                 self.change_state('run_out_of_time')
 
         elif self.state is 'run_out_of_time':
+            self.on_end_latex()
             self.subtaskBook.get_subtask(self, 'Say').say('I\'m running out of time.')
             self.change_state('prepare_to_pick_object')
 
@@ -60,12 +63,39 @@ class ManipulationTask(AbstractTask):
                     self.number_object_found -= 1
 
     def to_pdf(self, object_to_pdf):
+        if self.is_make_latex:
+            self.make_tex_header()
+
+        string_pic = 'object_description\n\\begin{figure}\n\\centering\n\\includegraphics[height=6.2cm]{' \
+                     'object_picture_position}\n\\label{fig:base}\n\\end{figure}\n'
+
         # wait for object P'muk here NOT FINISH
-        from reportlab.pdfgen import canvas
-        from reportlab.lib.units import cm
-        image = object_to_pdf.get_picture()
-        c = canvas.Canvas(self.number_object_found + '.pdf')
-        c.drawImage(image, 40, 300, 38.46/2*cm, 24.12/2*cm)
-        c.drawString(10*cm, 15*cm, 'something')
-        c.showPage()
-        c.save()
+        obj = string_pic.replace('object_description', object_to_pdf.time_stamp + '\n' + object_to_pdf.name)
+        obj = obj.replace('object_picture_position', object_to_pdf.picture_directory)
+        self.latex.write(obj + '\n\n')
+
+    def make_tex_header(self):
+        self.latex = open(roslib.packages.get_pkg_dir('main_state') + '/object.tex', 'rw')
+        string_header = ['\documentclass[10pt,a4paper]{llncs}',
+                         '\usepackage[latin1]{inputenc}'
+                         '\usepackage{amsmath}'
+                         '\usepackage{amsfonts}',
+                         '\usepackage{amssymb}',
+                         '\usepackage{graphicx}',
+                         '',
+                         '\\begin{document}',
+                         '',
+                         '\\title{SKUBA 2015 Object Recognition Report}',
+                         '\\author{ }',
+                         '\institute{ }',
+                         '\maketitle', '']
+        for line in string_header:
+            self.latex.write(line + '\n')
+        self.is_make_latex = True
+
+    def on_end_latex(self):
+        from subprocess import call
+
+        self.latex.write('\end{document}')
+        self.latex.close()
+        call(['pdflatex', 'object.tex'])
