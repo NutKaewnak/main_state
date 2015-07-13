@@ -281,6 +281,48 @@ class CommandExtractor(object):
             action_with_pronoun.object = action_with_object.object
             output.remove(action_with_object)
 
+    def count_command(self, list_action):
+        """
+        >>> CommandExtractor().count_command(CommandExtractor().getActions("bring a coke from bathroom to the desk"))
+        3
+        >>> CommandExtractor().count_command(CommandExtractor().getActions("go to the bedroom, find a person and tell the time"))
+        3
+        >>> CommandExtractor().count_command(CommandExtractor().getActions("go to the dinner-table, grasp the crackers, and take them to the side-table"))
+        3
+        >>> CommandExtractor().count_command(CommandExtractor().getActions("bring a coke to the person in the living room and answer him a question"))
+        4
+        >>> CommandExtractor().count_command(CommandExtractor().getActions("go to the door, ask the person there for her name and tell it to me"))
+        3
+        >>> CommandExtractor().count_command(CommandExtractor().getActions("go to the bedroom, find the waving person and tell the time"))
+        3
+        >>> CommandExtractor().count_command(CommandExtractor().getActions("go to the kitchen, find a person and follow her"))
+        3
+        >>> CommandExtractor().count_command(CommandExtractor().getActions("go to the side-table, grasp the coke, and take it to the dinner table"))
+        3
+        >>> CommandExtractor().count_command(CommandExtractor().getActions("go to the dinner-table, grasp the banana, and take it to the side-table"))
+        3
+        >>> CommandExtractor().count_command(CommandExtractor().getActions("take the coke from the sink and carry it to me"))
+        3
+        >>> CommandExtractor().count_command(CommandExtractor().getActions("go to the kitchen, grasp the coke, and take it to the side-table"))
+        3
+        >>> CommandExtractor().count_command(CommandExtractor().getActions("go to the bathroom, grasp the soap, and take it to the side-table"))
+        3
+        >>> CommandExtractor().count_command(CommandExtractor().getActions("grasp the coke from the small table and carry it to me"))
+        3
+        >>> CommandExtractor().count_command(CommandExtractor().getActions("deliver a coke to frank in the kitchen"))
+        3
+        >>> CommandExtractor().count_command(CommandExtractor().getActions("offer a coke to frank in the kitchen"))
+        3
+        >>> CommandExtractor().count_command(CommandExtractor().getActions("offer a coke to the person at the door"))
+        3
+        """
+        count = 0
+        for action in list_action:
+            count += 1
+            if action.action == 'grasp' and action.data != None and action.object != None:
+                count += 1
+        return count
+
     #Check whether command is valid or not
     def isValidCommand(self, command):
         """
