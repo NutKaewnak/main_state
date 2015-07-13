@@ -18,7 +18,7 @@ class Action:
         self.data = data
 
     def __repr__(self):
-        return "(%s, %s, %s)"%(self.action, self.data, self.object)
+        return "(%s, %s, %s)" % (self.action, self.data, self.object)
 
 def readFileToList(filename):
     output = []
@@ -95,8 +95,8 @@ class CommandExtractor(object):
             return None
         for word in ['me', 'him', 'her', 'it', 'them']:
             words = sentence.split()
-            if word in words: #and self.getObject(" ".join(words[words.index(word):])) == None:
-                return  word
+            if word in words:  # and self.getObject(" ".join(words[words.index(word):])) == None:
+                return word
         return None
 
     def hasPronoun(self, sentence):
@@ -117,7 +117,8 @@ class CommandExtractor(object):
     def changeVerb(self, word):
         if word in ['approach', 'drive', 'enter', 'go', 'head', 'move', 'navigate', 'point']:
             return 'go'
-        elif word in ['bring', 'carry', 'deliver', 'get', 'give', 'grab', 'grasp', 'hand', 'hold', 'pick', 'pick up', 'take', 'offer']:
+        elif word in ['bring', 'carry', 'deliver', 'get', 'give', 'grab', 'grasp', 'hand', 'hold', 'pick', 'pick up',
+                      'take', 'offer']:
             return 'grasp'
         elif word in ['announce', 'notify', 'remind', 'speak', 'tell']:
             return 'tell'
@@ -204,7 +205,7 @@ class CommandExtractor(object):
         """
         output = []
         for sentence in self.cut_sentence(command):
-            self.extract_sentence(sentence,output)
+            self.extract_sentence(sentence, output)
 
         self.replace_unknown_noun(output)
         return output
@@ -228,18 +229,18 @@ class CommandExtractor(object):
                 commands.append(sentence)
         return commands
 
-    def extract_sentence(self, sentence ,output):
+    def extract_sentence(self, sentence, output):
         words = sentence.split()
         word = words[0]
         object = self.getObject(sentence)
         data = self.getData(sentence)
         pronoun = None
         if object != None:
-            pronoun = self.getPronoun(sentence.replace(object,''))
-            object2 = self.getObject(sentence.replace(object,''))
-            if object2!=None:
-                pronoun = self.getPronoun(sentence.replace(object2,''))
-                if sentence.index("%s"%object) > sentence.index("%s"%object2):
+            pronoun = self.getPronoun(sentence.replace(object, ''))
+            object2 = self.getObject(sentence.replace(object, ''))
+            if object2 != None:
+                pronoun = self.getPronoun(sentence.replace(object2, ''))
+                if sentence.index("%s" % object) > sentence.index("%s" % object2):
                     output.append(Action(self.changeVerb(word), object, object2))
                 else:
                     output.append(Action(self.changeVerb(word), object2, object))
@@ -247,13 +248,12 @@ class CommandExtractor(object):
         else:
             pronoun = self.getPronoun(sentence)
 
-
         if pronoun != None and object == None:
             object = pronoun
         elif pronoun != None and data == None:
             data = pronoun
         if word == 'from':
-            output.insert(-1,Action(self.changeVerb(word), object, data))
+            output.insert(-1, Action(self.changeVerb(word), object, data))
         elif word == 'to':
             if data != None:
                 output[-1].data = data
