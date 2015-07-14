@@ -39,11 +39,12 @@ class NavigationTask(AbstractTask):
                 self.subtask.to_location('waypoint_1')  # must change
 
         elif self.state is 'prepare_to_waypoint2':
-            rospy.loginfo('going to waypoint 2')
-            self.delay.wait(150)
-            self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
-            self.subtask.to_location('waypoint_2')  # must change
-            self.change_state('going_to_waypoint2')
+            if self.current_subtask.state is 'finish':
+                rospy.loginfo('going to waypoint 2')
+                self.delay.wait(150)
+                self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
+                self.subtask.to_location('waypoint_2')  # must change
+                self.change_state('going_to_waypoint2')
 
         elif self.state is 'going_to_waypoint2':
             if self.subtask.state is 'finish' or not self.delay.is_waiting():
@@ -54,10 +55,18 @@ class NavigationTask(AbstractTask):
             elif self.subtask.state is 'error aborted':
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveRelative')
                 self.subtask.set_postion(0, 0, math.pi)
+                self.change_state('move_back')
+
+        elif self.state is 'move_back':
+            if self.subtask.state is 'finish':
+                self.subtask.set_postion(1.5, 0, math.pi)
                 self.change_state('finding_obstacle_waypoint2')
 
+        elif self.state is 'prepare_find_obstacle_waypoint2':
+            if self.subtask.state is 'finish':
+                self.subtask = self.subtaskBook.get_subtask(self, 'DetectFrontPerson')  # detect if people is blocking
+
         elif self.state is 'finding_obstacle_waypoint2':
-            self.subtask = self.subtaskBook.get_subtask(self, 'DetectFrontPerson')  # detect if people is blocking
             if self.subtask.state is 'found':
                 self.change_state('blocked_by_people')
             elif self.subtask.state is 'not_found':
