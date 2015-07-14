@@ -16,7 +16,7 @@ class Height(AbstractPerception):
                          FollowJointTrajectoryActionResult, self.callback_status)
 
     def callback_position(self, data):
-        self.height_data.pos = data.actual.positions[0]
+        self.height_data.pos = data.actual.positions[0]  # 0.02 0.2
         self.broadcast(Devices.NECK, self.height_data)
 
     def callback_status(self, data):
