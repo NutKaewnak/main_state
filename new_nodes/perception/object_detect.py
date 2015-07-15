@@ -32,7 +32,7 @@ class ObjectDetect(AbstractPerception):
         if len(name_array) == len(centroid_array):
             counter = len(name_array)
             for i in range(counter):
-                directory = roslib.packages.get_pkg_dir('tabletop') + '/out/object_' + name_array[i] + '.png'
+                directory = roslib.packages.get_pkg_dir('object_recognition') + '/out/object_' + name_array[i] + '.png'
                 object_array.append(DetectedObject(name_array[i], centroid_array[i], time_stamp, directory))
 
         self.broadcast(Devices.OBJECT, ObjectDetectData(object_array, object_status(data.result)))
