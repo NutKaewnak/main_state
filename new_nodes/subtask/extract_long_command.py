@@ -1,10 +1,10 @@
 __author__ = 'Frank'
 
-import roslib
 from include.command_extractor import CommandExtractor
 from include.abstract_subtask import AbstractSubtask
 
-class extract_long_command(AbstractSubtask):
+
+class ExtractLongCommand(AbstractSubtask):
     def __init__(self, planning_module):
         AbstractSubtask.__init__(self, planning_module)
         self.skill = self.current_skill
@@ -22,13 +22,17 @@ class extract_long_command(AbstractSubtask):
             self.change_state('wait_for_command')
 
         elif self.state is 'wait_for_command':
-            if perception_data.device is 'VOICE':
-                sentence = perception_data.input
-                if self.command_extractor.isValidCommand(sentence):
-                    self.data.append(self.command_extractor.getActions(sentence))
-                    self.num_actions = self.command_extractor.count_command(self.data)
-                    if self.num_actions >= 3:
-                        self.change_state('wait_for_confirm')
+            if self.skill.state is 'succeeded':
+                if perception_data.device is 'VOICE':
+                    sentence = perception_data.input
+                    if self.command_extractor.isValidCommand(sentence):
+                        self.data.append(self.command_extractor.getActions(sentence))
+                        self.num_actions = self.command_extractor.count_command(self.data)
+                        if self.num_actions >= 3:
+                            self.change_state('confirm')
+
+        elif self.state is 'confirm':
+            self.skill.say
 
         elif self.state is 'wait_for_confirm':
             if perception_data.device is 'VOICE':
@@ -37,3 +41,5 @@ class extract_long_command(AbstractSubtask):
                 elif perception_data.input is 'robot no':
                     self.skill.say('Your is canceled.')
                     self.change_state('init')
+
+    def confirm_command(self, data):
