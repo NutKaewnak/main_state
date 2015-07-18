@@ -8,7 +8,7 @@ from std_msgs.msg import String
 class CircleDetection(AbstractPerception):
     def __init__(self, planning_module):
         AbstractPerception.__init__(self, planning_module)
-        rospy.Subscriber("/door/status", String, self.callback_circle_detection)
+        rospy.Subscriber("/color_detect_output", String, self.callback_circle_detection)
 
         self.color = {'red': [0, 0], 'yellow': [0, 0], 'green': [0, 0]}
 

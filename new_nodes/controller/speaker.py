@@ -13,7 +13,10 @@ class Speaker:
         self.process = subprocess.Popen(["espeak", "-ven+f4", message, "-s 120"])
 
     def is_finish(self):
-        if self.process.poll() == 0:
-            return True
-        else:
+        if self.process is None:
             return False
+        elif self.process.poll() != 0:
+            return False
+        else:
+            self.process = None
+            return True
