@@ -18,6 +18,8 @@ from pick import Pick
 from detect_waving_people import DetectWavingPeople
 from search_waving_people import SearchWavingPeople
 from detect_front_person import DetectFrontPerson
+from object_recognition_subtask import ObjectRecognition
+from set_height_relative import SetHeightRelative
 from scissor_rock_paper import ScissorRockPaper
 
 
@@ -38,11 +40,12 @@ class SubtaskBook:
         self.book['QuestionAnswer'] = QuestionAnswer(planning_module)
         self.book['MoveAbsolute'] = MoveAbsolute(planning_module)
         self.book['Say'] = Say(planning_module)
-        self.book['ExtractObjectLocation'] = ExtractObjectLocation(planning_module)
         self.book['Pick'] = Pick(planning_module)
         self.book['DetectWavingPeople'] = DetectWavingPeople(planning_module)
         self.book['SearchWavingPeople'] = SearchWavingPeople(planning_module)
         self.book['DetectFrontPerson'] = DetectFrontPerson(planning_module)
+        self.book['ObjectRecognition'] = ObjectRecognition(planning_module)
+        self.book['SetHeightRelative'] = SetHeightRelative(planning_module)
         self.book['ScissorRockPaper'] = ScissorRockPaper(planning_module)
 
     def get_subtask(self, task, subtask_name):

@@ -11,7 +11,7 @@ class Introduce(AbstractSubtask):
         if self.state is 'init':
             if self.skill is None:
                 self.skill = self.skillBook.get_skill(self, 'Say')
-            self.skill.say('Hello, my name is Lamyai. Please tell me what you want')
+            self.skill.say('Hello, my name is Lamyai.')
             self.change_state('saying')
 
         elif self.state is 'saying':

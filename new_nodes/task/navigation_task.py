@@ -1,7 +1,6 @@
-import math
-
 __author__ = 'Nicole'
 import rospy
+import math
 from include.abstract_task import AbstractTask
 from include.delay import Delay
 
@@ -49,8 +48,8 @@ class NavigationTask(AbstractTask):
         elif self.state is 'going_to_waypoint2':
             if self.subtask.state is 'finish' or not self.delay.is_waiting():
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                self.subtask.say('I will leaving arena')
-                self.change_state('prepare_leave_arena')
+                self.subtask.say('I will go to waypoint 3')
+                self.change_state('prepare_to_waypoint3')
 
             elif self.subtask.state is 'error aborted':
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveRelative')
@@ -82,8 +81,23 @@ class NavigationTask(AbstractTask):
             self.subtask.toLocation('waypoint 2')  # must change
             self.change_state('going_to_waypoint2')
 
+        elif self.state is 'prepare_to_waypoint3':
+            if self.current_subtask.state is 'finish':
+                rospy.loginfo('going to waypoint 3')
+                self.delay.wait(150)
+                self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
+                self.subtask.to_location('waypoint_3')  # must change
+                self.change_state('going_to_waypoint3')
+
+        elif self.state is 'going_to_waypoint3':
+            if self.subtask.state is 'finish' or not self.delay.is_waiting():
+                self.subtask = self.subtaskBook.get_subtask(self, 'Say')
+                self.subtask.say('I will leaving arena')
+                self.change_state('prepare_leave_arena')
+
         elif self.state is 'prepare_leave_arena':
-            self.subtask = self.subtaskBook(self, 'LeaveArena')
+            rospy.loginfo('leave arena')
+            self.subtask = self.subtaskBook.get_subtask(self, 'LeaveArena')
             self.change_state('leave_arena')
 
         elif self.state is 'leave_arena':

@@ -9,7 +9,7 @@
 		<location name="library table" position="0.125, -14.054" rotation="1.848" height="0.70"/>
 		<location name="white shelf" position="-1.313, -15.486" rotation="-1.588" height="0.90"/>
 	</room>
-	<room name="living room" position="4.245, -15.171" rotation="0.890" height="0.70">
+	<room name="living_room" position="6.423, 3.959" rotation="1.560" height="0.70">
 		<locaiton name="living table" position="6.092, -13.962" rotation="-3.136" height="0.70"/>
 		<locaiton name="showcase" position="5.477, -11.492" rotation="1.566" height="0.70"/>
 		<locaiton name="sofa" position="4.727, -13.145" rotation="3.136" height="0.70"/>
@@ -27,24 +27,20 @@
         <location name="bar" position="2.286,-20.063" rotation="-2.413" height="1.29"/>
 	</room>
 	<location name="entrance" position="2.656, -7.349" rotation="3.126" height="1.29"/>
-    <location name="exit" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
+    <location name="exit" position="-0.310, 6.381" rotation="3.140" height="1.29"/>
     <location name="location one" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
     <location name="location two" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
     <location name="location three" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
     <location name="snack shelf" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
     <location name="drink shelf" position="-2.168, -17.241" rotation="3.097" height="1.29"/>
-    <location name="PickPlace" position="-0.685, -3.984" rotation="3.133" height="0.7"/>
-    <location name="notFound" position="-1.524, -1.386" rotation="1.561" height="1.29"/>
-    <location name="LeaveArena" position="3.524, 3.575" rotation="0.007" height="1.29"/>
-    <location name="detect" position="-4.978, 2.268" rotation="0.155" height="1.29"/>
     <location name="party room" position="-3.855, 4.601" rotation="2.632" height="1.29"/>
     <location name="kitchen table" position="-5.655, -4.016" rotation="-3.126" height="0.7"/>
-    <location name="reception table" position="-0.655, -3.996" rotation="-3.133" height="1.29"/>
     <location name="bar" position="-2.102, -0.4630" rotation="1.557" height="1.29"/>
-    <location name="dining table" position="-5.566, 6.874" rotation="3.137" height="1.29"/>
+    <location name="dinner_table" position="6.807, 6.987" rotation="-0.009" height="1.29"/>
     <location name="side table" position="-2.335, 6.438" rotation="0.063" height="1.29"/>
     <location name="living table" position="1.649, 6.928" rotation="0.026" height="1.29"/>
-    <location name="waypoint_1" position=" 4.769, 0.358" rotation="-1.415" height="1.29"/>
-    <location name="waypoint_2" position=" 4.621, -13.301" rotation="-2.968" height="1.29"/>
-    <location name="waypoint_3" position="  5.768, -7.461" rotation="1.701" height="1.29"/>
+    <location name="waypoint_1" position="6.448, 1.124" rotation="1.524" height="1.29"/>
+    <location name="waypoint_2" position="9.862, 6.965" rotation="-3.139" height="1.29"/>
+    <location name="waypoint_3" position="5.216, 6.224" rotation="3.126" height="1.29"/>
+    <location name="hallway_table" position="2.981, 2.737" rotation="-1.600" height="1.29"/>
 </location_information>

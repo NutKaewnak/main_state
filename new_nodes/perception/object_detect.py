@@ -17,12 +17,14 @@ def object_status(status):
             return 'no_object'
         elif status == 3:
             return 'found_object'
+        elif status == 4 or status == 5:
+            return 'other_error'
 
 
 class ObjectDetect(AbstractPerception):
     def __init__(self, planning_module):
         AbstractPerception.__init__(self, planning_module)
-        rospy.Subscriber('/tabletop_object_detection', ObjectDetection, self.callback_object_point)
+        # rospy.Subscriber('/tabletop_object_detection', ObjectDetection, self.callback_object_point)
 
     def callback_object_point(self, data):
         name_array = data.names

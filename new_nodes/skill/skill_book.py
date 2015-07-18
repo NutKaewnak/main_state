@@ -7,6 +7,7 @@ from say import Say
 from confirm import Confirm
 from turn_neck import TurnNeck
 from pick import Pick
+from set_height_relative import SetHeightRelative
 from count import Count
 
 
@@ -20,6 +21,7 @@ class SkillBook:
         self.book['Confirm'] = Confirm(control_module)
         self.book['TurnNeck'] = TurnNeck(control_module)
         self.book['Pick'] = Pick(control_module)
+        self.book['SetHeightRelative'] = SetHeightRelative(control_module)
         self.book['Count'] = Count(control_module)
 
     def get_skill(self, subtask, skill_name):

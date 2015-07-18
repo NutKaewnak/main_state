@@ -10,4 +10,4 @@ class TorsoController:
 
     def set_height_relative(self, height):
         rospy.loginfo("Set height to " + str(height))
-        self.torso.move_joint(height)
+        self.torso.move_joint([height])
