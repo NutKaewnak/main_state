@@ -20,8 +20,8 @@ class Count(AbstractSkill):
             self.timer.wait(1)
             self.change_state('waiting')
         elif self.state is 'waiting':
-            if not self.timer.is_waiting():
-                if self.time == 0:
+            if not self.timer.is_waiting() and self.controlModule.speaker.is_finish():
+                if self.time <= 0:
                     self.change_state('succeeded')
                 else:
                     self.change_state('start')
