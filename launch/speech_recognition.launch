@@ -3,6 +3,6 @@
     <remap from="/scan" to="/laser/scan"/>
   </node>-->
   <node name="main_state" pkg="main_state" type="main.py" output="screen" args="SpeechRecognition" />
-  <!--<include file="$(find speech_processing)/launch/question_Frank.launch" />-->
+  <include file="$(find speech_processing)/dic/50_questions/50_questions_new.launch" />
   
 </launch>

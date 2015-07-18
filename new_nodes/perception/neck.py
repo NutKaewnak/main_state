@@ -1,8 +1,7 @@
 __author__ = 'nicole'
 
 import rospy
-from dynamixel_msgs.msg import JointState
-from control_msgs.msg import FollowJointTrajectoryActionResult
+from control_msgs.msg import FollowJointTrajectoryActionResult, FollowJointTrajectoryFeedback
 from include.abstract_perception import AbstractPerception
 from include.devices import Devices
 
@@ -11,7 +10,8 @@ class Neck(AbstractPerception):
     def __init__(self, planning_module):
         AbstractPerception.__init__(self, planning_module)
         self.neck_pos = NeckPos()
-        rospy.Subscriber('/dynamixel/neck_controller/state', JointState, self.callback_position)
+        rospy.Subscriber('/dynamixel/neck_controller/state', 
+                         FollowJointTrajectoryFeedback, self.callback_position)
         rospy.Subscriber('/dynamixel/neck_controller/follow_joint_trajectory/result',
                          FollowJointTrajectoryActionResult, self.callback_status)
 
@@ -26,7 +26,7 @@ class Neck(AbstractPerception):
 
 
 class NeckPos:
-    def __init__(self):
+    def __init__(self, status=0):
         self.tilt = None
         self.pan = None
-        self.status = None
+        self.status = status

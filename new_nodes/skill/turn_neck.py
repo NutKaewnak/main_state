@@ -11,7 +11,7 @@ class TurnNeck(AbstractSkill):
         self.tilt = None
 
     def perform(self, perception_data):
-        if self.state is 'active':
+        if self.state is 'active' or self.state is 'pending':
             if perception_data.device is 'NECK':
                 self.pan = perception_data.input.pan
                 self.tilt = perception_data.input.tilt
