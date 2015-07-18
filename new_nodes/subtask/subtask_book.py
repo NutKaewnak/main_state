@@ -14,11 +14,11 @@ from question_answer import QuestionAnswer
 from people_detect import PeopleDetect
 from move_absolute import MoveAbsolute
 from say import Say
-from extract_object_location import ExtractObjectLocation
 from pick import Pick
 from detect_waving_people import DetectWavingPeople
 from search_waving_people import SearchWavingPeople
 from detect_front_person import DetectFrontPerson
+from scissor_rock_paper import ScissorRockPaper
 
 
 class SubtaskBook:
@@ -43,6 +43,7 @@ class SubtaskBook:
         self.book['DetectWavingPeople'] = DetectWavingPeople(planning_module)
         self.book['SearchWavingPeople'] = SearchWavingPeople(planning_module)
         self.book['DetectFrontPerson'] = DetectFrontPerson(planning_module)
+        self.book['ScissorRockPaper'] = ScissorRockPaper(planning_module)
 
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()
