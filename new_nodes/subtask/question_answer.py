@@ -38,7 +38,6 @@ class QuestionAnswer(AbstractSubtask):
             if self.skill.state is 'succeeded':
                 if perception_data.device is 'VOICE':
                     rospy.loginfo(perception_data.input)
-                    self.skill.say('The answer of the question ' + str(perception_data.input) + ' is ')
-                    self.skill.say(answers_the_questions.answers(perception_data.input))
+                    self.skill.say('The answer of the question ' + str(perception_data.input) + ' is ' + answers_the_questions.answers(perception_data.input) )
                     self.counter += 1
                     self.change_state('prepare_to_answer')
