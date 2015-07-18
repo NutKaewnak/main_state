@@ -1,0 +1,10 @@
+<launch>
+  <node name="main_state" pkg="main_state" type="main.py" output="screen" args="BasicFunctional" />
+  <node ns="door" name="door_detection" pkg="door_detection" type="door_detection_node">
+    <remap from="/scan" to="/laser/scan"/>    
+  </node>
+  <node ns="people" name="people_detection" pkg="people_detection" type="people_detection_node">
+    <remap from="peoplearray" to="/people_detection/people_array"/>
+  </node>
+
+</launch>
