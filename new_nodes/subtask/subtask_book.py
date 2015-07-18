@@ -38,7 +38,7 @@ class SubtaskBook:
         self.book['QuestionAnswer'] = QuestionAnswer(planning_module)
         self.book['MoveAbsolute'] = MoveAbsolute(planning_module)
         self.book['Say'] = Say(planning_module)
-        self.book['ExtractObjectLocation'] = ExtractObjectLocation(planning_module)
+        #self.book['ExtractObjectLocation'] = ExtractObjectLocation(planning_module)
         self.book['Pick'] = Pick(planning_module)
         self.book['DetectWavingPeople'] = DetectWavingPeople(planning_module)
         self.book['SearchWavingPeople'] = SearchWavingPeople(planning_module)
