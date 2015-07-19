@@ -8,6 +8,7 @@ class Delay:
         self.period = 0
 
     def wait(self, period):
+        # in seconds
         self.period = period
         self.start_time = time.localtime()
 

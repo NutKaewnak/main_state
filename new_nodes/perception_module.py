@@ -10,7 +10,7 @@ from perception.people_detect import PeopleDetection
 from perception.object_detect import ObjectDetect
 from perception.right_arm import RightArm
 from perception.left_arm import LeftArm
-
+from perception.circle_detection import CircleDetection
 from perception.delay import Delay
 
 
@@ -27,5 +27,5 @@ class PerceptionModule:
         self.object = ObjectDetect(main_state.planningModule)
         self.right_arm = RightArm(main_state.planningModule)
         self.left_arm = LeftArm(main_state.planningModule)
-
+        self.circle_detection = CircleDetection(main_state.planningModule)
         self.delay = Delay()

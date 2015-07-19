@@ -12,8 +12,10 @@ class Delay:
         self.start_time = time.localtime()
 
     def is_waiting(self):
-        current_time = time.localtime()
-        if time.mktime(current_time) - time.mktime(self.start_time) >= self.period:
+        if self.get_dif() >= self.period:
             return False
         return True
 
+    def get_dif(self):
+        current_time = time.localtime()
+        return time.mktime(current_time) - time.mktime(self.start_time)

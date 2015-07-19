@@ -12,6 +12,7 @@ class Devices:
     RIGHT_ARM = 'RIGHT_ARM'
     LEFT_ARM = 'LEFT_ARM'
     HEIGHT = 'HEIGHT'
+    CIRCLE_DETECT = 'CIRCLE_DETECT'
 
     def __init__(self):
         pass
