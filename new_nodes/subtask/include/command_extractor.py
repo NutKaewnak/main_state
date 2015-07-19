@@ -152,8 +152,42 @@ class CommandExtractor(object):
             return True
         return False
 
+    def getVerb(self, sentence):
+        for verb in self.verbs:
+            verb = ' %s '%verb
+            if verb in ' %s '%sentence:
+                return verb.strip()
+        return None
+
+    def replace_verb(self, sentence):
+        sentence = " %s "%sentence
+        # print sentence
+        for verb in	[' bring ', ' carry ', ' deliver ', ' take ']:
+            if verb in sentence:
+                sentence = sentence.replace(verb, ' bring ')
+                # sentence = sentence.strip()
+        for verb in	[' find ', ' look for ']:
+            if verb in sentence:
+                sentence = sentence.replace(verb, ' find ')
+                # return sentence.strip()
+        for verb in	[' go to ', ' navigate to ', ' reach ', ' get into ']:
+            if verb in sentence:
+                sentence = sentence.replace(verb, ' go to ')
+                # return sentence.strip()
+        for verb in	[' take ', ' grasp ', ' get ']:
+            if verb in sentence:
+                sentence = sentence.replace(verb, ' take ')
+                # return sentence.strip()
+        for verb in	[' tell ', ' say ', ' speak ']:
+            # print sentence
+            if verb in sentence:
+                # print verb
+                sentence = sentence.replace(verb, ' tell ')
+                # return sentence.strip()
+        return sentence.strip()
+
     def changeVerb(self, word):
-        if word in ['approach', 'drive', 'enter', 'go', 'head', 'move', 'navigate', 'point']:
+        if word in ['approach', 'drive', 'enter', 'go', 'head', 'move', 'navigate', 'point', 'get into']:
             return 'go'
         elif word in ['bring', 'carry', 'deliver', 'get', 'give', 'grab', 'grasp', 'hand', 'hold', 'pick', 'pick up', 'take', 'offer','retrieve']:
             return 'grasp'
@@ -177,6 +211,24 @@ class CommandExtractor(object):
             return 'to'
         elif word in ['from', 'in', 'at', 'on']:
             return 'go'
+        return None
+
+    def get_object_categories(self, sentence):
+        sentence = sentence.strip()
+        sentence = " %s "%sentence
+        for category in self.object_categories:
+            category = " %s "%category
+            if category in sentence:
+                return category.strip()
+        return None
+
+    def get_location_categories(self, sentence):
+        sentence = sentence.strip()
+        sentence = " %s "%sentence
+        for category in self.location_categories:
+            category = " %s "%category
+            if category in sentence:
+                return category.strip()
         return None
 
     def __init__(self):
@@ -277,16 +329,33 @@ class CommandExtractor(object):
         [(go, small table, None), (grasp, None, coke)]
         >>> CommandExtractor().getActions('take me a coke on small table')
         [(go, small table, None), (grasp, me, coke)]
+        >>> CommandExtractor().getActions("find a person in the bathroom and answer a question")
+        [(go, bathroom, None), (find, None, person), (answer, None, question)]
+        >>> CommandExtractor().getActions("find a person in the bathroom and tell what day is tomorrow")
+        [(go, bathroom, None), (find, None, person), (tell, None, what day is tomorrow)]
+        >>> CommandExtractor().getActions("find a person in the bathroom and tell the day of the week")
+        [(go, bathroom, None), (find, None, person), (tell, None, the day of the week)]
+        >>> CommandExtractor().getActions("find a person in the bathroom and tell your name")
+        [(go, bathroom, None), (find, None, person), (tell, None, your name)]
+        >>> CommandExtractor().getActions("find a person in the bathroom and tell the name of your team")
+        [(go, bathroom, None), (find, None, person), (tell, None, the name of your team)]
+        >>> CommandExtractor().getActions("find a person in the bathroom and tell the name of your team")
+        [(go, bathroom, None), (find, None, person), (tell, None, the name of your team)]
+        >>> CommandExtractor().getActions("take a coke from bedroom and deliver it to frank in bathroom")
+        [(go, bedroom, None), (grasp, None, coke), (go, bathroom, None), (give, frank, None)]
         """
         output = []
         for sentence in self.cut_sentence(command):
             self.extract_sentence(sentence,output)
 
+        # print output
         self.replace_unknown_noun(output)
+        # print output
         return output
 
     def cut_sentence(self, command):
         commands = []
+        command = self.replace_verb(command)
         words = command.split()
         for i in xrange(0,len(words)):
             word = words[i].lower()
@@ -323,6 +392,8 @@ class CommandExtractor(object):
                 return
         else:
             pronoun = self.getPronoun(sentence)
+
+
         if pronoun != None and object == None:
             object = pronoun
         elif pronoun != None and data == None:
@@ -345,7 +416,6 @@ class CommandExtractor(object):
         else:
             output.append(Action(self.changeVerb(word), object, data))
 
-
     def replace_unknown_noun(self, output):
         action_with_pronoun = None
         action_with_object = None
@@ -356,9 +426,18 @@ class CommandExtractor(object):
                 break
             elif self.isObject(action.object) and action.data == None:
                 action_with_object = action
+        # print action_with_object, action_with_pronoun
         if action_with_object != None and action_with_pronoun != None:
             action_with_pronoun.object = action_with_object.object
             output.remove(action_with_object)
+
+        temp = None
+        for action in output:
+            if temp != None:
+                if action.action == 'grasp':
+                    output.remove(action)
+            if action.action == 'grasp':
+                temp = action
 
     def count_command(self, list_action):
         """
@@ -425,12 +504,78 @@ class CommandExtractor(object):
         >>> CommandExtractor().count_command(CommandExtractor().getActions('find a waving person in bathroom'))
         2
         """
+
         count = 0
         for action in list_action:
             count += 1
             if action.action == 'grasp' and action.data != None and action.object != None:
                 count += 1
         return count
+
+    def make_question(self, list_action):
+        """
+        >>> CommandExtractor().make_question(CommandExtractor().getActions('find a waving person in bathroom'))
+        'Do you want me go to bathroom, and find waving person.'
+        >>> CommandExtractor().make_question(CommandExtractor().getActions('look for a person and follow her to bathroom'))
+        'Do you want me follow person to the bathroom.'
+        >>> CommandExtractor().make_question(CommandExtractor().getActions('look for a person and answer a question'))
+        'Do you want me find person, and answer question.'
+        >>> CommandExtractor().make_question(CommandExtractor().getActions('look for a person and say what day is today'))
+        'Do you want me find person, and tell what day is today.'
+        >>> CommandExtractor().make_question(CommandExtractor().getActions('take the coke from bathroom and carry it to me'))
+        'Do you want me go to bathroom, and grasp coke to you.'
+        >>> CommandExtractor().make_question(CommandExtractor().getActions('take the coke from bathroom and carry it to frank which is in bedroom'))
+        'Do you want me go to bathroom, grasp coke, go to bedroom, and give it to frank.'
+        >>> CommandExtractor().make_question(CommandExtractor().getActions('take the coke from bathroom and carry it to frank at bedroom'))
+        'Do you want me go to bathroom, grasp coke, go to bedroom, and give it to frank.'
+        >>> CommandExtractor().make_question(CommandExtractor().getActions('take the coke from bathroom and carry it to frank in bedroom'))
+        'Do you want me go to bathroom, grasp coke, go to bedroom, and give it to frank.'
+        >>> CommandExtractor().make_question(CommandExtractor().getActions('take the coke from bathroom and carry it to bedroom'))
+        'Do you want me go to bathroom, and grasp coke to bedroom.'
+        >>> CommandExtractor().make_question(CommandExtractor().getActions('get into bedroom and look for a coke'))
+        'Do you want me go to bedroom, and find coke.'
+        >>> CommandExtractor().make_question(CommandExtractor().getActions('look for a person in bathroom and answer a question'))
+        'Do you want me go to bathroom, find person, and answer question.'
+        >>> CommandExtractor().make_question(CommandExtractor().getActions('look for a person in bathroom and say your name'))
+        'Do you want me go to bathroom, find person, and tell my name.'
+        """
+
+        sentence = ""
+        for action in list_action:
+            if list_action.index(action) == len(list_action)-1 and len(list_action) > 1:
+                sentence += 'and '
+            if action.action == 'go':
+                sentence += 'go to '
+                sentence += '%s '%action.data
+            elif action.action == 'grasp':
+                sentence += 'grasp '
+                sentence += '%s '%action.object
+                if action.data != None:
+                    sentence += 'to %s '%action.data
+            elif action.action == 'find':
+                sentence += 'find '
+                sentence += '%s '%action.object
+                if action.data != None:
+                    sentence += 'in %s '%action.data
+            elif action.action == 'follow':
+                sentence += 'follow '
+                sentence += '%s '%action.object
+                sentence += 'to the %s '%action.data
+            elif action.action == 'tell':
+                sentence += 'tell '
+                sentence += '%s '%action.object
+            elif action.action == 'give':
+                sentence += 'give it to %s '%action.data
+            elif action.action == 'answer':
+                sentence += 'answer '
+                sentence += '%s '%action.object
+            sentence = sentence.strip() + ', '
+        sentence = ' %s '%sentence[:-2]
+        if sentence.count(' me ') > 0:
+            sentence = sentence.replace(' me ',' you ')
+        if sentence.count(' your ') > 0:
+            sentence = sentence.replace(' your ',' my ')
+        return "Do you want me " + sentence.strip()  + '.'
 
 
     #Check whether command is valid or not
@@ -539,10 +684,22 @@ class CommandExtractor(object):
         isVerbFound = self.has_verb(command)
         isObjectFound = self.has_object(command)
         isLocationFound = self.has_data(command)
+
         return  (isVerbFound and (isObjectFound or isLocationFound))
+
 
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
-    # print CommandExtractor().getActions('offer a coke to the person at the door')
+    # a = 'take the coke from bathroom and carry it to me'
+    # print CommandExtractor().getActions(a)
+    # print CommandExtractor().count_command(CommandExtractor().getActions(a))
+    # print CommandExtractor().isValidCommand(a)
+    # print CommandExtractor().make_question(CommandExtractor().getActions(a))
+    # print CommandExtractor().getActions('find a coke and take it')
+    # print CommandExtractor().getActions("find a person in the bathroom and tell what time is it")
+    # print CommandExtractor().getActions("go to bathroom")
+    # print CommandExtractor().getActions("find a person in the bathroom and tell the name of your team")
+    # print CommandExtractor().get_object_categories("bring me a fruit")
+    # print CommandExtractor().getVerb("gett into bathroom")
 
