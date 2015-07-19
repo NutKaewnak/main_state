@@ -10,4 +10,6 @@
   <node name="circle_output" pkg="image_view" type="image_view">
     <remap from="image" to="/circle_detection/output"/>
   </node>
+
+  <node name="static_pub" pkg="rostopic" type="rostopic" args="pub /voice/output std_msgs/String hello "/>
 </launch>
