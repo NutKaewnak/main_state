@@ -16,8 +16,8 @@ class ControlModule:
     torso = TorsoController()
     left_arm = ArmController("left")
     right_arm = ArmController("right")
-    manipulator = ManipulateController()
-    gripper = GripperController()
+    #manipulator = ManipulateController()
+    #gripper = GripperController()
 
     def __init__(self):
         pass

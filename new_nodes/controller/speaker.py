@@ -1,17 +1,22 @@
 __author__ = "AThousandYears"
 
 import rospy
-import threading
-from subprocess import call
+import subprocess
 
 
 class Speaker:
     def __init__(self):
-        self.lock = threading.Lock()
+        self.process = None
 
     def speak(self, message):
-        #if self.lock.locked():
-        #    return
-        #with self.lock:
-            rospy.loginfo("Robot speak: " + message)
-            call(["espeak", "-ven+f4", message, "-s 120"])
+        rospy.loginfo("Robot speak: " + message)
+        self.process = subprocess.Popen(["espeak", "-ven+f4", message, "-s 120"])
+
+    def is_finish(self):
+        if self.process is None:
+            return False
+        elif self.process.poll() != 0:
+            return False
+        else:
+            self.process = None
+            return True
