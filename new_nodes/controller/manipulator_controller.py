@@ -1,6 +1,7 @@
 __author__ = "kandithws"
 
 import rospy
+import math
 import moveit_commander
 import moveit_msgs.msg
 import std_msgs.msg
@@ -44,9 +45,11 @@ class ManipulateController:
         self.pickstate["arm_group"] = None
         self.pickstate["objectposition"] = None
         self.pickstate["laststate"] = None
-        self.pickstate["ref_frame"] = None 
+        self.pickstate["ref_frame"] = None
         # self.pickstate["demo"] = False
         self.settorquelimit = {}
+        self.GRIPPER_OPENED = 0.0
+        self.GRIPPER_CLOSED = -0.8
 
         # try:
         #     self.settorquelimit["right_gripper"] = rospy.ServiceProxy('/dynamixel/right_gripper/set_torque_limit', SetTorqueLimit)
@@ -70,6 +73,7 @@ class ManipulateController:
         moveit_commander.roscpp_initialize(sys.argv)
         self.robot = moveit_commander.RobotCommander()
         self.scene = moveit_commander.PlanningSceneInterface()
+      
 
 
     def manipulate(self, arm_group, position, orientation_rpy=[0, 0, 0],tolerance = [0.05,0.1], ref_frame="base_link", planning_time=50.00):
@@ -93,8 +97,8 @@ class ManipulateController:
             self.robot.right_arm.set_pose_reference_frame(ref_frame)
             self.robot.right_arm.set_pose_target(pose_target)
             # DEBUG
-            plan = self.robot.right_arm.plan()
-            rospy.loginfo(str(plan))
+            #plan = self.robot.right_arm.plan()
+            #rospy.loginfo(str(plan))
             self.robot.right_arm.go(False)  # async_move
 
         elif arm_group == "left_arm":
@@ -133,6 +137,29 @@ class ManipulateController:
             jointstate[group_joint_names[i]] = group_current_joint_values[i]
 
         return jointstate
+
+    def move_relative(self,arm_group,relative_goal_translation,relative_goal_rotation):
+        #respect to efflink
+        if arm_group == "right_arm":
+            last_pose = self.robot.right_arm.get_current_pose()
+            rospy.loginfo( str(type(last_pose)  ) + '\n'+ str(last_pose)   )        
+            rpy = tf.transformations.euler_from_quaternion([last_pose.pose.orientation.x,
+                                                            last_pose.pose.orientation.y,
+                                                            last_pose.pose.orientation.z,
+                                                            last_pose.pose.orientation.w])
+            new_pose_translation = []
+            new_pose_translation.append(last_pose.pose.position.x + relative_goal_translation[0])
+            new_pose_translation.append(last_pose.pose.position.y + relative_goal_translation[1])
+            new_pose_translation.append(last_pose.pose.position.z + relative_goal_translation[2])
+            new_pose_rotation = []
+            new_pose_rotation.append(rpy[0] + relative_goal_rotation[0])
+            new_pose_rotation.append(rpy[1] + relative_goal_rotation[1])
+            new_pose_rotation.append(rpy[2] + relative_goal_rotation[2])
+            self.manipulate(arm_group,new_pose_translation,new_pose_rotation)
+
+
+
+
 
 
 
@@ -197,11 +224,19 @@ class ManipulateController:
         self.static_pose(self.pickstate["arm_group"], "right_init_picking")
 
 
-    def pickobject_pregrasp(self,tolerance = [0.05,0.1], pregrasp_distance=0.3, pregrasp_direction=[1.0, 0, 0]):
+    def pickobject_pregrasp(self):
+
+        rospy.loginfo('pregrasp')
+        self.pickstate["laststate"] = "pregrasp"
+        self.static_pose(self.pickstate["arm_group"],'right_pregrasp')
+
+
+    def pickobject_movetoobjectfront(self,tolerance = [0.05,0.1], pregrasp_distance=0.3, pregrasp_direction=[1.0, 0, 0]):
         ##TODO -- pregrasp in any direction, current x only
         
         pregraspposition = []
         pregrasp_value = self.pickstate["objectposition"][0] - pregrasp_distance
+        
         if pregrasp_value <= 0.35:
             pregrasp_value = 0.35
 
@@ -212,12 +247,6 @@ class ManipulateController:
         self.manipulate(self.pickstate["arm_group"], pregraspposition)
         rospy.loginfo("Moving" + self.pickstate["arm_group"] + "to x = " + str(pregrasp_value) + " ,y = " + str(
             self.pickstate["objectposition"][1]) + " ,z= " + str(self.pickstate["objectposition"][2]) + "\n respect to " + self.pickstate["ref_frame"])
-
-    def pickobject_pregrasp_planB(self):
-
-        rospy.loginfo('Using Plan B picking')
-        self.pickstate["laststate"] = "pregrasp"
-        self.static_pose(self.pickstate["arm_group"],'right_pregrasp')
 
 
 
@@ -244,6 +273,7 @@ class ManipulateController:
             #self.robot.right_arm.clear_pose_targets()
             #self.robot.right_arm.set_goal_position_tolerance(0.05)
             #self.robot.right_arm.set_goal_orientation_tolerance(0.1)
+            rospy.loginfo('point : ' + str(self.pickstate["objectposition"][0])  +  ' ' + str (self.pickstate["objectposition"][1])  + ' ' + str(self.pickstate["objectposition"][2]))
             self.manipulate(self.pickstate["arm_group"], self.pickstate["objectposition"] ,[0,0,0] ,tolerance)
             #self.robot.right_arm.go(False)
             #(path, fraction) = self.robot.right_arm.compute_cartesian_path(waypoint, step, 0.00, True)
