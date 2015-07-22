@@ -11,6 +11,7 @@ class AbstractSubtask:
         self.current_skill = None
         self.subtaskBook = None
         self.current_subtask = None
+        self.perception_data = None
 
     def reset(self):
         self.state = 'init'
@@ -28,6 +29,7 @@ class AbstractSubtask:
         self.state = new_state
 
     def act(self, perception_data):
+        self.perception_data = perception_data
         if self.current_skill is not None:
             self.current_skill.act(perception_data)
         if self.current_subtask is not None:

@@ -8,6 +8,7 @@ class AbstractSkill:
         self.controlModule = control_module
         self.perception_module = None
         self.Devices = None
+        self.perception_data = None
 
     def reset(self):
         self.state = 'init'
@@ -18,6 +19,7 @@ class AbstractSkill:
         self.Devices = perception_module.Devices
 
     def act(self, perception_data):
+        self.perception_data = perception_data
         self.perform(perception_data)
 
     def change_state(self, new_state):
