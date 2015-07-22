@@ -10,6 +10,7 @@ class AbstractTask:
         self.Devices = None
         self.subtaskBook = planning_module.subtaskBook
         self.current_subtask = None
+        self.perception_data = None
 
     def reset(self):
         self.state = 'init'
@@ -32,6 +33,7 @@ class AbstractTask:
         self.state = target_state
 
     def act(self, perception_data):
+        self.perception_data = perception_data
         if self.current_subtask is not None:
             self.current_subtask.act(perception_data)
         self.perform(perception_data)
