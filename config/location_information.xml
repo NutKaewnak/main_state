@@ -15,9 +15,9 @@
         <location name="bed" position="10.541, -0.487" rotation="-1.557" height="1.29"/>
         <location name="desk" position="7.634, -2.048" rotation="-1.550" height="0.70"/>
     </room>
-    <room name="hallway" position="4.590, -1.352" rotation="3.139" height="1.29">
+    <room name="hallway" position="4.590, -2.352" rotation="3.139" height="1.29">
         <location name="bookcase" position="1.850, -1.937" rotation="3.119" height="1.29"/>
-        <location name="hallway table" position="3.071, -0.268" rotation="1.596" height="0.70"/>
+        <location name="hallway table" position="2.660, -1.286" rotation="1.581" height="0.70"/>
     </room>
 
 	<location name="entrance" position="2.656, -7.349" rotation="3.126" height="1.29"/>
