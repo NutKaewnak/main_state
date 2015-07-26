@@ -11,15 +11,15 @@ class DetectWavingPeople(AbstractSubtask):
         self.subtask = self.current_subtask
 
     def perform(self, perception_data):
-        # if self.state is not 'succeeded':
-        #     rospy.loginfo('DetectPeopleWithGesture : '+self.state)
         if self.state is 'init':
             self.gesture_pos = None
+            self.skill = self.skillBook.get_skill(self, 'TurnNeck')
+            self.skill.turn(-0.2, 0)
             self.change_state('searching')
 
         elif self.state is 'searching':
             if perception_data.device is self.Devices.GESTURE:
-                rospy.loginfo(type(perception_data.input))
+                rospy.loginfo('hello')
                 self.gesture_pos = perception_data.input
                 self.change_state('finish')
 
