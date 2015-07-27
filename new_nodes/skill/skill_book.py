@@ -9,6 +9,7 @@ from turn_neck import TurnNeck
 from pick import Pick
 from set_height_relative import SetHeightRelative
 from count import Count
+from grasp import Grasp
 
 
 class SkillBook:
@@ -23,6 +24,7 @@ class SkillBook:
         self.book['Pick'] = Pick(control_module)
         self.book['SetHeightRelative'] = SetHeightRelative(control_module)
         self.book['Count'] = Count(control_module)
+        self.book['Grasp'] = Grasp(control_module)
 
     def get_skill(self, subtask, skill_name):
         self.book[skill_name].reset()
