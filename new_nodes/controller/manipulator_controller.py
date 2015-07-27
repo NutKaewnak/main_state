@@ -342,9 +342,7 @@ class ManipulateController:
         elif self.pickstate["arm_group"] == "left_arm":
             self.robot.left_arm.clear_pose_targets()
 
-
-
-    def pickobject_finish(self,tolerance = [0.05,0.1]):
+    def pickobject_finish(self, tolerance = [0.05,0.1]):
         # To its normal position
         self.pickstate["laststate"] = "finish" 
         
@@ -576,7 +574,7 @@ class ManipulateController:
         # Return the list
         return places
 
-    def static_pose(self, arm_group, posture,tolerance = [0.05,0.1]):
+    def static_pose(self, arm_group, posture, tolerance=[0.05,0.1]):
         if arm_group == "right_arm":
             self.robot.right_arm.clear_pose_targets()
             self.robot.right_arm.set_goal_position_tolerance(tolerance[0])
