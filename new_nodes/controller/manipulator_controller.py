@@ -231,14 +231,14 @@ class ManipulateController:
         self.static_pose(self.pickstate["arm_group"],'right_pregrasp')
 
 
-    def pickobject_movetoobjectfront(self,tolerance = [0.05,0.1], pregrasp_distance=0.3, pregrasp_direction=[1.0, 0, 0]):
+    def pickobject_movetoobjectfront(self,tolerance = [0.05,0.1], pregrasp_distance=0.10, pregrasp_direction=[1.0, 0, 0]):
         ##TODO -- pregrasp in any direction, current x only
         
         pregraspposition = []
         pregrasp_value = self.pickstate["objectposition"][0] - pregrasp_distance
         
-        if pregrasp_value <= 0.35:
-            pregrasp_value = 0.35
+        if pregrasp_value <= 0.50:
+            pregrasp_value = 0.50
 
         pregraspposition.append(pregrasp_value)
         pregraspposition.append(self.pickstate["objectposition"][1])

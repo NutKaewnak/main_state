@@ -9,6 +9,7 @@ import geometry_msgs.msg
 import trajectory_msgs.msg
 import object_detection.msg
 import tf
+from dynamixel_controllers.srv import SetTorqueLimit
 from controller.manipulator_controller import ManipulateController
 from tabletop.srv import TabletopObjectDetection
 import numpy
@@ -69,7 +70,7 @@ def adding_fake_object():
     mnplctrl.scene.add_box("object", p, (0.15, 0.06, 0.3))
     
 ##---------------------------------------------------------------##
-def set_torque_limit(self,limit = 0.5):
+def set_torque_limit(limit = 0.5):
     rospy.wait_for_service('/dynamixel/right_gripper_joint_controller/set_torque_limit')
     try:
         rospy.loginfo('settorque')
@@ -91,14 +92,14 @@ def pick_tester():
     rospy.sleep(3.0)
 
     rospy.loginfo("--INIT--")
-    mnplctrl.pickobject_init("right_arm", "object", [0.65, -0.15, 0.90])
+    mnplctrl.pickobject_init("right_arm", "object", [0.70, -0.22 + 0.10, 0.95])
     rospy.loginfo("Press any key to Continue")
     raw_input()
 
-    # rospy.loginfo("---pregrasp---")
-    # mnplctrl.pickobject_pregrasp()
-    # rospy.loginfo("Press any key to Continue")
-    # raw_input()
+    rospy.loginfo("---pregrasp---")
+    mnplctrl.pickobject_pregrasp()
+    rospy.loginfo("Press any key to Continue")
+    raw_input()
     
 
     # rospy.loginfo("go to in front of object")
@@ -117,14 +118,27 @@ def pick_tester():
     rospy.loginfo("Press any key to Continue")
     raw_input()
     
+    rospy.loginfo("----movetoobjectfront----")
+    mnplctrl.pickobject_movetoobjectfront()
+    rospy.loginfo("movetoobjectfront Complete")
+
+    rospy.loginfo("Press any key to Continue")
+    raw_input()
+
+
+
+
     rospy.loginfo("----Reaching to Object----")
     mnplctrl.pickobject_reach()
     rospy.loginfo("Reaching Complete")
 
     rospy.loginfo("Press any key to Continue")
     raw_input()
+    
     rospy.loginfo("---GRASPING---")
     #mnplctrl.pickobject_grasp()
+    
+    set_torque_limit()
     pub.publish(Float64(mnplctrl.GRIPPER_CLOSED))
 
     rospy.loginfo("Press any key to Continue")
@@ -144,6 +158,17 @@ def pick_tester():
     rospy.loginfo("----Return To Normal-----")
     mnplctrl.static_pose("right_arm","right_init_picking")
     rospy.loginfo("---FINISH----")
+    
+
+    raw_input()
+
+    rospy.loginfo("---Opening Gripper---")
+    #mnplctrl.pickobject_opengripper()
+
+    pub.publish(Float64(mnplctrl.GRIPPER_OPENED))
+
+    rospy.loginfo("---Complete Opening Gripper----")
+
     rospy.spin()
     mnplctrl.__del__()
 
