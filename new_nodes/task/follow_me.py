@@ -1,9 +1,10 @@
-__author__ = 'AThousandYears'
 import rospy
 from include.abstract_task import AbstractTask
 from math import sqrt
 from subprocess import call
 from geometry_msgs.msg import Vector3
+
+__author__ = 'AThousandYears'
 
 
 class FollowMe(AbstractTask):
@@ -15,8 +16,6 @@ class FollowMe(AbstractTask):
 
     def perform(self, perception_data):
         if self.state is 'init':
-            set_neck_angle_topic = rospy.Publisher('/hardware_bridge/set_neck_angle', Vector3)
-            set_neck_angle_topic.publish(Vector3(0.0, 0.0, 0.0))
             if perception_data.device is self.Devices.VOICE and 'follow me' in perception_data.input:
                 call(['espeak', '-ven+f4', 'I will follow you.', '-s 120'])
                 self.change_state('follow_init')
