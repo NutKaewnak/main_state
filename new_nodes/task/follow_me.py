@@ -3,6 +3,7 @@ from include.abstract_task import AbstractTask
 from math import sqrt
 from subprocess import call
 from geometry_msgs.msg import Vector3
+from std_msgs.msg import Float64
 
 __author__ = 'AThousandYears'
 
@@ -16,6 +17,10 @@ class FollowMe(AbstractTask):
 
     def perform(self, perception_data):
         if self.state is 'init':
+            set_pan_angle_topic = rospy.Publisher('/dynamixel/tilt_controller/command', Float64)
+            set_pan_angle_topic.publish(Float64(0))
+            set_angle_topic = rospy.Publisher('/dynamixel/pan_controller/command', Float64)
+            set_angle_topic.publish(Float64(0))
             if perception_data.device is self.Devices.VOICE and 'follow me' in perception_data.input:
                 call(['espeak', '-ven+f4', 'I will follow you.', '-s 120'])
                 self.change_state('follow_init')

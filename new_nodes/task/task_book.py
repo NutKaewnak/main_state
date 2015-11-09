@@ -14,7 +14,7 @@ from manipulation_task import ManipulationTask
 from navigation_task import NavigationTask
 from test_detect_and_move_to_person import TestDetectAndMoveToPerson
 from inspection import Inspection
-from robozoo import RoboZoo
+# from robozoo import RoboZoo
 from robo_nurse import RoboNurse
 
 
@@ -36,7 +36,7 @@ class TaskBook:
         self.book['NavigationTask'] = NavigationTask(planning_module)
         self.book['TestDetectAndMoveToPerson'] = TestDetectAndMoveToPerson(planning_module)
         self.book['Inspection'] = Inspection(planning_module)
-        self.book['RoboZoo'] = RoboZoo(planning_module)
+        # self.book['RoboZoo'] = RoboZoo(planning_module)
         self.book['RoboNurse'] = RoboNurse(planning_module)
 
     def set_perception(self, perception_module):
