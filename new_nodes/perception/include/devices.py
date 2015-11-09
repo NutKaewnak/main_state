@@ -13,6 +13,7 @@ class Devices:
     LEFT_ARM = 'LEFT_ARM'
     HEIGHT = 'HEIGHT'
     CIRCLE_DETECT = 'CIRCLE_DETECT'
+    JOY = 'JOY'
 
     def __init__(self):
         pass

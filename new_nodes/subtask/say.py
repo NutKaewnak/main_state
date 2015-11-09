@@ -19,5 +19,3 @@ class Say(AbstractSubtask):
         if self.state is 'saying':
             if self.speak.state is 'succeeded':
                 self.change_state('finish')
-
-# Don't forget to add this subtask to subtask book
