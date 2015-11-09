@@ -10,7 +10,7 @@ class Speaker:
 
     def speak(self, message):
         rospy.loginfo("Robot speak: " + message)
-        self.process = subprocess.Popen(["espeak", "-ven+f4", message, "-s 120"])
+        self.process = subprocess.Popen('pico2wave -w temp.wav "'+ message +'" && aplay temp.wav', shell=True)
 
     def is_finish(self):
         if self.process is None:
