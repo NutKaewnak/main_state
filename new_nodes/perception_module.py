@@ -1,5 +1,6 @@
 __author__ = "AThousandYears"
 
+from perception.delay import Delay
 from perception.door_detect import DoorDetection
 from perception.include.devices import Devices
 from perception.base_status import BaseStatusPerception
@@ -12,12 +13,13 @@ from perception.right_arm import RightArm
 from perception.left_arm import LeftArm
 from perception.circle_detection import CircleDetection
 from perception.height import Height
-from perception.delay import Delay
+from perception.joy import JoyInput
 
 
 class PerceptionModule:
 
     def __init__(self, main_state):
+        self.delay = Delay()
         self.Devices = Devices
         self.base_status = BaseStatusPerception(main_state.planningModule)
         self.voice = VoicePerception(main_state.planningModule)
@@ -30,4 +32,4 @@ class PerceptionModule:
         self.left_arm = LeftArm(main_state.planningModule)
         self.circle_detection = CircleDetection(main_state.planningModule)
         self.height = Height(main_state.planningModule)
-        self.delay = Delay()
+        self.joy = JoyInput(main_state.planningModule)

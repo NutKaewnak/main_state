@@ -88,7 +88,7 @@ def answers(question):
         return "Aluminium"
     elif "three primary colors" in question:
         return "Blue, yellow and red"
-    elif "nearest the sun" in question:
+    elif "nearest to the sun" in question:
         return "Mercury"
     elif "great wall of china" in question:
         return "6259 kilometers"

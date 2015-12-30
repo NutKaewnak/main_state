@@ -16,6 +16,7 @@ class DetectAndMoveToPeople(AbstractSubtask):
             rospy.loginfo('DetectAndMoveToPeople state: '+self.state)
         if self.state is 'init':
             self.pos = None
+            self.skillBook.get_skill(self, 'TurnNeck').turn(0, 0)
             self.subtask = self.subtaskBook.get_subtask(self, 'PeopleDetect')
             self.change_state('find_people')
 

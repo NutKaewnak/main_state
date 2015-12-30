@@ -13,11 +13,11 @@ class GPSR(AbstractTask):
         self.say = self.subtaskBook.get_subtask(self, 'Say')
 
     def perform(self, perception_data):
-        rospy.loginfo('state in: ' + self.state + ' from: ' + str(perception_data.device) +
-                      ' data: ' + str(perception_data.input))
+        #rospy.loginfo('state in: ' + self.state + ' from: ' + str(perception_data.device) +
+                      #' data: ' + str(perception_data.input))
         if self.state is 'init':
-            self.subtask = self.subtaskBook.get_subtask(self, 'MovePassDoor')
-            self.change_state('move_pass_door')
+            #self.subtask = self.subtaskBook.get_subtask(self, 'MovePassDoor')
+            self.change_state('move_to_start')
 
         elif self.state is 'move_pass_door':
             if self.subtask.state is 'finish':
@@ -26,7 +26,7 @@ class GPSR(AbstractTask):
                 self.change_state('move_to_start')
 
         elif self.state is 'move_to_start':
-            if self.subtask.state is 'finish':
+            if self.subtask == None:
                 self.subtask = self.subtaskBook.get_subtask(self, 'Introduce')
                 self.change_state('introduce')
 

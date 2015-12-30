@@ -318,6 +318,7 @@ if __name__=='__main__':
     global callback
     try:
         pick_tester()
+        #pick_tester()
         #module_tester()
         #robozoo_tester()
         #rospy.wait_for_service('tabletop_object_detection')
