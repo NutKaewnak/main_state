@@ -575,6 +575,7 @@ class CommandExtractor(object):
             sentence = sentence.replace(' me ',' you ')
         if sentence.count(' your ') > 0:
             sentence = sentence.replace(' your ',' my ')
+        print sentence
         return "Do you want me " + sentence.strip()  + '.'
 
 

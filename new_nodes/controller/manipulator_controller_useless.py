@@ -23,7 +23,9 @@ GRASP_OVERTIGHTEN = -0.01
 GRIPPER_EFFORT = 0.2
 URDF_ELBOW_LIMIT = 0.2
 URDF_WRIST2_LIMIT = -0.40
-
+INIT_HAND = 0.0
+RISE_HAND_RIGHT = -1.82
+RISE_HAND_LEFT = 2.7
 
 GRIPPER_PITCH_OFFSET = 0.2
 EEF_OFFSET = []
@@ -50,12 +52,12 @@ class ManipulateController:
         self.settorquelimit = {}
         self.GRIPPER_OPENED = 0.0
         self.GRIPPER_CLOSED = -0.8
-        self.pregrasp_distance = 0
-        self.pregrasp_value_x = 0
-        self.pregrasp_value_y = 0
-        self.objectposition_x = 0
-        self.objectposition_y = 0
-        self.objectposition_z = 0
+        self.INIT_HAND = 0.0
+        self.RISE_HAND_RIGHT = -1.82
+        self.RISE_HAND_LEFT = 2.7
+        self.URDF_ELBOW_LIMIT = 0.2
+        self.URDF_WRIST2_LIMIT = -0.40
+
         # try:
         #     self.settorquelimit["right_gripper"] = rospy.ServiceProxy('/dynamixel/right_gripper/set_torque_limit', SetTorqueLimit)
         #     self.settorquelimit["left_gripper"] = rospy.ServiceProxy('/dynamixel/left_gripper/set_torque_limit', SetTorqueLimit)
@@ -219,87 +221,42 @@ class ManipulateController:
 
     ### PICKING PROCEDURE
     ### pregrasp -> opengripper -> reach -> grasp
-    def pickobject_init(self, arm_group, objectname, objectposition,tolerance = [0,0.05,0.1], ref_frame="base_link"):
-        if objectposition[0] >= 0.6:
-            self.pregrasp_distance_x = 0.2
-        else:
-            self.pregrasp_distance_x = 0.1
-
-        if objectposition[1] >= 0.2 or objectposition[1] <= -0.2:
-            self.pregrasp_distance_y = 0.1
-        else:
-            self.pregrasp_distance_y = 0
-        self.objectposition_x = objectposition[0]
-        self.objectposition_y = objectposition[1]
-        self.objectposition_z = objectposition[2]
-        self.pickstate["objectname"] = objectname
-        self.pickstate["arm_group"] = arm_group
-        self.pickstate["objectposition"] = objectposition
-        self.pickstate["laststate"] = "pregrasp"
-        self.pickstate["ref_frame"] = ref_frame
-        self.static_pose(self.pickstate["arm_group"], "right_init_picking_normal")
+    def pickobject_init_normal(self):
+        self.static_pose('right_arm', "right_init_picking_normal")
 
     def pickobject_prepare(self):
-        rospy.loginfo('prepare pregrasp')
-        self.pickstate["laststate"] = "prepare"
-        self.static_pose(self.pickstate["arm_group"],'right_picking_prepare')
+        self.static_pose('right_arm', "right_picking_prepare")
 
     def pickobject_pregrasp(self):
 
         rospy.loginfo('pregrasp')
         self.pickstate["laststate"] = "pregrasp"
-        self.static_pose(self.pickstate["arm_group"],'right_picking_pregrasp')
-        
+        self.static_pose('right_arm','new_right_pregrasp')
 
-    # def pickobject_movetoobjectfront(self,tolerance = [0.05,0.1], pregrasp_distance=0.30, pregrasp_direction=[1.0, 0, 0]):
-    #     ##TODO -- pregrasp in any direction, current x only
-        
-    #     pregraspposition = []
-    #     pregrasp_value = self.pickstate["objectposition"][0] - pregrasp_distance
-        
-    #     #if pregrasp_value <= 0.50:
-    #     #    pregrasp_value = 0.50
 
-    #     #pregraspposition.append(pregrasp_value)
-    #     pregraspposition.append(self.pickstate["objectposition"][0])
-    #     pregraspposition.append(self.pickstate["objectposition"][1])
-    #     pregraspposition.append(self.pickstate["objectposition"][2])
-    #     self.pickstate["laststate"] = "pregrasp"
-    #     self.manipulate(self.pickstate["arm_group"], pregraspposition)
-    #     #rospy.loginfo("Moving" + self.pickstate["arm_group"] + "to x = " + str(pregrasp_value) + " ,y = " + str(
-    #         #self.pickstate["objectposition"][1]) + " ,z= " + str(self.pickstate["objectposition"][2]) + "\n respect to " + self.pickstate["ref_frame"])
+    def pickobject_movetoobjectfront_1(self):
+        self.static_pose('right_arm','new_right_movetoobj_1')
 
-    def pickobject_movetoobjectfront_1(self,tolerance = [0.05,0.1], pregrasp_direction=[1.0, 0, 0]):
-        ##TODO -- pregrasp in any direction, current x only        
-        pregraspposition = []
-        self.pregrasp_value_x = self.pregrasp_distance_x
-        pregraspposition.append(self.pregrasp_value_x)
-        pregraspposition.append(self.pickstate["objectposition"][1])
-        pregraspposition.append(self.pickstate["objectposition"][2])
-        self.pickstate["laststate"] = "pregrasp"
-        print pregraspposition
-        self.manipulate(self.pickstate["arm_group"], pregraspposition)
- 
-    def pickobject_movetoobjectfront_2(self,tolerance = [0.05,0.1], pregrasp_direction=[1.0, 0, 0]):
+    def pickobject_movetoobjectfront_2(self):
+        self.static_pose('right_arm','new_right_movetoobj_2')
+
         ##TODO -- pregrasp in any direction, current x only
-        pregraspposition = []
-        self.pregrasp_value_x = self.pregrasp_distance_x + self.pregrasp_value_x
-        pregraspposition.append(self.pregrasp_value_x)
-        pregraspposition.append(self.pickstate["objectposition"][1])
-        pregraspposition.append(self.pickstate["objectposition"][2])
-        self.pickstate["laststate"] = "pregrasp"
-        print pregraspposition
-        self.manipulate(self.pickstate["arm_group"], pregraspposition)
+        
+        # pregraspposition = []
+        # pregrasp_value = self.pickstate["objectposition"][0] - pregrasp_distance
+        
+        # if pregrasp_value <= 0.50:
+        #     pregrasp_value = 0.50
 
-    def pickobject_movetoobjectfront_3(self,tolerance = [0.05,0.1], pregrasp_direction=[1.0, 0, 0]):
-        ##TODO -- pregrasp in any direction, current x only
-        pregraspposition = []
-        pregraspposition.append(self.pickstate["objectposition"][0])
-        pregraspposition.append(self.pickstate["objectposition"][1])
-        pregraspposition.append(self.pickstate["objectposition"][2])
-        self.pickstate["laststate"] = "pregrasp"
-        print pregraspposition
-        self.manipulate(self.pickstate["arm_group"], pregraspposition)
+        # pregraspposition.append(pregrasp_value)
+        # pregraspposition.append(self.pickstate["objectposition"][1])
+        # pregraspposition.append(self.pickstate["objectposition"][2])
+        # self.pickstate["laststate"] = "pregrasp"
+        # self.manipulate('right_arm', pregraspposition)
+        # rospy.loginfo("Moving" + 'right_arm' + "to x = " + str(pregrasp_value) + " ,y = " + str(
+        #     self.pickstate["objectposition"][1]) + " ,z= " + str(self.pickstate["objectposition"][2]) + "\n respect to " + self.pickstate["ref_frame"])
+
+
 
     def pickobject_opengripper(self):
         ##opengripper
@@ -314,7 +271,7 @@ class ManipulateController:
         self.pickstate["laststate"] = "reach"
         waypoint = []
         target_pose = geometry_msgs.msg.Pose()
-        target_pose.position.x = self.pickstate["objectposition"][0]+0.3
+        target_pose.position.x = self.pickstate["objectposition"][0]
         target_pose.position.y = self.pickstate["objectposition"][1]
         target_pose.position.z = self.pickstate["objectposition"][2]
         start_pose = self.robot.right_arm.get_current_pose().pose
