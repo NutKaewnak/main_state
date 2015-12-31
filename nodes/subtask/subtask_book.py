@@ -1,5 +1,4 @@
-__author__ = "AThousandYears"
-
+from people_detect import PeopleDetect
 from move_pass_door import MovePassDoor
 from move_to_location import MoveToLocation
 from register import Register
@@ -11,7 +10,6 @@ from follow_person import FollowPerson
 from move_relative import MoveRelative
 from bring_object_to_person import BringObjectToPerson
 from question_answer import QuestionAnswer
-from people_detect import PeopleDetect
 from move_absolute import MoveAbsolute
 from say import Say
 from pick import Pick
@@ -21,6 +19,8 @@ from detect_front_person import DetectFrontPerson
 from object_recognition_subtask import ObjectRecognition
 from set_height_relative import SetHeightRelative
 from scissor_rock_paper import ScissorRockPaper
+
+__author__ = "AThousandYears"
 
 
 class SubtaskBook:

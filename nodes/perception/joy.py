@@ -17,7 +17,7 @@ class JoyInput(AbstractPerception):
 
 def joy_array_transform(data_array):
     output = []
-    dict = ['A', 'B', 'X', 'Y', 'LB', 'RB', 'BACK', 'START', 'LOG', 'RA', 'LA']
+    button_array = ['A', 'B', 'X', 'Y', 'LB', 'RB', 'BACK', 'START', 'LOG', 'RA', 'LA']
     if data_array.axes[6] == 1:
         output.append('LEFT')
     elif data_array.axes[6] == -1:
@@ -33,7 +33,5 @@ def joy_array_transform(data_array):
 
     for x in range(0, 11):
         if bool(data_array.buttons[x]):
-            output.append(dict[x])
+            output.append(button_array[x])
     return output
-
-    # Don't forget to add this perception into perception_module

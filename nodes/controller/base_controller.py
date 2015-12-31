@@ -1,16 +1,16 @@
-__author__ = "AThousandYears"
-
 import rospy
 import actionlib
 from tf.transformations import quaternion_from_euler
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from std_srvs.srv import Empty
 
+__author__ = "AThousandYears"
+
 
 class BaseController:
     def __init__(self):
-        self.moveBase = actionlib.SimpleActionClient('/navigation/move_base', MoveBaseAction)
-        self.clearCostmap = rospy.ServiceProxy('/navigation/move_base_node/clear_costmaps', Empty)
+        self.move_base = actionlib.SimpleActionClient('/navigation/move_base', MoveBaseAction)
+        self.clear_costmap = rospy.ServiceProxy('/navigation/move_base_node/clear_costmaps', Empty)
 
     def set_absolute_position(self, x, y, theta):
         rospy.loginfo("Move robot to " + str((x, y, theta)) + ' in map')
@@ -21,7 +21,7 @@ class BaseController:
         self.set_new_goal(x, y, theta, 'base_link')
 
     def set_new_goal(self, x, y, theta, frame_id):
-        # self.moveBase.cancel_goal()
+        # self.move_base.cancel_goal()
 
         new_goal = MoveBaseGoal()
 
@@ -35,8 +35,8 @@ class BaseController:
         new_goal.target_pose.pose.orientation.z = quaternion[2]
         new_goal.target_pose.pose.orientation.w = quaternion[3]
 
-        self.moveBase.send_goal(new_goal)
+        self.move_base.send_goal(new_goal)
 
     def clear_costmaps(self):
         rospy.loginfo("Clear Costmaps")
-        self.clearCostmap()
+        self.clear_costmap()

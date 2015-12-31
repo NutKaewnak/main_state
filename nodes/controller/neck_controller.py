@@ -1,6 +1,6 @@
-__author__ = "AThousandYears"
-
 from joint_trajectory_follow import JointTrajectoryFollow
+
+__author__ = "AThousandYears"
 
 
 class NeckController:

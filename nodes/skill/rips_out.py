@@ -1,5 +1,6 @@
-__author__ = 'nicole'
 from include.abstract_skill import AbstractSkill
+
+__author__ = 'nicole'
 
 
 class RipsOut(AbstractSkill):

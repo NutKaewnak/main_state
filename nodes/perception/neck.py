@@ -1,9 +1,9 @@
-__author__ = 'nicole'
-
 import rospy
 from control_msgs.msg import FollowJointTrajectoryActionResult, FollowJointTrajectoryFeedback
 from include.abstract_perception import AbstractPerception
 from include.devices import Devices
+
+__author__ = 'nicole'
 
 
 class Neck(AbstractPerception):

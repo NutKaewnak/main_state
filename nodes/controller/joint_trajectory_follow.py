@@ -1,9 +1,9 @@
-__author__ = 'Nicole'
-
 import rospy
 import actionlib
 from trajectory_msgs.msg import JointTrajectoryPoint
 from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
+
+__author__ = 'Nicole'
 
 
 class JointTrajectoryFollow:
@@ -13,9 +13,6 @@ class JointTrajectoryFollow:
         self.joint_names = joint_names
         self.jta = actionlib.SimpleActionClient('/dynamixel/'+self.name+'/follow_joint_trajectory'
                                                 , FollowJointTrajectoryAction)
-        # rospy.loginfo('Waiting for joint trajectory action')
-        # self.jta.wait_for_server()
-        # rospy.loginfo('Found joint trajectory action!')
 
     def move_joint(self, angles):
         goal = FollowJointTrajectoryGoal()

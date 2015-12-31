@@ -1,8 +1,9 @@
-__author__ = 'nicole'
 from include.abstract_skill import AbstractSkill
 
+__author__ = 'nicole'
 
-class template(AbstractSkill):
+
+class Template(AbstractSkill):
     def __init__(self, control_module):
         AbstractSkill.__init__(self, control_module)
         # self.controlModule

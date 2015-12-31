@@ -14,6 +14,7 @@ from controller.manipulator_controller import ManipulateController
 from tabletop.srv import TabletopObjectDetection
 import numpy
 
+__author__ = 'ftprainnie'
 
 framecount = 0
 mnplctrl = None
@@ -23,7 +24,7 @@ enable = False
 finish = False
 
 
-def set_torque_limit(limit = 0.5):
+def set_torque_limit(limit=0.5):
     rospy.wait_for_service('/dynamixel/right_gripper_joint_controller/set_torque_limit')
     try:
         rospy.loginfo('settorque')
@@ -34,7 +35,7 @@ def set_torque_limit(limit = 0.5):
 
 
 def pick_tester():
-    global mnplctrl,pub,pos
+    global mnplctrl, pub, pos
     mnplctrl = ManipulateController()
     mnplctrl.init_controller()
     rospy.init_node('controller_tester')
@@ -135,7 +136,7 @@ def pick_tester():
     # mnplctrl.__del__()
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     global callback
     try:
         pick_tester()

@@ -1,7 +1,7 @@
-__author__ = "AThousandYears"
-
 import rospy
 from joint_trajectory_follow import JointTrajectoryFollow
+
+__author__ = "AThousandYears"
 
 
 class ArmController:

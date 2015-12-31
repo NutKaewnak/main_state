@@ -1,8 +1,9 @@
-__author__ = 'nicole'
 import rospy
 from include.abstract_perception import AbstractPerception
 from include.devices import Devices
 from std_msgs.msg import String
+
+__author__ = 'nicole'
 
 
 class DoorDetection(AbstractPerception):

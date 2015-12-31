@@ -1,5 +1,3 @@
-__author__ = "AThousandYears"
-
 from move_base_absolute import MoveBaseAbsolute
 from move_base_relative import MoveBaseRelative
 from rips_out import RipsOut
@@ -10,6 +8,8 @@ from pick import Pick
 from set_height_relative import SetHeightRelative
 from count import Count
 from grasp import Grasp
+
+__author__ = "AThousandYears"
 
 
 class SkillBook:

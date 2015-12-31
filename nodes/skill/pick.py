@@ -1,9 +1,9 @@
-__author__ = 'Nicole'
-
 import rospy
 from include.abstract_skill import AbstractSkill
 from include.arm_status import ArmStatus
 from include.delay import Delay
+
+__author__ = 'Nicole'
 
 
 class Pick(AbstractSkill):
@@ -23,7 +23,7 @@ class Pick(AbstractSkill):
             self.gripper = self.controlModule.gripper
             self.change_state('waiting_for_goal')
 
-        elif self.state is 'prepare_to_pick': 
+        elif self.state is 'prepare_to_pick':
             self.manipulator.static_pose(self.side + '_arm', self.side + '_normal')  # may change
             self.change_state('arm_normal')
 

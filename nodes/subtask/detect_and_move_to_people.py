@@ -1,7 +1,7 @@
-__author__ = 'nicole'
-
 import rospy
 from include.abstract_subtask import AbstractSubtask
+
+__author__ = 'nicole'
 
 
 class DetectAndMoveToPeople(AbstractSubtask):
@@ -12,8 +12,6 @@ class DetectAndMoveToPeople(AbstractSubtask):
         self.pos = None
 
     def perform(self, perception_data):
-        if self.state is not 'finish':
-            rospy.loginfo('DetectAndMoveToPeople state: '+self.state)
         if self.state is 'init':
             self.pos = None
             self.skillBook.get_skill(self, 'TurnNeck').turn(0, 0)

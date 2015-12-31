@@ -1,5 +1,6 @@
-__author__ = 'nuok'
 from include.abstract_skill import AbstractSkill
+
+__author__ = 'nuok'
 
 
 class Grasp(AbstractSkill):
@@ -10,4 +11,3 @@ class Grasp(AbstractSkill):
     def perform(self, perception_data):
         if self.state is 'init':
             self.change_state('succeeded')
-            # Don't to forget to add this skill to skill book
