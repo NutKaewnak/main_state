@@ -1,6 +1,7 @@
-__author__ = 'nicole'
 from include.abstract_skill import AbstractSkill
 from include.move_base_status import MoveBaseStatus
+
+__author__ = 'nicole'
 
 
 class SetHeightRelative(AbstractSkill):
@@ -21,5 +22,4 @@ class SetHeightRelative(AbstractSkill):
             if perception_data.device is self.Devices.HEIGHT:
                 state = MoveBaseStatus.get_state_from_status(perception_data.input)
                 self.change_state(state)
-
                 # Don't to forget to add this skill to skill book

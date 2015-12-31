@@ -1,9 +1,9 @@
-__author__ = 'nicole'
-
 from math import sqrt
 from include.abstract_subtask import AbstractSubtask
 from geometry_msgs.msg import Vector3
 from include.delay import Delay
+
+__author__ = 'nicole'
 
 
 class PeopleDetect(AbstractSubtask):
@@ -51,5 +51,3 @@ class PeopleDetect(AbstractSubtask):
     def set_timer(self, second):
         self.period = second
         self.timer.wait(self.period)
-
-# Don't forget to add this subtask to subtask book

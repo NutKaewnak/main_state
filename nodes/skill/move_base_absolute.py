@@ -1,7 +1,7 @@
-__author__ = "AThousandYears"
-
 from include.abstract_skill import AbstractSkill
 from include.move_base_status import MoveBaseStatus
+
+__author__ = "AThousandYears"
 
 
 class MoveBaseAbsolute(AbstractSkill):

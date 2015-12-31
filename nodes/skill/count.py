@@ -1,6 +1,7 @@
-__author__ = 'krit'
 from include.abstract_skill import AbstractSkill
 from include.delay import Delay
+
+__author__ = 'krit'
 
 
 class Count(AbstractSkill):

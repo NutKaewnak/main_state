@@ -1,5 +1,6 @@
-__author__ = 'nicole'
 from include.abstract_skill import AbstractSkill
+
+__author__ = 'nicole'
 
 
 class Confirm(AbstractSkill):
@@ -13,4 +14,3 @@ class Confirm(AbstractSkill):
                 self.change_state('confirm')
             elif perception_data.input is 'robot no':
                 self.change_state('negative')
-            # Don't to forget to add this skill to skill book

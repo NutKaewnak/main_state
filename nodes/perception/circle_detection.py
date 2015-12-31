@@ -1,8 +1,9 @@
-__author__ = 'krit'
 import rospy
 from include.abstract_perception import AbstractPerception
 from include.devices import Devices
 from std_msgs.msg import String
+
+__author__ = 'krit'
 
 
 class CircleDetection(AbstractPerception):

@@ -1,8 +1,8 @@
-__author__ = "AThousandYears"
-
 import rospy
 
 from perception_data import PerceptionData
+
+__author__ = "AThousandYears"
 
 
 class AbstractPerception:

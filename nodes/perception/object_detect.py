@@ -1,12 +1,11 @@
-__author__ = 'Nicole'
-
 import rospy
 import roslib
-# from std_msgs.msg import String
 from geometry_msgs.msg import Point
 from object_detection.msg import ObjectDetection
 from include.abstract_perception import AbstractPerception
 from include.devices import Devices
+
+__author__ = 'Nicole'
 
 
 def object_status(status):
@@ -40,7 +39,7 @@ class ObjectDetect(AbstractPerception):
         self.broadcast(Devices.OBJECT, ObjectDetectData(object_array, object_status(data.result)))
 
 
-class ObjectDetectData():
+class ObjectDetectData:
     def __init__(self, object_array, status):
         self.object_array = object_array
         self.status = status
@@ -49,7 +48,7 @@ class ObjectDetectData():
         return 'status: ' + object_status(self.status) + ' ' + str(self.object_array)
 
 
-class DetectedObject():
+class DetectedObject:
     def __init__(self, name, centroid, time_stamp, picture_directory):
         self.name = name
         self.centroid = centroid

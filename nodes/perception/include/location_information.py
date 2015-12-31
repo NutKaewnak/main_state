@@ -45,6 +45,7 @@ class RoomInfo(LocationInfo):
                '], Height: ' + str(self.height) + \
                ', locations: [' + str(self.locations) + '])'
 
+
 class LocationCategory():
     def __init__(self,location_info_node):
         self.location_categories = {}

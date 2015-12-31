@@ -1,5 +1,3 @@
-__author__ = "AThousandYears"
-
 from perception.delay import Delay
 from perception.door_detect import DoorDetection
 from perception.include.devices import Devices
@@ -14,6 +12,8 @@ from perception.left_arm import LeftArm
 from perception.circle_detection import CircleDetection
 from perception.height import Height
 from perception.joy import JoyInput
+
+__author__ = "AThousandYears"
 
 
 class PerceptionModule:

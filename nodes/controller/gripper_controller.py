@@ -1,8 +1,8 @@
-__author__ = 'Nicole'
-
 import rospy
 from joint_trajectory_follow import JointTrajectoryFollow
 from dynamixel_controllers.srv import SetTorqueLimit
+
+__author__ = 'Nicole'
 
 GRIPPER_EFFORT = 0.4
 

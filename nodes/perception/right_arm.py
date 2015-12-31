@@ -1,9 +1,9 @@
-__author__ = 'Nicole'
-
 import rospy
 from control_msgs.msg import FollowJointTrajectoryActionResult
 from include.abstract_perception import AbstractPerception
 from include.devices import Devices
+
+__author__ = 'Nicole'
 
 
 class RightArm(AbstractPerception):

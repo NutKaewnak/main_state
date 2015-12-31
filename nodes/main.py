@@ -1,13 +1,13 @@
 #!/usr/bin/env python
-
-__author__ = "AThousandYears"
-
 import rospy
 import sys
 
 from control_module import ControlModule
 from planning_module import PlanningModule
 from perception_module import PerceptionModule
+
+
+__author__ = "AThousandYears"
 
 
 class MainState:
