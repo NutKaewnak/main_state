@@ -19,7 +19,6 @@ class DetectWavingPeople(AbstractSubtask):
 
         elif self.state is 'searching':
             if perception_data.device is self.Devices.GESTURE:
-                rospy.loginfo('hello')
                 self.gesture_pos = perception_data.input
                 self.change_state('finish')
 
