@@ -6,7 +6,7 @@ from test import Test
 from follow_me import FollowMe
 from testSpeech import TestSpeach
 from restaurant import Restaurant
-from test_gesture import TestGesture
+# from test_gesture import TestGesture
 from GPSR import GPSR
 from speech_recognition import SpeechRecognition
 from test_object_recog_and_manip import TestObjectRecogAndManip
@@ -17,7 +17,7 @@ from inspection import Inspection
 from robozoo import RoboZoo
 from robo_nurse import RoboNurse
 from today_show import TodayShow
-
+from recognition_testing import TestRecognition
 
 class TaskBook:
     def __init__(self, planning_module):
@@ -29,7 +29,7 @@ class TaskBook:
         self.book['FollowMe'] = FollowMe(planning_module)
         self.book['TestSpeach'] = TestSpeach(planning_module)
         self.book['Restaurant'] = Restaurant(planning_module)
-        self.book['TestGesture'] = TestGesture(planning_module)
+        # self.book['TestGesture'] = TestGesture(planning_module)
         self.book['GPSR'] = GPSR(planning_module)
         self.book['SpeechRecognition'] = SpeechRecognition(planning_module)
         self.book['TestObjectRecogAndManip'] = TestObjectRecogAndManip(planning_module)
@@ -40,6 +40,7 @@ class TaskBook:
         self.book['RoboZoo'] = RoboZoo(planning_module)
         self.book['RoboNurse'] = RoboNurse(planning_module)
         self.book['TodayShow'] = TodayShow(planning_module)
+        self.book['RecognitionTesting'] =TestRecognition(planning_module)
 
     def set_perception(self, perception_module):
         for task in self.book:

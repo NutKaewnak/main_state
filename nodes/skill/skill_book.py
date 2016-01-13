@@ -8,6 +8,7 @@ from pick import Pick
 from set_height_relative import SetHeightRelative
 from count import Count
 from grasp import Grasp
+from recognize_objects import RecognizeObjects
 
 __author__ = "AThousandYears"
 
@@ -25,6 +26,7 @@ class SkillBook:
         self.book['SetHeightRelative'] = SetHeightRelative(control_module)
         self.book['Count'] = Count(control_module)
         self.book['Grasp'] = Grasp(control_module)
+        self.book['RecognizeObjects'] = RecognizeObjects(control_module)
 
     def get_skill(self, subtask, skill_name):
         self.book[skill_name].reset()
