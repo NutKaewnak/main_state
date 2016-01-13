@@ -14,6 +14,7 @@ class Devices:
     HEIGHT = 'HEIGHT'
     CIRCLE_DETECT = 'CIRCLE_DETECT'
     JOY = 'JOY'
+    RECOGNIZE_OBJECTS = 'RECOGNIZE_OBJECTS'
 
     def __init__(self):
         pass

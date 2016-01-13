@@ -12,6 +12,7 @@ from perception.left_arm import LeftArm
 from perception.circle_detection import CircleDetection
 from perception.height import Height
 from perception.joy import JoyInput
+from perception.recognize_objects_status import RecognizeObjectsPerception
 
 __author__ = "AThousandYears"
 
@@ -33,3 +34,4 @@ class PerceptionModule:
         self.circle_detection = CircleDetection(main_state.planningModule)
         self.height = Height(main_state.planningModule)
         self.joy = JoyInput(main_state.planningModule)
+        self.recognize_objects = RecognizeObjectsPerception(main_state.planningModule)
