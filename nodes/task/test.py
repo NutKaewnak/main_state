@@ -1,5 +1,7 @@
-__author__ = 'nicole'
 from include.abstract_task import AbstractTask
+
+__author__ = 'nicole'
+
 
 class Test(AbstractTask):
     def __init__(self, planning_module):
@@ -7,5 +9,5 @@ class Test(AbstractTask):
 
     def perform(self, perception_data):
         if self.state is 'init':
-            self.subtaskBook.get_subtask(self, 'Introduce')
+            self.subtaskBook.get_subtask(self, 'TestSubtaskSkill')
             self.change_state('finish')
