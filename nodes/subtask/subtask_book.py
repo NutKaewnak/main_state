@@ -19,6 +19,7 @@ from detect_front_person import DetectFrontPerson
 from object_recognition_subtask import ObjectRecognition
 from set_height_relative import SetHeightRelative
 from scissor_rock_paper import ScissorRockPaper
+from test_subtask_skill import TestSubtaskSkill
 
 __author__ = "AThousandYears"
 
@@ -47,6 +48,7 @@ class SubtaskBook:
         self.book['ObjectRecognition'] = ObjectRecognition(planning_module)
         self.book['SetHeightRelative'] = SetHeightRelative(planning_module)
         self.book['ScissorRockPaper'] = ScissorRockPaper(planning_module)
+        self.book['TestSubtaskSkill'] = TestSubtaskSkill(planning_module)
 
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()
