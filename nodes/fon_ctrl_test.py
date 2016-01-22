@@ -33,7 +33,6 @@ def set_torque_limit(limit=0.5):
     except rospy.ServiceException, e:
         rospy.logwarn("Service Torque call failed " + str(e))
 
-
 def pick_tester():
     global mnplctrl, pub, pos
     mnplctrl = ManipulateController()
