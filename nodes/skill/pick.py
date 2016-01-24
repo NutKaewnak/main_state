@@ -4,7 +4,7 @@ from include.arm_status import ArmStatus
 from include.delay import Delay
 from std_msgs.msg import Float64
 from dynamixel_controllers.srv import SetTorqueLimit
-
+from controller.manipulator_controller import ManipulateController
 __author__ = 'CinDy'
 
 
@@ -21,9 +21,8 @@ def set_torque_limit(limit=0.5):
 class Pick(AbstractSkill):
     def __init__(self, control_module):
         AbstractSkill.__init__(self, control_module)
-        self.manipulator = None
-        self.gripper = None
-        self.side = 'right'
+        self.manipulator = control_module.manipulator
+        self.side = 'right_arm'
         self.delay = Delay()
         self.goal_name = None
         self.goal_pose = None
@@ -35,13 +34,12 @@ class Pick(AbstractSkill):
 
     def perform(self, perception_data):
         if self.state is 'init':
-            self.manipulator = self.controlModule.manipulator
-            self.manipulator.init_controller()
-            self.gripper = self.controlModule.gripper
+            # self.manipulator.init_controller()
+            # self.gripper = self.controlModule.gripper
             self.change_state('arm_normal')
 
         elif self.state is 'arm_normal':
-            self.manipulator.pickobject_init(self.side + '_arm', 'object', [0.6, -0.18, 1.4])
+            self.manipulator.pickobject_init(self.side, 'object', [0.693 - 0.07, -0.170 + 0.09, 0.7 + 0.2])
             rospy.loginfo('--arm_normal--')
             self.change_state('prepare_to_pick')
 
@@ -56,9 +54,9 @@ class Pick(AbstractSkill):
             self.change_state('prepare_to_open_gripper')
 
         elif self.state is 'prepare_to_open_gripper':
-            if self.side is 'right':
+            if self.side is 'right_arm':
                 self.pub_right_gripper.publish(1.1)
-            elif self.side is 'left':
+            elif self.side is 'left_arm':
                 self.pub_left_gripper.publish(1.1)
             rospy.loginfo('--prepare_to_open_gripper--')
             #   self.manipulator.pickobject_opengripper()
@@ -113,10 +111,10 @@ class Pick(AbstractSkill):
             # self.manipulator.pickobject_grasp()
             set_torque_limit()
             rospy.loginfo('--grab_object--')
-            if self.side is 'right':
+            if self.side is 'right_arm':
                 self.pub_right_gripper.publish(0.3)
                 self.pub_right_wrist_2.publish(0.0)
-            elif self.side is 'left':
+            elif self.side is 'left_arm':
                 self.pub_left_gripper.publish(0.3)
                 self.pub_left_wrist_2.publish(0.0)
             # self.gripper.gripper_close()
@@ -131,18 +129,22 @@ class Pick(AbstractSkill):
         elif self.state is 'succeed':
             self.manipulator.finish()
 
-    def pick_object(self, side, goal_pose, goal_name='unknown'):
-        self.goal_name = goal_name
-        self.goal_pose = goal_pose
+    def pick_object(self, side, goal_name='unknown'):
+        # self.goal_name = goal_name
+        # self.goal_pose = goal_pose
+        rospy.loginfo('----pick_object:skill---')
         self.set_side(side)
-        self.controlModule.manipulator.manipulate(side + '_arm', self.goal_pose)
+        # self.controlModule.manipulator.manipulate(side + '_arm', self.goal_pose)
         self.change_state('init')
 
     def set_side(self, side):
         self.side = side
 
     def make_device(self):
-        if self.side is 'right':
+        if self.side is 'right_arm':
             self.device = 'RIGHT_ARM'
-        elif self.side is 'left':
+        elif self.side is 'left_arm':
             self.device = 'LEFT_ARM'
+
+    def after_move(self):
+        self.change_state('prepare_pregrasp')

@@ -18,7 +18,6 @@ from robozoo import RoboZoo
 from robo_nurse import RoboNurse
 from today_show import TodayShow
 from recognition_testing import TestRecognition
-from test import Test
 
 
 class TaskBook:
@@ -42,7 +41,6 @@ class TaskBook:
         self.book['RoboZoo'] = RoboZoo(planning_module)
         self.book['RoboNurse'] = RoboNurse(planning_module)
         self.book['TodayShow'] = TodayShow(planning_module)
-        self.book['Test'] = Test(planning_module)
         self.book['RecognitionTesting'] =TestRecognition(planning_module)
 
     def set_perception(self, perception_module):
