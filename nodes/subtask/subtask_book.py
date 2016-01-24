@@ -21,6 +21,7 @@ from set_height_relative import SetHeightRelative
 from scissor_rock_paper import ScissorRockPaper
 from recognize_objects import RecognizeObjects
 from test_subtask_skill import TestSubtaskSkill
+from objects_detection import ObjectsDetection
 
 __author__ = "AThousandYears"
 
@@ -50,6 +51,7 @@ class SubtaskBook:
         self.book['SetHeightRelative'] = SetHeightRelative(planning_module)
         self.book['ScissorRockPaper'] = ScissorRockPaper(planning_module)
         self.book['RecognizeObjects'] = RecognizeObjects(planning_module)
+        self.book['ObjectsDetection'] = ObjectsDetection(planning_module)
         self.book['TestSubtaskSkill'] = TestSubtaskSkill(planning_module)
 
     def get_subtask(self, task, subtask_name):

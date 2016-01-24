@@ -9,6 +9,7 @@ from set_height_relative import SetHeightRelative
 from count import Count
 from grasp import Grasp
 from recognize_objects import RecognizeObjects
+from detect_object_3ds import DetectObject3Ds
 
 __author__ = "AThousandYears"
 
@@ -27,6 +28,7 @@ class SkillBook:
         self.book['Count'] = Count(control_module)
         self.book['Grasp'] = Grasp(control_module)
         self.book['RecognizeObjects'] = RecognizeObjects(control_module)
+        self.book['DetectObject3Ds'] = DetectObject3Ds(control_module)
 
     def get_skill(self, subtask, skill_name):
         self.book[skill_name].reset()

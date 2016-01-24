@@ -15,6 +15,4 @@ class Devices:
     CIRCLE_DETECT = 'CIRCLE_DETECT'
     JOY = 'JOY'
     RECOGNIZE_OBJECTS = 'RECOGNIZE_OBJECTS'
-
-    def __init__(self):
-        pass
+    OBJECT_3DS_DETECTOR = 'OBJECT_3DS_DETECTOR'
