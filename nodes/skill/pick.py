@@ -30,6 +30,8 @@ class Pick(AbstractSkill):
         self.device = None
         self.pub_right_gripper = rospy.Publisher('/dynamixel/right_gripper_joint_controller/command', Float64)
         self.pub_right_wrist_2 = rospy.Publisher('/dynamixel/right_wrist_2_controller/command', Float64)
+        self.pub_left_gripper = rospy.Publisher('/dynamixel/left_gripper_joint_controller/command', Float64)
+        self.pub_left_wrist_2 = rospy.Publisher('/dynamixel/left_wrist_2_controller/command', Float64)
 
     def perform(self, perception_data):
         if self.state is 'init':
@@ -46,15 +48,18 @@ class Pick(AbstractSkill):
         elif self.state is 'prepare_to_pick':
             self.manipulator.pickobject_prepare()
             rospy.loginfo('--prepare_to_pick--')
-            '''self.make_device()
-
-            if self.device is not None and perception_data.device is self.device:
-                state = ArmStatus.get_state_from_status(perception_data.input)
-                if state is 'succeeded':'''
+            # self.make_device()
+            #
+            # if self.device is not None and perception_data.device is self.device:
+            #     state = ArmStatus.get_state_from_status(perception_data.input)
+            #     if state is 'succeeded':
             self.change_state('prepare_to_open_gripper')
 
         elif self.state is 'prepare_to_open_gripper':
-            self.pub_right_gripper.publish(1.1)
+            if self.side is 'right':
+                self.pub_right_gripper.publish(1.1)
+            elif self.side is 'left':
+                self.pub_left_gripper.publish(1.1)
             rospy.loginfo('--prepare_to_open_gripper--')
             #   self.manipulator.pickobject_opengripper()
             self.change_state('open_gripper')
@@ -65,8 +70,8 @@ class Pick(AbstractSkill):
                 self.delay.wait(15)
                 rospy.loginfo('--open_gripper--')
                 if state is 'succeeded':
-                    self.change_state('prepare_pregrasp')
-                    # self.change_state('prepare_move_to_object')
+                    self.change_state('wait_for_subtask')
+                    # waiting for move absolute in subtask
                 elif not self.delay.is_waiting():
                     rospy.logwarn('open_gripper out of time!')
                     self.change_state('prepare_to_open_gripper')
@@ -108,8 +113,12 @@ class Pick(AbstractSkill):
             # self.manipulator.pickobject_grasp()
             set_torque_limit()
             rospy.loginfo('--grab_object--')
-            self.pub_right_gripper.publish(0.3)
-            self.pub_right_wrist_2.publish(0.0)
+            if self.side is 'right':
+                self.pub_right_gripper.publish(0.3)
+                self.pub_right_wrist_2.publish(0.0)
+            elif self.side is 'left':
+                self.pub_left_gripper.publish(0.3)
+                self.pub_left_wrist_2.publish(0.0)
             # self.gripper.gripper_close()
             self.change_state('after_grasp')
 
