@@ -1,4 +1,4 @@
 <launch>
     <include file="$(find tabletop)/launch/tabletop.launch"/>
-    <node name="main_state" pkg="main_state" type="main.py" output="screen" args="TestObjectRecogAndManip" />
+    <node name="main_state" pkg="main_state" type="main.py" output="screen" args="Test" />
 </launch>

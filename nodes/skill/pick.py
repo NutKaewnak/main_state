@@ -2,8 +2,20 @@ import rospy
 from include.abstract_skill import AbstractSkill
 from include.arm_status import ArmStatus
 from include.delay import Delay
+from std_msgs.msg import Float64
+from dynamixel_controllers.srv import SetTorqueLimit
 
-__author__ = 'Nicole'
+__author__ = 'CinDy'
+
+
+def set_torque_limit(limit=0.5):
+    rospy.wait_for_service('/dynamixel/right_gripper_joint_controller/set_torque_limit')
+    try:
+        rospy.loginfo('settorque')
+        setTorque = rospy.ServiceProxy('/dynamixel/right_gripper_joint_controller/set_torque_limit', SetTorqueLimit)
+        respTorque = setTorque(limit)
+    except rospy.ServiceException, e:
+        rospy.logwarn("Service Torque call failed " + str(e))
 
 
 class Pick(AbstractSkill):
@@ -16,60 +28,75 @@ class Pick(AbstractSkill):
         self.goal_name = None
         self.goal_pose = None
         self.device = None
+        self.pub_right_gripper = rospy.Publisher('/dynamixel/right_gripper_joint_controller/command', Float64)
+        self.pub_right_wrist_2 = rospy.Publisher('/dynamixel/right_wrist_2_controller/command', Float64)
 
     def perform(self, perception_data):
         if self.state is 'init':
             self.manipulator = self.controlModule.manipulator
+            self.manipulator.init_controller()
             self.gripper = self.controlModule.gripper
-            self.change_state('waiting_for_goal')
-
-        elif self.state is 'prepare_to_pick':
-            self.manipulator.static_pose(self.side + '_arm', self.side + '_normal')  # may change
             self.change_state('arm_normal')
 
         elif self.state is 'arm_normal':
-            self.make_device()
+            self.manipulator.pickobject_init(self.side + '_arm', 'object', [0.6, -0.18, 1.4])
+            rospy.loginfo('--arm_normal--')
+            self.change_state('prepare_to_pick')
+
+        elif self.state is 'prepare_to_pick':
+            self.manipulator.pickobject_prepare()
+            rospy.loginfo('--prepare_to_pick--')
+            '''self.make_device()
 
             if self.device is not None and perception_data.device is self.device:
                 state = ArmStatus.get_state_from_status(perception_data.input)
-                if state is 'succeeded':
-                    self.change_state('prepare_move_hand_to_front_of_object')
-
-        elif self.state is 'prepare_move_hand_to_front_of_object':
-            self.manipulator.pickobject_pregrasp(self.side + '_arm', self.goal_name, self.goal_pose)
-            self.delay.wait(15)
-            self.change_state('move_to_in_front_of_object')
-
-        elif self.state is 'move_to_in_front_of_object':
-            if self.device is not None and perception_data.device is self.device:
-                state = ArmStatus.get_state_from_status(perception_data.input)
-                if state is 'succeeded':
-                    self.change_state('prepare_to_open_gripper')
-                elif not self.delay.is_waiting():
-                    rospy.logwarn('move_to_in_front_of_object out of time!')
-                    self.change_state('prepare_move_hand_to_front_of_object')
+                if state is 'succeeded':'''
+            self.change_state('prepare_to_open_gripper')
 
         elif self.state is 'prepare_to_open_gripper':
-            self.manipulator.pickobject_opengripper()
+            self.pub_right_gripper.publish(1.1)
+            rospy.loginfo('--prepare_to_open_gripper--')
+            #   self.manipulator.pickobject_opengripper()
             self.change_state('open_gripper')
 
         elif self.state is 'open_gripper':
             if self.device is not None and perception_data.device is self.device:
                 state = ArmStatus.get_state_from_status(perception_data.input)
                 self.delay.wait(15)
+                rospy.loginfo('--open_gripper--')
                 if state is 'succeeded':
-                    self.change_state('prepare_move_to_object')
+                    self.change_state('prepare_pregrasp')
+                    # self.change_state('prepare_move_to_object')
                 elif not self.delay.is_waiting():
                     rospy.logwarn('open_gripper out of time!')
                     self.change_state('prepare_to_open_gripper')
 
-        elif self.state is 'prepare_move_to_object':
-            # problem here
-            self.manipulator.pickobject_reach()
-            self.delay.wait(25)
+        elif self.state is 'prepare_pregrasp':
+            self.manipulator.pickobject_pregrasp()
+            rospy.loginfo('--prepare_pregrasp--')
+            # self.delay.wait(15)
+            self.change_state('pregrasp')
+
+        elif self.state is 'pregrasp':
+            rospy.loginfo('--pregrasp--')
+            if self.device is not None and perception_data.device is self.device:
+                state = ArmStatus.get_state_from_status(perception_data.input)
+                if state is 'succeeded':
+                    self.change_state('prepare_move_to_object_front')
+                elif not self.delay.is_waiting():
+                    rospy.logwarn('pregrasp out of time!')
+                    self.change_state('prepare_pregrasp')
+
+        elif self.state is 'prepare_move_to_object_front':
+            self.manipulator.pickobject_movetoobjectfront_1()
+            self.manipulator.pickobject_movetoobjectfront_2()
+            self.manipulator.pickobject_movetoobjectfront_3()
+            # self.delay.wait(25)
+            rospy.loginfo('--prepare_move_to_object_front--')
             self.change_state('move_to_object')
 
         elif self.state is 'move_to_object':
+            rospy.loginfo('--move_to_object--')
             if not self.delay.is_waiting():  # and device state is succeeded
                 if self.device is not None and perception_data.device is self.device:
                     state = ArmStatus.get_state_from_status(perception_data.input)
@@ -78,15 +105,29 @@ class Pick(AbstractSkill):
 
         elif self.state is 'grab_object':
             # close gripper
-            self.gripper.gripper_close()
-            self.change_state('succeeded')
+            # self.manipulator.pickobject_grasp()
+            set_torque_limit()
+            rospy.loginfo('--grab_object--')
+            self.pub_right_gripper.publish(0.3)
+            self.pub_right_wrist_2.publish(0.0)
+            # self.gripper.gripper_close()
+            self.change_state('after_grasp')
 
-    def pick_object(self, goal_pose, goal_name='unknown'):
-        self.change_state('init')
+        elif self.state is 'after_grasp':
+            # self.manipulator.pickobject_after_grasp()
+            rospy.loginfo('--after_grasp--')
+            self.manipulator.pickobject_prepare()
+            self.change_state('succeed')
+
+        elif self.state is 'succeed':
+            self.manipulator.finish()
+
+    def pick_object(self, side, goal_pose, goal_name='unknown'):
         self.goal_name = goal_name
         self.goal_pose = goal_pose
-        self.controlModule.manipulator.manipulate('right_arm', self.goal_pose)
-        self.change_state('prepare_to_pick')
+        self.set_side(side)
+        self.controlModule.manipulator.manipulate(side + '_arm', self.goal_pose)
+        self.change_state('init')
 
     def set_side(self, side):
         self.side = side

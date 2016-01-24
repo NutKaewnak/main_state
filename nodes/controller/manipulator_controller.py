@@ -199,7 +199,7 @@ class ManipulateController:
                 self.setjoint(jointname, jointvalue)
                 self.robot.right_gripper.go(False)
             else:
-                self.robot.right_arm.clear_pose_targets(False)
+                self.robot.right_arm.clear_pose_targets()
                 self.setjoint(jointname, jointvalue)
                 self.robot.right_arm.go(False)
 
@@ -209,7 +209,7 @@ class ManipulateController:
                 self.setjoint(jointname, jointvalue)
                 self.robot.left_gripper.go(False)
             else:
-                self.robot.left_arm.clear_pose_targets(False)
+                self.robot.left_arm.clear_pose_targets()
                 self.setjoint(jointname, jointvalue)
                 self.robot.left_arm.go(False)
         else:
