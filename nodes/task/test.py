@@ -9,5 +9,5 @@ class Test(AbstractTask):
 
     def perform(self, perception_data):
         if self.state is 'init':
-            self.subtaskBook.get_subtask(self, 'TestSubtaskSkill')
+            self.subtaskBook.get_subtask(self, 'Pick')
             self.change_state('finish')
