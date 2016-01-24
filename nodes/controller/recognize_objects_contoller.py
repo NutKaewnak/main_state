@@ -13,4 +13,4 @@ class RecognizeObjectsObController:
         names = []
         for name in object_names:
             names.append(String(name))
-        self.recognize_objects.send_goal(RecognizeObjectsGoal(names))
+        self.recognize_objects.send_goal(RecognizeObjectsGoal(names=names))

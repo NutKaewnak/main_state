@@ -1,4 +1,4 @@
-__author__ = 'Nicole'
+__author__ = 'CinDy'
 
 import rospy
 from include.abstract_subtask import AbstractSubtask
@@ -7,22 +7,25 @@ from include.abstract_subtask import AbstractSubtask
 class Pick(AbstractSubtask):
     def __init__(self, planning_module):
         AbstractSubtask.__init__(self, planning_module)
-        self.skill = self.current_skill
+        self.skill = self.skillBook.get_skill(self, 'Pick')
         self.input_object_pos = None
+        self.side_arm = None
+        self.move_base = None
 
     def perform(self, perception_data):
-        if self.state is 'init':
-            self.skill = self.skillBook.get_skill(self, 'Pick')
-            self.change_state('wait_object')
-            rospy.loginfo('pick subtask init')
+        if self.state is 'setting_arm':
+            self.skill.pick_object(self.side_arm, self.input_object_pos)
+            if self.skill.state is 'open_gripper':
+                self.move_base = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
+                self.move_base.set_position(0.5, 0, 0)
+            self.change_state('receive_object')
 
         elif self.state is 'receive_object':
-            self.skill.pick_object(self.input_object_pos)
+            self.skill.after_move()
             if self.skill.state is 'succeed':
                 self.change_state('finish')
-            elif self.skill.state is 'aborted':
-                self.change_state('error')
 
-    def pick_object(self, goal):
+    def pick_object(self, side, goal):
         self.input_object_pos = goal
-        self.change_state('receive_object')
+        self.side_arm = side
+        self.change_state('setting_arm')
