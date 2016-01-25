@@ -19,12 +19,13 @@ class Pick(AbstractSubtask):
 
         elif self.state is 'wait_skill_for_open_gripper':
             if self.skill.state is 'open_gripper':
+                rospy.loginfo('-----open_gripper:subtask-----')
                 self.move_base = self.subtaskBook.get_subtask(self, 'MoveRelative')
                 self.move_base.set_position(0.5, 0, 0)
             self.change_state('receive_object')
 
         elif self.state is 'receive_object':
-            self.skill.after_move()
+            self.skill.after_mani()
             if self.skill.state is 'succeed':
                 self.change_state('finish')
 
