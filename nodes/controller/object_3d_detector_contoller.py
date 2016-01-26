@@ -10,4 +10,4 @@ class Object3dsDetectorContoller:
         self.detector = actionlib.SimpleActionClient('/object/cluster_extraction', Object3DsAction)
 
     def set_new_goal(self):
-        self.recognize_objects.send_goal(Object3DsGoal())
+        self.detector.send_goal(Object3DsGoal())
