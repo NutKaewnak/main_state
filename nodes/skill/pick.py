@@ -74,7 +74,7 @@ class Pick(AbstractSkill):
                 self.pub_left_gripper.publish(1.1)
             print 'current state = ' + self.state
             # self.delay.wait(1000)
-            #   self.manipulator.pickobject_opengripper()
+            # self.manipulator.pickobject_opengripper()
             rospy.loginfo("Press any key to Continue3")
             # raw_input()
             self.change_state('open_gripper')
@@ -84,19 +84,19 @@ class Pick(AbstractSkill):
 
         elif self.state is 'open_gripper':
             rospy.loginfo('--open_gripper--')
-            if self.device is not None and perception_data.device is self.device:
-                state = ArmStatus.get_state_from_status(perception_data.input)
-                self.delay.wait(5000)
-                rospy.loginfo('--open_gripper--')
-                print 'current state = ' + self.state
-                rospy.loginfo("Press any key to Continue5")
-                raw_input()
-                if state is 'succeeded':
-                    self.change_state('wait_for_subtask_move')
-                    # waiting for move absolute in subtask
-                elif not self.delay.is_waiting():
-                    rospy.logwarn('open_gripper out of time!')
-                    self.change_state('prepare_open_gripper')
+            # if self.device is not None and perception_data.device is self.device:
+            #     state = ArmStatus.get_state_from_status(perception_data.input)
+            #     self.delay.wait(5000)
+            #     rospy.loginfo('--open_gripper--')
+            #     print 'current state = ' + self.state
+            #     rospy.loginfo("Press any key to Continue5")
+            #     raw_input()
+            #     if state is 'succeeded':
+            #         self.change_state('wait_for_subtask_move')
+            #         # waiting for move absolute in subtask
+            #     elif not self.delay.is_waiting():
+            #         rospy.logwarn('open_gripper out of time!')
+            #         self.change_state('prepare_open_gripper')
             self.change_state('wait_for_subtask_move')
             rospy.loginfo("Press any key to Continue6")
             raw_input()
