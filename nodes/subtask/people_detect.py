@@ -14,13 +14,15 @@ class PeopleDetect(AbstractSubtask):
         self.timer = Delay()
         self.period = 30
         self.nearest_people = None
-        self.is_found = False
+        self.people_array = []
 
     def perform(self, perception_data):
         if self.state is 'init':
             self.timer.wait(self.period)
             self.change_state('finding')
+            self.people_array = []
 
+        # TODO: set people array here
         elif self.state is 'finding' and perception_data.device is self.Devices.PEOPLE \
                 and perception_data.input != []:
             min_distance = 4.0  # set to maximum
@@ -33,9 +35,6 @@ class PeopleDetect(AbstractSubtask):
 
             if point is not None:
                 self.nearest_people = self.get_unit_vector(point, 0.5)
-                self.is_found = True
-            else:
-                self.is_found = False
 
         elif not self.timer.is_waiting():
             self.change_state('not_found')

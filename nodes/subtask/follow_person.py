@@ -10,6 +10,9 @@ class FollowPerson(AbstractSubtask):
     def __init__(self, planning_module):
         AbstractSubtask.__init__(self, planning_module)
         self.skill = None
+        self.move = None
+        self.turn_base = None
+        self.turn_neck = None
         self.last_point = Vector3()
         self.person_id = None
         self.distance_from_last = 9999.0
@@ -44,7 +47,7 @@ class FollowPerson(AbstractSubtask):
                     angle = Twist()
                     angle.angular.z = 0.1
                     self.turn_base.publish(angle)
-                elif theta<= -0.1:
+                elif theta <= -0.1:
                     angle = Twist()
                     angle.angular.z = -0.1
                     self.turn_base.publish(angle)

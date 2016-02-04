@@ -1,13 +1,11 @@
+import rospy
+from geometry_msgs.msg import Vector3
+from include.abstract_subtask import AbstractSubtask
+from include.location_information import *
 from include.location_information import read_location_information
 from include.object_information import read_object_info
 
 __author__ = "AThousandYears"
-
-import rospy
-from geometry_msgs.msg import Vector3
-
-from include.abstract_subtask import AbstractSubtask
-from include.location_information import *
 
 
 class MoveToLocation(AbstractSubtask):

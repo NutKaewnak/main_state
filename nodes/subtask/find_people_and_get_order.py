@@ -1,10 +1,7 @@
-__author__ = 'nicole'
-
-
-
 import rospy
-
 from include.abstract_subtask import AbstractSubtask
+
+__author__ = 'nicole'
 
 
 class FindPeopleAndGetOrder(AbstractSubtask):
@@ -31,10 +28,11 @@ class FindPeopleAndGetOrder(AbstractSubtask):
                 self.subtask = self.subtaskBook.get_subtask(self, 'DetectAndMoveToPeople')
                 self.change_state('detectAndMoveToPeople')
 
+        # TODO: Create subtask to speak some certain conversation
         elif self.state is 'detectAndMoveToPeople':
             if self.current_subtask.state is 'finish':
                 self.neck.set_neck_angle(0, 0)
-                self.subtask = self.subtaskBook.get_subtask(self, 'AskForNameAndCommand')  # must make it
+                self.subtask = self.subtaskBook.get_subtask(self, 'AskForNameAndCommand')
                 self.change_state('askForCommand')
                 rospy.loginfo('askForCommand')
 
@@ -46,10 +44,10 @@ class FindPeopleAndGetOrder(AbstractSubtask):
                     self.change_state('finish')
                     rospy.loginfo('subtask finish')
 
-    def getPeople(self):
+    def get_people(self):
         return self.people
 
-    def getOrder(self):
+    def get_order(self):
         return self.order
 
 # Don't forget to add this to subtask book.

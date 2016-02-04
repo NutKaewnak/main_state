@@ -1,9 +1,9 @@
-__author__ = 'AThousandYears'
-
 import rospy
 from include.abstract_perception import AbstractPerception
 from include.devices import Devices
 from people_detection.msg import  PersonObjectArray
+
+__author__ = 'AThousandYears'
 
 
 class PeopleDetection(AbstractPerception):

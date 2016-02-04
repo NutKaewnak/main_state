@@ -1,5 +1,6 @@
-__author__ = 'nicole'
 from include.abstract_subtask import AbstractSubtask
+
+__author__ = 'nicole'
 
 
 class Introduce(AbstractSubtask):
@@ -11,7 +12,7 @@ class Introduce(AbstractSubtask):
         if self.state is 'init':
             if self.skill is None:
                 self.skill = self.skillBook.get_skill(self, 'Say')
-            self.skill.say('Hello, my name is Lamyai. I am ready to serve you.')
+            self.skill.say('Hello, my name is Lam-yai. I am ready to serve you.')
             self.change_state('saying')
 
         elif self.state is 'saying':
