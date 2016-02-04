@@ -1,0 +1,7 @@
+<launch>
+  <node name="main_state" pkg="main_state" type="main.py" output="screen" args="GPSR" />
+  <node ns="door" name="door_detection" pkg="door_detection" type="door_detection_node">
+    <remap from="/scan" to="/laser/scan"/>
+  </node>
+  <include file="$(find speech_processing)/dic/GPSR_Frank/GPSR_Frank.launch"/>
+</launch>
