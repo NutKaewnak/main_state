@@ -14,7 +14,6 @@ class Pick(AbstractSubtask):
         self.move_base = None
         self.check = None
 
-
     def perform(self, perception_data):
         if self.state is 'setting_arm':
             self.skill.pick_object(self.side_arm)

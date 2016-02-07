@@ -16,7 +16,6 @@ def set_torque_limit(limit=0.5):
     except rospy.ServiceException, e:
         rospy.logwarn("Service Torque call failed " + str(e))
 
-
 class Pick(AbstractSkill):
     def __init__(self, control_module):
         AbstractSkill.__init__(self, control_module)

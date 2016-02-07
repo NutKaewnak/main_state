@@ -4,15 +4,11 @@ import rospy
 import moveit_commander
 import moveit_msgs.msg
 from std_msgs.msg import Bool,Float64
-import shape_msgs.msg
 import geometry_msgs.msg
 import trajectory_msgs.msg
-import object_detection.msg
 import tf
 from dynamixel_controllers.srv import SetTorqueLimit
 from controller.manipulator_controller import ManipulateController
-from tabletop.srv import TabletopObjectDetection
-import numpy
 from geometry_msgs.msg import Vector3
 from inverseKinematic import inverseKinematics
 
