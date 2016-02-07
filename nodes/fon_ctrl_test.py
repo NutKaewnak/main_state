@@ -44,7 +44,7 @@ class PointToPick():
     pub_right_gripper = rospy.Publisher('/dynamixel/right_gripper_joint_controller/command', Float64)
     pub_right_wrist_2 = rospy.Publisher('/dynamixel/right_wrist_2_controller/command', Float64)
 
-    # def pick_tester(self, data):
+
     def pick_tester(self):
         global mnplctrl,pub,pos
         mnplctrl = ManipulateController()
