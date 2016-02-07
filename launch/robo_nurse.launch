@@ -1,4 +1,5 @@
 <launch>
+
   <node name="main_state" pkg="main_state" type="main.py" output="screen" args="RoboNurse" />
   <node name="gesture_detection" pkg="gesture_detection" type="NIHandtracker" output="screen" >
     <remap from="points" to="/gesture/points"/>

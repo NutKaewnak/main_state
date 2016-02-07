@@ -101,7 +101,7 @@ class Pick(AbstractSkill):
         #     print "current state = " + self.state + "1------------------------------"
         #     rospy.loginfo("Press any key to Continue6")
         #     raw_input()
-        #
+
         # elif self.state is 'moving':
         #     rospy.loginfo("-----------------in moving :skill------------------------")
         #     self.move_base = self.skillBook.get_skill(self, 'MoveRelative')

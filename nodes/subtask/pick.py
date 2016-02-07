@@ -1,5 +1,6 @@
 __author__ = 'CinDy'
 
+
 import rospy
 from include.abstract_subtask import AbstractSubtask
 
@@ -12,6 +13,7 @@ class Pick(AbstractSubtask):
         self.side_arm = 'right_arm'
         self.move_base = None
         self.check = None
+
 
     def perform(self, perception_data):
         if self.state is 'setting_arm':
