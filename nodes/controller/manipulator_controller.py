@@ -613,8 +613,7 @@ class ManipulateController:
  
                         # Append this place pose to the list
                         places.append(deepcopy(place))
- 
-        # Return the list
+
         return places
 
     def static_pose(self, arm_group, posture, tolerance=[0.05, 0.1]):

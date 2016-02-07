@@ -39,7 +39,6 @@ class Pick(AbstractSubtask):
             elif self.skill.state is 'succeed':
                 self.change_state('finish')
         #     self.change_state('receive_object')
-        #
         # elif self.state is 'receive_object':
         #     if self.skill.state is 'succeed':
         #         self.change_state('finish')

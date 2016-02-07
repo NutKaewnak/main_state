@@ -80,7 +80,6 @@ class Pick(AbstractSkill):
             self.change_state('moving')
             print 'current state = ' + self.state + '-----1-----------------------------'
             rospy.loginfo("Press any key to Continue4")
-            # raw_input()
 
         # elif self.state is 'open_gripper':
         #     rospy.loginfo('--open_gripper--')
