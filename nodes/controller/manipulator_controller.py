@@ -206,7 +206,25 @@ class ManipulateController:
 
     # PICKING PROCEDURE
     # pregrasp -> opengripper -> reach -> grasp
-    def pickobject_init(self, arm_group, objectname, objectposition,tolerance = [0,0.05,0.1], ref_frame="base_link"):
+    def pickobject_init(self, arm_group, objectname, tolerance = [0,0.05,0.1], ref_frame="base_link"):
+        self.pickstate["arm_group"] = arm_group
+        self.pickstate["objectname"] = objectname
+        # self.pickstate["laststate"] = "pregrasp"
+        self.pickstate["ref_frame"] = ref_frame
+        self.static_pose(self.pickstate["arm_group"], 'right_init_picking_normal')
+        rospy.loginfo('---------------------------pickobject_init')
+
+    def pickobject_prepare(self):
+        # rospy.loginfo('prepare pregrasp')
+        # self.pickstate["laststate"] = "prepare"
+        self.static_pose(self.pickstate["arm_group"],'right_picking_prepare')
+        rospy.loginfo('---------------------------pickobject_prepare')
+
+    def pickobject_pregrasp(self, objectposition):
+        # rospy.loginfo('pregrasp')
+        # self.pickstate["laststate"] = "pregrasp"
+        self.pickstate["objectposition"] = objectposition
+
         if objectposition[0] >= 0.6:
             self.pregrasp_distance_x = 0.2
         else:
@@ -220,23 +238,6 @@ class ManipulateController:
         self.objectposition_x = objectposition[0]
         self.objectposition_y = objectposition[1]
         self.objectposition_z = objectposition[2]
-        self.pickstate["objectname"] = objectname
-        self.pickstate["arm_group"] = arm_group
-        self.pickstate["objectposition"] = objectposition
-        # self.pickstate["laststate"] = "pregrasp"
-        self.pickstate["ref_frame"] = ref_frame
-        self.static_pose(self.pickstate["arm_group"], "right_init_picking_normal")
-        rospy.loginfo('---------------------------pickobject_init')
-
-    def pickobject_prepare(self):
-        # rospy.loginfo('prepare pregrasp')
-        # self.pickstate["laststate"] = "prepare"
-        self.static_pose(self.pickstate["arm_group"],'right_picking_prepare')
-        rospy.loginfo('---------------------------pickobject_prepare')
-
-    def pickobject_pregrasp(self):
-        # rospy.loginfo('pregrasp')
-        # self.pickstate["laststate"] = "pregrasp"
         self.static_pose(self.pickstate["arm_group"],'right_picking_pregrasp')
         rospy.loginfo('---------------------------pickobject_pregrasp')
 
