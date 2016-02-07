@@ -13,7 +13,7 @@ from perception.circle_detection import CircleDetection
 from perception.height import Height
 from perception.joy import JoyInput
 from perception.recognize_objects_status import RecognizeObjectsPerception
-from perception.object_3ds_detector_status import Object3DsDetectorPerception
+#from perception.object_3ds_detector_status import Object3DsDetectorPerception
 
 __author__ = "AThousandYears"
 
@@ -36,4 +36,4 @@ class PerceptionModule:
         self.height = Height(main_state.planningModule)
         self.joy = JoyInput(main_state.planningModule)
         self.recognize_objects = RecognizeObjectsPerception(main_state.planningModule)
-        self.object_3ds_detector = Object3DsDetectorPerception(main_state.planningModule)
+        #self.object_3ds_detector = Object3DsDetectorPerception(main_state.planningModule)
