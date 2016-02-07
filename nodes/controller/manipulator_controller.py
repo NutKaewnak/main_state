@@ -5,12 +5,10 @@ import math
 import moveit_commander
 import moveit_msgs.msg
 import std_msgs.msg
-import shape_msgs.msg
 import geometry_msgs.msg
 import trajectory_msgs.msg
 import tf
 import sys
-from copy import deepcopy
 from dynamixel_controllers.srv import SetTorqueLimit
 
 GRIPPER_FRAME = 'right_wrist_3_Link'
