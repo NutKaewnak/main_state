@@ -329,7 +329,6 @@ class ManipulateController:
             (path, fraction) = self.robot.left_arm.compute_cartesian_path(waypoint, step, 0.00, True)
             self.robot.left_arm.execute(path)
 
-
     def pickobject_grasp(self):
         ##closegripper
         self.pickstate["laststate"] = "closegripper"
@@ -618,7 +617,7 @@ class ManipulateController:
         # Return the list
         return places
 
-    def static_pose(self, arm_group, posture, tolerance=[0.05,0.1]):
+    def static_pose(self, arm_group, posture, tolerance=[0.05, 0.1]):
         if arm_group == "right_arm":
             self.robot.right_arm.clear_pose_targets()
             self.robot.right_arm.set_goal_position_tolerance(tolerance[0])

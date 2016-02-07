@@ -50,7 +50,6 @@ class PointToPick():
         mnplctrl = ManipulateController()
         mnplctrl.init_controller()
         invK = inverseKinematics()
-        # rospy.init_node('controller_tester')
         object_pos = [0.710445 -0.05, -0.230658 + 0.11, 0.786225 + 0.05]
 
         pub_right_gripper = rospy.Publisher('/dynamixel/right_gripper_joint_controller/command', Float64)
