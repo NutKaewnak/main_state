@@ -26,6 +26,15 @@ class LocationInfo:
                '], Height: ' + str(self.height) + ')'
 
 
+class XMLunit:
+    def __init__(self, dict):
+        self.dict = {}
+        for key in dict:
+            self.dict[key] = dict[key]
+
+    def __getattr__(self, item):
+        return self.dict[item]
+
 class RoomInfo(LocationInfo):
     def __init__(self, name=None, position=None, height=0.0):
         LocationInfo.__init__(self, name, position, height)
@@ -93,4 +102,8 @@ def read_location_information_file(location_list, filename):
 if __name__ == "__main__":
     location_list = {}
     read_location_information(location_list)
+
+    a = {'name':'fuck'}
+    A = XMLunit(a)
+    print A.name
     # print location_list
