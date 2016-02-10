@@ -22,9 +22,9 @@
 
 	<location name="entrance" position="2.656, -7.349" rotation="3.126" height="1.29"/>
     <location name="exit" position="-0.310, 6.381" rotation="3.140" height="1.29"/>
-    <location name="waypoint_1" position="6.448, 1.124" rotation="1.524" height="1.29"/>
-    <location name="waypoint_2" position="9.862, 6.965" rotation="-3.139" height="1.29"/>
-    <location name="waypoint_3" position="5.216, 6.224" rotation="3.126" height="1.29"/>
+    <location name="waypoint_1" position="7.937, 0.047" rotation="0.000" height="1.29"/>
+    <location name="waypoint_2" position="11.364, -4.182" rotation="-1.578" height="1.29"/>
+    <location name="waypoint_3" position="14.018, -0.013" rotation="0.000" height="1.29"/>
     <location name="hallway table" position="2.981, 2.737" rotation="-1.600" height="1.29"/>
     <location name="gpsr_start" position="3.095, -1.314" rotation="-1.540" height="1.29"/>
 </location_information>
