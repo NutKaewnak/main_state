@@ -21,8 +21,8 @@ class Pick(AbstractSubtask):
             self.change_state('wait_skill_for_open_gripper')
 
         elif self.state is 'wait_skill_for_open_gripper':
-            print '***************wait_skill_for_open_gripper: in subtask********************'
-            print 'current state in subtask = ' + self.state +'********************'
+            # print '***************wait_skill_for_open_gripper: in subtask********************'
+            # print 'current state in subtask = ' + self.state +'********************'
             if self.skill.state is 'moving':
                 rospy.loginfo('********moving:subtask************')
                 # self.set_subtask_book()

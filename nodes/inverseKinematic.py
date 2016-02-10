@@ -29,11 +29,7 @@ class inverseKinematics:
         print 'r = ' + str(self.r)
         self.R = math.pow(self.x * self.x + self.z * self.z, 0.5)
         print 'R = ' + str(self.R)
- 
-        var1 = (self.R * self.R - self.UL * self.UL - self.r * self.r) / (2 * self.UL * self.r)
-        print "var1 >> " + str(var1)
-
-        self.Zeta1 = math.acos(0.38020184375)
+        self.Zeta1 = math.acos((self.R * self.R - self.UL * self.UL - self.r * self.r) / (2 * self.UL * self.r))
         print 'Zeta1 = ' + str(self.Zeta1)
         self.Zeta2 = math.asin(self.UL * math.sin(self.Zeta1) / self.R)
         print 'Zeta2 = ' + str(self.Zeta2)
@@ -49,9 +45,7 @@ class inverseKinematics:
         print 'z2 = ' + str(self.z2)
         self.Ah40 = -(math.asin(self.y / math.pow(self.y * self.y + self.z2 * self.z2, 0.5)))
         print 'Ah40 = ' + str(self.Ah40)
-        var2 = (self.x - (self.UL * math.sin(self.As20))) / self.FL
-        print "var2 >> " + str(var2)
-        self.Ah41 = math.acos(0.57084185908)
+        self.Ah41 = math.acos((self.x - (self.UL * math.sin(self.As20))) / self.FL)
         print 'Ah41 = ' + str(self.Ah41)
         self.Ah42 = -self.Ah40
         print 'Ah42 = ' + str(self.Ah42)
