@@ -92,7 +92,7 @@ def pick_tester():
     rospy.sleep(3.0)
 
     rospy.loginfo("--INIT--")
-    mnplctrl.pickobject_init("right_arm", "object", [0.70, -0.22 + 0.10, 0.95])
+    mnplctrl.pick_object_init("right_arm", "object", [0.70, -0.22 + 0.10, 0.95])
     rospy.loginfo("Press any key to Continue")
     raw_input()
 

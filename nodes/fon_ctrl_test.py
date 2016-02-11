@@ -60,7 +60,7 @@ class PointToPick():
 
         rospy.loginfo("--INIT PICK NORMAL--")
 
-        mnplctrl.pickobject_init("right_arm", "object", [0,0,0])
+        mnplctrl.pick_object_init("right_arm", "object", [0, 0, 0])
         # mnplctrl.pickobject_init("right_arm", "object", data)
         pub_pan.publish(0.0)
         pub_tilt.publish(-0.3)

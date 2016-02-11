@@ -22,7 +22,7 @@ def pick_tester():
     mnplctrl.init_controller()
     rospy.init_node('test_manipulator')
 
-    mnplctrl.pickobject_init("right_arm", "object", [0.82, -0.13, 0.8])
+    mnplctrl.pick_object_init("right_arm", "object", [0.82, -0.13, 0.8])
 
     mnplctrl.manipulate('right_arm', [0.82, -0.13, 0.8])
 

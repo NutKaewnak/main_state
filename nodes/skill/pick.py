@@ -2,19 +2,11 @@ import rospy
 from include.abstract_skill import AbstractSkill
 from include.arm_status import ArmStatus
 from include.delay import Delay
+from include.set_torque_limit import set_torque_limit
 from std_msgs.msg import Float64
-from dynamixel_controllers.srv import SetTorqueLimit
+
 __author__ = 'CinDy'
 
-
-def set_torque_limit(limit=0.5):
-    rospy.wait_for_service('/dynamixel/right_gripper_joint_controller/set_torque_limit')
-    try:
-        rospy.loginfo('settorque')
-        setTorque = rospy.ServiceProxy('/dynamixel/right_gripper_joint_controller/set_torque_limit', SetTorqueLimit)
-        respTorque = setTorque(limit)
-    except rospy.ServiceException, e:
-        rospy.logwarn("Service Torque call failed " + str(e))
 
 class Pick(AbstractSkill):
     def __init__(self, control_module):
@@ -27,6 +19,7 @@ class Pick(AbstractSkill):
         self.goal_name = None
         self.goal_pose = None
         self.device = None
+
         self.pub_right_gripper = rospy.Publisher('/dynamixel/right_gripper_joint_controller/command', Float64)
         self.pub_right_wrist_2 = rospy.Publisher('/dynamixel/right_wrist_2_controller/command', Float64)
         self.pub_right_wrist_3 = rospy.Publisher('/dynamixel/right_wrist_3_controller/command', Float64)
@@ -44,11 +37,12 @@ class Pick(AbstractSkill):
             self.set_static_pos()
             self.delay.wait(5000)
             # self.gripper s= self.controlModule.gripper
+            print(self.manipulator.get_joint_status())
             self.change_state('arm_normal')
 
         elif self.state is 'arm_normal':
             rospy.loginfo('---arm_normal---')
-            self.manipulator.pickobject_init(self.side, 'object', [0, 0, 0])
+            self.manipulator.pick_object_init(self.side, 'object', [0, 0, 0])
             self.delay.wait(3000)
             self.pub_pan.publish(0.0)
             self.pub_tilt.publish(-0.3)
