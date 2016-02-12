@@ -35,11 +35,15 @@ class Pick(AbstractSkill):
         if self.state is 'init_pick':
             self.manipulator.init_controller()
             self.set_static_pos()
-            self.delay.wait(5000)
-            # self.gripper s= self.controlModule.gripper
-            print(self.manipulator.get_joint_status())
-            self.change_state('arm_normal')
+            self.change_state('wait_arm_normal')
 
+        elif self.state is 'wait_arm_normal':
+            if perception_data.device == 'RIGHT_ARM':
+                if ArmStatus.get_state_from_status(perception_data.input) == 'succeeded':
+                    # self.gripper s= self.controlModule.gripper
+                    self.change_state('arm_normal')
+
+        # TODO: publish pan and tilt shouldn't be here. FIX IT!!
         elif self.state is 'arm_normal':
             rospy.loginfo('---arm_normal---')
             self.manipulator.pick_object_init(self.side, 'object', [0, 0, 0])
