@@ -14,6 +14,8 @@ class PeopleDetection(AbstractPerception):
         rospy.Subscriber("/people_detection/people_array", PersonObjectArray, self.callback_people_array)
 
     def callback_people_array(self, data):
-        person_array = self.tf_listener.transformPoint('odom', data)
+        person_array = []
+        for x in data:
+            person_array.append(self.tf_listener.transformPoint('odom', x))
         print person_array.point
         self.broadcast(Devices.PEOPLE, data.persons)
