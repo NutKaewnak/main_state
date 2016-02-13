@@ -1,5 +1,6 @@
-__author__ = 'Nicole'
 from include.abstract_task import AbstractTask
+
+__author__ = 'Nicole'
 
 
 class TestDetectAndMoveToPerson(AbstractTask):

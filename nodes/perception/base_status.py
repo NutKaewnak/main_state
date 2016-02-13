@@ -1,11 +1,10 @@
-__author__ = "AThousandYears"
-
 import rospy
 from tf.transformations import euler_from_quaternion
 from move_base_msgs.msg import MoveBaseActionResult, MoveBaseActionFeedback
-
 from include.abstract_perception import AbstractPerception
 from include.devices import Devices
+
+__author__ = "AThousandYears"
 
 
 class BaseStatusPerception(AbstractPerception):
@@ -17,7 +16,7 @@ class BaseStatusPerception(AbstractPerception):
         self.position = (0, 0, 0)
 
     def callback_base_status(self, data):
-        self.broadcast(Devices.BASE_STATUS, data.status.status)
+        self.broadcast(Devices.BASE_STcATUS, data.status.status)
 
     def callback_base_position(self, data):
         position = data.feedback.base_position.pose.position
