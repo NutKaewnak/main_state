@@ -197,7 +197,7 @@ class ManipulateController:
 
     # PICKING PROCEDURE
     # pregrasp -> open_gripper -> reach -> grasp
-    def pickobject_init(self, arm_group, object_name, tolerance=[0, 0.05, 0.1], ref_frame="base_link"):
+    def pickobject_init(self, arm_group, object_name, ref_frame="base_link"):
         self.pickstate["arm_group"] = arm_group
         self.pickstate["objectname"] = object_name
         # self.pickstate["laststate"] = "pregrasp"
@@ -324,15 +324,6 @@ class ManipulateController:
             self.robot.left_arm.set_goal_orientation_tolerance(0.05)
             (path, fraction) = self.robot.left_arm.compute_cartesian_path(waypoint, step, 0.00, True)
             self.robot.left_arm.execute(path)
-
-    def pickobject_opengripper(self):
-        ##opengripper
-        # self.pickstate["laststate"] = "opengripper"
-        if self.pickstate["arm_group"] == "right_arm":
-            self.movejoint("right_gripper_joint", GRIPPER_OPENED)
-        elif self.pickstate["arm_group"] == "left_arm":
-            self.movejoint("left_gripper_joint", GRIPPER_OPENED)
-        rospy.loginfo('------------------------------open gripper')
 
     def pickobject_grasp(self):
         # close gripper
