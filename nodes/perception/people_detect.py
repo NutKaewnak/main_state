@@ -15,7 +15,7 @@ class PeopleDetection(AbstractPerception):
 
     def callback_people_array(self, data):
         person_array = []
-        for x in data:
-            person_array.append(self.tf_listener.transformPoint('odom', x))
-        print person_array.point
+        for x in data.persons:
+            person_array.append(self.tf_listener.transformPoint('odom', x.personpoints))
+        print person_array
         self.broadcast(Devices.PEOPLE, data.persons)

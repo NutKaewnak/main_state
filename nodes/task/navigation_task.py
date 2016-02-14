@@ -1,8 +1,10 @@
-__author__ = 'Nicole'
 import rospy
 import math
 from include.abstract_task import AbstractTask
 from include.delay import Delay
+from include.get_distance import get_distance
+
+__author__ = 'Nicole'
 
 
 class NavigationTask(AbstractTask):
@@ -118,7 +120,7 @@ class NavigationTask(AbstractTask):
                 min_distance = 0.7  # set to maximum
                 id = None
                 for person in perception_data.input:
-                    distance = self.get_distance(person.personpoints, self.follow.last_point)
+                    distance = get_distance(person.personpoints, self.follow.last_point)
                     if person.personpoints.x >= self.follow.last_point.x - 0.25 and distance < min_distance:
                         min_distance = distance
                         id = person.id
@@ -137,7 +139,3 @@ class NavigationTask(AbstractTask):
         elif self.state is 'leave_arena':
             if self.subtask.state is 'finish':
                 self.change_state('finish')
-
-    @staticmethod
-    def get_distance(point_a, point_b):
-        return sqrt((point_a.x - point_b.x)**2 + (point_a.y - point_b.y)**2)
