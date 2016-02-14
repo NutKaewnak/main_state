@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+
+
+import rospy
+from fon_inverseKinematics import inverseKinematics
+from controller.manipulator_controller import ManipulateController
+
+
+__author__ = 'fptrainnie'
+
+
+class test_invKine():
+    
+    def __init__(self):
+        global invK, mnplctrl
+        mnplctrl = ManipulateController()
+        mnplctrl.init_controller()
+        invK = inverseKinematics()
+        self.invKine()
+        mnplctrl.movejoint('right_shoulder_1_joint', 0)
+        mnplctrl.movejoint('right_elbow_joint', 0)
+        rospy.sleep(2)
+
+    def invKine(self):
+        self.angle = invK.invKinem(0.65+0.2, -0.18, 0.8+0.1)
+        #mnplctrl.movejoint('right_arm', self.angle)
+        
+        if self.angle[0] > 1 :
+            usage_angle_shoulder = self.angle[0]-1
+        elif self.angle[0] < 1 :
+            usage_angle_shoulder = self.angle[0]+1 
+        print ">>zeta_shoulder = " + str(usage_angle_shoulder)
+        #print ">>zeta_elbow = " + str(usage_angle_elbow)
+   
+        if self.angle[1] > 1 :
+            usage_angle_elbow = self.angle[1]-1
+        elif self.angle[1] < 1 :
+            usage_angle_elbow = self.angle[1]+1 
+        print ">>zeta_elbow = " + str(usage_angle_elbow)
+
+        mnplctrl.movejoint('right_shoulder_1_joint', usage_angle_shoulder)
+        #mnplctrl.movejoint('right_shoulder_2_joint', self.angle[1])
+        mnplctrl.movejoint('right_elbow_joint', -1*usage_angle_elbow)
+        #mnplctrl.movejoint('right_wrist_1_joint', self.angle[3])
+        #mnplctrl.movejoint('right_wrist_2_joint', self.angle[4])
+        #mnplctrl.movejoint('right_wrist_3_joint', self.angle[5])
+
+
+if __name__ == '__main__':
+    try:
+        test_invKine()
+    except rospy.ROSInterruptException:
+        pass

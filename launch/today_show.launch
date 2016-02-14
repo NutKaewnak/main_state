@@ -1,0 +1,9 @@
+<launch>
+
+  <include file="$(find speech_processing)/launch/questions_New.launch"/>
+
+  <node name="main_state" pkg="main_state" type="main.py" output="screen" args="TodayShow" />
+  <node ns="people" name="people_detection" pkg="people_detection" type="people_detection_node">
+    <remap from="peoplearray" to="/people_detection/people_array"/>
+  </node>
+</launch>
