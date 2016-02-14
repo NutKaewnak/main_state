@@ -11,7 +11,7 @@ class inverseKinematics:
         rospy.init_node('inverseKinematic')        
 
     def invKinematic(self, x_endEffector, y_endEffector, z_endEffector):
-        x_endEffector = x_endEffector-0.02
+        x_endEffector = x_endEffector-0.2
         y_endEffector = y_endEffector+0.17
         z_endEffector = z_endEffector-0.8
 
@@ -30,9 +30,9 @@ class inverseKinematics:
         self.R = math.pow(self.x * self.x + self.z * self.z, 0.5)
         print 'R = ' + str(self.R)
         self.Zeta1 = math.acos((self.R * self.R - self.UL * self.UL - self.r * self.r) / (2 * self.UL * self.r))
-        print 'Zeta1 = ' + str(self.Zeta1)
+        print 'theta1 = ' + str(self.Zeta1)
         self.Zeta2 = math.asin(self.UL * math.sin(self.Zeta1) / self.R)
-        print 'Zeta2 = ' + str(self.Zeta2)
+        print 'theta2 = ' + str(self.Zeta2)
         self.As20 = math.asin(self.x / self.R) - (self.Zeta1 - self.Zeta2)
         print 'As20 = ' + str(self.As20)
         self.elbow_position = [self.UL * math.sin(self.As20), self.UL * math.cos(self.As20)]
