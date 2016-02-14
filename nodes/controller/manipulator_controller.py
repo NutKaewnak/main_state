@@ -14,8 +14,8 @@ __author__ = "ftprainnie"
 GRIPPER_FRAME = 'right_wrist_3_Link'
 GRIPPER_JOINT_NAMES = ['right_gripper_joint']
 
-GRIPPER_OPENED = 0.0
-GRIPPER_CLOSED = -0.6
+GRIPPER_OPENED = 1.1
+GRIPPER_CLOSED = -0.8
 GRIPPER_NEUTRAL = 0.0
 GRASP_OVERTIGHTEN = -0.01
 GRIPPER_EFFORT = 0.2
@@ -197,7 +197,7 @@ class ManipulateController:
 
     # PICKING PROCEDURE
     # pregrasp -> open_gripper -> reach -> grasp
-    def pick_object_init(self, arm_group, object_name, tolerance=[0, 0.05, 0.1], ref_frame="base_link"):
+    def pickobject_init(self, arm_group, object_name, tolerance=[0, 0.05, 0.1], ref_frame="base_link"):
         self.pickstate["arm_group"] = arm_group
         self.pickstate["objectname"] = object_name
         # self.pickstate["laststate"] = "pregrasp"
@@ -296,7 +296,7 @@ class ManipulateController:
             self.movejoint("right_gripper_joint", GRIPPER_OPENED)
         elif self.pickstate["arm_group"] == "left_arm":
             self.movejoint("left_gripper_joint", GRIPPER_OPENED)
-        rospy.loginfo('--------------------------------------open gripper')
+        rospy.loginfo('------------------------------open gripper')
 
     def pickobject_reach(self, tolerance=[0.05, 0.1], step=0.05):
         self.pickstate["laststate"] = "reach"
@@ -325,9 +325,18 @@ class ManipulateController:
             (path, fraction) = self.robot.left_arm.compute_cartesian_path(waypoint, step, 0.00, True)
             self.robot.left_arm.execute(path)
 
+    def pickobject_opengripper(self):
+        ##opengripper
+        # self.pickstate["laststate"] = "opengripper"
+        if self.pickstate["arm_group"] == "right_arm":
+            self.movejoint("right_gripper_joint", GRIPPER_OPENED)
+        elif self.pickstate["arm_group"] == "left_arm":
+            self.movejoint("left_gripper_joint", GRIPPER_OPENED)
+        rospy.loginfo('------------------------------open gripper')
+
     def pickobject_grasp(self):
         # close gripper
-        self.pickstate["laststate"] = "closegripper"
+        # self.pickstate["laststate"] = "closegripper"
         if self.pickstate["arm_group"] == "right_arm":
             # if self.pickstate["demo"] == False:
             # self.settorquelimit["right_gripper"](GRIPPER_EFFORT)
