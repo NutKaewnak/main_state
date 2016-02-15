@@ -1,43 +1,37 @@
 import rospy
 from include.abstract_task import AbstractTask
 from include.get_distance import get_distance
+from include.delay import Delay
 from math import sqrt
 from subprocess import call
 from geometry_msgs.msg import Vector3
+from std_msgs.msg import Float64
 
 __author__ = 'Nicole'
 
 
-class Restaurant(AbstractTask):
+class RestaurantVDO(AbstractTask):
     def __init__(self, planning_module):
         AbstractTask.__init__(self, planning_module)
         self.follow = None
         self.move = None
         self.location = None
         self.init_location = None
-        self.location_list = {'table a': [], 'table c': [], 'table b': []}
+        self.location_list = {'location one': [], 'location two': [], 'location three': []}
         self.command = None
         self.count = 0
         self.first = None
         self.say = None
         self.follow = self.subtaskBook.get_subtask(self, 'FollowPerson')
+        self.arm_init()
+        self.delay = Delay()
 
     def perform(self, perception_data):
-        rospy.loginfo('state : ' + self.state + str(perception_data.input))
+        # rospy.loginfo('state : ' + self.state + ' ' + str(perception_data.input))
         if self.state is 'init':
-            self.move = self.subtaskBook.get_subtask(self, 'MoveToLocation')
-            self.move.to_location('gpsr_start')
-            self.change_state('move_to_gpsr_start')
-
-        elif self.state is 'move_to_gpsr_start':
-            if self.current_subtask.state is 'finish':
-                self.change_state('wait_follow_command')
-
-        elif self.state is 'wait_follow_command':
-            if perception_data.device is self.Devices.VOICE and 'follow me' in perception_data.input:
-                self.say = self.subtaskBook.get_subtask(self, 'Say')
-                self.say.say('I will follow you.')
-                self.change_state('follow_init')
+            self.say = self.subtaskBook.get_subtask(self, 'Say')
+            print 'double kuy'
+            self.change_state('wait_for_command')
 
         elif self.state is 'follow_init':
             if self.say.state is not 'finish':
@@ -69,14 +63,15 @@ class Restaurant(AbstractTask):
                 if id is not None:
                     self.follow = self.subtaskBook.get_subtask(self, 'FollowPerson')
                     self.follow.set_person_id(id)
-            elif perception_data.device is self.Devices.VOICE and 'robot stop' in perception_data.input:
-                self.say = self.subtaskBook.get_subtask(self, 'Say')
-                self.say.say('Where is this place ?')
-                self.change_state('ask_for_location')
-            elif perception_data.device is self.Devices.VOICE and 'robot wait' in perception_data.input and 'command' in perception_data.input:
-                self.say = self.subtaskBook.get_subtask(self, 'Say')
-                self.say.say('Wait for command.')
-                self.change_state('wait_for_command')
+            elif perception_data.device is self.Devices.VOICE:
+                if 'robot stop' in perception_data.input:
+                    self.say = self.subtaskBook.get_subtask(self, 'Say')
+                    self.say.say('Where is this place ?')
+                    self.change_state('ask_for_location')
+                elif 'robot waiting' in perception_data.input:
+                    self.say = self.subtaskBook.get_subtask(self, 'Say')
+                    self.say.say('Wait for command.')
+                    self.change_state('wait_for_command')
 
         elif self.state is 'ask_for_location':
             if self.say.state is not 'finish':
@@ -96,6 +91,7 @@ class Restaurant(AbstractTask):
                 self.say = self.subtaskBook.get_subtask(self, 'Say')
                 self.say.say('I remember ' + self.location + '.')
                 self.location_list[self.location] = self.perception_module.base_status.position
+                print self.location_list
                 self.change_state('init')
             elif perception_data.device is self.Devices.VOICE and 'robot no' in perception_data.input:
                 self.say = self.subtaskBook.get_subtask(self, 'Say')
@@ -103,20 +99,39 @@ class Restaurant(AbstractTask):
                 self.change_state('ask_for_location')
 
         elif self.state is 'wait_for_command':
-            if self.say.state is not 'finish':
+            print 'kuy'
+            print self.say.state
+            if self.say.state is not 'init' and self.say.state is not 'finish':
                 return
             if perception_data.device is self.Devices.VOICE:
+                print perception_data.input
+                print self.location_list
                 for location in self.location_list:
                     if location in perception_data.input:
                         self.command = location
                         self.say = self.subtaskBook.get_subtask(self, 'Say')
-                        self.say.say('go to ' + self.command + ' yes or no ?')
+                        self.say.say('bring cup noodle to ' + self.command + ' yes or no ?')
                         self.change_state('confirm_command')
+
+                if 'follow me' in perception_data.input:
+                    self.say = self.subtaskBook.get_subtask(self, 'Say')
+                    self.say.say('I will follow you.')
+                    self.change_state('follow_init')
+                elif 'get out' in perception_data.input:
+                    self.say = self.subtaskBook.get_subtask(self, 'Say')
+                    self.say.say('I will go back.')
+                    self.say = self.subtaskBook.get_subtask(self, 'Say')
+                    self.move = self.subtaskBook.get_subtask(self, 'MoveToLocation')
+                    self.move.to_location('gpsr_start')
+                    self.change_state('move_to_gpsr_start')
 
         elif self.state is 'confirm_command':
             if self.say.state is not 'finish':
                 return
             if perception_data.device is self.Devices.VOICE and 'robot yes' in perception_data.input:
+                self.mama()
+                rospy.sleep(10000)
+                self.pub_right_gripper.publish(-0.4)
                 self.say = self.subtaskBook.get_subtask(self, 'Say')
                 self.say.say('I will go to ' + self.command + '.')
                 self.move = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
@@ -128,14 +143,37 @@ class Restaurant(AbstractTask):
                 self.change_state('wait_for_command')
 
         elif self.state is 'move_to_first':
-            if self.move.state is not 'finish':
+            if self.move.state is 'finish':
                 self.change_state('wait_for_order')
 
         elif self.state is 'wait_for_order':
             if perception_data.device is self.Devices.VOICE:
-                self.say.say('you want ' + perception_data.input + ' yes or no ?')
-                for location in self.location_list:
-                    if location in perception_data.input:
-                        self.command = location
-                        self.say.say('go to ' + self.command + ' yes or no ?')
-                        self.change_state('confirm_command')
+                self.pub_right_gripper.publish(1.1)
+                # self.say.say('you want ' + perception_data.input + ' yes or no ?')
+                # for location in self.location_list:
+                #     if location in perception_data.input:
+                #         self.command = location
+                #         self.say.say('go to ' + self.command + ' yes or no ?')
+                #         self.change_state('confirm_command')
+
+        elif self.state is 'move_to_gpsr_start':
+            if self.current_subtask.state is 'finish':
+                self.change_state('wait_for_command')
+
+    def arm_init(self):
+        self.pub_right_shoulder_1 = rospy.Publisher('/dynamixel/right_shoulder_1_controller/command', Float64)
+        self.pub_right_shoulder_2 = rospy.Publisher('/dynamixel/right_shoulder_2_controller/command', Float64)
+        self.pub_right_elbow = rospy.Publisher('/dynamixel/right_elbow_controller/command', Float64)
+        self.pub_right_wrist_1 = rospy.Publisher('/dynamixel/right_wrist_1_controller/command', Float64)
+        self.pub_right_wrist_2 = rospy.Publisher('/dynamixel/right_wrist_2_controller/command', Float64)
+        self.pub_right_wrist_3 = rospy.Publisher('/dynamixel/right_wrist_3_controller/command', Float64)
+        self.pub_right_gripper = rospy.Publisher('dynamixel/right_gripper_joint_controller/command', Float64)
+
+    def mama(self):
+    	self.pub_right_shoulder_1.publish(-0.6)
+    	self.pub_right_shoulder_2.publish(0.0)
+    	self.pub_right_elbow.publish(0.3)
+    	self.pub_right_wrist_1.publish(0.0)
+    	self.pub_right_wrist_2.publish(0.6)
+    	self.pub_right_wrist_3.publish(0.0)
+    	self.pub_right_gripper.publish(-0.8)

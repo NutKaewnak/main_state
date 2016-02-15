@@ -16,7 +16,7 @@ class BaseStatusPerception(AbstractPerception):
         self.position = (0, 0, 0)
 
     def callback_base_status(self, data):
-        self.broadcast(Devices.BASE_STcATUS, data.status.status)
+        self.broadcast(Devices.BASE_STATUS, data.status.status)
 
     def callback_base_position(self, data):
         position = data.feedback.base_position.pose.position
