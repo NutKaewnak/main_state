@@ -13,6 +13,7 @@ class Speaker:
         self.process = subprocess.Popen('pico2wave -w temp.wav "' + message + '" && aplay temp.wav', shell=True)
 
     def is_finish(self):
+        print self.process
         if self.process is None:
             return False
         elif self.process.poll() != 0:

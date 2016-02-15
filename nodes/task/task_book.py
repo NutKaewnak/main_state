@@ -19,6 +19,7 @@ from robo_nurse import RoboNurse
 from today_show import TodayShow
 from recognition_testing import TestRecognition
 from test_object3ds_detection import TestObject3DsDetection
+from restaurant_vdo import RestaurantVDO
 
 
 class TaskBook:
@@ -44,6 +45,7 @@ class TaskBook:
         self.book['TodayShow'] = TodayShow(planning_module)
         self.book['RecognitionTesting'] =TestRecognition(planning_module)
         self.book['TestObject3DsDetection'] = TestObject3DsDetection(planning_module)
+        self.book['RestaurantVDO'] = RestaurantVDO(planning_module)
 
     def set_perception(self, perception_module):
         for task in self.book:

@@ -18,5 +18,8 @@ class DetectObject3Ds(AbstractSkill):
             if perception_data.device is self.Devices.OBJECT_3DS_DETECTOR:
                 status = MoveBaseStatus.get_state_from_status(perception_data.input.status.status)
                 self.change_state(status)
+                print 'state_object = ' + self.state
                 if self.state is 'succeeded':
-                    self.objects = perception_data.input.result
+                    # print 'What the Fuck ------------------------'
+                    # print type(perception_data.input.result.)
+                    self.objects = perception_data.input.result.objects

@@ -22,7 +22,7 @@ from scissor_rock_paper import ScissorRockPaper
 from recognize_objects import RecognizeObjects
 from test_subtask_skill import TestSubtaskSkill
 from objects_detection import ObjectsDetection
-
+from pills_detection import PillsDetection
 __author__ = "AThousandYears"
 
 
@@ -44,6 +44,7 @@ class SubtaskBook:
         self.book['MoveAbsolute'] = MoveAbsolute(planning_module)
         self.book['Say'] = Say(planning_module)
         self.book['Pick'] = Pick(planning_module)
+        self.book['PillsDetection'] = PillsDetection(planning_module)
         self.book['DetectWavingPeople'] = DetectWavingPeople(planning_module)
         self.book['SearchWavingPeople'] = SearchWavingPeople(planning_module)
         self.book['DetectFrontPerson'] = DetectFrontPerson(planning_module)
