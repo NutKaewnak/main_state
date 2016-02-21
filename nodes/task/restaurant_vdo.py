@@ -30,7 +30,6 @@ class RestaurantVDO(AbstractTask):
         # rospy.loginfo('state : ' + self.state + ' ' + str(perception_data.input))
         if self.state is 'init':
             self.say = self.subtaskBook.get_subtask(self, 'Say')
-            print 'double kuy'
             self.change_state('wait_for_command')
 
         elif self.state is 'follow_init':
@@ -99,8 +98,6 @@ class RestaurantVDO(AbstractTask):
                 self.change_state('ask_for_location')
 
         elif self.state is 'wait_for_command':
-            print 'kuy'
-            print self.say.state
             if self.say.state is not 'init' and self.say.state is not 'finish':
                 return
             if perception_data.device is self.Devices.VOICE:

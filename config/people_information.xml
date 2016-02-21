@@ -1,22 +1,23 @@
 <people_information>
-	<person name="michael"/>
-	<person name="christopher"/>
-	<person name="matthew"/>
-	<person name="joshua"/>
-	<person name="daniel"/>
-	<person name="david"/>
-	<person name="andrew"/>
-	<person name="james"/>
-	<person name="justin"/>
-	<person name="joseph"/>
-	<person name="jessica"/>
-	<person name="ashley"/>
-	<person name="brittany"/>
-	<person name="amanda"/>
-	<person name="samantha"/>
-	<person name="sarah"/>
-	<person name="stephanie"/>
-	<person name="jennifer"/>
-	<person name="elizabeth"/>
-	<person name="lauren"/>
+	<person name="alex" sex="male"/>
+	<person name="angle" sex="male"/>
+	<person name="edward" sex="male"/>
+	<person name="jamie" sex="male"/>
+	<person name="john" sex="male"/>
+	<person name="kevin" sex="male"/>
+	<person name="kurt" sex="male"/>
+	<person name="tracy" sex="male"/>
+	<person name="robin" sex="male"/>
+	<person name="homer" sex="male"/>
+
+	<person name="alex" sex="female"/>
+	<person name="angle" sex="female"/>
+	<person name="eve" sex="female"/>
+	<person name="jamie" sex="female"/>
+	<person name="jane" sex="female"/>
+	<person name="liza" sex="female"/>
+	<person name="melissa" sex="female"/>
+	<person name="tracy" sex="female"/>
+	<person name="robin" sex="female"/>
+	<person name="sophia" sex="female"/>
 </people_information>
