@@ -61,11 +61,30 @@ class ManipulateController:
         self.grasp_plan = None
         self.robot = None
         self.scene = None
+        self.tf_listener = None
 
     def init_controller(self):
         moveit_commander.roscpp_initialize(sys.argv)
         self.robot = moveit_commander.RobotCommander()
         self.scene = moveit_commander.PlanningSceneInterface()
+        self.tf_listener = tf.TransformListener()
+
+    def transformPoint(self, position, arm_group, origin_frame = 'base_link'):
+    	destination_frame = None
+    	if arm_group == "right_arm":
+    		destination_frame = 'right_mani_link'
+    	elif arm_group == "left_arm":
+    		destination_frame = 'left_mani_link'
+
+    	tfpts = geometry_msgs.msg.PointStamped()
+    	tfpts.point.x = position[0]
+    	tfpts.point.y = position[1]
+    	tfpts.point.z = position[2]
+    	tfpts.header.stamp = rospy.Time(0)
+    	tfpts.header.frame_id = origin_frame
+    	point_out = self.tf_listener.transformPoint(destination_frame,tfpts)
+    	out = [point_out.point.x, point_out.point.y, point_out.point.z]
+    	return out 
 
     def manipulate(self, arm_group, position, orientation_rpy=[0, 0, 0], tolerance=[0.05, 0.1], ref_frame="base_link",
                    planning_time=50.00):
@@ -101,7 +120,7 @@ class ManipulateController:
             self.robot.left_arm.set_goal_orientation_tolerance(orient_tolerance)
             self.robot.left_arm.set_pose_reference_frame(ref_frame)
             self.robot.left_arm.set_pose_target(pose_target)
-            self.robot.left_arm.go(False)  # async_move
+            self.robot.left_arm.go(False)  # async_movel
         else:
             rospy.logwarn("No specified arm_group")
 
@@ -130,7 +149,7 @@ class ManipulateController:
 
         return joint_state
 
-    def move_relative(self, arm_group, relative_goal_translation, relative_goal_rotation):
+    def move_relative(self, arm_group, rel, llative_goal_translation, relative_goal_rotation):
         # respect to efflink
         if arm_group == "right_arm":
             last_pose = self.robot.right_arm.get_current_pose()
