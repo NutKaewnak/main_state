@@ -23,7 +23,7 @@ class Pick(AbstractSubtask):
             # self.neck.pan = 0
             self.neck = self.skillBook.get_skill(self, 'TurnNeck')
             print '******init_subtask'
-            self.neck.turn_relative(-0.4, 0)
+            self.neck.turn(-0.4, 0)
             self.change_state('setting_arm')
 
         elif self.state is 'setting_arm':
@@ -52,7 +52,7 @@ class Pick(AbstractSubtask):
         #         rospy.loginfo('******move:move_relative*******')
 
         elif self.state is 'detect_object':
-            rospy.loginfo('******detect_object:subtask******')
+            # rospy.loginfo('******detect_object:subtask******')
             if self.skill.state is 'checking':
                 rospy.loginfo('******checking:subtask******')
                 self.check = self.subtaskBook.get_subtask(self, 'ObjectsDetection')
@@ -60,7 +60,7 @@ class Pick(AbstractSubtask):
                 self.change_state('after_detect')
 
         elif self.state is 'after_detect':
-            rospy.loginfo('******after_detect:subtask******')
+            # rospy.loginfo('******after_detect:subtask******')
             if self.check.state == 'finish':
                 rospy.loginfo('******finish_detect:subtask******')
                 if self.check.objects is not None:
@@ -68,8 +68,7 @@ class Pick(AbstractSubtask):
                     # print type(self.check.objects)
                     # for i in self.check.objects:
                     #     print i
-                    self.skill.set_object_pos(self.check.objects[0].point.x, self.check.objects[0].point.y,
-                                              self.check.objects[0].point.z)
+                    self.skill.set_object_pos(self.check.objects[0].point.x, self.check.objects[0].point.y, self.check.objects[0].point.z)
                 self.skill.after_mani()
                 self.change_state('grasp_object')
 

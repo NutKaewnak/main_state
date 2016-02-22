@@ -23,19 +23,23 @@ class InverseKinematics:
         self.x = None
         self.y = None
         self.z = None
+        self.arm_group = 'right_arm'
 
     def init_position(self, x, y, z):
         self.x = x-0.02-0.08
         self.y = y+0.17
-        self.z = z-0.8+0.2
+        self.z = z-0.8
         # mani link
         # set_magicNumber
+        print '[' + str(self.x) + ',' + str(self.y) + ',' + str(self.z) + ']'
         self.object_pos = [self.x, self.y, self.z]
         rospy.loginfo("-------INIT POSITION-------")
 
     def inverse_kinematics_prepare(self):
         rospy.loginfo("---PICK PREPARE---")
-        angle = self.inv_kinematic(self.object_pos[0]-0.1, self.object_pos[1], 0.8)
+        # angle = self.inv_kinematic(self.object_pos[0]-0.1, self.object_pos[1], 0.8)
+        angle = self.inv_kinematic()
+        mnplctrl.init_controller()
         r_sh1 = self.inBound('right_shoulder_1_joint', -1*angle[0])
         mnplctrl.movejoint('right_shoulder_1_joint', r_sh1)
         r_sh2 = self.inBound('right_shoulder_2_joint', -1*angle[1])
@@ -50,7 +54,8 @@ class InverseKinematics:
         mnplctrl.movejoint('right_wrist_3_joint', r_wr3)
 
     def inverse_kinematics_pregrasp(self):
-        angle = self.inv_kinematic(self.object_pos[0], self.object_pos[1], self.object_pos[2])
+        # angle = self.inv_kinematic(self.object_pos[0], self.object_pos[1], self.object_pos[2])
+        angle = self.inv_kinematic()
         r_sh1 = self.inBound('right_shoulder_1_joint', -1*angle[0])
         mnplctrl.movejoint('right_shoulder_1_joint', r_sh1)
         r_sh2 = self.inBound('right_shoulder_2_joint', -1*angle[1])
@@ -164,54 +169,105 @@ class InverseKinematics:
 
 
     def inBound(self, joint_name, angle):
-        if joint_name == 'right_shoulder_1_joint':
-            if angle >= -1.2 and angle <= 0.5:
-                return angle
-            else:
-                if angle < -1.2:
-                    return -1.2
+        if self.arm_group == 'right_arm':
+            if joint_name == 'right_shoulder_1_joint':
+                if angle >= -1.2 and angle <= 0.5:
+                    return angle
                 else:
-                    return 0.5
-        elif joint_name == 'right_shoulder_2_joint':
-            if angle >= -1.46 and angle <= 1.1:
-                return angle
-            else:
-                if angle < -1.46:
-                    return -1.46
+                    if angle < -1.2:
+                        return -1.2
+                    else:
+                        return 0.5
+            elif joint_name == 'right_shoulder_2_joint':
+                if angle >= -1.46 and angle <= 1.1:
+                    return angle
                 else:
-                    return 1.1
-        elif joint_name == 'right_elbow_joint':
-            if angle >= -1.0 and angle <= 0.22:
-                return angle
-            else:
-                if angle < -1.0:
-                    return -1.0
+                    if angle < -1.46:
+                        return -1.46
+                    else:
+                        return 1.1
+            elif joint_name == 'right_elbow_joint':
+                if angle >= -1.0 and angle <= 0.22:
+                    return angle
                 else:
-                    return 0.22
-        elif joint_name == 'right_wrist_1_joint':
-            if angle >= -3.1 and angle <= 2.5:
-                return angle
-            else:
-                if angle < -3.1:
-                    return -3.1
+                    if angle < -1.0:
+                        return -1.0
+                    else:
+                        return 0.22
+            elif joint_name == 'right_wrist_1_joint':
+                if angle >= -3.1 and angle <= 2.5:
+                    return angle
                 else:
-                    return 2.5
-        elif joint_name == 'right_wrist_2_joint':
-            if angle >= -0.6 and angle <= 1.5:
-                return angle
-            else:
-                if angle < -0.6:
-                    return -0.6
+                    if angle < -3.1:
+                        return -3.1
+                    else:
+                        return 2.5
+            elif joint_name == 'right_wrist_2_joint':
+                if angle >= -0.6 and angle <= 1.5:
+                    return angle
                 else:
-                    return 1.5
-        elif joint_name == 'right_wrist_3_joint':
-            if angle >= -2.64 and angle <= 3.17:
-                return angle
-            else:
-                if angle < -2.64:
-                    return -2.64
+                    if angle < -0.6:
+                        return -0.6
+                    else:
+                        return 1.5
+            elif joint_name == 'right_wrist_3_joint':
+                if angle >= -2.64 and angle <= 3.17:
+                    return angle
                 else:
-                    return 3.17
+                    if angle < -2.64:
+                        return -2.64
+                    else:
+                        return 3.17
+        # ---------------------------
+        elif self.arm_group == 'left_arm':
+            if joint_name == 'left_shoulder_1_joint':
+                if angle >= -3.8 and angle <= 0.58:
+                    return angle
+                else:
+                    if angle < -3.8:
+                        return -3.8
+                    else:
+                        return 0.58
+            elif joint_name == 'left_shoulder_2_joint':
+                if angle >= -1.5 and angle <= 1.0:
+                    return angle
+                else:
+                    if angle < -1.5:
+                        return -1.5
+                    else:
+                        return 1.0
+            elif joint_name == 'left_elbow_joint':
+                if angle >= -0.88 and angle <= 0.17:
+                    return angle
+                else:
+                    if angle < -0.88:
+                        return -0.88
+                    else:
+                        return 0.17
+            elif joint_name == 'left_wrist_1_joint':
+                if angle >= -3.1 and angle <= 2.5:
+                    return angle
+                else:
+                    if angle < -3.1:
+                        return -3.1
+                    else:
+                        return 2.5
+            elif joint_name == 'left_wrist_2_joint':
+                if angle >= -0.6 and angle <= 1.5:
+                    return angle
+                else:
+                    if angle < -0.6:
+                        return -0.6
+                    else:
+                        return 1.5
+            elif joint_name == 'left_wrist_3_joint':
+                if angle >= -2.64 and angle <= 3.17:
+                    return angle
+                else:
+                    if angle < -2.64:
+                        return -2.64
+                    else:
+                        return 3.17
 
     # def init_controller(self):
     #     moveit_commander.rospy_initialize(sys.argv)

@@ -22,8 +22,9 @@ class TurnNeck(AbstractSkill):
 
         if self.state is 'receive':
             if perception_data.device is 'NECK':
+                print 'receive neck-------'
                 self.pan = perception_data.input.pan
-                self.tilt = perception_data.input.tiltfoll
+                self.tilt = perception_data.input.tilt
                 self.turn(self.pitch + self.tilt, self.yaw + self.pan)
 
     def turn(self, pitch, yaw):
