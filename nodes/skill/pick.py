@@ -22,25 +22,27 @@ class Pick(AbstractSkill):
         self.device = None
 
         # self.pub_right_gripper = rospy.Publisher('/dynamixel/right_gripper_joint_controller/command', Float64)
-        self.pub_right_wrist_2 = rospy.Publisher('/dynamixel/right_wrist_2_controller/command', Float64)
-        self.pub_right_wrist_3 = rospy.Publisher('/dynamixel/right_wrist_3_controller/command', Float64)
+        # self.pub_right_wrist_2 = rospy.Publisher('/dynamixel/right_wrist_2_controller/command', Float64)
+        # self.pub_right_wrist_3 = rospy.Publisher('/dynamixel/right_wrist_3_controller/command', Float64)
         # self.pub_tilt = rospy.Publisher('/dynamixel/tilt_controller/command', Float64)
         # self.pub_pan = rospy.Publisher('/dynamixel/pan_controller/command', Float64)
 
         # self.pub_left_gripper = rospy.Publisher('/dynamixel/left_gripper_joint_controller/command', Float64)
-        self.pub_left_wrist_2 = rospy.Publisher('/dynamixel/left_wrist_2_controller/command', Float64)
-        self.pub_left_wrist_3 = rospy.Publisher('/dynamixel/left_wrist_3_controller/command', Float64)
+        # self.pub_left_wrist_2 = rospy.Publisher('/dynamixel/left_wrist_2_controller/command', Float64)
+        # self.pub_left_wrist_3 = rospy.Publisher('/dynamixel/left_wrist_3_controller/command', Float64)
 
     def perform(self, perception_data):
         if self.state is 'init_pick':
             rospy.loginfo('----init_pick----')
             self.manipulator.init_controller()
             self.set_static_pos()
+            self.delay.wait(5000)
             self.change_state('wait_arm_normal')
 
         elif self.state is 'wait_arm_normal':
             if perception_data.device == 'RIGHT_ARM':
                 if ArmStatus.get_state_from_status(perception_data.input) == 'succeeded':
+                    self.delay.wait(5000)
                     # self.gripper s= self.controlModule.gripper
                     self.change_state('arm_normal')
 
@@ -51,6 +53,7 @@ class Pick(AbstractSkill):
             # self.pub_pan.publish(0.0)
             # self.pub_tilt.publish(-0.3)
             # self.pub_prismatic.publish(0+0.23)
+            self.delay.wait(5000)
             print '---current state = ' + self.state + '---'
             self.change_state('prepare_pick')
             print '----next state = ' + self.state + '----'
@@ -60,7 +63,7 @@ class Pick(AbstractSkill):
         elif self.state is 'prepare_pick':
             rospy.loginfo('---prepare_to_pick---')
             self.manipulator.pickobject_prepare()
-            self.delay.wait(3000)
+            self.delay.wait(8000)
             print '---current state = ' + self.state + '---'
             # self.make_device()
             #
@@ -81,7 +84,7 @@ class Pick(AbstractSkill):
             # elif self.side is 'left_arm':
             #     self.pub_left_gripper.publish(1.1)
             print '---current state = ' + self.state+'---'
-            self.delay.wait(3000)
+            self.delay.wait(6000)
             self.change_state('check_object')
             print '---next state = ' + self.state + '---'
             rospy.loginfo("Press any key to Continue3")
@@ -122,27 +125,32 @@ class Pick(AbstractSkill):
         elif self.state is 'check_object':
             rospy.loginfo('---check_object---')
             print '---current state = ' + self.state + '---'
+            self.delay.wait(6000)
             rospy.loginfo("Press any key to Continue4")
             self.change_state('checking')
             print '---next state = ' + self.state + '---'
+            raw_input()
 
         elif self.state is 'init_pos':
             rospy.loginfo('---init_pos---')
             self.kinematic.init_position(self.object_pos[0], self.object_pos[1], self.object_pos[2])
+            self.delay.wait(6000)
             self.change_state('prepare_obj')
+            raw_input()
 
         elif self.state is 'prepare_obj':
             rospy.loginfo('---prepare_obj---')
             self.kinematic.inverse_kinematics_prepare()
-            self.delay.wait(3000)
+            self.delay.wait(6000)
             self.change_state('pregrasp')
+            raw_input()
 
         elif self.state is 'pregrasp':
             rospy.loginfo('---pregrasp---')
             # self.manipulator.pickobject_pregrasp()
-            self.delay.wait(3000)
+            self.delay.wait(5000)
             self.kinematic.inverse_kinematics_pregrasp()
-            self.delay.wait(3000)
+            self.delay.wait(6000)
             print '---current state = ' + self.state + '---'
             # rospy.loginfo("Press any key to Continue5")
             # raw_input()
@@ -150,7 +158,7 @@ class Pick(AbstractSkill):
             # self.change_state('move_to_object_front')
             print '---next state = ' + self.state + '---'
             rospy.loginfo("Press any key to Continue5")
-            # raw_input()
+            raw_input()
 
         # elif self.state is 'pregrasp':
         #     rospy.loginfo('--pregrasp--')
@@ -166,22 +174,22 @@ class Pick(AbstractSkill):
         #             self.change_state('prepare_pregrasp')
         #     rospy.loginfo("Press any key to Continue11")
         #     raw_input()
-
-        elif self.state is 'move_to_object_front':
-            rospy.loginfo('---move_to_object_front---')
-            self.manipulator.pickobject_movetoobjectfront_1()
-            self.delay.wait(1000)
-            self.manipulator.pickobject_movetoobjectfront_2()
-            self.move_wrist2(-0.2)
-            self.delay.wait(1000)
-            self.manipulator.pickobject_movetoobjectfront_3()
-            self.move_wrist2(-0.2)
-            self.delay.wait(1000)
-            print '---current state = ' + self.state + '---'
-            rospy.loginfo("Press any key to Continue6")
-            # raw_input()
-            self.change_state('grab_object')
-            print '---next state = ' + self.state + '---'
+        #
+        # elif self.state is 'move_to_object_front':
+        #     rospy.loginfo('---move_to_object_front---')
+        #     self.manipulator.pickobject_movetoobjectfront_1()
+        #     self.delay.wait(1000)
+        #     self.manipulator.pickobject_movetoobjectfront_2()
+        #     self.move_wrist2(-0.2)
+        #     self.delay.wait(1000)
+        #     self.manipulator.pickobject_movetoobjectfront_3()
+        #     self.move_wrist2(-0.2)
+        #     self.delay.wait(1000)
+        #     print '---current state = ' + self.state + '---'
+        #     rospy.loginfo("Press any key to Continue6")
+        #     # raw_input()
+        #     self.change_state('grab_object')
+        #     print '---next state = ' + self.state + '---'
             # rospy.loginfo("Press any key to Continue13")
             # raw_input()
 
@@ -202,8 +210,8 @@ class Pick(AbstractSkill):
             rospy.loginfo('---grab_object---')
             print '---current state = ' + self.state + '---'
             # self.move_gripper(-0.6)
-            self.delay.wait(1000)
-            self.move_wrist2(0.0)
+            self.delay.wait(6000)
+            # self.move_wrist2(0.0)
             # if self.side is 'right_arm':
             #     self.pub_right_gripper.publish(0.3)
             #     self.delay.wait(1000)
@@ -216,20 +224,23 @@ class Pick(AbstractSkill):
             self.change_state('after_grasp')
             print '---next state = ' + self.state + '---'
             rospy.loginfo("Press any key to Continue7")
+            raw_input()
 
         elif self.state is 'after_grasp':
             # self.manipulator.pickobject_after_grasp()
             # rospy.loginfo('--after_grasp--')
             print '---current state = ' + self.state + '---'
             self.manipulator.pickobject_prepare()
-            self.delay.wait(1000)
+            self.delay.wait(6000)
             self.change_state('succeed')
             print '---next state = ' + self.state + '---'
             rospy.loginfo("Press any key to Continue8")
+            raw_input()
 
         elif self.state is 'succeed':
-            self.manipulator.finish()
+            self.manipulator.pick_object_finish()
             rospy.loginfo("Press any key to Continue9")
+            raw_input()
 
     # def pick_object(self, side, goal_name='unknown'):
     def pick_object(self, side):
@@ -260,11 +271,11 @@ class Pick(AbstractSkill):
             self.delay.wait(1000)
             self.change_state('init_pos')
 
-    def move_wrist2(self, value):
-        if self.side is 'right_arm':
-            self.pub_right_wrist_2.publish(value)
-        elif self.side is 'left_arm':
-            self.pub_left_wrist_2.publish(value)
+    # def move_wrist2(self, value):
+    #     if self.side is 'right_arm':
+    #         self.pub_right_wrist_2.publish(value)
+    #     elif self.side is 'left_arm':
+    #         self.pub_left_wrist_2.publish(value)
 
     # def move_gripper(self, value):
     #     if self.side is 'right_arm':
