@@ -2,9 +2,6 @@ import rospy
 from include.abstract_task import AbstractTask
 from include.get_distance import get_distance
 from include.delay import Delay
-from math import sqrt
-from subprocess import call
-from geometry_msgs.msg import Vector3
 from std_msgs.msg import Float64
 
 __author__ = 'Nicole'
@@ -37,7 +34,7 @@ class RestaurantVDO(AbstractTask):
             if self.say.state is not 'finish':
                 return
             if perception_data.device is self.Devices.PEOPLE:
-                distance = 2.0  # set to maximum
+                distance = 3.0  # set to maximum
                 id = None
                 for person in perception_data.input:
                     if person.personpoints.x < distance:
@@ -53,7 +50,7 @@ class RestaurantVDO(AbstractTask):
             if self.say.state is not 'finish':
                 return
             if self.follow.state is 'abort' and perception_data.device is self.Devices.PEOPLE:
-                min_distance = 0.7  # set to maximum
+                min_distance = 2  # set to maximum
                 id = None
                 for person in perception_data.input:
                     distance = get_distance(person.personpoints, self.follow.last_point)
@@ -130,8 +127,10 @@ class RestaurantVDO(AbstractTask):
                 return
             if perception_data.device is self.Devices.VOICE and 'robot yes' in perception_data.input:
                 self.mama()
-                rospy.sleep(10000)
-                self.pub_right_gripper.publish(-0.4)
+                self.pub_left_gripper.publish(1.1)
+                rospy.sleep(5)
+                self.pub_left_gripper.publish(-0.4)
+                rospy.sleep(3)
                 self.say = self.subtaskBook.get_subtask(self, 'Say')
                 self.say.say('I will go to ' + self.command + '.')
                 self.move = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
@@ -148,7 +147,8 @@ class RestaurantVDO(AbstractTask):
 
         elif self.state is 'wait_for_order':
             if perception_data.device is self.Devices.VOICE:
-                self.pub_right_gripper.publish(1.1)
+                self.send()
+                self.pub_left_gripper.publish(1.1)
                 # self.say.say('you want ' + perception_data.input + ' yes or no ?')
                 # for location in self.location_list:
                 #     if location in perception_data.input:
@@ -161,19 +161,71 @@ class RestaurantVDO(AbstractTask):
                 self.change_state('wait_for_command')
 
     def arm_init(self):
-        self.pub_right_shoulder_1 = rospy.Publisher('/dynamixel/right_shoulder_1_controller/command', Float64)
-        self.pub_right_shoulder_2 = rospy.Publisher('/dynamixel/right_shoulder_2_controller/command', Float64)
-        self.pub_right_elbow = rospy.Publisher('/dynamixel/right_elbow_controller/command', Float64)
-        self.pub_right_wrist_1 = rospy.Publisher('/dynamixel/right_wrist_1_controller/command', Float64)
-        self.pub_right_wrist_2 = rospy.Publisher('/dynamixel/right_wrist_2_controller/command', Float64)
-        self.pub_right_wrist_3 = rospy.Publisher('/dynamixel/right_wrist_3_controller/command', Float64)
-        self.pub_right_gripper = rospy.Publisher('dynamixel/right_gripper_joint_controller/command', Float64)
+        self.pub_left_shoulder_1 = rospy.Publisher('/dynamixel/left_shoulder_1_controller/command', Float64)
+        self.pub_left_shoulder_2 = rospy.Publisher('/dynamixel/left_shoulder_2_controller/command', Float64)
+        self.pub_left_elbow = rospy.Publisher('/dynamixel/left_elbow_controller/command', Float64)
+        self.pub_left_wrist_1 = rospy.Publisher('/dynamixel/left_wrist_1_controller/command', Float64)
+        self.pub_left_wrist_2 = rospy.Publisher('/dynamixel/left_wrist_2_controller/command', Float64)
+        self.pub_left_wrist_3 = rospy.Publisher('/dynamixel/left_wrist_3_controller/command', Float64)
+        self.pub_left_gripper = rospy.Publisher('dynamixel/left_gripper_joint_controller/command', Float64)
 
     def mama(self):
-    	self.pub_right_shoulder_1.publish(-0.6)
-    	self.pub_right_shoulder_2.publish(0.0)
-    	self.pub_right_elbow.publish(0.3)
-    	self.pub_right_wrist_1.publish(0.0)
-    	self.pub_right_wrist_2.publish(0.6)
-    	self.pub_right_wrist_3.publish(0.0)
-    	self.pub_right_gripper.publish(-0.8)
+        self.pub_left_shoulder_2.publish(0.2)
+        self.pub_left_elbow.publish(0.4)
+        self.pub_left_wrist_1.publish(0.0)
+        self.pub_left_wrist_2.publish(0.4)
+        self.pub_left_wrist_3.publish(0.0)
+        self.pub_left_shoulder_1.publish(-0.1)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-0.2)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-0.3)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-0.4)
+        rospy.sleep(0.5)
+
+    def send(self):
+        self.pub_left_shoulder_2.publish(0.2)
+        self.pub_left_elbow.publish(0.2)
+        self.pub_left_wrist_1.publish(0.0)
+        self.pub_left_wrist_2.publish(0.8)
+        self.pub_left_wrist_3.publish(0.0)
+        self.pub_left_shoulder_1.publish(-0.5)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-0.6)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-0.7)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-0.8)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-0.9)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-1.0)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-1.1)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-1.2)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-1.3)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-1.4)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-1.5)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-1.6)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-1.7)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-1.8)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-1.9)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-2.0)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-2.1)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-2.2)
+        rospy.sleep(0.5)
+        self.pub_left_shoulder_1.publish(-2.3)
+        rospy.sleep(0.5)
+

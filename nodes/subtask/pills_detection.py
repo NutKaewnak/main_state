@@ -21,7 +21,7 @@ class PillsDetection(AbstractSubtask):
 
     def perform(self, perception_data):
         if self.state is 'set_neck':
-            self.turn_neck.turn_relative(self, self.pitch_neck, 30)
+            self.turn_neck.turn_relative(self, self.pitch_neck, -0.34)
             self.change_state('detecting')
 
         elif self.state is 'detecting':
@@ -35,8 +35,8 @@ class PillsDetection(AbstractSubtask):
                 self.pill_dic[self.pill_name] = self.pill_pos
                 self.subtaskBook.get_subtask(self, 'Say').say(self.pill_name)
                 # turn left to right
-                self.turn_neck.turn_relative(self, 0, -5)
-                if self.turn_range is not 30:
+                self.turn_neck.turn_relative(self, 0, -0.11)
+                if self.turn_range is not 0.34:
                     # add +y turn range
                     self.change_state('detecting')
                 else:
@@ -44,8 +44,8 @@ class PillsDetection(AbstractSubtask):
 
         elif self.state is 'get_next_line':
             # add +z
-            self.pitch_neck -= 5
-            if self.line is not -30:
+            self.pitch_neck -= 0.1225
+            if self.line is not -0.994:
                 self.change_state('set_neck')
             else:
                 self.change_state('success')
