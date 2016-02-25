@@ -14,7 +14,7 @@ from perception.height import Height
 from perception.joy import JoyInput
 from perception.recognize_objects_status import RecognizeObjectsPerception
 from perception.object_3ds_detector_status import Object3DsDetectorPerception
-
+from perception.voice_recognition_mode_status import VoiceRecognitionModePerception
 __author__ = "AThousandYears"
 
 
@@ -37,3 +37,4 @@ class PerceptionModule:
         self.joy = JoyInput(main_state.planningModule)
         self.recognize_objects = RecognizeObjectsPerception(main_state.planningModule)
         self.object_3ds_detector = Object3DsDetectorPerception(main_state.planningModule)
+        self.voice_recognition_mode = VoiceRecognitionModePerception(main_state.planningModule)

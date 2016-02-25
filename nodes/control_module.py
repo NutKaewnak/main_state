@@ -7,6 +7,7 @@ from controller.manipulator_controller import ManipulateController
 from controller.gripper_controller import GripperController
 from controller.recognize_objects_contoller import RecognizeObjectsObController
 from controller.object_3d_detector_contoller import Object3dsDetectorContoller
+from controller.voice_recognition_mode_contoller import VoiceRecognitionModeContoller
 
 __author__ = "AThousandYears"
 
@@ -22,6 +23,7 @@ class ControlModule:
     manipulator = ManipulateController()
     gripper = GripperController()
     object_3d_detector = Object3dsDetectorContoller()
+    voice_recognition_mode = VoiceRecognitionModeContoller()
 
     def __init__(self):
         pass
