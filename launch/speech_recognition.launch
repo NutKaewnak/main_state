@@ -1,0 +1,9 @@
+<launch>
+  <!--<node ns="door" name="door_detection" pkg="door_detection" type="door_detection_node">
+    <remap from="/scan" to="/laser/scan"/>
+  </node>-->
+  <node name="main_state" pkg="main_state" type="main.py" output="screen" args="SpeechRecognition" />
+  <include file="$(find speech_processing)/dic/50_questions_Frank/50_questions_new.launch" />
+  <node name="static_pub" pkg="rostopic" type="rostopic" args="pub /door/status std_msgs/String open "/>
+  
+</launch>
