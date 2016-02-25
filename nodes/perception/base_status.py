@@ -1,11 +1,10 @@
-__author__ = "AThousandYears"
-
 import rospy
 from tf.transformations import euler_from_quaternion
 from move_base_msgs.msg import MoveBaseActionResult, MoveBaseActionFeedback
-
 from include.abstract_perception import AbstractPerception
 from include.devices import Devices
+
+__author__ = "AThousandYears"
 
 
 class BaseStatusPerception(AbstractPerception):

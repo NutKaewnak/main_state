@@ -11,6 +11,6 @@ class Test(AbstractTask):
     def perform(self, perception_data):
         if self.state is 'init':
             rospy.loginfo('---in test---')
-            self.pick = self.subtaskBook.get_subtask(self, 'Pick')
-            self.pick.pick_object('right_arm')
+            self.subtask = self.subtaskBook.get_subtask(self, 'Pick')
+            self.subtask.pick_object('right_arm')
             self.change_state('finish')

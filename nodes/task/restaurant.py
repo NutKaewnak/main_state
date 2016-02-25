@@ -30,7 +30,7 @@ class Restaurant(AbstractTask):
         elif self.state is 'follow_init':
             if self.skill.state is not 'finish': return
             if perception_data.device is self.Devices.PEOPLE:
-                distance = 2.0 # set to maximum
+                distance = 2.0  # set to maximum
                 id = None
                 for person in perception_data.input:
                     if person.personpoints.x < distance:
@@ -45,7 +45,7 @@ class Restaurant(AbstractTask):
             # recovery follow
             if self.skill.state is not 'finish': return
             if self.follow.state is 'abort' and perception_data.device is self.Devices.PEOPLE:
-                min_distance = 0.7 # set to maximum
+                min_distance = 0.7  # set to maximum
                 id = None
                 for person in perception_data.input:
                     distance = self.get_distance(person.personpoints, self.follow.last_point)
@@ -75,7 +75,8 @@ class Restaurant(AbstractTask):
                         self.change_state('confirm_location')
 
         elif self.state is 'confirm_location':
-            if self.skill.state is not 'finish': return
+            if self.skill.state is not 'finish':
+                return
             if perception_data.device is self.Devices.VOICE and 'robot yes' in perception_data.input:
                 self.skill = self.subtaskBook.get_subtask(self, 'Say')
                 self.skill.say('I remember ' + self.location + '.')
@@ -87,7 +88,8 @@ class Restaurant(AbstractTask):
                 self.change_state('ask_for_location')
 
         elif self.state is 'wait_for_command':
-            if self.skill.state is not 'finish': return
+            if self.skill.state is not 'finish':
+                return
             if perception_data.device is self.Devices.VOICE:
                 for location in self.location_list:
                     if location in perception_data.input:
@@ -97,7 +99,8 @@ class Restaurant(AbstractTask):
                         self.change_state('confirm_command')
 
         elif self.state is 'confirm_command':
-            if self.skill.state is not 'finish': return
+            if self.skill.state is not 'finish':
+                return
             if perception_data.device is self.Devices.VOICE and 'robot yes' in perception_data.input:
                 self.skill = self.subtaskBook.get_subtask(self, 'Say')
                 self.skill.say('I will go to ' + self.command + '.')
@@ -121,7 +124,6 @@ class Restaurant(AbstractTask):
                         self.command = location
                         self.skill.say('go to ' + self.command + ' yes or no ?')
                         self.change_state('confirm_command')
-
                 
     def get_distance(self, point_a, point_b):
         return sqrt((point_a.x - point_b.x)**2 + (point_a.y - point_b.y)**2)

@@ -1,8 +1,8 @@
-__author__ = 'nicole'
 from include.abstract_task import AbstractTask
+__author__ = 'nicole'
 
 
-class TestSpeach(AbstractTask):
+class TestSpeech(AbstractTask):
     def __init__(self, planning_module):
         AbstractTask.__init__(self, planning_module)
         self.subtask = None

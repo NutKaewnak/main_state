@@ -13,7 +13,7 @@ class TestObject3DsDetection(AbstractTask):
         if self.state is 'init':
             rospy.loginfo("Start Main State: Find Object, State: " + self.state)
             self.objects_detection_subtask = self.subtaskBook.get_subtask(self, 'ObjectsDetection')
-            self.objects_detection_subtask.start(['*'])
+            self.objects_detection_subtask.start()
             self.change_state('findObject')
 
         if self.state is 'findObject':

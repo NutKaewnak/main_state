@@ -8,7 +8,7 @@ from find_people_and_get_order import FindPeopleAndGetOrder
 from detect_and_move_to_people import DetectAndMoveToPeople
 from follow_person import FollowPerson
 from move_relative import MoveRelative
-from bring_object_to_person import BringObjectToPerson
+from bring_object_to_person import BringGrabbingObjectToPerson
 from question_answer import QuestionAnswer
 from move_absolute import MoveAbsolute
 from say import Say
@@ -22,7 +22,7 @@ from scissor_rock_paper import ScissorRockPaper
 from recognize_objects import RecognizeObjects
 from test_subtask_skill import TestSubtaskSkill
 from objects_detection import ObjectsDetection
-
+from pills_detection import PillsDetection
 __author__ = "AThousandYears"
 
 
@@ -39,11 +39,12 @@ class SubtaskBook:
         self.book['DetectAndMoveToPeople'] = DetectAndMoveToPeople(planning_module)
         self.book['FollowPerson'] = FollowPerson(planning_module)
         self.book['MoveRelative'] = MoveRelative(planning_module)
-        self.book['BringObjectToPerson'] = BringObjectToPerson(planning_module)
+        self.book['BringGrabbingObjectToPerson'] = BringGrabbingObjectToPerson(planning_module)
         self.book['QuestionAnswer'] = QuestionAnswer(planning_module)
         self.book['MoveAbsolute'] = MoveAbsolute(planning_module)
         self.book['Say'] = Say(planning_module)
         self.book['Pick'] = Pick(planning_module)
+        self.book['PillsDetection'] = PillsDetection(planning_module)
         self.book['DetectWavingPeople'] = DetectWavingPeople(planning_module)
         self.book['SearchWavingPeople'] = SearchWavingPeople(planning_module)
         self.book['DetectFrontPerson'] = DetectFrontPerson(planning_module)

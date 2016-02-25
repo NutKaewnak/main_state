@@ -1,7 +1,7 @@
-__author__ = 'Nicole'
-import rospy
 from include.abstract_subtask import AbstractSubtask
 from include.delay import Delay
+
+__author__ = 'Nicole'
 
 
 class SearchWavingPeople(AbstractSubtask):
@@ -17,7 +17,6 @@ class SearchWavingPeople(AbstractSubtask):
         self.new_neck_point = 0.3
 
     def perform(self, perception_data):
-        rospy.loginfo('search_people state:' + self.state)
         if self.state is 'init':
             self.skill = self.skillBook.get_skill(self, 'TurnNeck')
             self.subtask = self.subtaskBook.get_subtask(self, 'DetectWavingPeople')
@@ -52,5 +51,3 @@ class SearchWavingPeople(AbstractSubtask):
             if self.skill.state is 'succeeded':
                 self.timer.wait(3)
                 self.change_state('searching')
-
-                # Don't forget to add this subtask to subtask book

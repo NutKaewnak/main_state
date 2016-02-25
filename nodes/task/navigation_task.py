@@ -1,8 +1,10 @@
-__author__ = 'Nicole'
 import rospy
 import math
 from include.abstract_task import AbstractTask
 from include.delay import Delay
+from include.get_distance import get_distance
+
+__author__ = 'Nicole'
 
 
 class NavigationTask(AbstractTask):
@@ -26,7 +28,7 @@ class NavigationTask(AbstractTask):
         elif self.state is 'prepare_to_waypoint1':
             self.delay.wait(90)
             self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
-            self.subtask.to_location('waypoint_1')  # must change
+            self.subtask.to_location('waypoint_1')
             self.change_state('going_to_waypoint1')
 
         elif self.state is 'going_to_waypoint1':
@@ -35,14 +37,14 @@ class NavigationTask(AbstractTask):
                 self.change_state('prepare_to_waypoint2')
             elif self.subtask.state is 'error aborted':
                 rospy.loginfo('resend goal in waypoint_1')
-                self.subtask.to_location('waypoint_1')  # must change
+                self.subtask.to_location('waypoint_1')
 
         elif self.state is 'prepare_to_waypoint2':
             if self.current_subtask.state is 'finish':
                 rospy.loginfo('going to waypoint 2')
                 self.delay.wait(150)
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
-                self.subtask.to_location('waypoint_2')  # must change
+                self.subtask.to_location('waypoint_2')
                 self.change_state('going_to_waypoint2')
 
         elif self.state is 'going_to_waypoint2':
@@ -91,8 +93,42 @@ class NavigationTask(AbstractTask):
 
         elif self.state is 'going_to_waypoint3':
             if self.subtask.state is 'finish' or not self.delay.is_waiting():
-                self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                self.subtask.say('I will leaving arena')
+                self.subtask = self.subtaskBook.get_subtask(self, 'FollowPerson')
+                self.change_state('prepare_follow')
+
+        elif self.state is 'prepare_follow':
+            if perception_data.device is self.Devices.VOICE and 'follow me' in perception_data.input:
+                self.subtaskBook.get_subtask(self, 'Say').say('I will follow you.')
+                self.follow = self.subtaskBook.get_subtask(self, 'FollowPerson')
+                self.change_state('follow_init')
+
+        elif self.state is 'follow_init':
+            if perception_data.device is self.Devices.PEOPLE:
+                distance = 9999.0  # set to maximum
+                id = None
+                for person in perception_data.input:
+                    if person.personpoints.x < distance:
+                        distance = person.personpoints.x
+                        id = person.id
+                if id is not None:
+                    self.follow.set_person_id(id)
+                    self.change_state('follow')
+
+        elif self.state is 'follow':
+            # recovery follow
+            if self.follow.state is 'abort' and perception_data.device is self.Devices.PEOPLE:
+                min_distance = 0.7  # set to maximum
+                id = None
+                for person in perception_data.input:
+                    distance = get_distance(person.personpoints, self.follow.last_point)
+                    if person.personpoints.x >= self.follow.last_point.x - 0.25 and distance < min_distance:
+                        min_distance = distance
+                        id = person.id
+                if id is not None:
+                    self.follow.set_person_id(id)
+            elif perception_data.device is self.Devices.VOICE and 'robot stop' in perception_data.input:
+                self.change_state('init')
+            if self.subtask.state is 'abort':
                 self.change_state('prepare_leave_arena')
 
         elif self.state is 'prepare_leave_arena':

@@ -10,13 +10,16 @@ class DetectObject3Ds(AbstractSkill):
 
     def detect(self):
         self.change_state('active')
-        self.controlModule.detect_object_3ds.set_new_goal()
+        self.controlModule.object_3d_detector.set_new_goal()
 
     def perform(self, perception_data):
         if self.state is 'active':
             # check if base succeed
-            if perception_data.device is self.Devices.RECOGNIZE_OBJECTS:
+            if perception_data.device is self.Devices.OBJECT_3DS_DETECTOR:
                 status = MoveBaseStatus.get_state_from_status(perception_data.input.status.status)
                 self.change_state(status)
+                print 'state_object = ' + self.state
                 if self.state is 'succeeded':
-                    self.objects = perception_data.input.result
+                    # print 'What the Fuck ------------------------'
+                    # print type(perception_data.input.result.)
+                    self.objects = perception_data.input.result.objects

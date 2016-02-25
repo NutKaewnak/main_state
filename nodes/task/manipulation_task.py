@@ -1,4 +1,4 @@
-__author__ = 'Nicole'
+a__author__ = 'Nicole'
 import rospy
 import roslib
 from include.abstract_task import AbstractTask

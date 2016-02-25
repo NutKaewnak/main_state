@@ -1,6 +1,6 @@
 import rospy
 from include.abstract_task import AbstractTask
-from math import sqrt
+from include.get_distance import get_distance
 from subprocess import call
 from geometry_msgs.msg import Vector3
 from std_msgs.msg import Float64
@@ -44,7 +44,7 @@ class FollowMe(AbstractTask):
                 min_distance = 0.7  # set to maximum
                 id = None
                 for person in perception_data.input:
-                    distance = self.get_distance(person.personpoints, self.follow.last_point)
+                    distance = get_distance(person.personpoints, self.follow.last_point)
                     if person.personpoints.x >= self.follow.last_point.x - 0.25 and distance < min_distance:
                         min_distance = distance
                         id = person.id
@@ -52,8 +52,3 @@ class FollowMe(AbstractTask):
                     self.follow.set_person_id(id)
             elif perception_data.device is self.Devices.VOICE and 'robot stop' in perception_data.input:
                 self.change_state('init')
-
-    @staticmethod
-    def get_distance(point_a, point_b):
-        return sqrt((point_a.x - point_b.x)**2 + (point_a.y - point_b.y)**2)
-
