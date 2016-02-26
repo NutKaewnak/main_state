@@ -2,7 +2,6 @@ import rospy
 from include.abstract_subtask import AbstractSubtask
 from std_msgs.msg import Float64
 
-
 __author__ = 'CinDy'
 
 
@@ -62,21 +61,18 @@ class Pick(AbstractSubtask):
         elif self.state is 'after_detect':
             # rospy.loginfo('******after_detect:subtask******')
             if self.check.state == 'finish':
-                rospy.loginfo('******finish_detect:subtask******')
-                if self.check.objects is not None:
-                    # print self.check.objects
-                    # print type(self.check.objects)
-                    # for i in self.check.objects:
-                    #     print i
-                    self.skill.set_object_pos(self.check.objects[0].point.x, self.check.objects[0].point.y, self.check.objects[0].point.z)
-                self.skill.after_mani()
-                self.change_state('grasp_object')
+                # rospy.loginfo('******finish_detect:subtask******')
+                if len(self.check.objects) > 0:
+                    self.skill.set_object_pos(self.check.objects[0].point.x,
+                                              self.check.objects[0].point.y,
+                                              self.check.objects[0].point.z)
+                    self.skill.after_mani()
+                    self.change_state('grasp_object')
 
         elif self.state is 'grasp_object':
-            rospy.loginfo('******grasp_object:subtask******')
+            print self.skill.state
             if self.skill.state is 'succeed':
                 self.change_state('finish')
-
                 #     self.change_state('receive_object')
                 # elif self.state is 'receive_object':
                 #     if self.skill.state is 'succeed':

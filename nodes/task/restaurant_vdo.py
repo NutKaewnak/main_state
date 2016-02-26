@@ -24,7 +24,6 @@ class RestaurantVDO(AbstractTask):
         self.delay = Delay()
 
     def perform(self, perception_data):
-        # rospy.loginfo('state : ' + self.state + ' ' + str(perception_data.input))
         if self.state is 'init':
             self.say = self.subtaskBook.get_subtask(self, 'Say')
             self.change_state('wait_for_command')

@@ -15,8 +15,9 @@ class ObjectsDetection(AbstractSubtask):
 
     def perform(self, perception_data):
         if self.state is 'detecting':
-            # print '&&&&&&&&&&&&&&detecting &&&&&&&&&&&&&&&&'
             if self.detect_object_3ds_skill.state is 'succeeded':
-                print 'detect_successed&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
                 self.objects = self.detect_object_3ds_skill.objects
+                print self.objects
                 self.change_state('finish')
+            if self.detect_object_3ds_skill.state is 'not_found':
+                self.start()

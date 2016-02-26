@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import rospy
 import moveit_commander
 import moveit_msgs.msg
@@ -75,9 +76,19 @@ def robozoo_tester():
     mnplctrl.static_pose('right_arm', "right_init_picking")
     rospy.loginfo('--Finish--')
 
+def test():
+    global mnplctrl, finish
+    rospy.init_node('robozoo')
+    mnplctrl = ManipulateController()
+    mnplctrl.init_controller()
+    
+    #rospy.Subscriber("wip_done", Bool, boolcallback)
+    rospy.loginfo('1st:right_init_picking')
+    mnplctrl.static_pose('right_arm', "right_init_picking")
+
 
 if __name__ == '__main__':
     try:
-        robozoo_tester()
+        test()
     except rospy.ROSInterruptException:
         pass

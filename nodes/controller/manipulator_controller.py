@@ -14,8 +14,8 @@ __author__ = "ftprainnie"
 GRIPPER_FRAME = 'right_wrist_3_Link'
 GRIPPER_JOINT_NAMES = ['right_gripper_joint']
 
-GRIPPER_OPENED = 1.1
-GRIPPER_CLOSED = -0.8
+GRIPPER_OPENED = 0.1
+GRIPPER_CLOSED = -0.5
 GRIPPER_NEUTRAL = 0.0
 GRASP_OVERTIGHTEN = -0.01
 GRIPPER_EFFORT = 0.2
@@ -45,6 +45,8 @@ class ManipulateController:
         self.objectposition_x = 0
         self.objectposition_y = 0
         self.objectposition_z = 0
+        # TODO: This should not be here
+        # self.delay = Delay()
         # try:
         #     self.settorquelimit["right_gripper"] = rospy.ServiceProxy('/dynamixel/right_gripper/set_torque_limit',
         #                                                               SetTorqueLimit)
@@ -69,22 +71,22 @@ class ManipulateController:
         self.scene = moveit_commander.PlanningSceneInterface()
         self.tf_listener = tf.TransformListener()
 
-    def transformPoint(self, position, arm_group, origin_frame = 'base_link'):
-    	destination_frame = None
-    	if arm_group == "right_arm":
-    		destination_frame = 'right_mani_link'
-    	elif arm_group == "left_arm":
-    		destination_frame = 'left_mani_link'
+    def transformPoint(self, position, arm_group, origin_frame='base_link'):
+        destination_frame = None
+        if arm_group == "right_arm":
+            destination_frame = 'right_mani_link'
+        elif arm_group == "left_arm":
+            destination_frame = 'left_mani_link'
 
-    	tfpts = geometry_msgs.msg.PointStamped()
-    	tfpts.point.x = position[0]
-    	tfpts.point.y = position[1]
-    	tfpts.point.z = position[2]
-    	tfpts.header.stamp = rospy.Time(0)
-    	tfpts.header.frame_id = origin_frame
-    	point_out = self.tf_listener.transformPoint(destination_frame,tfpts)
-    	out = [point_out.point.x, point_out.point.y, point_out.point.z]
-    	return out 
+        tfpts = geometry_msgs.msg.PointStamped()
+        tfpts.point.x = position[0]
+        tfpts.point.y = position[1]
+        tfpts.point.z = position[2]
+        tfpts.header.stamp = rospy.Time(0)
+        tfpts.header.frame_id = origin_frame
+        point_out = self.tf_listener.transformPoint(destination_frame, tfpts)
+        out = [point_out.point.x, point_out.point.y, point_out.point.z]
+        return out
 
     def manipulate(self, arm_group, position, orientation_rpy=[0, 0, 0], tolerance=[0.05, 0.1], ref_frame="base_link",
                    planning_time=50.00):
@@ -222,13 +224,13 @@ class ManipulateController:
         # self.pickstate["laststate"] = "pregrasp"
         self.pickstate["ref_frame"] = ref_frame
         self.static_pose(self.pickstate["arm_group"], 'right_init_picking_normal')
-        rospy.loginfo('---------------------------pick object_init')
+        # rospy.loginfo('---------------------------pick object_init')
 
     def pickobject_prepare(self):
         # rospy.loginfo('prepare pregrasp')
         # self.pickstate["laststate"] = "prepare"
         self.static_pose(self.pickstate["arm_group"], 'right_picking_prepare')
-        rospy.loginfo('---------------------------pick object_prepare')
+        # rospy.loginfo('---------------------------pick object_prepare')
 
     def pickobject_pregrasp(self, objectposition):
         # rospy.loginfo('pregrasp')
@@ -311,11 +313,17 @@ class ManipulateController:
     def pickobject_opengripper(self):
         ##opengripper
         # self.pickstate["laststate"] = "opengripper"
-        if self.pickstate["arm_group"] == "right_arm":
+        if self.pickstate["arm_group"] == 'right_arm':
             self.movejoint("right_gripper_joint", GRIPPER_OPENED)
-        elif self.pickstate["arm_group"] == "left_arm":
-            self.movejoint("left_gripper_joint", GRIPPER_OPENED)
+            # self.delay.wait(5000) # TODO: delay should not be here
+            # self.static_pose(self.pickstate["right_gripper"], 'right_gripper_open')
+            # print '>>loop<<'
+
+        # elif self.pickstate["arm_group"] == 'left_arm':
+        #     pass
+            # self.movejoint("left_gripper_joint", GRIPPER_OPENED)
         rospy.loginfo('------------------------------open gripper')
+        pass
 
     def pickobject_reach(self, tolerance=[0.05, 0.1], step=0.05):
         self.pickstate["laststate"] = "reach"
@@ -332,7 +340,7 @@ class ManipulateController:
             # self.robot.right_arm.set_goal_position_tolerance(0.05)
             # self.robot.right_arm.set_goal_orientation_tolerance(0.1)
             rospy.loginfo('point : ' + str(self.pickstate["objectposition"][0]) + ' ' + str(
-                    self.pickstate["objectposition"][1]) + ' ' + str(self.pickstate["objectposition"][2]))
+                self.pickstate["objectposition"][1]) + ' ' + str(self.pickstate["objectposition"][2]))
             self.manipulate(self.pickstate["arm_group"], self.pickstate["objectposition"], [0, 0, 0], tolerance)
             # self.robot.right_arm.go(False)
             # (path, fraction) = self.robot.right_arm.compute_cartesian_path(waypoint, step, 0.00, True)
@@ -347,10 +355,10 @@ class ManipulateController:
     def pickobject_grasp(self):
         # close gripper
         # self.pickstate["laststate"] = "closegripper"
-        if self.pickstate["arm_group"] == "right_arm":
+        if self.pickstate["arm_group"] == "right_gripper":
             # if self.pickstate["demo"] == False:
             # self.settorquelimit["right_gripper"](GRIPPER_EFFORT)
-            self.movejoint("right_gripper_joint", GRIPPER_CLOSED)
+            self.static_pose(self.pickstate["arm_group"], 'right_gripper_close')
         elif self.pickstate["arm_group"] == "left_arm":
             # if self.pickstate["demo"] == False:
             # self.settorquelimit["left_gripper"](GRIPPER_EFFORT)
