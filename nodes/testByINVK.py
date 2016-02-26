@@ -77,6 +77,7 @@ class test_invKine():
         # rospy.loginfo("---PICK PREPARE---")
         # angle = invK.inv_kinematic()
 
+        mnplctrl.movejoint('right_shoulder_1_joint', 0.1)
         # r_sh1 = invK.inBound('right_shoulder_1_joint', -1*angle[0])
         # mnplctrl.movejoint('right_shoulder_1_joint', r_sh1)
         # r_sh2 = invK.inBound('right_shoulder_2_joint', -1*angle[1])
