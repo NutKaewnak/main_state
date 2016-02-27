@@ -38,9 +38,9 @@ finish = False
 #         pos.append(position.x)
 #         pos.append(position.y)
 #         pos.append(position.z)
-#     #mnplctrl.pick("right_arm",[position.x-0.2,position.y,position.z+0.05],[0.0,0.0,0.0],"object","table","base_link")
-#     #mnplctrl.robot.right_arm.set_support_surface_name("table")
-#     #mnplctrl.robot.right_arm.pick("object")
+#     #manipulator_ctrl.pick("right_arm",[position.x-0.2,position.y,position.z+0.05],[0.0,0.0,0.0],"object","table","base_link")
+#     #manipulator_ctrl.robot.right_arm.set_support_surface_name("table")
+#     #manipulator_ctrl.robot.right_arm.pick("object")
 #     #moveit_commander.
 
 
@@ -103,12 +103,12 @@ def pick_tester():
     
 
     # rospy.loginfo("go to in front of object")
-    # mnplctrl.pickobject_movetoobjectfront()
+    # manipulator_ctrl.pickobject_movetoobjectfront()
     # rospy.loginfo("--complete--")
     # raw_input()
 
     rospy.loginfo("---Opening Gripper---")
-    #mnplctrl.pickobject_opengripper()
+    #manipulator_ctrl.pickobject_opengripper()
 
     pub.publish(Float64(mnplctrl.GRIPPER_OPENED))
 
@@ -136,7 +136,7 @@ def pick_tester():
     raw_input()
     
     rospy.loginfo("---GRASPING---")
-    #mnplctrl.pickobject_grasp()
+    #manipulator_ctrl.pickobject_grasp()
     
     set_torque_limit()
     pub.publish(Float64(mnplctrl.GRIPPER_CLOSED))
@@ -163,7 +163,7 @@ def pick_tester():
     raw_input()
 
     rospy.loginfo("---Opening Gripper---")
-    #mnplctrl.pickobject_opengripper()
+    #manipulator_ctrl.pickobject_opengripper()
 
     pub.publish(Float64(mnplctrl.GRIPPER_OPENED))
 
@@ -284,12 +284,12 @@ def open_challenge_tester():
     raw_input()
 
     rospy.loginfo('5th Crack')
-    mnplctrl.movejoint("right_gripper_joint",mnplctrl.GRIPPER_CLOSED)
+    mnplctrl.move_joint("right_gripper_joint", mnplctrl.GRIPPER_CLOSED)
     rospy.loginfo('executing: Crack')
     raw_input()
 
     rospy.loginfo('6th Release')
-    mnplctrl.movejoint("right_gripper_joint",mnplctrl.GRIPPER_OPENED)
+    mnplctrl.move_joint("right_gripper_joint", mnplctrl.GRIPPER_OPENED)
     rospy.loginfo('executing: Release')
     raw_input()
 

@@ -56,7 +56,7 @@ class OpenChallenge:
         torque_limit = 0.5
 
         # rospy.loginfo('1st:right_init_picking')
-        # self.mnplctrl.static_pose('right_arm',"right_init_picking")
+        # self.manipulator_ctrl.static_pose('right_arm',"right_init_picking")
         # rospy.loginfo('executing:right_init_picking')
         # raw_input()
 
@@ -68,7 +68,7 @@ class OpenChallenge:
         rospy.sleep(7.00)
         
         rospy.loginfo('2rd: open gripper')
-        # self.mnplctrl.movejoint("right_gripper_joint",self.mnplctrl.GRIPPER_OPENED)
+        # self.manipulator_ctrl.move_joint("right_gripper_joint",self.manipulator_ctrl.GRIPPER_OPENED)
         self.pub.publish( Float64(self.mnplctrl.GRIPPER_OPENED) ) 
         rospy.loginfo('executing: open gripper')
         # raw_input()
@@ -81,7 +81,7 @@ class OpenChallenge:
         rospy.sleep(7.00)
 
         # rospy.loginfo('4th movedownward')
-        # self.mnplctrl.move_relative('right_arm',[0,0,-0.05],[0,0,0])
+        # self.manipulator_ctrl.move_relative('right_arm',[0,0,-0.05],[0,0,0])
         # rospy.loginfo('executing: movedownward')
         # raw_input()
 
@@ -89,21 +89,21 @@ class OpenChallenge:
         rospy.loginfo('settorque limit to gripper : ' + str(torque_limit))
 
         rospy.loginfo('5' + ' Crack')
-        # self.mnplctrl.movejoint("right_gripper_joint",self.mnplctrl.GRIPPER_CLOSED)
+        # self.manipulator_ctrl.move_joint("right_gripper_joint",self.manipulator_ctrl.GRIPPER_CLOSED)
         self.pub.publish(Float64(self.mnplctrl.GRIPPER_CLOSED) )
         rospy.loginfo('executing: Crack')
         # raw_input()
         rospy.sleep(3.00)
 
         rospy.loginfo('6' + 'Release')
-        # self.mnplctrl.movejoint("right_gripper_joint",self.mnplctrl.GRIPPER_OPENED)
-        self.pub.publish( Float64(self.mnplctrl.GRIPPER_OPENED) )
+        # self.manipulator_ctrl.move_joint("right_gripper_joint",self.manipulator_ctrl.GRIPPER_OPENED)
+        self.pub.publish(Float64(self.mnplctrl.GRIPPER_OPENED))
         rospy.loginfo('executing: Release')
         # raw_input()
         rospy.sleep(5.00)
 
         # rospy.loginfo('7th going_up')
-        # self.mnplctrl.move_relative('right_arm',[0,0,+0.05],[0,0,0])
+        # self.manipulator_ctrl.move_relative('right_arm',[0,0,+0.05],[0,0,0])
         # rospy.loginfo('executing: going_up')
         # raw_input()
 

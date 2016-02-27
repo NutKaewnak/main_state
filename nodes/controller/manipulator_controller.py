@@ -1,13 +1,13 @@
 import rospy
-import math
 import moveit_commander
 import moveit_msgs.msg
-import std_msgs.msg
-import geometry_msgs.msg
 import trajectory_msgs.msg
 import tf
 import sys
-from dynamixel_controllers.srv import SetTorqueLimit
+from geometry_msgs.msg import Pose
+from geometry_msgs.msg import Pose2D
+from geometry_msgs.msg import Point
+from geometry_msgs.msg import PointStamped
 
 __author__ = "ftprainnie"
 
@@ -30,39 +30,24 @@ REFERENCE_FRAME = 'base_link'
 
 class ManipulateController:
     def __init__(self):
-        # group should be "left_arm" or "right_arm"
-        # self.moveit_commander.roscpp_initialize(" ")
-        # moveit_commander.roscpp_initialize(sys.argv)
-        self.pickstate = {"objectname": None, "arm_group": None, "objectposition": None, "ref_frame": None}
-        # self.pickstate["laststate"] = None
-        # self.pickstate["demo"] = False
-        self.settorquelimit = {}
+        # group should be "left_arm" or "right_arm
+        self.pick_state = {"object_name": None,
+                           "arm_group": None,
+                           "object_position": None,
+                           "ref_frame": None}
+        self.set_torque_limit = {}
         self.GRIPPER_OPENED = 0.0
         self.GRIPPER_CLOSED = -0.8
         self.pregrasp_distance = 0
-        self.pregrasp_value_x = 0
-        self.pregrasp_value_y = 0
-        self.objectposition_x = 0
-        self.objectposition_y = 0
-        self.objectposition_z = 0
-        # TODO: This should not be here
-        # self.delay = Delay()
-        # try:
-        #     self.settorquelimit["right_gripper"] = rospy.ServiceProxy('/dynamixel/right_gripper/set_torque_limit',
-        #                                                               SetTorqueLimit)
-        #     self.settorquelimit["left_gripper"] = rospy.ServiceProxy('/dynamixel/left_gripper/set_torque_limit',
-        #                                                              SetTorqueLimit)
-        #     #Test if there == service avaliable
-        #     self.settorquelimit["right_gripper"](GRIPPER_EFFORT)
-        # except rospy.ServiceException, e:
-        #     rospy.loginfo("Service call failed: Running DEMO MODE")
-        #     self.pickstate["demo"] = True
-
-        # self.group = self.moveit_commander.MoveGroupCommander(arm_group)
-        # self.group.set_planning_time(planning_time)
+        self.pregrasp_value = Pose2D()
+        self.object_position = Point()
         self.grasp_plan = None
         self.robot = None
         self.scene = None
+        self.right_arm_group = None
+        self.right_gripper_group = None
+        self.left_arm_group = None
+        self.left_gripper_group = None
         self.tf_listener = None
 
     def init_controller(self):
@@ -70,28 +55,33 @@ class ManipulateController:
         self.robot = moveit_commander.RobotCommander()
         self.scene = moveit_commander.PlanningSceneInterface()
         self.tf_listener = tf.TransformListener()
+        print 'kuy'
+        self.right_arm_group = moveit_commander.MoveGroupCommander('right_arm')
+        print dir(self.right_arm_group.clear_pose_targets)
+        self.right_gripper_group = moveit_commander.MoveGroupCommander('right_gripper')
+        self.left_arm_group = moveit_commander.MoveGroupCommander('left_arm')
+        self.left_gripper_group = moveit_commander.MoveGroupCommander('left_gripper')
 
-    def transformPoint(self, position, arm_group, origin_frame='base_link'):
+    def transform_point(self, position, arm_group, origin_frame='base_link'):
         destination_frame = None
         if arm_group == "right_arm":
             destination_frame = 'right_mani_link'
         elif arm_group == "left_arm":
             destination_frame = 'left_mani_link'
 
-        tfpts = geometry_msgs.msg.PointStamped()
-        tfpts.point.x = position[0]
-        tfpts.point.y = position[1]
-        tfpts.point.z = position[2]
-        tfpts.header.stamp = rospy.Time(0)
-        tfpts.header.frame_id = origin_frame
-        point_out = self.tf_listener.transformPoint(destination_frame, tfpts)
-        out = [point_out.point.x, point_out.point.y, point_out.point.z]
-        return out
+        tf_points = PointStamped()
+        tf_points.point.x = position[0]
+        tf_points.point.y = position[1]
+        tf_points.point.z = position[2]
+        tf_points.header.stamp = rospy.Time(0)
+        tf_points.header.frame_id = origin_frame
+        point_out = self.tf_listener.transform_point(destination_frame, tf_points)
+        return point_out.point
 
     def manipulate(self, arm_group, position, orientation_rpy=[0, 0, 0], tolerance=[0.05, 0.1], ref_frame="base_link",
                    planning_time=50.00):
 
-        pose_target = geometry_msgs.msg.Pose()
+        pose_target = Pose()
         quaternion = tf.transformations.quaternion_from_euler(orientation_rpy[0],
                                                               orientation_rpy[1],
                                                               orientation_rpy[2])
@@ -104,25 +94,25 @@ class ManipulateController:
         pose_target.orientation.w = quaternion[3]
 
         if arm_group == "right_arm":
-            self.robot.right_arm.set_planning_time(planning_time)
-            self.robot.right_arm.clear_pose_targets()
-            self.robot.right_arm.set_goal_position_tolerance(tolerance[0])
-            self.robot.right_arm.set_goal_orientation_tolerance(tolerance[1])
-            self.robot.right_arm.set_pose_reference_frame(ref_frame)
-            self.robot.right_arm.set_pose_target(pose_target)
+            self.right_arm_group.set_planning_time(planning_time)
+            self.right_arm_group.clear_pose_targets()
+            self.right_arm_group.set_goal_position_tolerance(tolerance[0])
+            self.right_arm_group.set_goal_orientation_tolerance(tolerance[1])
+            self.right_arm_group.set_pose_reference_frame(ref_frame)
+            self.right_arm_group.set_pose_target(pose_target)
             # DEBUG
-            # plan = self.robot.right_arm.plan()
+            # plan = self.right_arm_group.plan()
             # rospy.loginfo(str(plan))
-            self.robot.right_arm.go(False)  # async_move
+            self.right_arm_group.go(False)  # async_move
 
         elif arm_group == "left_arm":
-            self.robot.left_arm.set_planning_time(planning_time)
-            self.robot.left_arm.clear_pose_targets()
-            self.robot.left_arm.set_goal_position_tolerance(pos_tolerance)
-            self.robot.left_arm.set_goal_orientation_tolerance(orient_tolerance)
-            self.robot.left_arm.set_pose_reference_frame(ref_frame)
-            self.robot.left_arm.set_pose_target(pose_target)
-            self.robot.left_arm.go(False)  # async_movel
+            self.left_arm_group.set_planning_time(planning_time)
+            self.left_arm_group.clear_pose_targets()
+            self.left_arm_group.set_goal_position_tolerance(tolerance[0])
+            self.left_arm_group.set_goal_orientation_tolerance(tolerance[1])
+            self.left_arm_group.set_pose_reference_frame(ref_frame)
+            self.left_arm_group.set_pose_target(pose_target)
+            self.left_arm_group.go(False)  # async_movel
         else:
             rospy.logwarn("No specified arm_group")
 
@@ -132,17 +122,17 @@ class ManipulateController:
         group_current_joint_values = None
 
         if arm_group == "right_arm":
-            group_joint_names = self.robot.right_arm.get_joints()
-            group_current_joint_values = self.robot.right_arm.get_current_joint_values()
+            group_joint_names = self.right_arm_group.get_joints()
+            group_current_joint_values = self.right_arm_group.get_current_joint_values()
         elif arm_group == "left_arm":
-            group_joint_names = self.robot.left_arm.get_joints()
-            group_current_joint_values = self.robot.left_arm.get_current_joint_values()
+            group_joint_names = self.left_arm_group.get_joints()
+            group_current_joint_values = self.left_arm_group.get_current_joint_values()
         elif arm_group == "right_gripper":
-            group_joint_names = self.robot.right_gripper.get_joints()
-            group_current_joint_values = self.robot.right_gripper.get_current_joint_values()
+            group_joint_names = self.right_gripper_group.get_joints()
+            group_current_joint_values = self.right_gripper_group.get_current_joint_values()
         elif arm_group == "left_gripper":
-            group_joint_names = self.robot.left_gripper.get_joints()
-            group_current_joint_values = self.robot.left_gripper.get_current_joint_values()
+            group_joint_names = self.left_gripper_group.get_joints()
+            group_current_joint_values = self.left_gripper_group.get_current_joint_values()
         else:
             rospy.logwarn("No specified arm_group")
 
@@ -151,10 +141,10 @@ class ManipulateController:
 
         return joint_state
 
-    def move_relative(self, arm_group, rel, llative_goal_translation, relative_goal_rotation):
+    def move_relative(self, arm_group, rel, relative_goal_translation, relative_goal_rotation):
         # respect to efflink
         if arm_group == "right_arm":
-            last_pose = self.robot.right_arm.get_current_pose()
+            last_pose = self.right_arm_group.get_current_pose()
             rospy.loginfo(str(type(last_pose)) + '\n' + str(last_pose))
             rpy = tf.transformations.euler_from_quaternion([last_pose.pose.orientation.x,
                                                             last_pose.pose.orientation.y,
@@ -169,16 +159,16 @@ class ManipulateController:
 
     def set_joint(self, joint_name, joint_value):
         if (type(joint_name) == str) and (type(joint_value) == float):
-            if joint_name.find("right") != -1:
-                if joint_name.find("gripper") != -1:
-                    self.robot.right_gripper.set_joint_value_target(joint_name, joint_value)
+            if "right" in joint_name:
+                if "gripper" in joint_name:
+                    self.right_gripper_group.set_joint_value_target(joint_name, joint_value)
                 else:
-                    self.robot.right_arm.set_joint_value_target(joint_name, joint_value)
-            elif joint_name.find("left") != -1:
-                if joint_name.find("gripper") != -1:
-                    self.robot.left_gripper.set_joint_value_target(joint_name, joint_value)
+                    self.right_arm_group.set_joint_value_target(joint_name, joint_value)
+            elif "left" in joint_name:
+                if "gripper" in joint_name:
+                    self.left_gripper_group.set_joint_value_target(joint_name, joint_value)
                 else:
-                    self.robot.left_arm.set_joint_value_target(joint_name, joint_value)
+                    self.left_arm_group.set_joint_value_target(joint_name, joint_value)
             else:
                 rospy.logwarn("Controller : No specified Joint is Found")
                 return False
@@ -191,26 +181,28 @@ class ManipulateController:
         else:
             rospy.logwarn("Invalid Argument")
 
-    def movejoint(self, jointname, jointvalue):
-        if jointname.find("right") != -1:
-            if jointname.find("gripper") != -1:
-                self.robot.right_gripper.clear_pose_targets()
-                self.set_joint(jointname, jointvalue)
-                self.robot.right_gripper.go(False)
+    def move_joint(self, joint_name, joint_value):
+        if "right" in joint_name:
+            if "gripper" in joint_name:
+                self.right_gripper_group.clear_pose_targets()
+                self.set_joint(joint_name, joint_value)
+                self.right_gripper_group.go(False)
             else:
-                self.robot.right_arm.clear_pose_targets()
-                self.set_joint(jointname, jointvalue)
-                self.robot.right_arm.go(False)
+                print self.right_arm_group
+                if self.right_arm_group.clear_pose_targets() is not None:
+                    self.right_arm_group.clear_pose_targets()
+                self.set_joint(joint_name, joint_value)
+                self.right_arm_group.go(False)
 
-        elif jointname.find("left") != -1:
-            if jointname.find("gripper") != -1:
-                self.robot.left_gripper.clear_pose_targets()
-                self.set_joint(jointname, jointvalue)
-                self.robot.left_gripper.go(False)
+        elif "left" in joint_name:
+            if "gripper" in joint_name:
+                self.left_gripper_group.clear_pose_targets()
+                self.set_joint(joint_name, joint_value)
+                self.left_gripper_group.go(False)
             else:
-                self.robot.left_arm.clear_pose_targets()
-                self.set_joint(jointname, jointvalue)
-                self.robot.left_arm.go(False)
+                self.left_arm_group.clear_pose_targets()
+                self.set_joint(joint_name, joint_value)
+                self.left_arm_group.go(False)
         else:
             rospy.logwarn("Controller : No specified Joint is Found")
             return False
@@ -219,71 +211,53 @@ class ManipulateController:
     # PICKING PROCEDURE
     # pregrasp -> open_gripper -> reach -> grasp
     def pickobject_init(self, arm_group, object_name, ref_frame="base_link"):
-        self.pickstate["arm_group"] = arm_group
-        self.pickstate["objectname"] = object_name
-        # self.pickstate["laststate"] = "pregrasp"
-        self.pickstate["ref_frame"] = ref_frame
-        self.static_pose(self.pickstate["arm_group"], 'right_init_picking_normal')
+        self.pick_state["arm_group"] = arm_group
+        self.pick_state["object_name"] = object_name
+        # self.pick_state["laststate"] = "pregrasp"
+        self.pick_state["ref_frame"] = ref_frame
+        self.static_pose(self.pick_state["arm_group"], 'right_init_picking_normal')
         # rospy.loginfo('---------------------------pick object_init')
 
     def pickobject_prepare(self):
         # rospy.loginfo('prepare pregrasp')
-        # self.pickstate["laststate"] = "prepare"
-        self.static_pose(self.pickstate["arm_group"], 'right_picking_prepare')
+        # self.pick_state["laststate"] = "prepare"
+        self.static_pose(self.pick_state["arm_group"], 'right_picking_prepare')
         # rospy.loginfo('---------------------------pick object_prepare')
 
-    def pickobject_pregrasp(self, objectposition):
+    def pickobject_pregrasp(self, object_position):
         # rospy.loginfo('pregrasp')
-        # self.pickstate["laststate"] = "pregrasp"
-        self.pickstate["objectposition"] = objectposition
+        # self.pick_state["laststate"] = "pregrasp"
+        self.pick_state["object_position"] = object_position
 
-        if objectposition[0] >= 0.6:
+        if object_position[0] >= 0.6:
             self.pregrasp_distance_x = 0.2
         else:
             self.pregrasp_distance_x = 0.1
 
-        if objectposition[1] >= 0.2 or objectposition[1] <= -0.2:
+        if object_position[1] >= 0.2 or object_position[1] <= -0.2:
             self.pregrasp_distance_y = 0.1
         else:
             self.pregrasp_distance_y = 0
 
-        self.objectposition_x = objectposition[0]
-        self.objectposition_y = objectposition[1]
-        self.objectposition_z = objectposition[2]
-        self.static_pose(self.pickstate["arm_group"], 'right_picking_pregrasp')
-        rospy.loginfo('---------------------------pickobject_pregrasp')
-
-    # def pickobject_movetoobjectfront(self,tolerance = [0.05,0.1], pregrasp_distance=0.30, pregrasp_direction=[1.0, 0, 0]):
-    #     # TODO -- pregrasp in any direction, current x only
-
-    #     pregraspposition = []
-    #     pregrasp_value = self.pickstate["objectposition"][0] - pregrasp_distance
-
-    #     # if pregrasp_value <= 0.50:
-    #     #     pregrasp_value = 0.50
-
-    #     # pregraspposition.append(pregrasp_value)
-    #     pregraspposition.append(self.pickstate["objectposition"][0])
-    #     pregraspposition.append(self.pickstate["objectposition"][1])
-    #     pregraspposition.append(self.pickstate["objectposition"][2])
-    #     self.pickstate["laststate"] = "pregrasp"
-    #     self.manipulate(self.pickstate["arm_group"], pregraspposition)
-    #     # rospy.loginfo("Moving" + self.pickstate["arm_group"] + "to x = " + str(pregrasp_value) + " ,y = " + str(
-    #         # self.pickstate["objectposition"][1]) + " ,z= " + str(self.pickstate["objectposition"][2]) + "\n respect to " + self.pickstate["ref_frame"])
+        self.object_position.x = object_position[0]
+        self.object_position.y = object_position[1]
+        self.object_position.z = object_position[2]
+        self.static_pose(self.pick_state["arm_group"], 'right_picking_pregrasp')
+        rospy.loginfo('---pick_object_pregrasp---')
 
     def pickobject_movetoobjectfront_1(self, tolerance=[0.05, 0.1], pregrasp_direction=[1.0, 0, 0]):
         # TODO -- pregrasp in any direction, current x only
         pregraspposition = []
         self.pregrasp_value_x = self.pregrasp_distance_x
         pregraspposition.append(self.pregrasp_value_x)
-        pregraspposition.append(self.pickstate["objectposition"][1])
-        pregraspposition.append(self.pickstate["objectposition"][2])
-        # self.pickstate["laststate"] = "pregrasp"
+        pregraspposition.append(self.pick_state["objectposition"][1])
+        pregraspposition.append(self.pick_state["objectposition"][2])
+        # self.pick_state["laststate"] = "pregrasp"
         # print pregraspposition
-        if self.pickstate["arm_group"] is not None:
-            self.manipulate(self.pickstate["arm_group"], pregraspposition)
+        if self.pick_state["arm_group"] is not None:
+            self.manipulate(self.pick_state["arm_group"], pregraspposition)
         else:
-            rospy.logwarn('manipulator_controller.pickstate arm_group is None')
+            rospy.logwarn('manipulator_controller.pick_state arm_group is None')
 
         rospy.loginfo('--------------------------------------move to object front1')
 
@@ -292,86 +266,85 @@ class ManipulateController:
         pregraspposition = []
         self.pregrasp_value_x = self.pregrasp_distance_x + self.pregrasp_value_x
         pregraspposition.append(self.pregrasp_value_x)
-        pregraspposition.append(self.pickstate["objectposition"][1])
-        pregraspposition.append(self.pickstate["objectposition"][2])
-        # self.pickstate["laststate"] = "pregrasp"
+        pregraspposition.append(self.pick_state["objectposition"][1])
+        pregraspposition.append(self.pick_state["objectposition"][2])
+        # self.pick_state["laststate"] = "pregrasp"
         # print pregraspposition
-        self.manipulate(self.pickstate["arm_group"], pregraspposition)
+        self.manipulate(self.pick_state["arm_group"], pregraspposition)
         rospy.loginfo('--------------------------------------move to object front2')
 
     def pickobject_movetoobjectfront_3(self, tolerance=[0.05, 0.1], pregrasp_direction=[1.0, 0, 0]):
         # TODO -- pregrasp in any direction, current x only
         pregraspposition = []
-        pregraspposition.append(self.pickstate["objectposition"][0])
-        pregraspposition.append(self.pickstate["objectposition"][1])
-        pregraspposition.append(self.pickstate["objectposition"][2])
-        # self.pickstate["laststate"] = "pregrasp"
+        pregraspposition.append(self.pick_state["objectposition"][0])
+        pregraspposition.append(self.pick_state["objectposition"][1])
+        pregraspposition.append(self.pick_state["objectposition"][2])
+        # self.pick_state["laststate"] = "pregrasp"
         # print pregraspposition
-        self.manipulate(self.pickstate["arm_group"], pregraspposition)
+        self.manipulate(self.pick_state["arm_group"], pregraspposition)
         rospy.loginfo('--------------------------------------move to object front3')
 
     def pickobject_opengripper(self):
-        ##opengripper
-        # self.pickstate["laststate"] = "opengripper"
-        if self.pickstate["arm_group"] == 'right_arm':
-            self.movejoint("right_gripper_joint", GRIPPER_OPENED)
+        # open gripper
+        if self.pick_state["arm_group"] == 'right_arm':
+            self.move_joint("right_gripper_joint", GRIPPER_OPENED)
             # self.delay.wait(5000) # TODO: delay should not be here
-            # self.static_pose(self.pickstate["right_gripper"], 'right_gripper_open')
+            # self.static_pose(self.pick_state["right_gripper"], 'right_gripper_open')
             # print '>>loop<<'
 
-        # elif self.pickstate["arm_group"] == 'left_arm':
-        #     pass
-            # self.movejoint("left_gripper_joint", GRIPPER_OPENED)
+            # elif self.pick_state["arm_group"] == 'left_arm':
+            #     pass
+            # self.move_joint("left_gripper_joint", GRIPPER_OPENED)
         rospy.loginfo('------------------------------open gripper')
         pass
 
     def pickobject_reach(self, tolerance=[0.05, 0.1], step=0.05):
-        self.pickstate["laststate"] = "reach"
+        self.pick_state["laststate"] = "reach"
         waypoint = []
-        target_pose = geometry_msgs.msg.Pose()
-        target_pose.position.x = self.pickstate["objectposition"][0] + 0.3
-        target_pose.position.y = self.pickstate["objectposition"][1]
-        target_pose.position.z = self.pickstate["objectposition"][2]
-        start_pose = self.robot.right_arm.get_current_pose().pose
+        target_pose = Pose()
+        target_pose.position.x = self.pick_state["objectposition"][0] + 0.3
+        target_pose.position.y = self.pick_state["objectposition"][1]
+        target_pose.position.z = self.pick_state["objectposition"][2]
+        start_pose = self.right_arm_group.get_current_pose().pose
         waypoint.append(start_pose)
         waypoint.append(target_pose)
-        if self.pickstate["arm_group"] == "right_arm":
-            # self.robot.right_arm.clear_pose_targets()
-            # self.robot.right_arm.set_goal_position_tolerance(0.05)
-            # self.robot.right_arm.set_goal_orientation_tolerance(0.1)
-            rospy.loginfo('point : ' + str(self.pickstate["objectposition"][0]) + ' ' + str(
-                self.pickstate["objectposition"][1]) + ' ' + str(self.pickstate["objectposition"][2]))
-            self.manipulate(self.pickstate["arm_group"], self.pickstate["objectposition"], [0, 0, 0], tolerance)
-            # self.robot.right_arm.go(False)
-            # (path, fraction) = self.robot.right_arm.compute_cartesian_path(waypoint, step, 0.00, True)
-            # self.robot.right_arm.execute(path)
-        elif self.pickstate["arm_group"] == "left_arm":
-            self.robot.left_arm.clear_pose_targets()
-            self.robot.left_arm.set_goal_position_tolerance(0.01)
-            self.robot.left_arm.set_goal_orientation_tolerance(0.05)
-            (path, fraction) = self.robot.left_arm.compute_cartesian_path(waypoint, step, 0.00, True)
-            self.robot.left_arm.execute(path)
+        if self.pick_state["arm_group"] == "right_arm":
+            # self.right_arm_group.clear_pose_targets()
+            # self.right_arm_group.set_goal_position_tolerance(0.05)
+            # self.right_arm_group.set_goal_orientation_tolerance(0.1)
+            rospy.loginfo('point : ' + str(self.pick_state["objectposition"][0]) + ' ' + str(
+                self.pick_state["objectposition"][1]) + ' ' + str(self.pick_state["objectposition"][2]))
+            self.manipulate(self.pick_state["arm_group"], self.pick_state["objectposition"], [0, 0, 0], tolerance)
+            # self.right_arm_group.go(False)
+            # (path, fraction) = self.right_arm_group.compute_cartesian_path(waypoint, step, 0.00, True)
+            # self.right_arm_group.execute(path)
+        elif self.pick_state["arm_group"] == "left_arm":
+            self.left_arm_group.clear_pose_targets()
+            self.left_arm_group.set_goal_position_tolerance(0.01)
+            self.left_arm_group.set_goal_orientation_tolerance(0.05)
+            (path, fraction) = self.left_arm_group.compute_cartesian_path(waypoint, step, 0.00, True)
+            self.left_arm_group.execute(path)
 
     def pickobject_grasp(self):
         # close gripper
-        # self.pickstate["laststate"] = "closegripper"
-        if self.pickstate["arm_group"] == "right_gripper":
-            # if self.pickstate["demo"] == False:
-            # self.settorquelimit["right_gripper"](GRIPPER_EFFORT)
-            self.static_pose(self.pickstate["arm_group"], 'right_gripper_close')
-        elif self.pickstate["arm_group"] == "left_arm":
-            # if self.pickstate["demo"] == False:
-            # self.settorquelimit["left_gripper"](GRIPPER_EFFORT)
-            self.movejoint("left_gripper_joint", GRIPPER_CLOSED)
+        # self.pick_state["laststate"] = "closegripper"
+        if self.pick_state["arm_group"] == "right_gripper":
+            # if self.pick_state["demo"] == False:
+            # self.set_torque_limit["right_gripper"](GRIPPER_EFFORT)
+            self.static_pose(self.pick_state["arm_group"], 'right_gripper_close')
+        elif self.pick_state["arm_group"] == "left_arm":
+            # if self.pick_state["demo"] == False:
+            # self.set_torque_limit["left_gripper"](GRIPPER_EFFORT)
+            self.move_joint("left_gripper_joint", GRIPPER_CLOSED)
 
     def pickobject_after_grasp(self, shoulder_offset=0.2, elbow_offset=0.1, tolerance=[0.05, 0.1]):
         ## + shoulderoffset && fix wrist tobe zero
-        self.pickstate["laststate"] = "aftergrasp"
+        self.pick_state["laststate"] = "aftergrasp"
 
-        if self.pickstate["arm_group"] == "right_arm":
-            self.robot.right_arm.clear_pose_targets()
-            # group_joint_names = self.robot.right_arm.get_joints()
-            # group_current_joint_values = self.robot.right_arm.get_current_joint_values()
+        if self.pick_state["arm_group"] == "right_arm":
+            self.right_arm_group.clear_pose_targets()
+            # group_joint_names = self.right_arm_group.get_joints()
+            # group_current_joint_values = self.right_arm_group.get_current_joint_values()
             joint_status = self.get_joint_status(self.pick_state["arm_group"])
             rospy.loginfo(str(joint_status))
 
@@ -383,7 +356,7 @@ class ManipulateController:
             #     elif group_joint_names[i] == 'right_elbow_joint':
             #         if group_current_joint_values[i] >= 0.00:
             #             self.setjoint('right_elbow_joint',URDF_ELBOW_LIMIT)
-            #         else: 
+            #         else:
             #             self.setjoint(group_joint_names[i],group_current_joint_values[i] + elbow_offset)
             #     else :
             #         self.setjoint(group_joint_names[i],group_current_joint_values[i])
@@ -397,22 +370,22 @@ class ManipulateController:
             self.set_joint('right_wrist_1_joint', 0.00)
             self.set_joint('right_wrist_2_joint', URDF_WRIST2_LIMIT)
             self.set_joint('right_wrist_3_joint', 0.00)
-            self.robot.right_arm.go(False)
+            self.right_arm_group.go(False)
 
-        elif self.pickstate["arm_group"] == "left_arm":
-            self.robot.left_arm.clear_pose_targets()
+        elif self.pick_state["arm_group"] == "left_arm":
+            self.left_arm_group.clear_pose_targets()
 
     def pick_object_finish(self, tolerance=[0.05, 0.1]):
         # To its normal position
-        self.pickstate["laststate"] = "finish"
+        self.pick_state["laststate"] = "finish"
 
-        self.pickstate["objectname"] = None
-        self.pickstate["arm_group"] = None
-        self.pickstate["objectposition"] = None
-        self.pickstate["ref_frame"] = None
-        if self.pickstate["arm_group"] == "right_arm":
+        self.pick_state["object_name"] = None
+        self.pick_state["arm_group"] = None
+        self.pick_state["objectposition"] = None
+        self.pick_state["ref_frame"] = None
+        if self.pick_state["arm_group"] == "right_arm":
             self.static_pose("right_arm", "right_normal")
-        elif self.pickstate["arm_group"] == "left_arm":
+        elif self.pick_state["arm_group"] == "left_arm":
             self.static_pose("left_arm", "left_normal")
 
     def pick(self, arm_group, position, orientation_rpy=[0, 0, 0], desired_object="part", support_surface_name="table",
@@ -434,53 +407,20 @@ class ManipulateController:
         # Generate a list of grasps
         grasp = self.make_grasps(pose_target, desired_object, [-0.2])
 
-        # if grasp_constraint == None:
-        #     grasp_constraint = moveit_msgs.msg.Grasp()
-        #     grasp_constraint.grasp_pose = pose_target
-
-        #     grasp_constraint.pre_grasp_approach.direction.vector.x = 1.0
-        #     grasp_constraint.pre_grasp_approach.direction.header.frame_id = "right_wrist_3_Link"
-        #     #grasp_constraint.pre_grasp_approach.direction.header.frame_id = "left_wrist_3_Link"
-        #     grasp_constraint.pre_grasp_approach.min_distance = 0.1
-        #     grasp_constraint.pre_grasp_approach.desired_distance = 0.25
-
-        #     # Retreat directly move_back
-        #     grasp_constraint.post_grasp_retreat.direction.header.frame_id = "right_wrist_3_Link"
-        #     #grasp_constraint.post_grasp_retreat.direction.vector.x = -1.0
-        #     grasp_constraint.post_grasp_retreat.direction.vector.z = 1.0
-        #     grasp_constraint.post_grasp_retreat.min_distance = 0.00
-        #     grasp_constraint.post_grasp_retreat.desired_distance = 0.00
-
-        #     # open_gripper
-        #     grasp_constraint.pre_grasp_posture.joint_names.append("right_gripper_joint")
-        #     #grasp_constraint.pre_grasp_posture.joint_names.append("left_gripper_joint")
-        #     grasp_constraint.pre_grasp_posture.points.append(trajectory_msgs.msg.JointTrajectoryPoint())
-        #     grasp_constraint.pre_grasp_posture.points[0].positions.append(std_msgs.msg.Float64())
-        #     grasp_constraint.pre_grasp_posture.points[0].positions[0] = 0
-
-        #     # close_gripper
-        #     grasp_constraint.grasp_posture.joint_names.append("right_gripper_joint")
-        #     #grasp_constraint.grasp_posture.joint_names.append("left_gripper_joint")
-        #     grasp_constraint.grasp_posture.points.append(trajectory_msgs.msg.JointTrajectoryPoint())
-        #     grasp_constraint.grasp_posture.points[0].positions.append(std_msgs.msg.Float64())
-        #     grasp_constraint.grasp_posture.points[0].positions[0] = -0.2
-
-        #     grasp = [grasp_constraint]
-
         if arm_group == "right_arm":
-            self.robot.right_arm.set_support_surface_name(support_surface_name)
-            self.robot.right_arm.set_goal_position_tolerance(0.01)
-            self.robot.right_gripper.set_goal_position_tolerance(0.01)
-            self.robot.right_arm.set_goal_orientation_tolerance(0.05)
-            self.robot.right_gripper.set_goal_orientation_tolerance(0.05)
-            self.robot.right_arm.set_planning_time(planning_time)
-            self.robot.right_arm.pick(desired_object, grasp)
+            self.right_arm_group.set_support_surface_name(support_surface_name)
+            self.right_arm_group.set_goal_position_tolerance(0.01)
+            self.right_gripper_group.set_goal_position_tolerance(0.01)
+            self.right_arm_group.set_goal_orientation_tolerance(0.05)
+            self.right_gripper_group.set_goal_orientation_tolerance(0.05)
+            self.right_arm_group.set_planning_time(planning_time)
+            self.right_arm_group.pick(desired_object, grasp)
         elif arm_group == "left_arm":
-            self.robot.left_arm.set_support_surface_name(support_surface_name)
-            self.robot.left_arm.set_goal_position_tolerance(0.01)
-            self.robot.left_arm.set_goal_orientation_tolerance(0.05)
-            self.robot.left_arm.set_planning_time(planning_time)
-            self.robot.left_arm.pick(desired_object, grasp)
+            self.left_arm_group.set_support_surface_name(support_surface_name)
+            self.left_arm_group.set_goal_position_tolerance(0.01)
+            self.left_arm_group.set_goal_orientation_tolerance(0.05)
+            self.left_arm_group.set_planning_time(planning_time)
+            self.left_arm_group.pick(desired_object, grasp)
         else:
             rospy.logwarn("No specified arm_group")
 
@@ -636,17 +576,17 @@ class ManipulateController:
 
     def static_pose(self, arm_group, posture, tolerance=[0.05, 0.1]):
         if arm_group == "right_arm":
-            self.robot.right_arm.clear_pose_targets()
-            self.robot.right_arm.set_goal_position_tolerance(tolerance[0])
-            self.robot.right_arm.set_goal_orientation_tolerance(tolerance[1])
-            self.robot.right_arm.set_named_target(posture)
-            self.robot.right_arm.go(False)  # async_move
+            self.right_arm_group.clear_pose_targets()
+            self.right_arm_group.set_goal_position_tolerance(tolerance[0])
+            self.right_arm_group.set_goal_orientation_tolerance(tolerance[1])
+            self.right_arm_group.set_named_target(posture)
+            self.right_arm_group.go(False)  # async_move
         elif arm_group == "left_arm":
-            self.robot.left_arm.clear_pose_targets()
-            self.robot.left_arm.set_goal_position_tolerance(tolerance[0])
-            self.robot.left_arm.set_goal_orientation_tolerance(tolerance[1])
-            self.robot.left_arm.set_named_target(posture)
-            self.robot.left_arm.go(False)  # async_move
+            self.left_arm_group.clear_pose_targets()
+            self.left_arm_group.set_goal_position_tolerance(tolerance[0])
+            self.left_arm_group.set_goal_orientation_tolerance(tolerance[1])
+            self.left_arm_group.set_named_target(posture)
+            self.left_arm_group.go(False)  # async_move
         else:
             rospy.logwarn("No specified arm_group1")
 
