@@ -22,7 +22,7 @@ class ControlModule:
     right_arm = ArmController("right")
     recognize_objects = RecognizeObjectsObController()
     manipulator = ManipulateController()
-    kinematics = InverseKinematics()
+    kinematics = InverseKinematics(manipulator)
     gripper = GripperController()
     object_3d_detector = Object3dsDetectorContoller()
     voice_recognition_mode = VoiceRecognitionModeContoller()

@@ -28,7 +28,7 @@ class PointToPick():
         # self.receive_point()
         self.pick_tester()
 
-    def set_torque_limit(self, limit = 0.3):
+    def set_torque_limit(self, limit=0.3):
         rospy.wait_for_service('/dynamixel/right_gripper_joint_controller/set_torque_limit')
         try:
             rospy.loginfo('settorque')
@@ -40,13 +40,12 @@ class PointToPick():
     pub_right_gripper = rospy.Publisher('/dynamixel/right_gripper_joint_controller/command', Float64)
     pub_right_wrist_2 = rospy.Publisher('/dynamixel/right_wrist_2_controller/command', Float64)
 
-
     def pick_tester(self):
-        global mnplctrl,pub,pos
+        global mnplctrl, pub, pos
         mnplctrl = ManipulateController()
         mnplctrl.init_controller()
         invK = inverseKinematics()
-        object_pos = [0.710445 -0.05, -0.230658 + 0.11, 0.786225 + 0.05]
+        object_pos = [0.710445 - 0.05, -0.230658 + 0.11, 0.786225 + 0.05]
 
         pub_right_gripper = rospy.Publisher('/dynamixel/right_gripper_joint_controller/command', Float64)
         pub_right_wrist_2 = rospy.Publisher('/dynamixel/right_wrist_2_controller/command', Float64)
@@ -61,7 +60,7 @@ class PointToPick():
         rospy.loginfo("--INIT PICK NORMAL--")
 
         mnplctrl.pick_object_init("right_arm", "object", [0, 0, 0])
-        # mnplctrl.pickobject_init("right_arm", "object", data)
+        # manipulator_ctrl.pickobject_init("right_arm", "object", data)
         pub_pan.publish(0.0)
         pub_tilt.publish(-0.3)
         rospy.loginfo("Press any key to Continue")
@@ -112,34 +111,34 @@ class PointToPick():
         raw_input()
 
         # rospy.loginfo("----Reaching to Object----")
-        # mnplctrl.pickobject_reach()
+        # manipulator_ctrl.pickobject_reach()
         # rospy.loginfo("Reaching Complete")
 
         # rospy.loginfo("Press any key to Continue")
         # raw_input()
 
         # self.angle = invK.invKinematic(object_pos[0], object_pos[1], object_pos[2])
-        # mnplctrl.movejoint('right_shoulder_1_joint', -1*self.angle[0])
-        # mnplctrl.movejoint('right_shoulder_2_joint', self.angle[1])
-        # mnplctrl.movejoint('right_elbow_joint', self.angle[2])
-        # mnplctrl.movejoint('right_wrist_1_joint', self.angle[3])
-        # mnplctrl.movejoint('right_wrist_2_joint', self.angle[4])
-        # mnplctrl.movejoint('right_wrist_3_joint', self.angle[5])        
+        # manipulator_ctrl.move_joint('right_shoulder_1_joint', -1*self.angle[0])
+        # manipulator_ctrl.move_joint('right_shoulder_2_joint', self.angle[1])
+        # manipulator_ctrl.move_joint('right_elbow_joint', self.angle[2])
+        # manipulator_ctrl.move_joint('right_wrist_1_joint', self.angle[3])
+        # manipulator_ctrl.move_joint('right_wrist_2_joint', self.angle[4])
+        # manipulator_ctrl.move_joint('right_wrist_3_joint', self.angle[5])
 
         rospy.loginfo("---GRASPING---")
-        #mnplctrl.pickobject_grasp()
+        #manipulator_ctrl.pickobject_grasp()
 
         self.set_torque_limit()
         pub_right_gripper.publish(-0.6)
         pub_right_wrist_2.publish(0.0)
-        # mnplctrl.pickobject_movetoobjectfront_2()
-        #pub.publish(Float64(mnplctrl.GRIPPER_CLOSED))
+        # manipulator_ctrl.pickobject_movetoobjectfront_2()
+        #pub.publish(Float64(manipulator_ctrl.GRIPPER_CLOSED))
 
         rospy.loginfo("Press any key to Continue")
         raw_input()
 
         rospy.loginfo("---After Grasp---")
-        # mnplctrl.pickobject_after_grasp()
+        # manipulator_ctrl.pickobject_after_grasp()
 
         # rospy.loginfo("Press any key to Continue")
         # raw_input()
@@ -150,27 +149,26 @@ class PointToPick():
         raw_input()
 
         # rospy.loginfo("----Return To Normal-----")
-        # mnplctrl.static_pose("right_arm","right_init_picking")
+        # manipulator_ctrl.static_pose("right_arm","right_init_picking")
         # rospy.loginfo("---FINISH----")
         # raw_input()
         # rospy.loginfo("---Opening Gripper---")
-        #mnplctrl.pickobject_opengripper()
+        #manipulator_ctrl.pickobject_opengripper()
 
-        # pub.publish(Float64(mnplctrl.GRIPPER_OPENED))
+        # pub.publish(Float64(manipulator_ctrl.GRIPPER_OPENED))
 
         # rospy.loginfo("---Complete Opening Gripper----")
 
         # rospy.spin()
-        # mnplctrl.__del__()
-
+        # manipulator_ctrl.__del__()
 
     def receive_point(self):
-        rospy.init_node('receive_point', anonymous = True)
+        rospy.init_node('receive_point', anonymous=True)
         rospy.Subscriber("/object_point", Vector3, self.pick_tester)
         rospy.spin()
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     # global callback
     try:
         PointToPick()
