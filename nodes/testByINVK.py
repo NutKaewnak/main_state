@@ -18,17 +18,26 @@ class TestInvKine:
 
     def invKine(self):
     	#  manipulator_ctrl.manipulate('right_arm', [0.50, -0.14, 0.70])
-        object_pos = [0.60, -0.17, 0.77]  # [0.57, -0.07, 0.85]
+        object_pos = [0.60, -0.25, 0.77]  # [0.57, -0.07, 0.85]
+        invK.manipulator_ctrl.init_controller()
+
         arm_group = "right_arm"
         # arm_group = 'left_arm'
 
+        rospy.loginfo("-----ARM NORMAL-----")
+        invK.set_normal(arm_group)
+        raw_input()
+
+        rospy.loginfo("-----ARM PREPARE-----")
+        # invK.manipulator_ctrl.pickobject_prepare()
+
         rospy.loginfo("-----INIT POSITION-----")
-        invK.init_position(arm_group, object_pos[0], object_pos[1], object_pos[2])
-        invK.manipulator_ctrl.init_controller()
+        invK.init_position(object_pos[0], object_pos[1], object_pos[2])
         raw_input()
 
         rospy.loginfo("-----OPEN GRIPPER-----")
-        invK.manipulator_ctrl.pickobject_opengripper()
+        invK.open_gripper()
+        raw_input()
 
         rospy.loginfo("-----PICK PREPARE-----")
         invK.inverse_kinematics_prepare()
@@ -39,7 +48,8 @@ class TestInvKine:
         raw_input()
 
         rospy.loginfo("-----GRASP-----")
-        invK.manipulator_ctrl.pickobject_grasp()
+        invK.close_gripper()
+        raw_input()
 
 if __name__ == '__main__':
     try:
