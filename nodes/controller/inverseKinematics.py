@@ -24,6 +24,7 @@ class InverseKinematics:
     def open_gripper(self):
         if self.arm_group == 'right_arm':
             self.manipulator_ctrl.move_joint("right_gripper_joint", 0.8)
+            rospy.sleep(5.0)
         # elif self.arm_group == 'left_arm':
             # self.move_joint("left_gripper_joint", XX)
 
@@ -82,81 +83,113 @@ class InverseKinematics:
         cos_theta1 = (R * R - UL * UL - r * r) / (2 * UL * r + 0.00000001)
 
         try:
-            sin_theta1 = math.pow(1 - math.pow(cos_theta1, 2), 0.5)
-            print "--> cos_theta1 = " + str(cos_theta1)
             try:
-                theta1 = math.atan(sin_theta1 / cos_theta1+0.00000001)
+                sin_theta1 = math.pow(1 - math.pow(cos_theta1, 2), 0.5)
+                print "--> cos_theta1 = " + str(cos_theta1)
+                try:
+                    theta1 = math.atan(sin_theta1 / cos_theta1+0.00000001)
+                except ValueError:
+                    theta1 = math.acos((R * R - UL * UL - r * r) / (2 * UL * r + 0.00000001))
             except ValueError:
                 theta1 = math.acos((R * R - UL * UL - r * r) / (2 * UL * r + 0.00000001))
+            print 'theta1 = ' + str(theta1)
         except ValueError:
-            theta1 = math.acos((R * R - UL * UL - r * r) / (2 * UL * r + 0.00000001))
-        print 'theta1 = ' + str(theta1)
+            print 'FFFFFFFFFFFFAAAAAAAAAAAAAAALLLLLLLSSSSSSSSEEEEEEE'
+            return False
 
-        sin_theta2 = UL * math.sin(theta1) / (R+0.00000001)
-        if type(sin_theta2) == float:
-            cos_theta2 = math.pow(1 - math.pow(sin_theta2, 2), 0.5)
-            if type(cos_theta2) == float:
-                theta2 = math.atan(sin_theta2 / (cos_theta2+0.00000001))
+        try:
+            sin_theta2 = UL * math.sin(theta1) / (R+0.00000001)
+            if type(sin_theta2) == float:
+                cos_theta2 = math.pow(1 - math.pow(sin_theta2, 2), 0.5)
+                if type(cos_theta2) == float:
+                    theta2 = math.atan(sin_theta2 / (cos_theta2+0.00000001))
+                else:
+                    theta2 = math.asin(UL * math.sin(theta1) / (R + 0.00000001))
             else:
                 theta2 = math.asin(UL * math.sin(theta1) / (R + 0.00000001))
-        else:
-            theta2 = math.asin(UL * math.sin(theta1) / (R + 0.00000001))
-        print 'theta2 = ' + str(theta2)
+            print 'theta2 = ' + str(theta2)
+        except ValueError:
+            print 'FFFFFFFFFFFFAAAAAAAAAAAAAAALLLLLLLSSSSSSSSEEEEEEE'
+            return False
 
-        sin_theta3 = x / (R + 0.00000001)
-        if type(sin_theta3) == float:
-            cos_theta3 = math.pow(1 - math.pow(sin_theta3, 2), 0.5)
-            if type(cos_theta3) == float:
-                theta3 = math.atan(sin_theta3 / (cos_theta3+0.00000001))
+        try:
+            sin_theta3 = x / (R + 0.00000001)
+            if type(sin_theta3) == float:
+                cos_theta3 = math.pow(1 - math.pow(sin_theta3, 2), 0.5)
+                if type(cos_theta3) == float:
+                    theta3 = math.atan(sin_theta3 / (cos_theta3+0.00000001))
+                else:
+                    theta3 = math.asin(x / (R + 0.00000001))
             else:
                 theta3 = math.asin(x / (R + 0.00000001))
-        else:
-            theta3 = math.asin(x / (R + 0.00000001))
-        as20 = theta3 - theta1 + theta2
-        print 'as20 = ' + str(as20)
+            as20 = theta3 - theta1 + theta2
+            print 'as20 = ' + str(as20)
+        except ValueError:
+            print 'FFFFFFFFFFFFAAAAAAAAAAAAAAALLLLLLLSSSSSSSSEEEEEEE'
+            return False
 
         # self.elbow_position = [self.UL * math.sin(self.as20), self.UL * math.cos(self.as20)]
 
-        as21 = math.atan(y / ((r * math.sin(theta1))+0.00000001))+0.25
-        as21 = -as21
-        print 'as21 = ' + str(as21)
+        try:
+            as21 = math.atan(y / ((r * math.sin(theta1))+0.00000001))+0.25
+            as21 = -as21
+            print 'as21 = ' + str(as21)
+        except ValueError:
+            print 'FFFFFFFFFFFFAAAAAAAAAAAAAAALLLLLLLSSSSSSSSEEEEEEE'
+            return False
 
-        cos_theta4 = r * math.cos(theta1) / (FL+0.00000001)
-        if type(cos_theta4) == float:
-            sin_theta4 = math.pow(1 - math.pow(cos_theta4, 2), 0.5)
-            if type(sin_theta4) == float:
-                theta4 = math.atan(sin_theta4 / (cos_theta4+0.00000001))
+        try:
+            cos_theta4 = r * math.cos(theta1) / (FL+0.00000001)
+            if type(cos_theta4) == float:
+                sin_theta4 = math.pow(1 - math.pow(cos_theta4, 2), 0.5)
+                if type(sin_theta4) == float:
+                    theta4 = math.atan(sin_theta4 / (cos_theta4+0.00000001))
+                else:
+                    theta4 = math.acos(r * math.cos(theta1) / (FL+0.00000001))
             else:
                 theta4 = math.acos(r * math.cos(theta1) / (FL+0.00000001))
-        else:
-            theta4 = math.acos(r * math.cos(theta1) / (FL+0.00000001))
-        ae22 = (math.pi / 2) - theta4
-        print 'ae22 = ' + str(ae22)
+            ae22 = (math.pi / 2) - theta4
+            print 'ae22 = ' + str(ae22)
+        except ValueError:
+            print 'FFFFFFFFFFFFAAAAAAAAAAAAAAALLLLLLLSSSSSSSSEEEEEEE'
+            return False
 
-        z2 = UL * math.cos(as20) - z
-        # print 'z2 = ' + str(self.z2)
+        try:
+            z2 = UL * math.cos(as20) - z
+            # print 'z2 = ' + str(self.z2)
+        except ValueError:
+            print 'FFFFFFFFFFFFAAAAAAAAAAAAAAALLLLLLLSSSSSSSSEEEEEEE'
+            return False
 
-        sin_theta5 = y / (math.pow(y * y + z2 * z2, 0.5)+0.00000001)
-        if type(sin_theta5) == float:
-            cos_theta5 = math.pow(1 - math.pow(sin_theta5, 2), 0.5)
-            if type(cos_theta5) == float:
-                theta5 = math.atan(sin_theta5 / (cos_theta5+0.00000001))
+        try:
+            sin_theta5 = y / (math.pow(y * y + z2 * z2, 0.5)+0.00000001)
+            if type(sin_theta5) == float:
+                cos_theta5 = math.pow(1 - math.pow(sin_theta5, 2), 0.5)
+                if type(cos_theta5) == float:
+                    theta5 = math.atan(sin_theta5 / (cos_theta5+0.00000001))
+                else:
+                    theta5 = math.asin(y / (math.pow(y * y + z2 * z2, 0.5)+0.00000001))
             else:
                 theta5 = math.asin(y / (math.pow(y * y + z2 * z2, 0.5)+0.00000001))
-        else:
-            theta5 = math.asin(y / (math.pow(y * y + z2 * z2, 0.5)+0.00000001))
-        ah40 = -theta5
-        print 'ah40 = ' + str(ah40)
+            ah40 = -theta5
+            print 'ah40 = ' + str(ah40)
+        except ValueError:
+            print 'FFFFFFFFFFFFAAAAAAAAAAAAAAALLLLLLLSSSSSSSSEEEEEEE'
+            return False
 
-        costheta6 = (x - (UL * math.sin(as20))) / (FL+0.00000001)
-        if type(costheta6) == float:
-            sintheta6 = math.pow(1 - math.pow(costheta6, 2), 0.5)
-            if type(sintheta6) == float:
-                theta6 = math.atan(sintheta6 / (costheta6+0.00000001))
+        try:
+            costheta6 = (x - (UL * math.sin(as20))) / (FL+0.00000001)
+            if type(costheta6) == float:
+                sintheta6 = math.pow(1 - math.pow(costheta6, 2), 0.5)
+                if type(sintheta6) == float:
+                    theta6 = math.atan(sintheta6 / (costheta6+0.00000001))
+                else:
+                    theta6 = math.acos((x - (UL * math.sin(as20))) / (FL+0.00000001))
             else:
                 theta6 = math.acos((x - (UL * math.sin(as20))) / (FL+0.00000001))
-        else:
-            theta6 = math.acos((x - (UL * math.sin(as20))) / (FL+0.00000001))
+        except ValueError:
+            print 'FFFFFFFFFFFFAAAAAAAAAAAAAAALLLLLLLSSSSSSSSEEEEEEE'
+            return False
 
         ah41 = theta6
         print 'ah41 = ' + str(ah41)

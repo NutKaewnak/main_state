@@ -106,7 +106,7 @@ class PointToPick():
         rospy.loginfo("movetoobjectfront Complete")
         rospy.sleep(2.0)
         pub_right_wrist_2.publish(-0.2)
-        
+
         rospy.loginfo("Press any key to Continue")
         raw_input()
 
