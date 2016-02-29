@@ -53,3 +53,6 @@ class Pick(AbstractSubtask):
         rospy.loginfo('------in pick_object:subtask------')
         self.side_arm = side
         self.change_state('init')
+
+    def open_gripper(self):
+        self.skill.open_gripper()

@@ -3,6 +3,7 @@ from include.move_base_status import MoveBaseStatus
 
 __author__ = "Frank"
 
+
 class VoiceRecognitionMode(AbstractSkill):
     def __init__(self, control_module):
         AbstractSkill.__init__(self, control_module)

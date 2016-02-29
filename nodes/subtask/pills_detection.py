@@ -9,8 +9,9 @@ class PillsDetection(AbstractSubtask):
         self.turn_neck = self.skillBook.get_skill(self, 'TurnNeck')
         self.detect_objects = None
         self.pill_pos = None
-        self.pill_name = None
-        self.pill_dic = {}
+        self.pill_name = 'object'
+        self.pills_dic = {}
+        self.speak = None
         self.turn_range = 0
         self.shelf_height = 60
         self.pitch_neck = 0
@@ -25,18 +26,28 @@ class PillsDetection(AbstractSubtask):
             self.change_state('detecting')
 
         elif self.state is 'detecting':
-            self.detect_objects.start()
-            self.change_state('get_data')
+            if self.turn_neck.state is 'successed':
+                self.detect_objects.start()
+                self.change_state('get_data')
 
         elif self.state is 'get_data':
             if self.detect_objects.state is 'finish':
-                self.pill_pos = self.detect_objects.objects
+                self.pill_pos = self.detect_objects.objects[0].point
                 # self.pill_name = self.detect_objects.name
-                self.pill_dic[self.pill_name] = self.pill_pos
-                self.subtaskBook.get_subtask(self, 'Say').say(self.pill_name)
+                self.pills_dic[self.pill_name] = self.pill_pos
+                self.speak = self.subtaskBook.get_subtask(self, 'Say')
+                self.speak.say(self.pill_name)
+                self.change_state('speaking')
+
+        elif self.state is 'speaking':
+            if self.speak.state is 'finish':
                 # turn left to right
                 self.turn_neck.turn_relative(self, 0, -0.11)
-                if self.turn_range is not 0.34:
+                self.change_state('turn_neck')
+
+        elif self.state is 'turn_neck':
+            if self.turn_neck.state is 'successed':
+                if self.turn_neck.pan < 0.34:
                     # add +y turn range
                     self.change_state('detecting')
                 else:
@@ -45,18 +56,10 @@ class PillsDetection(AbstractSubtask):
         elif self.state is 'get_next_line':
             # add +z
             self.pitch_neck -= 0.1225
-            if self.line is not -0.994:
+            if self.pitch_neck > -0.994:
                 self.change_state('set_neck')
             else:
-                self.change_state('success')
-
-        elif self.state is 'success':
-            # check if skill is succeed
-
-            if self.skill.state is 'succeed':
                 self.change_state('finish')
-            elif self.skill.state is 'aborted':
-                rospy.loginfo('Aborted at MovePassDoor')
-                self.change_state('error')
+
 
 # Don't forget to add this subtask to subtask book
