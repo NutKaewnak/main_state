@@ -301,3 +301,6 @@ class Pick(AbstractSkill):
             rospy.loginfo('---after_mani:in_skill---')
             self.delay.wait(1000)
             self.change_state('init_pos')
+
+    def open_gripper(self):
+        self.manipulator.pickobject_opengripper()

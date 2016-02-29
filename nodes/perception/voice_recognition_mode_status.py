@@ -5,6 +5,7 @@ import rospy
 
 __author__ = "Frank"
 
+
 class VoiceRecognitionModePerception(AbstractPerception):
     def __init__(self, planning_module):
         AbstractPerception.__init__(self, planning_module)

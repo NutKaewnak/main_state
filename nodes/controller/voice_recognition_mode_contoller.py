@@ -5,6 +5,7 @@ from std_msgs.msg import String
 
 __author__ = "Frank"
 
+
 class VoiceRecognitionModeContoller:
     def __init__(self):
         self.voice_recognition_mode = actionlib.SimpleActionClient('/recognizer/voice_reg', VoiceRegAction)

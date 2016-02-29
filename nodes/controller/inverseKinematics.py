@@ -1,8 +1,7 @@
 import math
 import rospy
 from dynamixel_controllers.srv import SetTorqueLimit
-# import moveit_commander
-# import sys
+
 
 __author__ = 'fptrainnie'
 
@@ -10,16 +9,24 @@ __author__ = 'fptrainnie'
 class InverseKinematics:
     def __init__(self, manipulator_ctrl):
         global FL, UL
-        # rospy.init_node('inverseKinematic')
         FL = 0.29  # FL is Forearm Length
         UL = 0.35  # UL is Upperarm Length
-        # self.SE = 1.75 #SE is shoulderhack_encoderratio
+        # self.SE = 1.75  # SE is shoulderhack_encoderratio
         self.object_pos = []
         self.manipulator_ctrl = manipulator_ctrl
         self.x = None
         self.y = None
         self.z = None
         self.arm_group = ''
+
+    def init_position(self, x, y, z):
+        rospy.loginfo("-----INVK INIT POSITION-----")
+        if self.arm_group == 'right_arm':
+            y = y
+        elif self.arm_group == 'left_arm':
+            y = -y
+        self.object_pos = [x, y, z]
+        print self.arm_group + ' <----> ' + str(self.object_pos)
 
     def open_gripper(self):
         if self.arm_group == 'right_arm':
@@ -34,31 +41,12 @@ class InverseKinematics:
         # elif self.arm_group == 'left_arm':
             # self.move_joint("left_gripper_joint", XX)
 
-    def init_position(self, x, y, z):
-        rospy.loginfo("-----INVK INIT POSITION-----")
-        if self.arm_group == 'right_arm':
-            y = y
-        elif self.arm_group == 'left_arm':
-            y = -y
-        self.object_pos = [x, y, z]
-        print self.arm_group + ' <----> ' + str(self.object_pos)
-
     def set_normal(self, arm_group):
         self.arm_group = arm_group
         if self.arm_group == 'right_arm':
-            self.manipulator_ctrl.move_joint('right_shoulder_1_joint', 0.0)
-            self.manipulator_ctrl.move_joint('right_shoulder_2_joint', 0.0)
-            self.manipulator_ctrl.move_joint('right_elbow_joint', 0.0)
-            self.manipulator_ctrl.move_joint('right_wrist_1_joint', 0.0)
-            self.manipulator_ctrl.move_joint('right_wrist_2_joint', 1.2)
-            self.manipulator_ctrl.move_joint('right_wrist_3_joint', 0.0)
+            self.manipulator_ctrl.static_pose("arm_group", 'right_normal')
         # elif self.arm_group == 'left_arm':
-        #     self.manipulator_ctrl.move_joint('left_shoulder_1_joint', 0)
-        #     self.manipulator_ctrl.move_joint('left_shoulder_2_joint', 0)
-        #     self.manipulator_ctrl.move_joint('left_elbow_joint', 0)
-        #     self.manipulator_ctrl.move_joint('left_wrist_1_joint', 0)
-        #     self.manipulator_ctrl.move_joint('left_wrist_2_joint', 1.2)
-        #     self.manipulator_ctrl.move_joint('left_wrist_3_joint', 0)
+        #     self.manipulator_ctrl.static_pose("arm_group", 'left_normal')
 
     def cal_mani(self, x, y, z):
         pos_x = x-0.02-0.08
@@ -69,7 +57,7 @@ class InverseKinematics:
 
     def inverse_kinematics_prepare(self):
         rospy.loginfo('-----PICK PREPARE-----')
-        angle = self.cal_mani(self.object_pos[0]-0.1, self.object_pos[1], 0.82222)
+        angle = self.cal_mani(self.object_pos[0]-0.1, self.object_pos[1], self.object_pos[2])
         self.move(angle)
 
     def inverse_kinematics_pregrasp(self):
@@ -93,6 +81,7 @@ class InverseKinematics:
             except ValueError:
                 theta1 = math.acos((R * R - UL * UL - r * r) / (2 * UL * r + 0.00000001))
             print 'theta1 = ' + str(theta1)
+        
         except ValueError:
             print 'FFFFFFFFFFFFAAAAAAAAAAAAAAALLLLLLLSSSSSSSSEEEEEEE'
             return False
@@ -171,7 +160,7 @@ class InverseKinematics:
                     theta5 = math.asin(y / (math.pow(y * y + z2 * z2, 0.5)+0.00000001))
             else:
                 theta5 = math.asin(y / (math.pow(y * y + z2 * z2, 0.5)+0.00000001))
-            ah40 = -theta5
+            ah40 = -theta5/3.0
             print 'ah40 = ' + str(ah40)
         except ValueError:
             print 'FFFFFFFFFFFFAAAAAAAAAAAAAAALLLLLLLSSSSSSSSEEEEEEE'
