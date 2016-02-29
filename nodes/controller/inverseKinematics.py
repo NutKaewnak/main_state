@@ -21,9 +21,20 @@ class InverseKinematics:
         self.z = None
         self.arm_group = ''
 
-    def init_position(self, arm_group, x, y, z):
-        rospy.loginfo("-----INIT POSITION-----")
-        self.arm_group = arm_group
+    def open_gripper(self):
+        if self.arm_group == 'right_arm':
+            self.manipulator_ctrl.move_joint("right_gripper_joint", 0.8)
+        # elif self.arm_group == 'left_arm':
+            # self.move_joint("left_gripper_joint", XX)
+
+    def close_gripper(self):
+        if self.arm_group == 'right_arm':
+            self.manipulator_ctrl.move_joint("right_gripper_joint", 0.0)
+        # elif self.arm_group == 'left_arm':
+            # self.move_joint("left_gripper_joint", XX)
+
+    def init_position(self, x, y, z):
+        rospy.loginfo("-----INVK INIT POSITION-----")
         if self.arm_group == 'right_arm':
             y = y
         elif self.arm_group == 'left_arm':
@@ -31,10 +42,27 @@ class InverseKinematics:
         self.object_pos = [x, y, z]
         print self.arm_group + ' <----> ' + str(self.object_pos)
 
+    def set_normal(self, arm_group):
+        self.arm_group = arm_group
+        if self.arm_group == 'right_arm':
+            self.manipulator_ctrl.move_joint('right_shoulder_1_joint', 0.0)
+            self.manipulator_ctrl.move_joint('right_shoulder_2_joint', 0.0)
+            self.manipulator_ctrl.move_joint('right_elbow_joint', 0.0)
+            self.manipulator_ctrl.move_joint('right_wrist_1_joint', 0.0)
+            self.manipulator_ctrl.move_joint('right_wrist_2_joint', 1.2)
+            self.manipulator_ctrl.move_joint('right_wrist_3_joint', 0.0)
+        # elif self.arm_group == 'left_arm':
+        #     self.manipulator_ctrl.move_joint('left_shoulder_1_joint', 0)
+        #     self.manipulator_ctrl.move_joint('left_shoulder_2_joint', 0)
+        #     self.manipulator_ctrl.move_joint('left_elbow_joint', 0)
+        #     self.manipulator_ctrl.move_joint('left_wrist_1_joint', 0)
+        #     self.manipulator_ctrl.move_joint('left_wrist_2_joint', 1.2)
+        #     self.manipulator_ctrl.move_joint('left_wrist_3_joint', 0)
+
     def cal_mani(self, x, y, z):
-        pos_x = x
-        pos_y = y+0.17
-        pos_z = z-0.7
+        pos_x = x-0.02-0.08
+        pos_y = y+0.14
+        pos_z = z-0.8+0.2
         angle = self.inv_kinematic(pos_x, pos_y, pos_z)
         return angle
 
@@ -142,58 +170,58 @@ class InverseKinematics:
 
     def move(self, angle):
         if self.arm_group == 'right_arm':
-            r_sh1 = self.inBound('right_shoulder_1_joint', angle[0])
-            print ">>> PRINT " + str(r_sh1)
+            r_sh1 = self.in_bound('right_shoulder_1_joint', -1*angle[0])
             self.manipulator_ctrl.move_joint('right_shoulder_1_joint', r_sh1)
-            r_sh2 = self.inBound('right_shoulder_2_joint', angle[1])
+            r_sh2 = self.in_bound('right_shoulder_2_joint', -1*angle[1])
             self.manipulator_ctrl.move_joint('right_shoulder_2_joint', r_sh2)
-            r_elb = self.inBound('right_elbow_joint', angle[2])
+            r_elb = self.in_bound('right_elbow_joint', -1*angle[2])
+            print ">>> PRINT " + str(r_elb)
             self.manipulator_ctrl.move_joint('right_elbow_joint', r_elb)
-            r_wr1 = self.inBound('right_wrist_1_joint', angle[3])
+            r_wr1 = self.in_bound('right_wrist_1_joint', angle[3])
             self.manipulator_ctrl.move_joint('right_wrist_1_joint', r_wr1)
-            r_wr2 = self.inBound('right_wrist_2_joint', angle[4])
+            r_wr2 = self.in_bound('right_wrist_2_joint', angle[4])
             self.manipulator_ctrl.move_joint('right_wrist_2_joint', r_wr2)
-            r_wr3 = self.inBound('right_wrist_3_joint', angle[5])
+            r_wr3 = self.in_bound('right_wrist_3_joint', angle[5])
             self.manipulator_ctrl.move_joint('right_wrist_3_joint', r_wr3)
         # elif self.arm_group == 'left_arm':
-        #     l_sh1 = self.inBound('left_shoulder_1_joint', -1*angle[0])
+        #     l_sh1 = self.in_bound('left_shoulder_1_joint', -1*angle[0])
         #     manipulator_ctrl.move_joint('left_shoulder_1_joint', l_sh1)
-        #     l_sh2 = self.inBound('left_shoulder_2_joint', -1*angle[1])
+        #     l_sh2 = self.in_bound('left_shoulder_2_joint', -1*angle[1])
         #     manipulator_ctrl.move_joint('left_shoulder_2_joint', l_sh2)
-        #     l_elb = self.inBound('left_elbow_joint', -1*angle[2])
+        #     l_elb = self.in_bound('left_elbow_joint', -1*angle[2])
         #     manipulator_ctrl.move_joint('left_elbow_joint', l_elb)
-        #     l_wr1 = self.inBound('left_wrist_1_joint', angle[3])
+        #     l_wr1 = self.in_bound('left_wrist_1_joint', angle[3])
         #     manipulator_ctrl.move_joint('left_wrist_1_joint', l_wr1)
-        #     l_wr2 = self.inBound('left_wrist_2_joint', angle[4])
+        #     l_wr2 = self.in_bound('left_wrist_2_joint', angle[4])
         #     manipulator_ctrl.move_joint('left_wrist_2_joint', l_wr2)
-        #     l_wr3 = self.inBound('left_wrist_3_joint', angle[5])
+        #     l_wr3 = self.in_bound('left_wrist_3_joint', angle[5])
         #     manipulator_ctrl.move_joint('left_wrist_3_joint', l_wr3)
 
-    def inBound(self, joint_name, angle):
+    def in_bound(self, joint_name, angle):
         print 'THIS IS ' + self.arm_group
         if self.arm_group == 'right_arm':
             if joint_name == 'right_shoulder_1_joint':
-                if angle >= -0.3 and angle <= 1.3:
+                if angle >= -1.2 and angle <= 0.5:
                     return angle
                 else:
-                    if angle < -0.3:
-                        return -0.3
+                    if angle < -1.2:
+                        return -1.2
                     else:
-                        return 1.3
+                        return 0.5
             elif joint_name == 'right_shoulder_2_joint':
-                if angle >= -0.8 and angle <= 1.6:
+                if angle >= -1.47 and angle <= 1.1:
                     return angle
                 else:
-                    if angle < -0.8:
-                        return -0.8
+                    if angle < -1.47:
+                        return -1.47
                     else:
-                        return 1.6
+                        return 1.1
             elif joint_name == 'right_elbow_joint':
-                if angle >= -0.3 and angle <= 1.0:
-                    return angle
+                if angle >= -0.1 and angle <= 0.22:
+                    return round(angle, 2)
                 else:
-                    if angle < -1.0:
-                        return -1.0
+                    if angle < -0.1:
+                        return -0.1
                     else:
                         return 0.22
             elif joint_name == 'right_wrist_1_joint':

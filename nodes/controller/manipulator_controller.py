@@ -14,8 +14,8 @@ __author__ = "ftprainnie"
 GRIPPER_FRAME = 'right_wrist_3_Link'
 GRIPPER_JOINT_NAMES = ['right_gripper_joint']
 
-GRIPPER_OPENED = 0.1
-GRIPPER_CLOSED = -0.5
+GRIPPER_OPENED = 0.8
+GRIPPER_CLOSED = 0.0
 GRIPPER_NEUTRAL = 0.0
 GRASP_OVERTIGHTEN = -0.01
 GRIPPER_EFFORT = 0.2
@@ -55,9 +55,7 @@ class ManipulateController:
         self.robot = moveit_commander.RobotCommander()
         self.scene = moveit_commander.PlanningSceneInterface()
         self.tf_listener = tf.TransformListener()
-        print 'kuy'
         self.right_arm_group = moveit_commander.MoveGroupCommander('right_arm')
-        print dir(self.right_arm_group.clear_pose_targets)
         self.right_gripper_group = moveit_commander.MoveGroupCommander('right_gripper')
         self.left_arm_group = moveit_commander.MoveGroupCommander('left_arm')
         self.left_gripper_group = moveit_commander.MoveGroupCommander('left_gripper')
@@ -163,6 +161,8 @@ class ManipulateController:
                 if "gripper" in joint_name:
                     self.right_gripper_group.set_joint_value_target(joint_name, joint_value)
                 else:
+                    print joint_name
+                    print joint_value
                     self.right_arm_group.set_joint_value_target(joint_name, joint_value)
             elif "left" in joint_name:
                 if "gripper" in joint_name:
@@ -188,9 +188,7 @@ class ManipulateController:
                 self.set_joint(joint_name, joint_value)
                 self.right_gripper_group.go(False)
             else:
-                print self.right_arm_group
-                if self.right_arm_group.clear_pose_targets() is not None:
-                    self.right_arm_group.clear_pose_targets()
+                self.right_arm_group.clear_pose_targets()
                 self.set_joint(joint_name, joint_value)
                 self.right_arm_group.go(False)
 
@@ -210,19 +208,16 @@ class ManipulateController:
 
     # PICKING PROCEDURE
     # pregrasp -> open_gripper -> reach -> grasp
-    def pickobject_init(self, arm_group, object_name, ref_frame="base_link"):
+    def pickobject_init(self, arm_group, ref_frame="base_link"):
         self.pick_state["arm_group"] = arm_group
         self.pick_state["object_name"] = object_name
-        # self.pick_state["laststate"] = "pregrasp"
         self.pick_state["ref_frame"] = ref_frame
         self.static_pose(self.pick_state["arm_group"], 'right_init_picking_normal')
-        # rospy.loginfo('---------------------------pick object_init')
+        rospy.loginfo('---------------------------pick object_init')
 
     def pickobject_prepare(self):
-        # rospy.loginfo('prepare pregrasp')
-        # self.pick_state["laststate"] = "prepare"
         self.static_pose(self.pick_state["arm_group"], 'right_picking_prepare')
-        # rospy.loginfo('---------------------------pick object_prepare')
+        rospy.loginfo('---------------------------pick object_prepare')
 
     def pickobject_pregrasp(self, object_position):
         # rospy.loginfo('pregrasp')
@@ -288,15 +283,7 @@ class ManipulateController:
         # open gripper
         if self.pick_state["arm_group"] == 'right_arm':
             self.move_joint("right_gripper_joint", GRIPPER_OPENED)
-            # self.delay.wait(5000) # TODO: delay should not be here
-            # self.static_pose(self.pick_state["right_gripper"], 'right_gripper_open')
-            # print '>>loop<<'
-
-            # elif self.pick_state["arm_group"] == 'left_arm':
-            #     pass
-            # self.move_joint("left_gripper_joint", GRIPPER_OPENED)
         rospy.loginfo('------------------------------open gripper')
-        pass
 
     def pickobject_reach(self, tolerance=[0.05, 0.1], step=0.05):
         self.pick_state["laststate"] = "reach"
