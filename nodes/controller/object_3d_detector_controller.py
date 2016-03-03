@@ -5,7 +5,8 @@ from std_msgs.msg import String
 
 __author__ = "Frank"
 
-class Object3dsDetectorContoller:
+
+class Object3dsDetectorController:
     def __init__(self):
         self.detector = actionlib.SimpleActionClient('/object/cluster_extraction', Object3DsAction)
 

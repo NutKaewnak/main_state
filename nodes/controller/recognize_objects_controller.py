@@ -5,6 +5,7 @@ from std_msgs.msg import String
 
 __author__ = "Frank"
 
+
 class RecognizeObjectsObController:
     def __init__(self):
         self.recognize_objects = actionlib.SimpleActionClient('/object/recognize_objects', RecognizeObjectsAction)

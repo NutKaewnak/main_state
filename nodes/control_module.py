@@ -6,8 +6,8 @@ from controller.arm_controller import ArmController
 from controller.manipulator_controller import ManipulateController
 from controller.gripper_controller import GripperController
 from controller.recognize_objects_controller import RecognizeObjectsObController
-from controller.object_3d_detector_controller import Object3dsDetectorContoller
-from controller.voice_recognition_mode_controller import VoiceRecognitionModeContoller
+from controller.object_3d_detector_controller import Object3dsDetectorController
+from controller.voice_recognition_mode_controller import VoiceRecognitionModeController
 
 __author__ = "AThousandYears"
 
@@ -22,8 +22,8 @@ class ControlModule:
     recognize_objects = RecognizeObjectsObController()
     manipulator = ManipulateController()
     gripper = GripperController()
-    object_3d_detector = Object3dsDetectorContoller()
-    voice_recognition_mode = VoiceRecognitionModeContoller()
+    object_3d_detector = Object3dsDetectorController()
+    voice_recognition_mode = VoiceRecognitionModeController()
 
     def __init__(self):
         pass

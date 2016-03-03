@@ -32,7 +32,7 @@ class PerceptionModule:
         self.people = PeopleDetection(main_state.planningModule)
         self.object_3ds_detector = Object3DsDetectorPerception(main_state.planningModule)
         self.right_arm = RightArm(main_state.planningModule)
-        self.right_arm = RightGripper(main_state.planningModule)
+        self.right_gripper = RightGripper(main_state.planningModule)
         self.left_arm = LeftArm(main_state.planningModule)
         self.circle_detection = CircleDetection(main_state.planningModule)
         self.height = Height(main_state.planningModule)

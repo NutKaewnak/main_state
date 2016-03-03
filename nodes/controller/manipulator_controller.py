@@ -7,6 +7,7 @@ import sys
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Pose2D
 from geometry_msgs.msg import Point
+from std_msgs.msg import Float64
 from geometry_msgs.msg import PointStamped
 
 __author__ = "ftprainnie"
@@ -71,6 +72,7 @@ class ManipulateController:
         self.scene = None
         self.arm_groups = dict()
         self.tf_listener = None
+        self.pub_right_gripper = rospy.Publisher('/dynamixel/right_gripper_joint_controller/command', Float64)
 
     def init_controller(self):
         moveit_commander.roscpp_initialize(sys.argv)
@@ -261,6 +263,68 @@ class ManipulateController:
             (path, fraction) = self.left_arm_group.compute_cartesian_path(waypoint, step, 0.00, True)
             self.left_arm_group.execute(path)
 
+    def pickobject_grasp(self):
+        # close gripper
+        # self.pick_state["laststate"] = "closegripper"
+        if self.pick_state["arm_group"] == "right_arm":
+            # self.set_torque_limit["right_gripper"](GRIPPER_EFFORT)
+            self.pub_right_gripper.publish(GRIPPER_CLOSED)
+        elif self.pick_state["arm_group"] == "left_arm":
+            # if self.pick_state["demo"] == False:
+            # self.set_torque_limit["left_gripper"](GRIPPER_EFFORT)
+            self.move_joint("left_gripper_joint", GRIPPER_CLOSED)
+
+    def pickobject_after_grasp(self, shoulder_offset=0.2, elbow_offset=0.1, tolerance=[0.05, 0.1]):
+        ## + shoulderoffset && fix wrist tobe zero
+        self.pick_state["laststate"] = "aftergrasp"
+
+        if self.pick_state["arm_group"] == "right_arm":
+            self.right_arm_group.clear_pose_targets()
+            # group_joint_names = self.right_arm_group.get_joints()
+            # group_current_joint_values = self.right_arm_group.get_current_joint_values()
+            joint_status = self.get_joint_status(self.pick_state["arm_group"])
+            rospy.loginfo(str(joint_status))
+
+            # for i in range(0,len(group_joint_names)):
+            #     if group_joint_names[i] == 'right_shoulder_1_joint':
+            #         self.setjoint(group_joint_names[i],group_current_joint_values[i] - shoulder_offset)
+            #     elif group_joint_names[i] == 'right_shoulder_2_joint':
+            #         self.setjoint(group_joint_names[i],group_current_joint_values[i])
+            #     elif group_joint_names[i] == 'right_elbow_joint':
+            #         if group_current_joint_values[i] >= 0.00:
+            #             self.setjoint('right_elbow_joint',URDF_ELBOW_LIMIT)
+            #         else:
+            #             self.setjoint(group_joint_names[i],group_current_joint_values[i] + elbow_offset)
+            #     else :
+            #         self.setjoint(group_joint_names[i],group_current_joint_values[i])
+
+            self.set_joint("right_shoulder_1_joint", joint_status["right_shoulder_1_joint"] - shoulder_offset)
+            self.set_joint("right_shoulder_2_joint", joint_status["right_shoulder_2_joint"])
+            if joint_status["right_elbow_joint"] >= 0.00:
+                self.set_joint('right_elbow_joint', URDF_ELBOW_LIMIT)
+            else:
+                self.set_joint("right_elbow_joint", joint_status["right_elbow_joint"] + elbow_offset)
+            self.set_joint('right_wrist_1_joint', 0.00)
+            self.set_joint('right_wrist_2_joint', URDF_WRIST2_LIMIT)
+            self.set_joint('right_wrist_3_joint', 0.00)
+            self.right_arm_group.go(False)
+
+        elif self.pick_state["arm_group"] == "left_arm":
+            self.left_arm_group.clear_pose_targets()
+
+    def pick_object_finish(self, tolerance=[0.05, 0.1]):
+        # To its normal position
+        self.pick_state["laststate"] = "finish"
+
+        self.pick_state["object_name"] = None
+        self.pick_state["arm_group"] = None
+        self.pick_state["objectposition"] = None
+        self.pick_state["ref_frame"] = None
+        if self.pick_state["arm_group"] == "right_arm":
+            self.static_pose("right_arm", "right_normal")
+        elif self.pick_state["arm_group"] == "left_arm":
+            self.static_pose("left_arm", "left_normal")
+
     def pick(self, arm_group, position, orientation_rpy=[0, 0, 0], desired_object="part", support_surface_name="table",
              ref_frame="base_link", planning_time=300.00, grasp_constraint=None):
 
@@ -402,7 +466,7 @@ class ManipulateController:
     # Generate a list of possible place poses
     def make_places(self, init_pose):
         # Initialize the place location as a PoseStamped message
-        place = PoseStamped()
+        place = PointStamped()
 
         # Start with the input place pose
         place = init_pose
@@ -461,7 +525,6 @@ class ManipulateController:
             arm_group = RIGHT_ARM
         elif 'left' in posture:
             arm_group = LEFT_ARM
-
         if arm_group == RIGHT_ARM or arm_group == LEFT_ARM:
             self.arm_groups[arm_group].clear_pose_targets()
             self.arm_groups[arm_group].set_goal_position_tolerance(tolerance[0])
