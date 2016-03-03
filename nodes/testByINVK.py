@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 import rospy
-from controller.inverseKinematics import InverseKinematics
-from controller.manipulator_controller import ManipulateController
-from task.include.delay import Delay
 from std_msgs.msg import Float64
 
+from controller.manipulator_controller import ManipulateController
+from nodes.skill.include.inverse_kinematics import InverseKinematics
+from task.include.delay import Delay
 
 __author__ = 'fptrainnie'
 
@@ -30,7 +30,7 @@ class TestInvKine:
         raw_input()
 
         rospy.loginfo("-----ARM PREPARE-----")
-        invK.manipulator_ctrl.pickobject_prepare()
+        invK.manipulator_ctrl.pick_object_prepare()
         raw_input()
 
         rospy.loginfo("-----INIT POSITION-----")
@@ -42,7 +42,7 @@ class TestInvKine:
         raw_input()
 
         rospy.loginfo("-----PICK PREPARE-----")
-        invK.inverse_kinematics_prepare()
+        invK.pick_prepare()
         raw_input()
 
         rospy.loginfo("-----PICK PREGRASP-----")
@@ -54,7 +54,7 @@ class TestInvKine:
         raw_input()#
 
         rospy.loginfo("-----AFTER GRASP-----")
-        invK.manipulator_ctrl.pickobject_prepare()
+        invK.manipulator_ctrl.pick_object_prepare()
         raw_input()
 
 if __name__ == '__main__':

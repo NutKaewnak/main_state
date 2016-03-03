@@ -21,4 +21,4 @@ class ObjectsDetection(AbstractSubtask):
                 print self.objects
                 self.change_state('finish')
             if self.detect_object_3ds_skill.state is 'not_found':
-                self.start()
+                self.change_state('not_found')

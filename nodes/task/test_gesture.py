@@ -18,7 +18,7 @@ class TestRecognition(AbstractTask):
                 point = self.current_subtask.get_point()
                 self.subtask = self.change_state_with_subtask('moveToGesture', 'MoveRelative')
 
-                # TODO: move the code below to subtask
+                # TODO: arm_group_manipulate the code below to subtask
                 if self.subtask is not None:
                     magic_number = 0
                     if point.y > 0:

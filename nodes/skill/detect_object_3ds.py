@@ -22,8 +22,6 @@ class DetectObject3Ds(AbstractSkill):
                 self.change_state(status)
                 print 'state_object = ' + self.state
                 if self.state is 'succeeded':
-                    # print 'What the Fuck ------------------------'
-                    # print type(perception_data.input.result.)
                     if not perception_data.input.result.objects:
                         self.change_state('not_found')
                     self.objects = perception_data.input.result.objects

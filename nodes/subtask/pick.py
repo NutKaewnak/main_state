@@ -1,6 +1,5 @@
 import rospy
 from include.abstract_subtask import AbstractSubtask
-from std_msgs.msg import Float64
 
 __author__ = 'CinDy'
 
@@ -9,50 +8,47 @@ class Pick(AbstractSubtask):
     def __init__(self, planning_module):
         AbstractSubtask.__init__(self, planning_module)
         self.skill = None
-        self.input_object_pos = None
-        self.side_arm = 'right_arm'
+        self.input_object_point = None
+        self.side_arm = None
         self.subtask = None
-        self.check = None
         self.neck = None
 
     def perform(self, perception_data):
         if self.state is 'init':
             rospy.loginfo('pick subtask init')
-            # self.neck.tilt = -0.3
-            # self.neck.pan = 0
-            self.neck = self.skillBook.get_skill(self, 'TurnNeck')
-            self.neck.turn(-0.4, 0)
+            self.change_state('wait_for_point')
+
+        elif self.state is 'receive_point':
             self.change_state('setting_arm')
 
         elif self.state is 'setting_arm':
-            self.skill = self.skillBook.get_skill(self, 'Pick')
-            self.skill.pick_object(self.side_arm)
-            self.change_state('detect_object')
+            self.skill = self.skillBook.get_skill(self, 'Graps')
+            self.skill.set_side = self.side_arm
+            self.skill.pick_object(self.input_object_point)
+            self.change_state('wait_for_skill')
 
-        elif self.state is 'detect_object':
-            if self.skill.state is 'checking':
-                self.check = self.subtaskBook.get_subtask(self, 'ObjectsDetection')
-                self.check.start()
-                self.change_state('after_detect')
-
-        elif self.state is 'after_detect':
-            if self.check.state == 'finish':
-                if len(self.check.objects) > 0:
-                    self.skill.set_object_pos(self.check.objects[0].point.x,
-                                              self.check.objects[0].point.y,
-                                              self.check.objects[0].point.z)
-                    self.skill.after_mani()
-                    self.change_state('grasp_object')
-
-        elif self.state is 'grasp_object':
+        elif self.state is 'wait_for_skill':
             print self.skill.state
-            if self.skill.state is 'succeed':
+            if self.skill.state is 'done_prepare':
+                self.skill.after_prepare()
+            elif self.skill.state is 'unreachable':
+                self.change_state('solve_unreachable')
+            elif self.skill.state is 'succeed':
                 self.change_state('finish')
 
-    def pick_object(self, side):
-        rospy.loginfo('------in pick_object:subtask------')
-        self.side_arm = side
-        self.change_state('init')
+    def pick_object(self, point):
+        """
+        Let subtask pick object. Please make sure that side arm is already design (Default: 'right_arm').
+        :param point: (Point) point of object to pick.
+        :return: None
+        """
+        self.input_object_point = point
+        if self.side_arm is None:
+            self.side_arm = 'right_arm'
+        self.change_state('receive_point')
 
     def open_gripper(self):
-        self.skill.open_gripper()
+        self.skillBook.get_skill(self, 'Graps').open_gripper()
+
+    def close_gripper(self):
+        self.skill = self.skillBook.get_skill(self, 'Graps').close_gripper()
