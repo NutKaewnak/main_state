@@ -22,13 +22,12 @@ class Pick(AbstractSubtask):
             self.change_state('setting_arm')
 
         elif self.state is 'setting_arm':
-            self.skill = self.skillBook.get_skill(self, 'Graps')
-            self.skill.set_side = self.side_arm
+            self.skill = self.skillBook.get_skill(self, 'Grasp')
+            self.skill.set_side(self.side_arm)
             self.skill.pick_object(self.input_object_point)
             self.change_state('wait_for_skill')
 
         elif self.state is 'wait_for_skill':
-            print self.skill.state
             if self.skill.state is 'done_prepare':
                 self.skill.after_prepare()
             elif self.skill.state is 'unreachable':

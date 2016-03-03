@@ -15,11 +15,10 @@ class TestInvKine:
         self.delay = Delay()
         rospy.init_node('inverseKinematic')
         invK = InverseKinematics(ManipulateController())
-        self.pub_right_gripper = rospy.Publisher('/dynamixel/right_gripper_joint_controller/command', Float64)
         self.invKine()
 
     def invKine(self):
-        object_pos = [0.60, -0.25, 0.77]  # [0.57, -0.07, 0.85]
+        object_pos = [0.63, -0.20, 0.85]  # [0.57, -0.07, 0.85]
         arm_group = "right_arm"
         # arm_group = 'left_arm'
 
@@ -38,7 +37,7 @@ class TestInvKine:
         raw_input()
 
         rospy.loginfo("-----OPEN GRIPPER-----")
-        self.pub_right_gripper.publish(0.8)
+        invK.manipulator_ctrl.pickobject_opengripper()
         raw_input()
 
         rospy.loginfo("-----PICK PREPARE-----")
@@ -50,8 +49,8 @@ class TestInvKine:
         raw_input()
 
         rospy.loginfo("-----CLOSE GRIPPER-----")
-        self.pub_right_gripper.publish(0.0)
-        raw_input()#
+        invK.manipulator_ctrl.pickobject_grasp()
+        raw_input()
 
         rospy.loginfo("-----AFTER GRASP-----")
         invK.manipulator_ctrl.pick_object_prepare()

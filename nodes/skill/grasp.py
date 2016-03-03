@@ -22,6 +22,9 @@ class Grasp(AbstractSkill):
     def perform(self, perception_data):
         if self.state is 'init_pick':
             self.manipulator.init_controller()
+            self.change_state('prepare_arm_normal')
+
+        elif self.state is 'prepare_arm_normal':
             self.set_arm_normal()
             self.change_state('arm_normal')
 
@@ -42,7 +45,7 @@ class Grasp(AbstractSkill):
                     self.change_state('open_gripper')
 
         elif self.state is 'open_gripper':
-            if perception_data.device == self.arm_device:
+            if perception_data.device == self.gripper_device:
                 arm_status = ArmStatus.get_state_from_status(perception_data.input)
                 if arm_status == 'succeeded':
                     # TODO: fix side

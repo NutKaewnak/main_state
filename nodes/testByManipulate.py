@@ -10,8 +10,7 @@ import tf
 from dynamixel_controllers.srv import SetTorqueLimit
 from controller.manipulator_controller import ManipulateController
 from geometry_msgs.msg import Vector3
-from inverseKinematic import inverseKinematics
-
+from controller.inverseKinematics import InverseKinematics
 __author__ = 'ftprainnie'
 
 framecount = 0
@@ -44,7 +43,7 @@ class PointToPick():
         global mnplctrl, pub, pos
         mnplctrl = ManipulateController()
         mnplctrl.init_controller()
-        invK = inverseKinematics()
+        invK = InverseKinematics()
         object_pos = [0.710445 - 0.05, -0.230658 + 0.11, 0.786225 + 0.05]
 
         pub_right_gripper = rospy.Publisher('/dynamixel/right_gripper_joint_controller/command', Float64)

@@ -59,7 +59,7 @@ class RoboZoo(AbstractTask):
                 #         self.goods_low()
                 #         self.check_instruct = 'LOW'
                         # call(['play', '~/SKUBAVOICE/Intro_all.mp3'])
-                
+
                 # if 'Y' in perception_data.input:
                 #     self.arm_pos = [-0.15, 0.38, 0.3, 0.15, -0.13, -0.3]
                 #     # self.respect()
@@ -110,26 +110,26 @@ class RoboZoo(AbstractTask):
 
                 elif 'BACK' in perception_data.input:
                     self.count_start = 0
-                    # self.pub_right_gripper.publish(0.8)
-                    self.pub_left_gripper.publish(0.8)
+                    self.pub_right_gripper.publish(0.8)
+                    # open gripper
+                    # self.pub_left_gripper.publish(0.8)
 
                 elif 'START' in perception_data.input:
-                    self.pub_left_gripper.publish(0.2)
-                    # self.count_start += 1
-                    # if self.count_start == 1:
-                    #     # self.pub_right_gripper.publish(-0.3)
-                    #     self.pub_left_gripper.publish(0.8)
-                    # elif self.count_start == 2:
-                    #     # self.pub_right_gripper.publish(-0.4)
-                    #     self.pub_left_gripper.publish(0.8)
-                    # elif self.count_start == 3:
-                    #     # self.pub_right_gripper.publish(-0.6)                    
-                    #     self.pub_left_gripper.publish(0.8)  
-                    # elif self.count_start == 4:
-                    #     # self.pub_right_gripper.publish(-0.8)
-                    #     self.pub_left_gripper.publish(0.8)
-                    # else:
-                    #     pass
+                    self.count_start += 1
+                    if self.count_start == 1:
+                        self.pub_right_gripper.publish(0.6)
+                        # self.pub_left_gripper.publish(0.8)
+                    elif self.count_start == 2:
+                        self.pub_right_gripper.publish(0.4)
+                        # self.pub_left_gripper.publish(0.8)
+                    elif self.count_start == 3:
+                        self.pub_right_gripper.publish(0.2)
+                        # self.pub_left_gripper.publish(0.8)
+                    elif self.count_start == 4:
+                        self.pub_right_gripper.publish(0.0)
+                        # self.pub_left_gripper.publish(0.8)
+                    else:
+                        pass
 
                 # if side is RIGHT:
                 #     if 'LB' in perception_data.input:
@@ -178,20 +178,20 @@ class RoboZoo(AbstractTask):
                 #         self.pub_left_shoulder_2.publish(self.arm_pos[1])
 
     def arm_init(self):
-        # self.pub_right_shoulder_1 = rospy.Publisher('/dynamixel/right_shoulder_1_controller/command', Float64)
-        # self.pub_right_shoulder_2 = rospy.Publisher('/dynamixel/right_shoulder_2_controller/command', Float64)
-        # self.pub_right_elbow = rospy.Publisher('/dynamixel/right_elbow_controller/command', Float64)
-        # self.pub_right_wrist_1 = rospy.Publisher('/dynamixel/right_wrist_1_controller/command', Float64)
-        # self.pub_right_wrist_2 = rospy.Publisher('/dynamixel/right_wrist_2_controller/command', Float64)
-        # self.pub_right_wrist_3 = rospy.Publisher('/dynamixel/right_wrist_3_controller/command', Float64)
-        # self.pub_right_gripper = rospy.Publisher('dynamixel/right_gripper_joint_controller/command', Float64)
-        self.pub_left_shoulder_1 = rospy.Publisher('/dynamixel/left_shoulder_1_controller/command', Float64)
-        self.pub_left_shoulder_2 = rospy.Publisher('/dynamixel/left_shoulder_2_controller/command', Float64)
-        self.pub_left_elbow = rospy.Publisher('/dynamixel/left_elbow_controller/command', Float64)
-        self.pub_left_wrist_1 = rospy.Publisher('/dynamixel/left_wrist_1_controller/command', Float64)
-        self.pub_left_wrist_2 = rospy.Publisher('/dynamixel/left_wrist_2_controller/command', Float64)
-        self.pub_left_wrist_3 = rospy.Publisher('/dynamixel/left_wrist_3_controller/command', Float64)
-        self.pub_left_gripper = rospy.Publisher('dynamixel/left_gripper_joint_controller/command', Float64)
+        self.pub_right_shoulder_1 = rospy.Publisher('/dynamixel/right_shoulder_1_controller/command', Float64)
+        self.pub_right_shoulder_2 = rospy.Publisher('/dynamixel/right_shoulder_2_controller/command', Float64)
+        self.pub_right_elbow = rospy.Publisher('/dynamixel/right_elbow_controller/command', Float64)
+        self.pub_right_wrist_1 = rospy.Publisher('/dynamixel/right_wrist_1_controller/command', Float64)
+        self.pub_right_wrist_2 = rospy.Publisher('/dynamixel/right_wrist_2_controller/command', Float64)
+        self.pub_right_wrist_3 = rospy.Publisher('/dynamixel/right_wrist_3_controller/command', Float64)
+        self.pub_right_gripper = rospy.Publisher('dynamixel/right_gripper_joint_controller/command', Float64)
+        # self.pub_left_shoulder_1 = rospy.Publisher('/dynamixel/left_shoulder_1_controller/command', Float64)
+        # self.pub_left_shoulder_2 = rospy.Publisher('/dynamixel/left_shoulder_2_controller/command', Float64)
+        # self.pub_left_elbow = rospy.Publisher('/dynamixel/left_elbow_controller/command', Float64)
+        # self.pub_left_wrist_1 = rospy.Publisher('/dynamixel/left_wrist_1_controller/command', Float64)
+        # self.pub_left_wrist_2 = rospy.Publisher('/dynamixel/left_wrist_2_controller/command', Float64)
+        # self.pub_left_wrist_3 = rospy.Publisher('/dynamixel/left_wrist_3_controller/command', Float64)
+        # self.pub_left_gripper = rospy.Publisher('dynamixel/left_gripper_joint_controller/command', Float64)
 
     def neck_init(self):
         self.pub_tilt = rospy.Publisher('/dynamixel/tilt_controller/command', Float64)
@@ -206,25 +206,24 @@ class RoboZoo(AbstractTask):
         self.pub_left_wrist_3.publish(0.0)
 
     def normal(self):
-     #    self.pub_right_shoulder_1.publish(0.0)
-     #    self.pub_right_shoulder_2.publish(0.0)
-     #    self.pub_right_elbow.publish(0.0)
-     #    self.pub_right_wrist_1.publish(0.0)
-     #    self.pub_right_wrist_2.publish(1.2)
-     #    self.pub_right_wrist_3.publish(0.0)
-    # self.pub_right_gripper.publish(-0.8)
-    # self.pub_left_gripper.publish(0.0)
+        self.pub_right_shoulder_1.publish(0.0)
+        self.pub_right_shoulder_2.publish(0.0)
+        self.pub_right_elbow.publish(0.0)
+        self.pub_right_wrist_1.publish(0.0)
+        self.pub_right_wrist_2.publish(1.2)
+        self.pub_right_wrist_3.publish(0.0)
+        self.pub_right_gripper.publish(0.0)
+        # close gripper
         rospy.sleep(0.3)
-        self.pub_left_shoulder_1.publish(0.0)
-        self.pub_left_shoulder_2.publish(0.0)
-        self.pub_left_elbow.publish(0.0)
-        self.pub_left_wrist_1.publish(0.0)
-        self.pub_left_wrist_2.publish(1.3)
-        self.pub_left_wrist_3.publish(0.0)
-        rospy.sleep(0.3)
+        # self.pub_left_shoulder_1.publish(0.0)
+        # self.pub_left_shoulder_2.publish(0.0)
+        # self.pub_left_elbow.publish(0.0)
+        # self.pub_left_wrist_1.publish(0.0)
+        # self.pub_left_wrist_2.publish(1.3)
+        # self.pub_left_wrist_3.publish(0.0)
+        # self.pub_left_gripper.publish(0.1)
         self.pub_tilt.publish(0.0)
         self.pub_pan.publish(0.0)
-        self.pub_left_gripper.publish(0.1)
 
     def goods_high(self):
         # self.pub_right_shoulder_1.publish(-0.7)
@@ -289,13 +288,13 @@ class RoboZoo(AbstractTask):
         # self.pub_right_wrist_3.publish(0.0)
         # self.pub_right_gripper.publish(-0.8)
 
-    def mama_left(self):
-        self.pub_left_shoulder_1.publish(-0.4)
-        self.pub_left_shoulder_2.publish(0.2)
-        self.pub_left_elbow.publish(0.4)
-        self.pub_left_wrist_1.publish(0.0)
-        self.pub_left_wrist_2.publish(0.4)
-        self.pub_left_wrist_3.publish(0.0)
+    # def mama_left(self):
+    #     self.pub_left_shoulder_1.publish(-0.4)
+    #     self.pub_left_shoulder_2.publish(0.2)
+    #     self.pub_left_elbow.publish(0.4)
+    #     self.pub_left_wrist_1.publish(0.0)
+    #     self.pub_left_wrist_2.publish(0.4)
+    #     self.pub_left_wrist_3.publish(0.0)
 
     # def wai(self):
     #   step1
@@ -469,7 +468,7 @@ class RoboZoo(AbstractTask):
     #     rospy.sleep(2)
     #     self.pub_right_wrist_2.publish(-0.5)
     #     rospy.sleep(2)
-    #     self.pub_right_wrist_2.publish(0.0)    
+    #     self.pub_right_wrist_2.publish(0.0)
 
     # def clean_window(self):
     #     self.pub_right_shoulder_1.publish(-0.1)

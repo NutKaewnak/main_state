@@ -4,7 +4,6 @@ from rips_out import RipsOut
 from say import Say
 from confirm import Confirm
 from turn_neck import TurnNeck
-from pick import Pick
 from set_height_relative import SetHeightRelative
 from count import Count
 from grasp import Grasp
@@ -24,7 +23,6 @@ class SkillBook:
         self.book['Say'] = Say(control_module)
         self.book['Confirm'] = Confirm(control_module)
         self.book['TurnNeck'] = TurnNeck(control_module)
-        self.book['Pick'] = Pick(control_module)
         self.book['SetHeightRelative'] = SetHeightRelative(control_module)
         self.book['Count'] = Count(control_module)
         self.book['Grasp'] = Grasp(control_module)
