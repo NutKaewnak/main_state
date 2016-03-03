@@ -136,7 +136,7 @@ def pick_tester():
     raw_input()
     
     rospy.loginfo("---GRASPING---")
-    #manipulator_ctrl.pickobject_grasp()
+    #manipulator_ctrl.pick_object_grasp()
     
     set_torque_limit()
     pub.publish(Float64(mnplctrl.GRIPPER_CLOSED))

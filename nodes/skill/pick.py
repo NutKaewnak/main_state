@@ -90,7 +90,7 @@ class Pick(AbstractSkill):
         #         raw_input()
         #         if state is 'succeeded':
         #             self.change_state('wait_for_subtask_move')
-        #             # waiting for move absolute in subtask
+        #             # waiting for arm_group_manipulate absolute in subtask
         #         elif not self.delay.is_waiting():
         #             rospy.logwarn('open_gripper out of time!')
         #             self.change_state('prepare_open_gripper')
@@ -135,7 +135,7 @@ class Pick(AbstractSkill):
                     self.change_state('prepare_obj')
 
         elif self.state is 'prepare_obj':
-            self.kinematic.inverse_kinematics_prepare()
+            self.kinematic.pick_prepare()
             self.change_state('wait_pregrasp')
 
         elif self.state is 'wait_pregrasp':
@@ -212,7 +212,7 @@ class Pick(AbstractSkill):
         elif self.state is 'grab_object':
             # close gripper
             set_torque_limit()
-            self.manipulator.pickobject_grasp()
+            self.manipulator.pick_object_grasp()
             self.change_state('wait_after_grasp')
 
         elif self.state is 'wait_after_grasp':

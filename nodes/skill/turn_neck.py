@@ -1,6 +1,7 @@
-__author__ = 'Nicole'
 from include.abstract_skill import AbstractSkill
 from include.neck_status import NeckStatus
+
+__author__ = 'Nicole'
 
 
 class TurnNeck(AbstractSkill):
@@ -22,7 +23,6 @@ class TurnNeck(AbstractSkill):
 
         if self.state is 'receive':
             if perception_data.device is 'NECK':
-                print 'receive neck-------'
                 self.pan = perception_data.input.pan
                 self.tilt = perception_data.input.tilt
                 self.turn(self.pitch + self.tilt, self.yaw + self.pan)
@@ -34,6 +34,5 @@ class TurnNeck(AbstractSkill):
     def turn_relative(self, pitch, yaw):
         self.pitch = pitch
         self.yaw = yaw
-        print 'turn_relative---------'
         self.change_state('receive')
 

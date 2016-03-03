@@ -1,6 +1,7 @@
-__author__ = 'Nicole'
 import rospy
 from include.abstract_task import AbstractTask
+
+__author__ = 'Nicole'
 
 
 class TestObjectRecogAndManip(AbstractTask):

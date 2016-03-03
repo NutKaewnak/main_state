@@ -72,7 +72,7 @@ class PointToPick():
         raw_input()
 
         rospy.loginfo("---PICK PREPARE---")
-        mnplctrl.pickobject_prepare()
+        mnplctrl.pick_object_prepare()
         rospy.loginfo("Press any key to Continue")
         raw_input()
 
@@ -126,7 +126,7 @@ class PointToPick():
         # manipulator_ctrl.move_joint('right_wrist_3_joint', self.angle[5])
 
         rospy.loginfo("---GRASPING---")
-        #manipulator_ctrl.pickobject_grasp()
+        #manipulator_ctrl.pick_object_grasp()
 
         self.set_torque_limit()
         pub_right_gripper.publish(-0.6)
@@ -144,7 +144,7 @@ class PointToPick():
         # raw_input()
 
         # rospy.loginfo("---pregrasp---")
-        mnplctrl.pickobject_prepare()
+        mnplctrl.pick_object_prepare()
         rospy.loginfo("Press any key to Continue")
         raw_input()
 
