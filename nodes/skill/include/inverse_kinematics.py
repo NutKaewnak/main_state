@@ -138,14 +138,14 @@ def inverse_kinematic(target_point):
         ae22 = (math.pi / 2) - theta4
         print 'ae22 = ' + str(ae22)
     except ValueError:
-        print 'FFFFFFFFFFFFAAAAAAAAAAAAAAALLLLLLLSSSSSSSSEEEEEEE'
+        print 'FALSE'
         return False
 
     try:
         z2 = UL * math.cos(as20) - z
         # print 'z2 = ' + str(self.z2)
     except ValueError:
-        print 'FFFFFFFFFFFFAAAAAAAAAAAAAAALLLLLLLSSSSSSSSEEEEEEE'
+        print 'FALSE'
         return False
 
     try:
@@ -161,7 +161,7 @@ def inverse_kinematic(target_point):
         ah40 = -theta5/3.0
         print 'ah40 = ' + str(ah40)
     except ValueError:
-        print 'FFFFFFFFFFFFAAAAAAAAAAAAAAALLLLLLLSSSSSSSSEEEEEEE'
+        print 'FALSE'
         return False
 
     try:
@@ -175,7 +175,7 @@ def inverse_kinematic(target_point):
         else:
             theta6 = math.acos((x - (UL * math.sin(as20))) / (FL + VERY_SMALL_NUMBER))
     except ValueError:
-        print 'FFFFFFFFFFFFAAAAAAAAAAAAAAALLLLLLLSSSSSSSSEEEEEEE'
+        print 'FALSE'
         return False
 
     ah41 = theta6
@@ -191,21 +191,14 @@ def inverse_kinematic(target_point):
     out_angles['right_wrist_2_joint'] = ah41
     out_angles['right_wrist_3_joint'] = ah42
 
+    out_angles['left_shoulder_1_joint'] = as20
+    out_angles['left_shoulder_2_joint'] = as21
+    out_angles['left_elbow_joint'] = ae22
+    out_angles['left_wrist_1_joint'] = ah40
+    out_angles['left_wrist_2_joint'] = ah41
+    out_angles['left_wrist_3_joint'] = ah42
+
     return out_angles
-
-
-def prepare_point_to_invert_kinematic(point):
-    """
-    Prepare the point for invert kinematic calculation.
-    :param point: (geometry/Point)
-    :return: (geometry/Point) tuned point for inverse kinematic method.
-    """
-    # TODO: fix this tf
-    out_point = Point()
-    out_point.x = point.x-0.1
-    out_point.y = point.y+0.14
-    out_point.z = point.z-0.69
-    return out_point
 
 
 class InverseKinematics:
@@ -238,9 +231,9 @@ class InverseKinematics:
         point_to_calculate.x = self.object_point.x - 0.1
         point_to_calculate.y = self.object_point.y
         point_to_calculate.z = self.object_point.z
-        return inverse_kinematic(prepare_point_to_invert_kinematic(point_to_calculate))
+        return self.prepare_point_to_invert_kinematic(point_to_calculate)
 
-    def inverse_kinematics_pregrasp(self):
+    def point_inverse_kinematics_pregrasp(self):
         """
         Move arm to  the target point.
         :return: (dict()) Dict of arm joint and angle to move on.
@@ -250,4 +243,21 @@ class InverseKinematics:
         point_to_calculate.x = self.object_point.x
         point_to_calculate.y = self.object_point.y
         point_to_calculate.z = self.object_point.z
-        return inverse_kinematic(prepare_point_to_invert_kinematic(point_to_calculate))
+        return self.prepare_point_to_invert_kinematic(point_to_calculate)
+
+    def prepare_point_to_invert_kinematic(self, point):
+        """
+        Prepare the point for invert kinematic calculation.
+        :param point: (geometry/Point)
+        :return: (geometry/Point) tuned point for inverse kinematic method.
+        """
+        # TODO: fix this tf
+
+        out_point = Point()
+        out_point.x = point.x-0.2
+        if self.arm_group == 'right_arm':
+            out_point.y = point.y + 0.14
+        elif self.arm_group == 'left_arm':
+            out_point.y = point.y - 0.14
+        out_point.z = point.z-0.5
+        return out_point

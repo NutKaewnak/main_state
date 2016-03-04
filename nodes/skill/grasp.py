@@ -45,7 +45,7 @@ class Grasp(AbstractSkill):
                     self.change_state('open_gripper')
 
         elif self.state is 'open_gripper':
-            if perception_data.device == self.gripper_device:
+            if perception_data.device == self.arm_device:
                 arm_status = ArmStatus.get_state_from_status(perception_data.input)
                 if arm_status == 'succeeded':
                     # TODO: fix side
@@ -54,6 +54,7 @@ class Grasp(AbstractSkill):
                     self.change_state('wait_open_gripper')
 
         elif self.state is 'wait_open_gripper':
+            print 'open na ja'
             if perception_data.device == self.gripper_device:
                 # TODO: may bug
                 arm_status = ArmStatus.get_state_from_status(perception_data.input)

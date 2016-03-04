@@ -24,7 +24,8 @@ class PlanningModule:
         self.perceptionModule = perception_module
 
     def perform(self, perception_data):
-        if self.perceptionModule.delay.is_waiting():
-            return
+        if self.perceptionModule is not None:
+            if self.perceptionModule.delay.is_waiting():
+                return
 
         self.taskBook.book[self.task].act(perception_data)
