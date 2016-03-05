@@ -22,20 +22,18 @@ class ManipulateController:
         :param arm_side: (string) should be either 'left_arm' or 'right_arm'
         :return: (None)
         """
-
         self.arm_side = arm_side
         self.arm_group = None
         self.set_torque_limit = {}
         self.robot = None
         self.scene = None
         self.tf_listener = None
-        self.moveit_initiator = None
+        self.moveit_initiator = MoveItInitiator()
 
     def init_controller(self):
-        self.moveit_initiator = MoveItInitiator()
         self.robot = self.moveit_initiator.robot
         self.scene = self.moveit_initiator.scene
-        self.tf_listener = self.moveit_initiator.tf_listenner
+        self.tf_listener = self.moveit_initiator.tf_listener
         self.arm_group = self.moveit_initiator.init_controller(self.arm_side)
 
     def transform_point(self, point_stamped, arm_group):
@@ -94,6 +92,10 @@ class ManipulateController:
         self.manipulate(arm_group, new_pose)
 
     def move_joint(self, joint_name, joint_value):
+        print joint_name
+        print joint_value
+        print self.arm_side
+        print self.arm_group
         if (type(joint_name) == str) and (type(joint_value) == float):
             self.arm_group.clear_pose_targets()
             self.arm_group.set_joint_value_target(joint_name, joint_value)
@@ -110,8 +112,11 @@ class ManipulateController:
         :param angles: (dict()) dict of angle and arm_joint
         :return: (None)
         """
+        print angles
+        print self.arm_group.get_joints()
         for x in angles:
-            self.move_joint(x, angles[x])
+            if x in self.arm_group.get_joints():
+                self.move_joint(x, angles[x])
 
     def static_pose(self, posture, tolerance=[0.05, 0.1]):
         self.arm_group.clear_pose_targets()

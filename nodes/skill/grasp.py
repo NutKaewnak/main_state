@@ -1,6 +1,6 @@
 import rospy
 from include.abstract_skill import AbstractSkill
-from include.inverse_kinematics import InverseKinematics
+from include import inverse_kinematics
 from include.arm_status import ArmStatus
 from include.set_torque_limit import set_torque_limit
 
@@ -10,9 +10,9 @@ __author__ = 'nuok'
 class Grasp(AbstractSkill):
     def __init__(self, control_module):
         AbstractSkill.__init__(self, control_module)
-        self.manipulator = control_module.manipulator
-        self.kinematic = InverseKinematics()
-        self.gripper = control_module.gripper
+        self.kinematic = inverse_kinematics.InverseKinematics()
+        self.manipulator = control_module.right_arm
+        self.gripper = control_module.right_gripper
         self.goal_point = None
         self.side = None
         self.move_base = None
@@ -22,6 +22,7 @@ class Grasp(AbstractSkill):
     def perform(self, perception_data):
         if self.state is 'init_pick':
             self.manipulator.init_controller()
+            self.gripper.init_controller()
             self.change_state('prepare_arm_normal')
 
         elif self.state is 'prepare_arm_normal':
@@ -50,11 +51,13 @@ class Grasp(AbstractSkill):
                 if arm_status == 'succeeded':
                     # TODO: fix side
                     gripper_opened = 0.8
-                    self.manipulator.move_joint("right_gripper_joint", gripper_opened)
+                    print self.gripper
+                    self.gripper.move_joint("right_gripper_joint", gripper_opened)
                     self.change_state('wait_open_gripper')
 
         elif self.state is 'wait_open_gripper':
-            print 'open na ja'
+            # print self.gripper_device
+            # print perception_data.device == self.gripper_device
             if perception_data.device == self.gripper_device:
                 # TODO: may bug
                 arm_status = ArmStatus.get_state_from_status(perception_data.input)
@@ -70,14 +73,22 @@ class Grasp(AbstractSkill):
                 self.change_state('prepare_object')
 
         elif self.state is 'prepare_object':
-            self.manipulator.move_arm_group(self.kinematic.pick_prepare())
+            angles = inverse_kinematics.inverse_kinematic(self.kinematic.pick_prepare())
+            print angles
+            print 'kuy'
+            for x in angles:
+                inverse_kinematics.in_bound(x, angles[x])
+            print angles
+            self.manipulator.move_arm_group(angles)
             self.change_state('pregrasp')
 
         elif self.state is 'pregrasp':
             if perception_data.device == self.arm_device:
                 print ArmStatus.get_state_from_status(perception_data.input)
                 if ArmStatus.get_state_from_status(perception_data.input) == 'succeeded':
-                    self.manipulator.move_arm_group(self.kinematic.inverse_kinematics_pregrasp())
+                    angles = inverse_kinematics.inverse_kinematic(self.kinematic.point_inverse_kinematics_pregrasp())
+                    self.manipulator.move_arm_group(angles)
+                    print 'kuy'
                     self.change_state('grab_object')
 
         elif self.state is 'grab_object':

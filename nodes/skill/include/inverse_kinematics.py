@@ -52,6 +52,9 @@ def in_bound(joint_name, angle):
         angle_min = -2.64
 
     if bool(angle_max) and bool(angle_min):
+        if angle > angle_max or angle < angle_min:
+            for x in xrange(100):
+                print 'kuy'
         return max(min(angle_max, angle), angle_min)
 
 
@@ -87,7 +90,7 @@ def inverse_kinematic(target_point):
     try:
         sin_theta2 = UL * math.sin(theta1) / (R + VERY_SMALL_NUMBER)
         if type(sin_theta2) == float:
-            cos_theta2 = math.pow(1 - math.sqrt(sin_theta2, 2))
+            cos_theta2 = math.pow(1 - math.sqrt(sin_theta2), 2)
             if type(cos_theta2) == float:
                 theta2 = math.atan(sin_theta2 / (cos_theta2 + VERY_SMALL_NUMBER))
             else:
@@ -252,7 +255,6 @@ class InverseKinematics:
         :return: (geometry/Point) tuned point for inverse kinematic method.
         """
         # TODO: fix this tf
-
         out_point = Point()
         out_point.x = point.x-0.2
         if self.arm_group == 'right_arm':
