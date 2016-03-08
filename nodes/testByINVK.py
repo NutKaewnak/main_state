@@ -14,6 +14,7 @@ class TestInvKine:
         global invK, manipulator_ctrl
         self.delay = Delay()
         rospy.init_node('inverseKinematic')
+
         invK = inverse_kinematics.InverseKinematics()
         manipulator_ctrl = ManipulateController()
         self.invKine()

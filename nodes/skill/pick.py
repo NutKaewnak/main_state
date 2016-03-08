@@ -11,7 +11,7 @@ __author__ = 'CinDy'
 class Pick(AbstractSkill):
     def __init__(self, control_module):
         AbstractSkill.__init__(self, control_module)
-        self.manipulator = control_module.manipulator
+        self.manipulator = control_module.right_arm
         self.kinematic = control_module.kinematics
         self.gripper = control_module.gripper
         self.object_pos = None

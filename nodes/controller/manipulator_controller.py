@@ -28,9 +28,10 @@ class ManipulateController:
         self.robot = None
         self.scene = None
         self.tf_listener = None
-        self.moveit_initiator = MoveItInitiator()
+        self.moveit_initiator = None
 
     def init_controller(self):
+        self.moveit_initiator = MoveItInitiator()
         self.robot = self.moveit_initiator.robot
         self.scene = self.moveit_initiator.scene
         self.tf_listener = self.moveit_initiator.tf_listener

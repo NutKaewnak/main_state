@@ -13,7 +13,8 @@ class MoveBaseAbsolute(AbstractSkill):
 
     def set_position(self, x, y, theta):
         self.change_state('active')
-        self.controlModule.base.clear_costmaps()
+        # self.controlModule.base.clear_costmaps()
+        print('--clear costmap--')
         self.controlModule.base.set_absolute_position(x, y, theta)
 
     def perform(self, perception_data):

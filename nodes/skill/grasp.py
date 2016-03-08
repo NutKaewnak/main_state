@@ -75,7 +75,6 @@ class Grasp(AbstractSkill):
         elif self.state is 'prepare_object':
             angles = inverse_kinematics.inverse_kinematic(self.kinematic.pick_prepare())
             print angles
-            print 'kuy'
             for x in angles:
                 inverse_kinematics.in_bound(x, angles[x])
             print angles
@@ -88,7 +87,6 @@ class Grasp(AbstractSkill):
                 if ArmStatus.get_state_from_status(perception_data.input) == 'succeeded':
                     angles = inverse_kinematics.inverse_kinematic(self.kinematic.point_inverse_kinematics_pregrasp())
                     self.manipulator.move_arm_group(angles)
-                    print 'kuy'
                     self.change_state('grab_object')
 
         elif self.state is 'grab_object':

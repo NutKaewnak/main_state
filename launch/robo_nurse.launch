@@ -6,7 +6,7 @@
   </node>
 
   <node ns="door" name="door_detection" pkg="door_detection" type="door_detection_node">
-    <remap from="/scan" to="/laser/scan"/>    
+    <remap from="/scan" to="/laser/scan"/>
   </node>
   <include file="$(find speech_processing)/launch/switch.launch"/>
 

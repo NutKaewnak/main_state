@@ -1,10 +1,11 @@
-a__author__ = 'Nicole'
 import rospy
 import roslib
 from include.abstract_task import AbstractTask
 from include.delay import Delay
 from subprocess import call
 from std_msgs.msg import Float64
+
+__author__ = 'Nicole'
 
 
 class ManipulationTask(AbstractTask):
