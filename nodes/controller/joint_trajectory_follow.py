@@ -17,9 +17,11 @@ class JointTrajectoryFollow:
     def move_joint(self, angles):
         goal = FollowJointTrajectoryGoal()
         goal.trajectory.joint_names = self.joint_names
+        print 'goal =' + str(goal)+'/n'
         rospy.loginfo('send: ' + str(angles) + ' to ' + str(self.joint_names))
         point = JointTrajectoryPoint()
         point.positions = angles
         point.time_from_start = rospy.Duration(3)
+        print 'point = ' + str(point) + ' positions =' + str(point.positions) + ' time_from_start =' + str(point.time_from_start)
         goal.trajectory.points.append(point)
         self.jta.send_goal(goal)

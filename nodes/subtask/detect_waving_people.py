@@ -20,6 +20,7 @@ class DetectWavingPeople(AbstractSubtask):
 
         elif self.state is 'searching':
             if perception_data.device is self.Devices.GESTURE:
+                print '--seaching--'
                 self.gesture_pos = perception_data.input
                 self.change_state('finish')
 

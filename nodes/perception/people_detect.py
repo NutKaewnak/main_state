@@ -19,10 +19,12 @@ class PeopleDetection(AbstractPerception):
         print data
         print 'kuy'
         for x in data.persons:
-            print x
+            print 'x ='+ str(x)
             temp = PointStamped()
             temp.header = data.header
             temp.point = x.personpoints
+            print 'temp = '+str(temp)
+            print 'temp.point = '+str(temp.point)
             person_array.append(self.tf_listener.transformPoint('odom', temp))
         print person_array
         self.broadcast(Devices.PEOPLE, data.persons)

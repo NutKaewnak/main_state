@@ -1,6 +1,8 @@
 import rospy
 import subprocess
+import tf
 from include.abstract_task import AbstractTask
+from geometry_msgs.msg import PointStamped
 # import sys
 # sys.path.append('nodes.controller')
 # from gripper_controller import GripperController
@@ -13,12 +15,13 @@ class RoboNurse(AbstractTask):
     def __init__(self, planning_module):
         AbstractTask.__init__(self, planning_module)
         self.subtask = None
-        self.shelf_pos = None
+        self.shelf_pos = [3, 3, 0]
         self.granny_pos = None
         self.pill_dic = {}
         self.pill_name = None
         self.pill_pos = None
         self.pick = None
+        self.tf_listener = tf.TransformListener()
 
     def perform(self, perception_data):
         # if self.state is 'init':
@@ -43,16 +46,21 @@ class RoboNurse(AbstractTask):
                 self.change_state('detecting_granny')
 
         elif self.state is 'detecting_granny':
+            print 'Detect.state =' + self.subtask.state
             if self.subtask.state is 'finish':
                 rospy.loginfo('---detecting_granny---')
-                self.granny_pos = self.subtask.get_point()
-                print "granny pos = " + self.granny_pos
+                temp = PointStamped()
+                temp.point = self.subtask.get_point()
+                self.granny_pos = self.tf_listener.transformPoint('odom', temp)
+                # self.granny_pos = self.subtask.get_point()
+                print "granny pos = " + str(self.granny_pos)
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
-                self.subtask.set_position(self.granny_pos[0], self.granny_pos[1], self.granny_pos[2])
-                self.change_state('wait_move_to_granny')
+                self.subtask.set_position(self.granny_pos.x, self.granny_pos.y, self.granny_pos.z)
+                self.change_state('move_to_granny')
 
         elif self.state is 'move_to_granny':
             if perception_data.device is self.Devices.BASE_STATUS:
+                rospy.loginfo('---move_of_granny---')
                 print perception_data.input
             if self.subtask.state is 'error':
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
@@ -66,15 +74,15 @@ class RoboNurse(AbstractTask):
         elif self.state is 'tell_granny_to_ask_for_pill':
             if self.subtask.state is 'finish':
                 rospy.loginfo('---tell_granny_ask_pill---')
-                self.subtask.say('If you want me to give you a pill. Say. Robot give me pill.')
-                self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode').recognize(1)
+                self.subtask.say('If you want me to give you a pill. Say. Robot gives me pill.')
+                # self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode').recognize(1)
                 self.change_state('wait_for_granny_command')
 
         elif self.state is 'wait_for_granny_command':
             if self.subtask.state is 'finish':
                 rospy.loginfo('---wait_for_granny_command---')
                 if perception_data.device is self.Devices.VOICE:
-                    print perception_data.input == 'robot give me pill'
+                    print perception_data.input == 'robot gives me pill'
                     if 'pill' in perception_data.input:
                         self.subtask.say('Okay, granny.')
                         self.change_state('init_move')
@@ -83,7 +91,7 @@ class RoboNurse(AbstractTask):
             if self.subtask.state is 'finish':
                 rospy.loginfo('---init_move---')
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
-                self.subtask.set_position(self.shelf_pos.x, self.shelf_pos.y, self.shelf_pos.z)
+                self.subtask.set_position(self.shelf_pos[0], self.shelf_pos[1], self.shelf_pos[2])
                 self.change_state('move_to_shelf')
 
         elif self.state is 'move_to_shelf':
@@ -139,16 +147,16 @@ class RoboNurse(AbstractTask):
         elif self.state is 'give_pill':
             if self.subtask.state is 'finish':
                 self.pick.gripper_open()
-                self.change_state('prepare_leave_arena')
-
-        elif self.state is 'prepare_leave_arena':
-            rospy.loginfo('leave arena')
-            self.subtask = self.subtaskBook.get_subtask(self, 'LeaveArena')
-            self.change_state('leave_arena')
-
-        elif self.state is 'leave_arena':
-            if self.subtask.state is 'finish':
                 self.change_state('finish')
+
+        # elif self.state is 'prepare_leave_arena':
+        #     rospy.loginfo('leave arena')
+        #     self.subtask = self.subtaskBook.get_subtask(self, 'LeaveArena')
+        #     self.change_state('leave_arena')
+        #
+        # elif self.state is 'leave_arena':
+        #     if self.subtask.state is 'finish':
+        #         self.change_state('finish')
 
     def speak(self, message):
         rospy.loginfo("Robot HACKED speak: " + message)

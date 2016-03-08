@@ -26,6 +26,7 @@ class MainState:
 
 
 if __name__ == "__main__":
+    print('kuy')
     if len(sys.argv) >= 2:
         MainState(sys.argv[1])
     else:

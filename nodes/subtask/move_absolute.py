@@ -11,6 +11,7 @@ class MoveAbsolute(AbstractSubtask):
         self.moveAbsolute = None
 
     def set_position(self, x, y, theta):
+        print '--moveAbsolute.set_position--'
         self.moveAbsolute = self.skillBook.get_skill(self, 'MoveBaseAbsolute')
         self.moveAbsolute.set_position(x, y, theta)
         self.change_state('move')

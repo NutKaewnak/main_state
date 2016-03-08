@@ -24,7 +24,7 @@ class BaseController:
         # self.move_base.cancel_goal()
 
         new_goal = MoveBaseGoal()
-
+        print 'new_goal =' +str(new_goal)
         new_goal.target_pose.header.frame_id = frame_id
         new_goal.target_pose.header.stamp = rospy.Time.now()
 
@@ -34,7 +34,8 @@ class BaseController:
         quaternion = quaternion_from_euler(0, 0, theta)
         new_goal.target_pose.pose.orientation.z = quaternion[2]
         new_goal.target_pose.pose.orientation.w = quaternion[3]
-
+        print '--new_goal = ' + str(new_goal)
+        print '--Quaterion = ' + str(quaternion)
         self.move_base.send_goal(new_goal)
 
     def clear_costmaps(self):
