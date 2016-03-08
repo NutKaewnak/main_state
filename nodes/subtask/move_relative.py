@@ -18,7 +18,7 @@ class MoveRelative(AbstractSubtask):
     def perform(self, perception_data):
         if self.state is 'move':
             # check if base succeed
-            if selft.moveRelative.state is 'succeeded':
+            if self.moveRelative.state is 'succeeded':
                 self.change_state('finish')
             elif self.moveRelative.state is 'aborted':
                 rospy.loginfo('Aborted')
