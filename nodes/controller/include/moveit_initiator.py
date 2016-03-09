@@ -8,7 +8,6 @@ class MoveItInitiator(object):
     class _MoveItInitiator:
         def __init__(self):
             moveit_commander.roscpp_initialize(sys.argv)
-            print 'kuy'
             self.robot = moveit_commander.RobotCommander()
             self.scene = moveit_commander.PlanningSceneInterface()
             self.tf_listener = tf.TransformListener()

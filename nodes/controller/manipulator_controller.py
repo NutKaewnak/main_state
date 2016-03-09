@@ -3,7 +3,7 @@ import tf
 from include.moveit_initiator import MoveItInitiator
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Pose2D
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import PointStamped
 
 __author__ = "ftprainnie"
 
@@ -37,20 +37,27 @@ class ManipulateController:
         self.tf_listener = self.moveit_initiator.tf_listener
         self.arm_group = self.moveit_initiator.init_controller(self.arm_side)
 
-    def transform_point(self, point_stamped, arm_group):
+    def transform_point(self, pos, origin_frame='base_link'):
         """
         Transform point from origin frame (Default: 'base_link') to 'mani_link'
         :param point_stamped: (PointStamped)
         :param arm_group: (string)
         :return: (PointStamped), False if input arm_group is incorrect
         """
-        destination_frame = None
-        if 'ARM' in arm_group:
-            destination_frame = 'torso_link'
-        else:
-            return False
-        point_out = self.tf_listener.transform_point(destination_frame, point_stamped)
-        print point_out.point
+        # destination_frame = None
+        # if 'ARM' in arm_group or 'arm' in arm_group:
+        destination_frame = "torso_Link"
+        tf_points = PointStamped()
+        tf_points.point.x = pos.x
+        tf_points.point.y = pos.y
+        tf_points.point.z = pos.z
+        tf_points.header.stamp = rospy.Time(0)
+        tf_points.header.frame_id = origin_frame
+        print "Waiting For Transform"
+        self.tf_listener.waitForTransform(destination_frame, origin_frame, rospy.Time(0), rospy.Duration(4.00))
+        print "Success Waiting"
+        point_out = self.tf_listener.transformPoint(destination_frame, tf_points)
+        print 'HERRREEEE >>>>> ' + str(point_out.point.x) + ', ' + str(point_out.point.y) + ', ' + str(point_out.point.z)
         return point_out.point
 
     def manipulate(self, pose_target, orientation_rpy=[0, 0, 0], ref_frame="base_link", planning_time=50.00):
