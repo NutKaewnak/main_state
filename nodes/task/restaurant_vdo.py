@@ -20,7 +20,6 @@ class RestaurantVDO(AbstractTask):
         self.first = None
         self.say = None
         self.follow = self.subtaskBook.get_subtask(self, 'FollowPerson')
-        self.arm_init()
         self.delay = Delay()
 
     def perform(self, perception_data):
@@ -141,87 +140,6 @@ class RestaurantVDO(AbstractTask):
             if self.move.state is 'finish':
                 self.change_state('wait_for_order')
 
-        elif self.state is 'wait_for_order':
-            if perception_data.device is self.Devices.VOICE:
-                self.send()
-                self.pub_left_gripper.publish(1.1)
-                # self.say.say('you want ' + perception_data.input + ' yes or no ?')
-                # for location in self.location_list:
-                #     if location in perception_data.input:
-                #         self.command = location
-                #         self.say.say('go to ' + self.command + ' yes or no ?')
-                #         self.change_state('confirm_command')
-
         elif self.state is 'move_to_gpsr_start':
             if self.current_subtask.state is 'finish':
                 self.change_state('wait_for_command')
-
-    def arm_init(self):
-        self.pub_left_shoulder_1 = rospy.Publisher('/dynamixel/left_shoulder_1_controller/command', Float64)
-        self.pub_left_shoulder_2 = rospy.Publisher('/dynamixel/left_shoulder_2_controller/command', Float64)
-        self.pub_left_elbow = rospy.Publisher('/dynamixel/left_elbow_controller/command', Float64)
-        self.pub_left_wrist_1 = rospy.Publisher('/dynamixel/left_wrist_1_controller/command', Float64)
-        self.pub_left_wrist_2 = rospy.Publisher('/dynamixel/left_wrist_2_controller/command', Float64)
-        self.pub_left_wrist_3 = rospy.Publisher('/dynamixel/left_wrist_3_controller/command', Float64)
-        self.pub_left_gripper = rospy.Publisher('dynamixel/left_gripper_joint_controller/command', Float64)
-
-    def mama(self):
-        self.pub_left_shoulder_2.publish(0.2)
-        self.pub_left_elbow.publish(0.4)
-        self.pub_left_wrist_1.publish(0.0)
-        self.pub_left_wrist_2.publish(0.4)
-        self.pub_left_wrist_3.publish(0.0)
-        self.pub_left_shoulder_1.publish(-0.1)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-0.2)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-0.3)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-0.4)
-        rospy.sleep(0.5)
-
-    def send(self):
-        self.pub_left_shoulder_2.publish(0.2)
-        self.pub_left_elbow.publish(0.2)
-        self.pub_left_wrist_1.publish(0.0)
-        self.pub_left_wrist_2.publish(0.8)
-        self.pub_left_wrist_3.publish(0.0)
-        self.pub_left_shoulder_1.publish(-0.5)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-0.6)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-0.7)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-0.8)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-0.9)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-1.0)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-1.1)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-1.2)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-1.3)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-1.4)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-1.5)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-1.6)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-1.7)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-1.8)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-1.9)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-2.0)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-2.1)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-2.2)
-        rospy.sleep(0.5)
-        self.pub_left_shoulder_1.publish(-2.3)
-        rospy.sleep(0.5)
-
