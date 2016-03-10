@@ -16,14 +16,19 @@ class Pick(AbstractSubtask):
     def perform(self, perception_data):
         if self.state is 'init':
             rospy.loginfo('pick subtask init')
-            self.change_state('wait_for_point')
+            self.skill = self.skillBook.get_skill(self, 'Grasp')
+            self.skill.set_side(self.side_arm)
+            self.change_state('wait_for_skill_init')
+
+        elif self.state is 'wait_for_skill_init':
+            if self.skill.state is 'wait_for_point':
+                self.change_state('wait_for_point')
 
         elif self.state is 'receive_point':
+            print 'kuy kuy kuy'
             self.change_state('setting_arm')
 
         elif self.state is 'setting_arm':
-            self.skill = self.skillBook.get_skill(self, 'Grasp')
-            self.skill.set_side(self.side_arm)
             self.skill.pick_object(self.input_object_point)
             self.change_state('wait_for_skill')
 

@@ -11,22 +11,28 @@ class Grasp(AbstractSkill):
     def __init__(self, control_module):
         AbstractSkill.__init__(self, control_module)
         self.kinematic = inverse_kinematics.InverseKinematics()
-        self.manipulator = control_module.right_arm
+        self.right_arm = control_module.right_arm
         self.gripper = control_module.right_gripper
         self.goal_point = None
         self.side = None
         self.move_base = None
         self.arm_device = None
         self.gripper_device = None
+        self.is_init = False
 
     def perform(self, perception_data):
-        if self.state is 'init_pick':
-            self.manipulator.init_controller()
-            self.gripper.init_controller()
-            self.change_state('prepare_arm_normal')
+        if self.state is 'init':
+            if not self.is_init:
+                self.is_init = True
+                self.right_arm.init_controller()
+                self.gripper.init_controller()
+            self.change_state('wait_for_point')
 
         elif self.state is 'prepare_arm_normal':
-            self.set_arm_normal()
+            if self.side is 'right_arm':
+                self.right_arm.static_pose('right_normal')
+            elif self.side is 'left_arm':
+                self.right_arm.static_pose('left_normal')
             self.change_state('arm_normal')
 
         elif self.state is 'arm_normal':
@@ -34,7 +40,7 @@ class Grasp(AbstractSkill):
                 arm_status = ArmStatus.get_state_from_status(perception_data.input)
                 if arm_status == 'succeeded' or arm_status == "preempted":
                     # TODO: fix side
-                    self.manipulator.static_pose('right_init_picking_normal')
+                    self.right_arm.static_pose('right_init_picking_normal')
                     self.change_state('prepare_pick')
 
         elif self.state is 'prepare_pick':
@@ -42,7 +48,7 @@ class Grasp(AbstractSkill):
                 arm_status = ArmStatus.get_state_from_status(perception_data.input)
                 if arm_status == 'succeeded' or arm_status == "preempted":
                     # TODO: fix side
-                    self.manipulator.static_pose('right_picking_prepare')
+                    self.right_arm.static_pose('right_picking_prepare')
                     self.change_state('open_gripper')
 
         elif self.state is 'open_gripper':
@@ -78,7 +84,7 @@ class Grasp(AbstractSkill):
             for x in angles:
                 inverse_kinematics.in_bound(x, angles[x])
             print angles
-            self.manipulator.move_arm_group(angles)
+            self.right_arm.move_arm_group(angles)
             self.change_state('pregrasp')
 
         elif self.state is 'pregrasp':
@@ -86,7 +92,7 @@ class Grasp(AbstractSkill):
                 print ArmStatus.get_state_from_status(perception_data.input)
                 if ArmStatus.get_state_from_status(perception_data.input) == 'succeeded':
                     angles = inverse_kinematics.inverse_kinematic(self.kinematic.point_inverse_kinematics_pregrasp())
-                    self.manipulator.move_arm_group(angles)
+                    self.right_arm.move_arm_group(angles)
                     self.change_state('grab_object')
 
         elif self.state is 'grab_object':
@@ -96,7 +102,7 @@ class Grasp(AbstractSkill):
                     # close gripper
                     set_torque_limit()
                     # TODO: fix side
-                    self.manipulator.static_pose('right_gripper_close')
+                    self.right_arm.static_pose('right_gripper_close')
                     self.change_state('after_grasp')
 
         elif self.state is 'after_grasp':
@@ -104,7 +110,7 @@ class Grasp(AbstractSkill):
                 print ArmStatus.get_state_from_status(perception_data.input)
                 if ArmStatus.get_state_from_status(perception_data.input) == 'succeeded':
                     # TODO: fix side
-                    self.manipulator.static_pose('right_picking_prepare')
+                    self.right_arm.static_pose('right_picking_prepare')
                     self.change_state('wait_succeeded')
 
         elif self.state is 'wait_succeeded':
@@ -112,7 +118,7 @@ class Grasp(AbstractSkill):
                 print ArmStatus.get_state_from_status(perception_data.input)
                 if ArmStatus.get_state_from_status(perception_data.input) == 'succeeded':
                     # TODO: fix side
-                    self.manipulator.pick_object_finish('right_normal')
+                    self.right_arm.pick_object_finish('right_normal')
                     rospy.loginfo('--after_grasp--')
                     print '---current state = ' + self.state + '---'
                     self.change_state('succeeded')
@@ -133,7 +139,7 @@ class Grasp(AbstractSkill):
         """
         self.goal_point = point
         rospy.loginfo('----pick_object:skill---')
-        self.change_state('init_pick')
+        self.change_state('prepare_arm_normal')
 
     def set_side(self, side):
         self.side = side
@@ -145,17 +151,11 @@ class Grasp(AbstractSkill):
             self.gripper_device = 'LEFT_GRIPPER'
         self.kinematic.arm_group = side
 
-    def set_arm_normal(self):
-        if self.side is 'right_arm':
-            self.manipulator.static_pose('right_normal')
-        elif self.side is 'left_arm':
-            self.manipulator.static_pose('left_normal')
-
     def after_prepare(self):
         self.change_state('init_pos')
 
     def open_gripper(self):
-        self.manipulator.pickobject_opengripper()
+        self.right_arm.pickobject_opengripper()
 
     def close_gripper(self):
-        self.manipulator.pickobject_closegripper()
+        self.right_arm.pickobject_closegripper()
