@@ -1,3 +1,4 @@
+import math
 import rospy
 from include.abstract_subtask import AbstractSubtask
 from math import atan, sqrt
@@ -11,7 +12,6 @@ class FollowPerson(AbstractSubtask):
         AbstractSubtask.__init__(self, planning_module)
         self.skill = None
         self.move = None
-        self.turn_base = None
         self.turn_neck = None
         self.last_point = Vector3()
         self.person_id = None
@@ -27,7 +27,6 @@ class FollowPerson(AbstractSubtask):
         if self.state is 'init':
             self.move = self.skillBook.get_skill(self, 'MoveBaseRelative')
             self.turn_neck = self.skillBook.get_skill(self, 'TurnNeck')
-            self.turn_base = rospy.Publisher('/base/cmd_vel', Twist)
             self.turn_neck.turn(-0.1, 0.0)
             self.change_state('wait')
 
@@ -41,19 +40,15 @@ class FollowPerson(AbstractSubtask):
                 theta = atan(point.y/point.x) 
                 self.turn_neck.turn(-0.2, theta)
 
-                size = sqrt(point.x**2 + point.y**2)
-                x, y = point.x/size*(size-self.offset_from_person), point.y/size*(size-self.offset_from_person)
-                if theta >= 0.1:
-                    angle = Twist()
-                    angle.angular.z = 0.1
-                    self.turn_base.publish(angle)
-                elif theta <= -0.1:
-                    angle = Twist()
-                    angle.angular.z = -0.1
-                    self.turn_base.publish(angle)
-                # rospy.sleep(0.01)
+                size = math.hypot(point.x, point.y)
+                x = point.x/size*(size-self.offset_from_person)
+                y = point.y/size*(size-self.offset_from_person)
+
+                self.move.set_position(0, 0, theta)
+                rospy.sleep(0.1)
+
                 self.move.set_position(x, y, theta)
-                self.distance_from_last = sqrt((point.x - self.last_point.x) ** 2 + (point.y - self.last_point.y) ** 2)
+                self.distance_from_last = math.hypot((point.x - self.last_point.x), (point.y - self.last_point.y))
                 self.last_point = point
 
             elif perception_data.device is self.Devices.VOICE:
@@ -63,7 +58,6 @@ class FollowPerson(AbstractSubtask):
                     self.change_state('abort')
             else:
                 rospy.loginfo("Stop Robot")
-                # self.skillBook.get_skill(self, 'Say').say('I cannot find you. Please come in front of me.')
                 self.turn_neck.turn(-0.1, 0.0)
                 self.move.stop()
                 self.change_state('abort')
