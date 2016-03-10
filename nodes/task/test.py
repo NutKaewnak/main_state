@@ -12,10 +12,16 @@ class Test(AbstractTask):
 
     def perform(self, perception_data):
         if self.state is 'init':
-            rospy.loginfo('---in test---')
-            self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
-            self.subtask.turn(-0.4, 0)
-            self.change_state('find_object')
+            self.pick = self.subtaskBook.get_subtask(self, 'Pick')
+            self.pick.side_arm = 'right_arm'
+            self.change_state('wait_for_arm_init')
+
+        elif self.state is 'wait_for_arm_init':
+            if self.pick.state is 'wait_for_point':
+                rospy.loginfo('---in test---')
+                self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
+                self.subtask.turn(-0.4, 0)
+                self.change_state('find_object')
 
         elif self.state is 'find_object':
             self.subtask = self.subtaskBook.get_subtask(self, 'ObjectsDetection')
@@ -28,8 +34,7 @@ class Test(AbstractTask):
                 self.change_state('pick')
 
         elif self.state is 'pick':
-            self.pick = self.subtaskBook.get_subtask(self, 'Pick')
-            self.pick.side_arm = 'right_arm'
+            self.current_subtask = self.pick
             self.pick.pick_object(self.object_goal)
             self.change_state('wait_for_pick')
 

@@ -51,12 +51,13 @@ def in_bound(joint_name, angle):
     # elif joint_name == 'left_wrist_3_joint':
     #     angle_max = 3.17
     #     angle_min = -2.64
+
     print 'Kuyyyy'
     if bool(angle_max) and bool(angle_min):
         print 'KUYYYY'
         if angle > angle_max or angle < angle_min:
             print '-!-!-!-!-!-!-!-!-!-! SAsssssS OUT OF BOUND --> ' + str(angle)
-            return False  
+            return False
         print 'INBOUND na SAssssSSSS --> ' + str(angle)
         return angle
 
@@ -72,115 +73,75 @@ def inverse_kinematic(target_point):
     pos_z = float(target_point.z)
     r = math.sqrt(FL * FL - pos_y * pos_y) + VERY_SMALL_NUMBER
     R = math.hypot(pos_x, pos_z)
-    cos_theta1 = (R * R - UL * UL - r * r) / (2 * UL * r + VERY_SMALL_NUMBER)
 
     try:
-        try:
-            sin_theta1 = math.sqrt(1 - math.pow(cos_theta1, 2))
-            print "--> cos_theta1 = " + str(cos_theta1)
-            try:
-                theta1 = math.atan2(sin_theta1, cos_theta1 + VERY_SMALL_NUMBER)
-            except ValueError:
-                theta1 = math.acos((R * R - UL * UL - r * r) / (2 * UL * r + VERY_SMALL_NUMBER))
-        except ValueError:
-            theta1 = math.acos((R * R - UL * UL - r * r) / (2 * UL * r + VERY_SMALL_NUMBER))
-        print 'theta1 = ' + str(theta1)
-
+        cos_theta1 = (R * R - UL * UL - r * r) / (2 * UL * r + VERY_SMALL_NUMBER)
+        sin_theta1 = math.sqrt(1 - math.pow(cos_theta1, 2))
+        theta1 = math.atan2(sin_theta1, cos_theta1 + VERY_SMALL_NUMBER)
     except ValueError:
         print 'FALSE theta1'
         return False
 
     try:
         sin_theta2 = UL * math.sin(theta1) / (R + VERY_SMALL_NUMBER)
-        if type(sin_theta2) == float:
-            cos_theta2 = math.pow(1 - math.sqrt(sin_theta2), 2)
-            if type(cos_theta2) == float:
-                theta2 = math.atan2(sin_theta2, (cos_theta2 + VERY_SMALL_NUMBER))
-            else:
-                theta2 = math.asin(UL * math.sin(theta1) / (R + VERY_SMALL_NUMBER))
-        else:
-            theta2 = math.asin(UL * math.sin(theta1) / (R + VERY_SMALL_NUMBER))
-        print 'theta2 = ' + str(theta2)
+        cos_theta2 = math.pow(1 - math.sqrt(sin_theta2), 2)
+        theta2 = math.atan2(sin_theta2, (cos_theta2 + VERY_SMALL_NUMBER))
     except ValueError:
         print 'FALSE theta2'
         return False
 
     try:
         sin_theta3 = pos_x / (R + VERY_SMALL_NUMBER)
-        if type(sin_theta3) == float:
-            cos_theta3 = math.sqrt(1 - math.pow(sin_theta3, 2))
-            if type(cos_theta3) == float:
-                theta3 = math.atan2(sin_theta3, (cos_theta3 + VERY_SMALL_NUMBER))
-            else:
-                theta3 = math.asin(pos_x / (R + VERY_SMALL_NUMBER))
-        else:
-            theta3 = math.asin(pos_x / (R + VERY_SMALL_NUMBER))
+        cos_theta3 = math.sqrt(1 - math.pow(sin_theta3, 2))
+        theta3 = math.atan2(sin_theta3, (cos_theta3 + VERY_SMALL_NUMBER))
         as20 = theta3 - theta1 + theta2 - 0.2
         print 'as20 = ' + str(as20)
     except ValueError:
-        print 'FALSE'
+        print 'FALSE theta3'
         return False
 
     # self.elbow_position = [self.UL * math.sin(self.as20), self.UL * math.cos(self.as20)]
 
     try:
-        as21 = math.atan(pos_y / ((r * math.sin(theta1)) + VERY_SMALL_NUMBER))
+        as21 = math.atan2(pos_y, ((r * math.sin(theta1)) + VERY_SMALL_NUMBER))
         print 'as21 = ' + str(as21)
     except ValueError:
-        print 'FALSE'
+        print 'FALSE as21'
         return False
 
     try:
         cos_theta4 = r * math.cos(theta1) / (FL + VERY_SMALL_NUMBER)
-        if type(cos_theta4) == float:
-            sin_theta4 = math.sqrt(1 - math.pow(cos_theta4, 2))
-            if type(sin_theta4) == float:
-                theta4 = math.atan2(sin_theta4, (cos_theta4 + VERY_SMALL_NUMBER))
-            else:
-                theta4 = math.acos(r * math.cos(theta1) / (FL + VERY_SMALL_NUMBER))
-        else:
-            theta4 = math.acos(r * math.cos(theta1) / (FL + VERY_SMALL_NUMBER))
+        sin_theta4 = math.sqrt(1 - math.pow(cos_theta4, 2))
+        theta4 = math.atan2(sin_theta4, (cos_theta4 + VERY_SMALL_NUMBER))
         ae22 = (math.pi / 2) - theta4 + 0.08
         print 'ae22 = ' + str(ae22)
     except ValueError:
-        print 'FALSE'
+        print 'FALSE ae22'
         return False
 
     try:
         z2 = UL * math.cos(as20) - pos_z
         # print 'z2 = ' + str(self.z2)
     except ValueError:
-        print 'FALSE'
+        print 'FALSE z2'
         return False
 
     try:
         sin_theta5 = pos_y / (math.hypot(pos_y, z2) + VERY_SMALL_NUMBER)
-        if type(sin_theta5) == float:
-            cos_theta5 = math.pow(1 - math.pow(sin_theta5, 2), 0.5)
-            if type(cos_theta5) == float:
-                theta5 = math.atan2(sin_theta5, (cos_theta5 + VERY_SMALL_NUMBER))
-            else:
-                theta5 = math.asin(pos_y / (math.pow(pos_y * pos_y + z2 * z2, 0.5) + VERY_SMALL_NUMBER))
-        else:
-            theta5 = math.asin(pos_y / (math.pow(pos_y * pos_y + z2 * z2, 0.5) + VERY_SMALL_NUMBER))
+        cos_theta5 = math.pow(1 - math.pow(sin_theta5, 2), 0.5)
+        theta5 = math.atan2(sin_theta5, (cos_theta5 + VERY_SMALL_NUMBER))
         ah40 = -theta5/3.0
         print 'ah40 = ' + str(ah40)
     except ValueError:
-        print 'FALSE'
+        print 'FALSE ah40'
         return False
 
     try:
         costheta6 = (pos_x - (UL * math.sin(as20))) / (FL + VERY_SMALL_NUMBER)
-        if type(costheta6) == float:
-            sintheta6 = math.pow(1 - math.pow(costheta6, 2), 0.5)
-            if type(sintheta6) == float:
-                theta6 = math.atan2(sintheta6, (costheta6 + VERY_SMALL_NUMBER))
-            else:
-                theta6 = math.acos((pos_x - (UL * math.sin(as20))) / (FL + VERY_SMALL_NUMBER))
-        else:
-            theta6 = math.acos((pos_x - (UL * math.sin(as20))) / (FL + VERY_SMALL_NUMBER))
+        sintheta6 = math.pow(1 - math.pow(costheta6, 2), 0.5)
+        theta6 = math.atan2(sintheta6, (costheta6 + VERY_SMALL_NUMBER))
     except ValueError:
-        print 'FALSE'
+        print 'FALSE theta6'
         return False
 
     ah41 = theta6
