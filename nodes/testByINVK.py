@@ -24,9 +24,9 @@ class TestInvKine:
     def invKine(self):
         # object_pos = [0.63, -0.20, 0.85]  # [0.57, -0.07, 0.85]
         self.obj_pos = Point()
-        self.obj_pos.x = 0.65-0.1
+        self.obj_pos.x = 0.65
         self.obj_pos.y = -0.17
-        self.obj_pos.z = 0.85
+        self.obj_pos.z = 0.80
         arm_group = "right_arm"
         # arm_group = 'left_arm'
 
@@ -48,6 +48,18 @@ class TestInvKine:
 
         rospy.loginfo("-----PICK PREPARE-----")
 
+        out_angle = inverse_kinematics.inverse_kinematic(manipulator_ctrl.transform_point(invK.prepare_point_to_invert_kinematic(self.obj_pos)))
+        print 'ANGLE = ' + str(out_angle['right_shoulder_1_joint'])
+        manipulator_ctrl.move_joint('right_shoulder_1_joint', inverse_kinematics.in_bound('right_shoulder_1_joint', out_angle['right_shoulder_1_joint']))
+        manipulator_ctrl.move_joint('right_shoulder_2_joint', inverse_kinematics.in_bound('right_shoulder_2_joint', out_angle['right_shoulder_2_joint']))
+        manipulator_ctrl.move_joint('right_elbow_joint', inverse_kinematics.in_bound('right_elbow_joint', out_angle['right_elbow_joint']))
+        manipulator_ctrl.move_joint('right_wrist_1_joint', inverse_kinematics.in_bound('right_wrist_1_joint', out_angle['right_wrist_1_joint']))
+        manipulator_ctrl.move_joint('right_wrist_2_joint', inverse_kinematics.in_bound('right_wrist_2_joint', out_angle['right_wrist_2_joint']))
+        manipulator_ctrl.move_joint('right_wrist_3_joint', inverse_kinematics.in_bound('right_wrist_3_joint', out_angle['right_wrist_3_joint']))
+        raw_input()
+
+        self.obj_pos.x += 0.1
+        rospy.loginfo("-----PICK PREGRASP-----")
         out_angle = inverse_kinematics.inverse_kinematic(manipulator_ctrl.transform_point(invK.prepare_point_to_invert_kinematic(self.obj_pos)))
         print 'ANGLE = ' + str(out_angle['right_shoulder_1_joint'])
         manipulator_ctrl.move_joint('right_shoulder_1_joint', inverse_kinematics.in_bound('right_shoulder_1_joint', out_angle['right_shoulder_1_joint']))

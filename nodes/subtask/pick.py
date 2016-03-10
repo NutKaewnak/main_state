@@ -18,7 +18,11 @@ class Pick(AbstractSubtask):
             rospy.loginfo('pick subtask init')
             self.skill = self.skillBook.get_skill(self, 'Grasp')
             self.skill.set_side(self.side_arm)
-            self.change_state('wait_for_point')
+            self.change_state('wait_for_skill_init')
+
+        elif self.state is 'wait_for_skill_init':
+            if self.skill.state is 'wait_for_point':
+                self.change_state('wait_for_point')
 
         elif self.state is 'receive_point':
             self.change_state('setting_arm')

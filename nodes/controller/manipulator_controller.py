@@ -120,8 +120,6 @@ class ManipulateController:
         :param angles: (dict()) dict of angle and arm_joint
         :return: (None)
         """
-        print angles
-        print self.arm_group.get_joints()
         for x in angles:
             if x in self.arm_group.get_joints():
                 self.move_joint(x, angles[x])
