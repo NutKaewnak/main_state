@@ -1,0 +1,30 @@
+<location_information>
+	<room name="living room" position="6.423, 3.959" rotation="1.560" height="0.70">
+		<locaiton name="dinner table" position="6.638, 6.957" rotation="-0.036" height="0.70"/>
+		<locaiton name="sofa" position="10.140, 5.865" rotation="-0.270" height="0.70"/>
+        <location name="bar" position="6.037, 4.023" rotation="-3.110" height="0.70"/>
+        <location name="couch table" position="8.687, 4.051" rotation="-0.042" height="0.70"/>
+	</room>
+	<room name="kitchen" position="4.075, 6.747" rotation="3.129" height="1.29">
+		<location name="kitchen table" position="2.943, 5.970" rotation="-1.552" height="1.29"/>
+		<location name="fridge" position="0.979, 7.610" rotation="1.590" height="1.29"/>
+		<location name="cupboard" position="3.937, 7.974" rotation="1.573" height="1.29"/>
+        <location name="kitchen counter" position="2.342, 7.575" rotation="1.570" height="1.29"/>
+	</room>
+    <room name="bedroom" position="7.024, -1.518" rotation="-0.018" height="1.29">
+        <location name="bed" position="10.541, -0.487" rotation="-1.557" height="1.29"/>
+        <location name="desk" position="7.634, -2.048" rotation="-1.550" height="0.70"/>
+    </room>
+    <room name="hallway" position="4.590, -2.352" rotation="3.139" height="1.29">
+        <location name="bookcase" position="1.850, -1.937" rotation="3.119" height="1.29"/>
+        <location name="hallway table" position="2.660, -1.286" rotation="1.581" height="0.70"/>
+    </room>
+
+	<location name="entrance" position="2.656, -7.349" rotation="3.126" height="1.29"/>
+    <location name="exit" position="-0.310, 6.381" rotation="3.140" height="1.29"/>
+    <location name="waypoint_1" position="7.937, 0.047" rotation="0.000" height="1.29"/>
+    <location name="waypoint_2" position="11.364, -4.182" rotation="-1.578" height="1.29"/>
+    <location name="waypoint_3" position="14.018, -0.013" rotation="0.000" height="1.29"/>
+    <location name="hallway table" position="2.981, 2.737" rotation="-1.600" height="1.29"/>
+    <location name="gpsr_start" position="25.972, 3.633" rotation="-0.795" height="1.29"/>
+</location_information>

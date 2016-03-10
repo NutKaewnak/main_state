@@ -1,0 +1,8 @@
+location one,0.0,0.0,0.0,0.0
+location two,0.0,0.0,0.0,0.0
+location three,0.0,0.0,0.0,0.0
+snack shelf,0.0,0.0,0.0,0.0
+food shelf,0.0,0.0,0.0,0.0
+drink shelf,0.0,0.0,0.0,0.0
+tool shelf,0.0,0.0,0.0,0.0
+start_pos,0.0,0.0,0.0,0.0

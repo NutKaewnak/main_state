@@ -1,0 +1,27 @@
+<location_category>	
+	<category name="table">
+		<location name="kitchen table"/>
+		<location name="kitchen counter"/>
+		<location name="couch table"/>
+		<location name="dinner table"/>
+		<location name="left bedside table"/>
+		<location name="right bedside table"/>
+		<location name="hallwaytable"/>
+		<location name="desk"/>
+	</category>
+	<category name="shelf">
+		<location name="cupboard"/>
+		<location name="bar"/>
+		<location name="bookcase"/>
+	</category>
+	<category name="appliance">
+		<location name="fridge"/>
+	</category>
+	<category name="utility">
+		<location name="trash bin"/>
+	</category>
+	<category name="seat">
+		<location name="sofa"/>
+		<location name="bed"/>
+	</category>
+</location_category>
