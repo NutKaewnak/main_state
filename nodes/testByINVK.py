@@ -25,9 +25,9 @@ class TestInvKine:
     def invKine(self):
         # object_pos = [0.63, -0.20, 0.85]  # [0.57, -0.07, 0.85]
         self.obj_pos = Point()
-        self.obj_pos.x = 0.6
-        self.obj_pos.y = -0.25
-        self.obj_pos.z = 0.6
+        self.obj_pos.x = 0.60 - 0.1
+        self.obj_pos.y = -0.21
+        self.obj_pos.z = 0.8
         arm_group = "right_arm"
         # arm_group = 'left_arm'
 
@@ -47,8 +47,6 @@ class TestInvKine:
         self.pub_right_gripper.publish(0.8)
         raw_input()
 
-        #out_angle = inverse_kinematics.inverse_kinematic(manipulator_ctrl.transform_point(invK.prepare_point_to_invert_kinematic(self.obj_pos)))
-        # manipulator_ctrl.transform_point(self.obj_pos)
         out_angle = inverse_kinematics.inverse_kinematic(manipulator_ctrl.transform_point(self.obj_pos), 0)
         raw_input()
         print 'ANGLE = ' + str(out_angle['right_shoulder_1_joint'])
@@ -59,8 +57,21 @@ class TestInvKine:
         manipulator_ctrl.move_joint('right_wrist_2_joint', inverse_kinematics.in_bound('right_wrist_2_joint', out_angle['right_wrist_2_joint']))
         manipulator_ctrl.move_joint('right_wrist_3_joint', inverse_kinematics.in_bound('right_wrist_3_joint', out_angle['right_wrist_3_joint']))
         raw_input()
-        rospy.loginfo("-----CLOSE GRIPPER + Move relative-----")
-        manipulator_ctrl.move_relative([0, 0, 0], [0, 0, 0])
+
+        self.obj_pos.x += 0.1
+        out_angle = inverse_kinematics.inverse_kinematic(manipulator_ctrl.transform_point(self.obj_pos), 0)
+        raw_input()
+        print 'ANGLE = ' + str(out_angle['right_shoulder_1_joint'])
+        manipulator_ctrl.move_joint('right_shoulder_1_joint', inverse_kinematics.in_bound('right_shoulder_1_joint', out_angle['right_shoulder_1_joint']))
+        manipulator_ctrl.move_joint('right_shoulder_2_joint', inverse_kinematics.in_bound('right_shoulder_2_joint', out_angle['right_shoulder_2_joint']))
+        manipulator_ctrl.move_joint('right_elbow_joint', inverse_kinematics.in_bound('right_elbow_joint', out_angle['right_elbow_joint']))
+        manipulator_ctrl.move_joint('right_wrist_1_joint', inverse_kinematics.in_bound('right_wrist_1_joint', out_angle['right_wrist_1_joint']))
+        manipulator_ctrl.move_joint('right_wrist_2_joint', inverse_kinematics.in_bound('right_wrist_2_joint', out_angle['right_wrist_2_joint']))
+        manipulator_ctrl.move_joint('right_wrist_3_joint', inverse_kinematics.in_bound('right_wrist_3_joint', out_angle['right_wrist_3_joint']))
+        raw_input()
+        # rospy.loginfo("-----CLOSE GRIPPER + Move relative-----")
+        # manipulator_ctrl.move_relative([0, 0, 0], [0, 0, 0])
+        rospy.loginfo("-----CLOSE GRIPPER-----")
         self.pub_right_gripper.publish(0.1)
         raw_input()
 
@@ -68,7 +79,7 @@ class TestInvKine:
         manipulator_ctrl.static_pose('right_picking_prepare')
         raw_input()
 
-        rospy.spin()
+        # rospy.spin()
 
 if __name__ == '__main__':
     try:
