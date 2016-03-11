@@ -62,110 +62,102 @@ def in_bound(joint_name, angle):
         return angle
 
 
-def inverse_kinematic(target_point):
+def inverse_kinematic(target_point, orientation = 0.0):
     """
     Using inverse kinematic to calculate angles that arm should manipulate in order to move to target point.
+    :param orientation: desired wrist angle respect to (arm_side)_wrist_2_joint
     :param target_point: (geometry/Point)
     :return: (dict()) dict of arm joint and output angle.
     """
     pos_x = float(target_point.x)
     pos_y = float(target_point.y)
     pos_z = float(target_point.z)
-    r = math.sqrt(FL * FL - pos_y * pos_y) + VERY_SMALL_NUMBER
-    R = math.hypot(pos_x, pos_z)
-
     try:
-        cos_theta1 = (R * R - UL * UL - r * r) / (2 * UL * r + VERY_SMALL_NUMBER)
-        sin_theta1 = math.sqrt(1 - math.pow(cos_theta1, 2))
-        theta1 = math.atan2(sin_theta1, cos_theta1 + VERY_SMALL_NUMBER)
-    except ValueError:
-        print 'FALSE theta1'
-        return False
+        r = math.sqrt(FL * FL - pos_y * pos_y)
+        R = math.hypot(pos_x, pos_z)
+        gripper_length = 0.25
 
-    try:
-        sin_theta2 = UL * math.sin(theta1) / (R + VERY_SMALL_NUMBER)
-        cos_theta2 = math.pow(1 - math.sqrt(sin_theta2), 2)
-        theta2 = math.atan2(sin_theta2, (cos_theta2 + VERY_SMALL_NUMBER))
-    except ValueError:
-        print 'FALSE theta2'
-        return False
+        try:
+            cos_theta2 = (R * R - UL * UL - r * r) / (2 * UL * r + VERY_SMALL_NUMBER)
+            sin_theta2 = math.sqrt(1 - math.pow(cos_theta2, 2))
+            theta2 = math.atan2(sin_theta2, cos_theta2)
+            print "THEHA2 = " + str(theta2)
+        except ValueError:
+            print 'FALSE theta2'
+            return False
 
-    try:
-        sin_theta3 = pos_x / (R + VERY_SMALL_NUMBER)
-        cos_theta3 = math.sqrt(1 - math.pow(sin_theta3, 2))
-        theta3 = math.atan2(sin_theta3, (cos_theta3 + VERY_SMALL_NUMBER))
-        as20 = theta3 - theta1 + theta2 - 0.2
-        print 'as20 = ' + str(as20)
-    except ValueError:
-        print 'FALSE theta3'
-        return False
+        try:
+            theta1 = math.atan2(pos_x, math.fabs(pos_z)) - math.atan2(r*math.sin(theta2), UL + r*math.cos(theta2))
+            as20 = theta1
+            as20 *= -1
+            print 'as20 = ' + str(as20)
+        except ValueError:
+            print 'FALSE as20'
+            return False
 
-    # self.elbow_position = [self.UL * math.sin(self.as20), self.UL * math.cos(self.as20)]
+        try:
+            as21 = math.atan2(pos_y, (r + VERY_SMALL_NUMBER))
+            print 'as21 = ' + str(as21)
+        except ValueError:
+            print 'FALSE as21'
+            return False
 
-    try:
-        as21 = math.atan2(pos_y, ((r * math.sin(theta1)) + VERY_SMALL_NUMBER))
-        print 'as21 = ' + str(as21)
-    except ValueError:
-        print 'FALSE as21'
-        return False
+        try:
+            ae22 = theta2 - 0.5*math.pi
+            print 'ae22 = ' + str(ae22)
+        except ValueError:
+            print 'FALSE ae22'
+            return False
 
-    try:
-        cos_theta4 = r * math.cos(theta1) / (FL + VERY_SMALL_NUMBER)
-        sin_theta4 = math.sqrt(1 - math.pow(cos_theta4, 2))
-        theta4 = math.atan2(sin_theta4, (cos_theta4 + VERY_SMALL_NUMBER))
-        ae22 = (math.pi / 2) - theta4 + 0.08
-        print 'ae22 = ' + str(ae22)
-    except ValueError:
-        print 'FALSE ae22'
-        return False
+        try:
+            theta_d = 0.5*math.pi - orientation
+            theta3 = theta_d - theta1 - theta2
+            print 'theta3 = ' + str(theta3)
+            ah41 = -theta3
+            print "ah41 = " + str(ah41)
+        except ValueError:
+            print 'FALSE ah41'
 
-    try:
-        z2 = UL * math.cos(as20) - pos_z
-        # print 'z2 = ' + str(self.z2)
-    except ValueError:
-        print 'FALSE z2'
-        return False
-
-    try:
-        sin_theta5 = pos_y / (math.hypot(pos_y, z2) + VERY_SMALL_NUMBER)
-        cos_theta5 = math.pow(1 - math.pow(sin_theta5, 2), 0.5)
-        theta5 = math.atan2(sin_theta5, (cos_theta5 + VERY_SMALL_NUMBER))
-        ah40 = -theta5/3.0
+        ah40 = 0
         print 'ah40 = ' + str(ah40)
+        ah42 = 0
+
+        # try:
+        #     costheta6 = (pos_x - (UL * math.sin(as20))) / (FL + VERY_SMALL_NUMBER)
+        #     print 'costheta6 = ' + str(costheta6)
+        #     sintheta6 = math.pow(1 - math.pow(costheta6, 2), 0.5)
+        #     print 'sintheta6 = ' + str(sintheta6)
+        #     theta6 = math.atan2(sintheta6, (costheta6 + VERY_SMALL_NUMBER))
+        # except ValueError:
+        #     print 'FALSE theta6'
+        #     return False
+        # # ah41 = theta6
+        # # print 'ah41 = ' + str(ah41)
+        # # ah42 = -ah40
+        # # print 'ah42 = ' + str(ah42)
+
+        out_angles = dict()
+        out_angles['right_shoulder_1_joint'] = as20
+        out_angles['right_shoulder_2_joint'] = as21
+        out_angles['right_elbow_joint'] = ae22
+        out_angles['right_wrist_1_joint'] = ah40
+        out_angles['right_wrist_2_joint'] = ah41
+        out_angles['right_wrist_3_joint'] = ah42
+
+        out_angles['left_shoulder_1_joint'] = as20
+        out_angles['left_shoulder_2_joint'] = as21
+        out_angles['left_elbow_joint'] = ae22
+        # out_angles['left_wrist_1_joint'] = ah40
+        # out_angles['left_wrist_2_joint'] = ah41
+        # out_angles['left_wrist_3_joint'] = ah42
+        out_angles['left_wrist_1_joint'] = 0
+        out_angles['left_wrist_2_joint'] = 0
+        out_angles['left_wrist_3_joint'] = 0
+
+        return out_angles
     except ValueError:
-        print 'FALSE ah40'
-        return False
-
-    try:
-        costheta6 = (pos_x - (UL * math.sin(as20))) / (FL + VERY_SMALL_NUMBER)
-        sintheta6 = math.pow(1 - math.pow(costheta6, 2), 0.5)
-        theta6 = math.atan2(sintheta6, (costheta6 + VERY_SMALL_NUMBER))
-    except ValueError:
-        print 'FALSE theta6'
-        return False
-
-    ah41 = theta6
-    print 'ah41 = ' + str(ah41)
-    ah42 = -ah40
-    print 'ah42 = ' + str(ah42)
-
-    out_angles = dict()
-    out_angles['right_shoulder_1_joint'] = -1 * as20
-    out_angles['right_shoulder_2_joint'] = as21
-    out_angles['right_elbow_joint'] = -1 * ae22
-    out_angles['right_wrist_1_joint'] = ah40
-    out_angles['right_wrist_2_joint'] = ah41
-    out_angles['right_wrist_3_joint'] = ah42
-
-    out_angles['left_shoulder_1_joint'] = as20
-    out_angles['left_shoulder_2_joint'] = as21
-    out_angles['left_elbow_joint'] = ae22
-    out_angles['left_wrist_1_joint'] = ah40
-    out_angles['left_wrist_2_joint'] = ah41
-    out_angles['left_wrist_3_joint'] = ah42
-
-    return out_angles
-
+        print "CAN'T CALCULATE R or r"
+        return false
 
 class InverseKinematics:
     def __init__(self, arm_group='right_arm'):

@@ -40,13 +40,18 @@ class ManipulateController:
     def transform_point(self, pos, origin_frame='base_link'):
         """
         Transform point from origin frame (Default: 'base_link') to 'mani_link'
-        :param point_stamped: (PointStamped)
-        :param arm_group: (string)
+        :param pos: (PointStamped)
+        :param origin_frame:
         :return: (PointStamped), False if input arm_group is incorrect
         """
         # destination_frame = None
         # if 'ARM' in arm_group or 'arm' in arm_group:
-        destination_frame = "torso_Link"
+        # destination_frame = "torso_Link"
+        # destination_frame = "right_mani_link"
+        if "right" in self.arm_side:
+            destination_frame = "right_mani_link"
+        elif "left" in self.arm_side:
+            destination_frame = "left_mani_link"
         tf_points = PointStamped()
         tf_points.point.x = pos.x
         tf_points.point.y = pos.y
@@ -60,7 +65,7 @@ class ManipulateController:
         print 'HERRREEEE >>>>> ' + str(point_out.point.x) + ', ' + str(point_out.point.y) + ', ' + str(point_out.point.z)
         return point_out.point
 
-    def manipulate(self, pose_target, orientation_rpy=[0, 0, 0], ref_frame="base_link", planning_time=50.00):
+    def manipulate(self, pose_target, ref_frame="base_link", planning_time=50.00):
         self.arm_group.set_planning_time(planning_time)
         self.arm_group.clear_pose_targets()
         self.arm_group.set_goal_position_tolerance(0.05)
@@ -79,9 +84,9 @@ class ManipulateController:
             joint_state[group_joint_names[i]] = group_current_joint_values[i]
         return joint_state
 
-    def move_relative(self, arm_group, relative_goal_translation, relative_goal_rotation):
+    def move_relative(self, relative_goal_translation, relative_goal_rotation):
         # respect to efflink
-        last_pose = self.arm_side.get_current_pose()
+        last_pose = self.arm_group.get_current_pose()
         rospy.loginfo(str(type(last_pose)) + '\n' + str(last_pose))
 
         rpy = tf.transformations.euler_from_quaternion([last_pose.pose.orientation.x,
@@ -97,7 +102,7 @@ class ManipulateController:
         new_pose.orientation.y = rpy[1] + relative_goal_rotation[1]
         new_pose.orientation.z = rpy[2] + relative_goal_rotation[2]
 
-        self.manipulate(arm_group, new_pose)
+        self.manipulate(new_pose)
 
     def move_joint(self, joint_name, joint_value):
         print joint_name
