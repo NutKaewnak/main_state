@@ -70,12 +70,11 @@ def inverse_kinematic(target_point, orientation = 0.0):
     :return: (dict()) dict of arm joint and output angle.
     """
     pos_x = float(target_point.x)
-    pos_y = float(target_point.y)
+    pos_y = float(target_point.y) + 0.04
     pos_z = float(target_point.z)
     try:
         r = math.sqrt(FL * FL - pos_y * pos_y)
         R = math.hypot(pos_x, pos_z)
-        gripper_length = 0.25
 
         try:
             cos_theta2 = (R * R - UL * UL - r * r) / (2 * UL * r + VERY_SMALL_NUMBER)
@@ -121,20 +120,6 @@ def inverse_kinematic(target_point, orientation = 0.0):
         ah40 = 0
         print 'ah40 = ' + str(ah40)
         ah42 = 0
-
-        # try:
-        #     costheta6 = (pos_x - (UL * math.sin(as20))) / (FL + VERY_SMALL_NUMBER)
-        #     print 'costheta6 = ' + str(costheta6)
-        #     sintheta6 = math.pow(1 - math.pow(costheta6, 2), 0.5)
-        #     print 'sintheta6 = ' + str(sintheta6)
-        #     theta6 = math.atan2(sintheta6, (costheta6 + VERY_SMALL_NUMBER))
-        # except ValueError:
-        #     print 'FALSE theta6'
-        #     return False
-        # # ah41 = theta6
-        # # print 'ah41 = ' + str(ah41)
-        # # ah42 = -ah40
-        # # print 'ah42 = ' + str(ah42)
 
         out_angles = dict()
         out_angles['right_shoulder_1_joint'] = as20
