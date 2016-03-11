@@ -22,5 +22,9 @@ class NeckStatus:
     def get_state_from_status(status):
         return NeckStatus.neckStatus[int(status)]
 
+    @staticmethod
+    def is_active(status):
+        return status in [0, 1, 6, 7]
+
 if __name__ == "__main__":
     print NeckStatus.get_state_from_status(4)
