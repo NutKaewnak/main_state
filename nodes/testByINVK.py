@@ -25,7 +25,7 @@ class TestInvKine:
     def invKine(self):
         # object_pos = [0.63, -0.20, 0.85]  # [0.57, -0.07, 0.85]
         self.obj_pos = Point()
-        self.obj_pos.x = 0.60 - 0.1
+        self.obj_pos.x = 0.6 - 0.1
         self.obj_pos.y = -0.21
         self.obj_pos.z = 0.8
         arm_group = "right_arm"

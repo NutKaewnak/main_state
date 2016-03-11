@@ -20,6 +20,7 @@ class DetectObject3Ds(AbstractSkill):
                 print 'input= '+str(perception_data.input)
                 print 'result.object = '+str(perception_data.input.result.objects)
                 print 'result.object[0].point = '+str(perception_data.input.result.objects[0].point)
+                print 'result.object[0].width = '+str(perception_data.input.result.objects[0].width)
                 status = MoveBaseStatus.get_state_from_status(perception_data.input.status.status)
                 self.change_state(status)
                 print 'state_object = ' + self.state

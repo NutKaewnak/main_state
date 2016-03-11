@@ -24,6 +24,10 @@ from objects_detection import ObjectsDetection
 from pills_detection import PillsDetection
 from voice_recognition_mode import VoiceRecognitionMode
 from turn_neck import TurnNeck
+from detect_phone import DetectPhone
+from detect_blanket import DetectBlanket
+from detect_cane import DetectCane
+
 # from object_recognition_subtask import ObjectRecognition
 
 __author__ = "AThousandYears"
@@ -58,6 +62,9 @@ class SubtaskBook:
         self.book['TestSubtaskSkill'] = TestSubtaskSkill(planning_module)
         self.book['VoiceRecognitionMode'] = VoiceRecognitionMode(planning_module)
         self.book['TurnNeck'] = TurnNeck(planning_module)
+        self.book['DetectPhone'] = DetectPhone(planning_module)
+        self.book['DetectBlanket'] = DetectBlanket(planning_module)
+        self.book['DetectCane'] = DetectCane(planning_module)
 
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()
