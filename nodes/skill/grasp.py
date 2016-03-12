@@ -134,7 +134,7 @@ class Grasp(AbstractSkill):
         """
         Let skill control manipulation to pick object at design point.
         Please make sure to set desire arm side (Default: 'right_arm').
-        :param point: (geometry/Point) goal of the object
+        :param point: (geometry_msgs.msg.Point) goal of the object
         :return: None
         """
         self.goal_point = point
