@@ -40,9 +40,9 @@ class ManipulateController:
     def transform_point(self, pos, origin_frame='base_link'):
         """
         Transform point from origin frame (Default: 'base_link') to 'mani_link'
-        :param pos: (PointStamped)
+        :param pos: (geometry_msgs.msg.PointStamped)
         :param origin_frame:
-        :return: (PointStamped), False if input arm_group is incorrect
+        :return: (geometry_msgs.msg.PointStamped), False if input arm_group is incorrect
         """
         # destination_frame = None
         # if 'ARM' in arm_group or 'arm' in arm_group:
