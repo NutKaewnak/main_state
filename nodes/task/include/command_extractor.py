@@ -13,7 +13,7 @@ class Action:
         self.data = data
 
     def __repr__(self):
-        return "(%s, %s, %s)"%(self.action, self.data, self.object)
+        return "(%s, %s, %s)"%(self.action, self.object, self.data)
 
 def readFileToList(filename):
     output = []
@@ -262,85 +262,85 @@ class CommandExtractor(object):
     def getActions(self, command):
         """
         >>> CommandExtractor().getActions("bring a coke from bathroom to the desk")
-        [(go, bathroom, None), (grasp, desk, coke)]
-        >>> CommandExtractor().getActions("go to the bedroom find a person and tell the time")
-        [(go, bedroom, None), (find, None, person), (tell, None, time)]
+        [(go, None, bathroom), (grasp, coke, desk)]
+        >>> CommandExtractor().getActions("go to the bedroom find a person andro tell the time")
+        [(go, None, bedroom), (find, person, None), (tell, time, None)]
         >>> CommandExtractor().getActions("go to the dinner-table grasp the crackers and take them to the side-table")
-        [(go, dinner-table, None), (grasp, side-table, crackers)]
+        [(go, None, dinner-table), (grasp, crackers, side-table)]
         >>> CommandExtractor().getActions("bring a coke to the person in the living room and answer him a question")
-        [(grasp, None, coke), (go, living room, None), (give, person, None), (answer, him, question)]
+        [(grasp, coke, None), (go, None, living room), (give, None, person), (answer, question, him)]
         >>> CommandExtractor().getActions("go to the door ask the person there for her name and tell it to me")
-        [(go, door, None), (ask, person, her name), (tell, me, it)]
+        [(go, None, door), (ask, her name, person), (tell, it, me)]
         >>> CommandExtractor().getActions("go to the bedroom find the waving person and tell the time")
-        [(go, bedroom, None), (find, None, waving person), (tell, None, time)]
+        [(go, None, bedroom), (find, waving person, None), (tell, time, None)]
         >>> CommandExtractor().getActions("go to the kitchen find a person and follow her")
-        [(go, kitchen, None), (find, None, person), (follow, None, her)]
+        [(go, None, kitchen), (find, person, None), (follow, her, None)]
         >>> CommandExtractor().getActions("go to the side-table grasp the coke and take it to the dinner table")
-        [(go, side-table, None), (grasp, dinner table, coke)]
+        [(go, None, side-table), (grasp, coke, dinner table)]
         >>> CommandExtractor().getActions("go to the dinner-table grasp the banana and take it to the side-table")
-        [(go, dinner-table, None), (grasp, side-table, banana)]
+        [(go, None, dinner-table), (grasp, banana, side-table)]
         >>> CommandExtractor().getActions("take the coke from the sink and carry it to me")
-        [(go, sink, None), (grasp, me, coke)]
+        [(go, None, sink), (grasp, coke, me)]
         >>> CommandExtractor().getActions("go to the kitchen grasp the coke and take it to the side-table")
-        [(go, kitchen, None), (grasp, side-table, coke)]
+        [(go, None, kitchen), (grasp, coke, side-table)]
         >>> CommandExtractor().getActions("go to the bathroom grasp the soap and take it to the side-table")
-        [(go, bathroom, None), (grasp, side-table, soap)]
+        [(go, None, bathroom), (grasp, soap, side-table)]
         >>> CommandExtractor().getActions("grasp the coke from the small table and carry it to me")
-        [(go, small table, None), (grasp, me, coke)]
+        [(go, None, small table), (grasp, coke, me)]
         >>> CommandExtractor().getActions("deliver a coke to frank in the kitchen")
-        [(grasp, None, coke), (go, kitchen, None), (give, frank, None)]
+        [(grasp, coke, None), (go, None, kitchen), (give, None, frank)]
         >>> CommandExtractor().getActions("offer a coke to frank in the kitchen")
-        [(grasp, None, coke), (go, kitchen, None), (give, frank, None)]
+        [(grasp, coke, None), (go, None, kitchen), (give, None, frank)]
         >>> CommandExtractor().getActions("offer a coke to the person at the door")
-        [(grasp, None, coke), (go, door, None), (give, person, None)]
+        [(grasp, coke, None), (go, None, door), (give, None, person)]
         >>> CommandExtractor().getActions("take me a coke on the desk")
-        [(go, desk, None), (grasp, me, coke)]
+        [(go, None, desk), (grasp, coke, me)]
         >>> CommandExtractor().getActions('move to show case go to desk and leave apartment')
-        [(go, show case, None), (go, desk, None), (exit, apartment, None)]
+        [(go, None, show case), (go, None, desk), (exit, None, apartment)]
         >>> CommandExtractor().getActions('navigate to kitchen table bring soda and exit apartment')
-        [(go, kitchen table, None), (grasp, None, soda), (exit, apartment, None)]
+        [(go, None, kitchen table), (grasp, soda, None), (exit, None, apartment)]
         >>> CommandExtractor().getActions('go to bar find coffee and take it')
-        [(go, bar, None), (find, None, coffee), (grasp, None, it)]
+        [(go, None, bar), (find, coffee, None), (grasp, it, None)]
         >>> CommandExtractor().getActions('go to reception table identify green cup and take it')
-        [(go, reception table, None), (find, None, green cup), (grasp, None, it)]
+        [(go, None, reception table), (find, green cup, None), (grasp, it, None)]
         >>> CommandExtractor().getActions('go to reception table go to bar and introduce yourself')
-        [(go, reception table, None), (go, bar, None), (introduce, None, yourself)]
+        [(go, None, reception table), (go, None, bar), (introduce, yourself, None)]
         >>> CommandExtractor().getActions('go to desk find frank and exit')
-        [(go, desk, None), (find, None, frank), (exit, None, None)]
+        [(go, None, desk), (find, frank, None), (exit, None, None)]
         >>> CommandExtractor().getActions('bring me a coke')
-        [(grasp, me, coke)]
+        [(grasp, coke, me)]
         >>> CommandExtractor().getActions('carry a cake to small table')
-        [(grasp, small table, cake)]
+        [(grasp, cake, small table)]
         >>> CommandExtractor().getActions('navigate to door')
-        [(go, door, None)]
+        [(go, None, door)]
         >>> CommandExtractor().getActions('carry a toy to small table')
-        [(grasp, small table, toy)]
+        [(grasp, toy, small table)]
         >>> CommandExtractor().getActions('go to desk find a person and exit')
-        [(go, desk, None), (find, None, person), (exit, None, None)]
+        [(go, None, desk), (find, person, None), (exit, None, None)]
         >>> CommandExtractor().getActions('bring cake to desk')
-        [(grasp, desk, cake)]
+        [(grasp, cake, desk)]
         >>> CommandExtractor().getActions('detect a person in bathroom')
-        [(go, bathroom, None), (find, None, person)]
+        [(go, None, bathroom), (find, person, None)]
         >>> CommandExtractor().getActions('find a waving person in bathroom')
-        [(go, bathroom, None), (find, None, waving person)]
+        [(go, None, bathroom), (find, waving person, None)]
         >>> CommandExtractor().getActions('bring a coke on small table')
-        [(go, small table, None), (grasp, None, coke)]
+        [(go, None, small table), (grasp, coke, None)]
         >>> CommandExtractor().getActions('take me a coke on small table')
-        [(go, small table, None), (grasp, me, coke)]
+        [(go, None, small table), (grasp, coke, me)]
         >>> CommandExtractor().getActions("find a person in the bathroom and answer a question")
-        [(go, bathroom, None), (find, None, person), (answer, None, question)]
+        [(go, None, bathroom), (find, person, None), (answer, question, None)]
         >>> CommandExtractor().getActions("find a person in the bathroom and tell what day is tomorrow")
-        [(go, bathroom, None), (find, None, person), (tell, None, what day is tomorrow)]
+        [(go, None, bathroom), (find, person, None), (tell, what day is tomorrow, None)]
         >>> CommandExtractor().getActions("find a person in the bathroom and tell the day of the week")
-        [(go, bathroom, None), (find, None, person), (tell, None, the day of the week)]
+        [(go, None, bathroom), (find, person, None), (tell, the day of the week, None)]
         >>> CommandExtractor().getActions("find a person in the bathroom and tell your name")
-        [(go, bathroom, None), (find, None, person), (tell, None, your name)]
+        [(go, None, bathroom), (find, person, None), (tell, your name, None)]
         >>> CommandExtractor().getActions("find a person in the bathroom and tell the name of your team")
-        [(go, bathroom, None), (find, None, person), (tell, None, the name of your team)]
+        [(go, None, bathroom), (find, person, None), (tell, the name of your team, None)]
         >>> CommandExtractor().getActions("find a person in the bathroom and tell the name of your team")
-        [(go, bathroom, None), (find, None, person), (tell, None, the name of your team)]
+        [(go, None, bathroom), (find, person, None), (tell, the name of your team, None)]
         >>> CommandExtractor().getActions("take a coke from bedroom and deliver it to frank in bathroom")
-        [(go, bedroom, None), (grasp, None, coke), (go, bathroom, None), (give, frank, None)]
+        [(go, None, bedroom), (grasp, coke, None), (go, None, bathroom), (give, None, frank)]
         """
         output = []
         for sentence in self.cut_sentence(command):
@@ -576,7 +576,7 @@ class CommandExtractor(object):
         return "Do you want me " + sentence.strip()  + '.'
 
 
-    #Check whether command is valid or not
+    # Check whether command is valid or not
     def isValidCommand(self, command):
         """
         >>> CommandExtractor().isValidCommand('')
