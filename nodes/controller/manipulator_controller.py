@@ -65,7 +65,7 @@ class ManipulateController:
         print 'HERRREEEE >>>>> ' + str(point_out.point.x) + ', ' + str(point_out.point.y) + ', ' + str(point_out.point.z)
         return point_out.point
 
-    def manipulate(self, pose_target, ref_frame="base_link", planning_time=50.00):
+    def manipulate(self, pose_target, orientation_rpy=[0, 0, 0], ref_frame="base_link", planning_time=50.00):
         self.arm_group.set_planning_time(planning_time)
         self.arm_group.clear_pose_targets()
         self.arm_group.set_goal_position_tolerance(0.05)

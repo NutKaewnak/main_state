@@ -33,24 +33,24 @@ def in_bound(joint_name, angle):
         angle_max = 3.17
         angle_min = -2.64
 
-    # elif joint_name == 'left_shoulder_1_joint':
-    #     angle_max = 0.58
-    #     angle_min = -3.8
-    # elif joint_name == 'left_shoulder_2_joint':
-    #     angle_max = 1.0
-    #     angle_min = -1.5
-    # elif joint_name == 'left_elbow_joint':
-    #     angle_max = 0.17
-    #     angle_min = -0.88
-    # elif joint_name == 'left_wrist_1_joint':
-    #     angle_max = 2.5
-    #     angle_min = -3.1
-    # elif joint_name == 'left_wrist_2_joint':
-    #     angle_max = 1.5
-    #     angle_min = -0.6
-    # elif joint_name == 'left_wrist_3_joint':
-    #     angle_max = 3.17
-    #     angle_min = -2.64
+    elif joint_name == 'left_shoulder_1_joint':
+        angle_max = 0.58
+        angle_min = -1.2
+    elif joint_name == 'left_shoulder_2_joint':
+        angle_max = 1.0
+        angle_min = -1.5
+    elif joint_name == 'left_elbow_joint':
+        angle_max = 0.17
+        angle_min = -0.88
+    elif joint_name == 'left_wrist_1_joint':
+        angle_max = 2.5
+        angle_min = -3.1
+    elif joint_name == 'left_wrist_2_joint':
+        angle_max = 1.5
+        angle_min = -0.6
+    elif joint_name == 'left_wrist_3_joint':
+        angle_max = 3.17
+        angle_min = -2.64
 
     print 'Kuyyyy'
     if bool(angle_max) and bool(angle_min):
@@ -86,24 +86,30 @@ def inverse_kinematic(target_point, orientation = 0.0):
             return False
 
         try:
-            theta1 = math.atan2(pos_x, math.fabs(pos_z)) - math.atan2(r*math.sin(theta2), UL + r*math.cos(theta2))
+            theta1 = math.atan2(pos_x, pos_z) - math.atan2(r*math.sin(theta2), UL + r*math.cos(theta2))
             as20 = theta1
             as20 *= -1
             print 'as20 = ' + str(as20)
+            as25 = as20
+            print 'as25 = ' + str(as25)
         except ValueError:
-            print 'FALSE as20'
+            print 'FALSE as20 as25'
             return False
 
         try:
             as21 = math.atan2(pos_y, (r + VERY_SMALL_NUMBER))
             print 'as21 = ' + str(as21)
+            as26 = as21
+            print 'as26 = ' + str(as26)
         except ValueError:
-            print 'FALSE as21'
+            print 'FALSE as21 as26'
             return False
 
         try:
             ae22 = theta2 - 0.5*math.pi
             print 'ae22 = ' + str(ae22)
+            ae27 = ae22
+            print 'ae27 = ' + str(ae27)
         except ValueError:
             print 'FALSE ae22'
             return False
@@ -114,12 +120,24 @@ def inverse_kinematic(target_point, orientation = 0.0):
             print 'theta3 = ' + str(theta3)
             ah41 = -theta3
             print "ah41 = " + str(ah41)
+            ah46 = ah41
+            print 'ah46 = ' + str(ah46)
         except ValueError:
             print 'FALSE ah41'
 
-        ah40 = 0
+        right_rotate_wrist = as21
+        print 'Right rotate = ' + str(right_rotate_wrist)
+        ah40 = right_rotate_wrist / 2.0
         print 'ah40 = ' + str(ah40)
-        ah42 = 0
+        ah42 = ah40
+        print 'ah42 = ' + str(ah42)
+
+        left_rotate_wrist = as26
+        print 'Left rotate = ' + str(left_rotate_wrist)
+        ah45 = left_rotate_wrist / 2.0
+        print 'ah45 = ' + str(ah45)
+        ah47 = ah45
+        print 'ah47 = ' + str(ah47)
 
         out_angles = dict()
         out_angles['right_shoulder_1_joint'] = as20
@@ -129,15 +147,15 @@ def inverse_kinematic(target_point, orientation = 0.0):
         out_angles['right_wrist_2_joint'] = ah41
         out_angles['right_wrist_3_joint'] = ah42
 
-        out_angles['left_shoulder_1_joint'] = as20
-        out_angles['left_shoulder_2_joint'] = as21
-        out_angles['left_elbow_joint'] = ae22
+        out_angles['left_shoulder_1_joint'] = as25
+        out_angles['left_shoulder_2_joint'] = as26
+        out_angles['left_elbow_joint'] = ae27
         # out_angles['left_wrist_1_joint'] = ah40
         # out_angles['left_wrist_2_joint'] = ah41
         # out_angles['left_wrist_3_joint'] = ah42
-        out_angles['left_wrist_1_joint'] = 0
-        out_angles['left_wrist_2_joint'] = 0
-        out_angles['left_wrist_3_joint'] = 0
+        out_angles['left_wrist_1_joint'] = ah45
+        out_angles['left_wrist_2_joint'] = ah46
+        out_angles['left_wrist_3_joint'] = ah47
 
         return out_angles
     except ValueError:
