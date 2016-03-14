@@ -10,8 +10,8 @@ class SearchWavingPeople(AbstractSubtask):
         self.skill = self.skillBook.get_skill(self, 'TurnNeck')
         self.subtask = self.current_subtask
         self.timer = Delay()
-        self.limit_up = 0.8  # pan
-        self.limit_down = -0.8
+        self.limit_up = 0.5  # pan
+        self.limit_down = -0.5
         self.neck_direction = 'right'
         self.waving_people_point = None
         self.new_neck_point = 0.3
@@ -20,7 +20,7 @@ class SearchWavingPeople(AbstractSubtask):
     def perform(self, perception_data):
         # if perception_data.device is 'NECK':
         #     self.pan = perception_data.input.pan
-        print self.state, '&&&&&&&'
+        # print self.state, '&&&&&&&'
         if self.state is 'init':
             # self.skill = self.skillBook.get_skill(self, 'TurnNeck')
             self.skill.turn(0, 0)
@@ -28,6 +28,9 @@ class SearchWavingPeople(AbstractSubtask):
             self.change_state("wait_turn_neck_0_0")
 
         elif self.state is "wait_turn_neck_0_0" and not self.timer.is_waiting():
+            if perception_data.device is 'NECK':
+                self.pan = perception_data.input.pan
+                print 'pan = ' + str(self.pan)
             self.change_state('searching')
 
         elif self.state is 'searching':
@@ -42,6 +45,7 @@ class SearchWavingPeople(AbstractSubtask):
                     print 'detectWaving subtask state = ' + self.subtask.state
 
         elif self.state is 'detecting':
+            # print '===^^^detecting^^^==='
             if self.subtask.state is 'finish':
                 print 'find people'
                 self.waving_people_point = self.subtask.get_point()
@@ -84,6 +88,7 @@ class SearchWavingPeople(AbstractSubtask):
                 self.skill.turn_relative(0, self.new_neck_point)
                 self.timer.wait(5)
                 self.change_state("wait_turn_neck_relative")
+
         elif self.state is "wait_turn_neck_relative" and not self.timer.is_waiting():
             print 'pan =' + str(self.pan)
             print('----turn_neck----')

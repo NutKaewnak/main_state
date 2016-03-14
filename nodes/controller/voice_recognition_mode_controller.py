@@ -10,5 +10,5 @@ class VoiceRecognitionModeController:
     def __init__(self):
         self.voice_recognition_mode = actionlib.SimpleActionClient('/recognizer/voice_reg', VoiceRegAction)
 
-    def set_new_goal(self):
-        self.voice_recognition_mode.send_goal(VoiceRegGoal())
+    def set_new_goal(self, id):
+        self.voice_recognition_mode.send_goal(VoiceRegGoal(id))
