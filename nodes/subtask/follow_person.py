@@ -37,6 +37,7 @@ class FollowPerson(AbstractSubtask):
                 if person.id == self.person_id:
                     point = person.personpoints
 
+            self.turn_base.publish(Twist())
             if point is not None:
                 theta = atan(point.y/point.x)
                 self.turn_neck.turn(-0.1, theta)
