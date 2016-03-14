@@ -1,6 +1,7 @@
 import rospy
 from include.abstract_subtask import AbstractSubtask
 from include.delay import Delay
+
 __author__ = 'nicole'
 
 
@@ -21,18 +22,22 @@ class DetectWavingPeople(AbstractSubtask):
             self.change_state('searching')
 
         elif self.state is 'searching':
-            # print 'hi'
-            if not self.delay.is_waiting() or perception_data.device is self.Devices.GESTURE:
-                print '--detecting--'
-                if not perception_data.input:
-                    self.change_state('not_found')
-                else:
+            # print self.delay.is_waiting()
+            if self.delay.is_waiting():
+                # print 'timer is waiting'
+                if perception_data.device is self.Devices.GESTURE:
+                    print '--detecting--'
+                    # print 'perception_data.input = ' + str(perception_data.input)
+                    # if not perception_data.input:
                     self.gesture_pos = perception_data.input
                     self.change_state('finish')
+
             else:
-                # for i in xrange(20):
-                #     print 'hello'
                 self.change_state('not_found')
+                # else:
+                #     for i in xrange(20):
+                #         print 'hello'
+                #     self.change_state('not_found')
 
     def start(self):
         self.gesture_pos = None

@@ -19,4 +19,4 @@ class GestureDetection(AbstractPerception):
         data.header.stamp = rospy.Time(0)
         point_tf = self.tf_listener.transformPoint('base_link', data)
         # print 'point_tf.point ' + str(point_tf.point)
-        self.broadcast(Devices.GESTURE, point_tf.point)
+        self.broadcast(Devices.GESTURE, point_tf)

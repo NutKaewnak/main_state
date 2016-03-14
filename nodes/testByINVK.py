@@ -42,9 +42,9 @@ class TestInvKine:
         GRIPPER_EFFORT = 0.4
 
         self.obj_pos = Point()
-        self.obj_pos.x = 0.75-0.25
-        self.obj_pos.y = -0.22 + 0.04
-        self.obj_pos.z = 0.85
+        self.obj_pos.x = 0.66-0.25
+        self.obj_pos.y = -0.188 + 0.04
+        self.obj_pos.z = 0.82
 
         # rospy.loginfo("-----ARM NORMAL-----")
         # manipulator_ctrl.static_pose('right_normal')

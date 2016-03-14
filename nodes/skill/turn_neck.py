@@ -20,6 +20,7 @@ class TurnNeck(AbstractSkill):
         #     self.tilt = 0
         #     self.pitch = 0
         #     self.yaw = 0
+
         if perception_data.device is 'NECK':
             self.pan = perception_data.input.pan
             self.tilt = perception_data.input.tilt
