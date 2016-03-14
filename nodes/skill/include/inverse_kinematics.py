@@ -15,14 +15,14 @@ def in_bound(joint_name, angle):
     angle_min = None
     if joint_name == 'right_shoulder_1_joint':
         print 'THIS IS '+joint_name
-        angle_max = 0.5
-        angle_min = -1.2
+        angle_max = 0.4
+        angle_min = -1.35
     elif joint_name == 'right_shoulder_2_joint':
         angle_max = 1.1
         angle_min = -1.47
     elif joint_name == 'right_elbow_joint':
         angle_max = 0.22
-        angle_min = -1.0
+        angle_min = -1.5
     elif joint_name == 'right_wrist_1_joint':
         angle_max = 2.5
         angle_min = -3.1
@@ -70,11 +70,13 @@ def inverse_kinematic(target_point, orientation = 0.0):
     :return: (dict()) dict of arm joint and output angle.
     """
     pos_x = float(target_point.x)
-    pos_y = float(target_point.y) + 0.04
+    pos_y = float(target_point.y)
     pos_z = float(target_point.z)
     try:
         r = math.sqrt(FL * FL - pos_y * pos_y)
         R = math.hypot(pos_x, pos_z)
+        print 'r = ' + str(r)
+        print 'R = ' + str(R)
 
         try:
             cos_theta2 = (R * R - UL * UL - r * r) / (2 * UL * r + VERY_SMALL_NUMBER)
@@ -86,7 +88,7 @@ def inverse_kinematic(target_point, orientation = 0.0):
             return False
 
         try:
-            theta1 = math.atan2(pos_x, pos_z) - math.atan2(r*math.sin(theta2), UL + r*math.cos(theta2))
+            theta1 = math.atan2(pos_x, math.fabs(pos_z)) - math.atan2(r*math.sin(theta2), UL + r*math.cos(theta2))
             as20 = theta1
             as20 *= -1
             print 'as20 = ' + str(as20)

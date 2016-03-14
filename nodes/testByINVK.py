@@ -5,7 +5,9 @@ from controller.manipulator_controller import ManipulateController
 from skill.include import inverse_kinematics
 from task.include.delay import Delay
 from geometry_msgs.msg import Point
+from dynamixel_controllers.srv import SetTorqueLimit
 import math
+
 
 __author__ = 'fptrainnie'
 
@@ -15,27 +17,38 @@ class TestInvKine:
         global invK, manipulator_ctrl
         self.delay = Delay()
         rospy.init_node('TestInverseKinematic')
-
         invK = inverse_kinematics.InverseKinematics()
         manipulator_ctrl = ManipulateController()
         manipulator_ctrl.init_controller()
         self.pub_right_gripper = rospy.Publisher('dynamixel/right_gripper_joint_controller/command', Float64)
         self.pub_left_gripper = rospy.Publisher('dynamixel/left_gripper_joint_controller/command', Float64)
+        self.set_torque_limit = rospy.ServiceProxy('/dynamixel/right_gripper/set_torque_limit', SetTorqueLimit)
         self.invKine()
+
+    def set_torque_limit(self, limit = 0.3):
+        rospy.wait_for_service('/dynamixel/right_gripper_joint_controller/set_torque_limit')
+        try:
+            rospy.loginfo('settorque')
+            setTorque = rospy.ServiceProxy('/dynamixel/right_gripper_joint_controller/set_torque_limit', SetTorqueLimit)
+            respTorque = setTorque(limit)
+        except rospy.ServiceException, e:
+            rospy.logwarn("Service Torque call failed " + str(e))
 
     def invKine(self):
 
         # FOR TEST RIGHT ARM
         # position y < 0
 
-        self.obj_pos = Point()
-        self.obj_pos.x = 0.6
-        self.obj_pos.y = -0.25
-        self.obj_pos.z = 0.8
+        GRIPPER_EFFORT = 0.4
 
-        rospy.loginfo("-----ARM NORMAL-----")
-        manipulator_ctrl.static_pose('right_normal')
-        raw_input()
+        self.obj_pos = Point()
+        self.obj_pos.x = 0.75-0.25
+        self.obj_pos.y = -0.22 + 0.04
+        self.obj_pos.z = 0.85
+
+        # rospy.loginfo("-----ARM NORMAL-----")
+        # manipulator_ctrl.static_pose('right_normal')
+        # raw_input()
 
         rospy.loginfo("-----ARM PREPARE-----")
         manipulator_ctrl.static_pose('right_picking_prepare')
@@ -61,9 +74,35 @@ class TestInvKine:
         manipulator_ctrl.move_joint('right_wrist_2_joint', inverse_kinematics.in_bound('right_wrist_2_joint', out_angle['right_wrist_2_joint']))
         manipulator_ctrl.move_joint('right_wrist_3_joint', inverse_kinematics.in_bound('right_wrist_3_joint', out_angle['right_wrist_3_joint']))
         raw_input()
+
+        self.obj_pos.x += 0.1
+        out_angle = inverse_kinematics.inverse_kinematic(manipulator_ctrl.transform_point(self.obj_pos), 0)
+        raw_input()
+        print 'ANGLE = ' + str(out_angle['right_shoulder_1_joint'])
+        manipulator_ctrl.move_joint('right_shoulder_1_joint', inverse_kinematics.in_bound('right_shoulder_1_joint', out_angle['right_shoulder_1_joint']))
+        manipulator_ctrl.move_joint('right_shoulder_2_joint', inverse_kinematics.in_bound('right_shoulder_2_joint', out_angle['right_shoulder_2_joint']))
+        manipulator_ctrl.move_joint('right_elbow_joint', inverse_kinematics.in_bound('right_elbow_joint', out_angle['right_elbow_joint']))
+        manipulator_ctrl.move_joint('right_wrist_1_joint', inverse_kinematics.in_bound('right_wrist_1_joint', out_angle['right_wrist_1_joint']))
+        manipulator_ctrl.move_joint('right_wrist_2_joint', inverse_kinematics.in_bound('right_wrist_2_joint', out_angle['right_wrist_2_joint']))
+        manipulator_ctrl.move_joint('right_wrist_3_joint', inverse_kinematics.in_bound('right_wrist_3_joint', out_angle['right_wrist_3_joint']))
+        raw_input()
+
+        self.obj_pos.x += 0.05
+        out_angle = inverse_kinematics.inverse_kinematic(manipulator_ctrl.transform_point(self.obj_pos), 0)
+        raw_input()
+        print 'ANGLE = ' + str(out_angle['right_shoulder_1_joint'])
+        manipulator_ctrl.move_joint('right_shoulder_1_joint', inverse_kinematics.in_bound('right_shoulder_1_joint', out_angle['right_shoulder_1_joint']))
+        manipulator_ctrl.move_joint('right_shoulder_2_joint', inverse_kinematics.in_bound('right_shoulder_2_joint', out_angle['right_shoulder_2_joint']))
+        manipulator_ctrl.move_joint('right_elbow_joint', inverse_kinematics.in_bound('right_elbow_joint', out_angle['right_elbow_joint']))
+        manipulator_ctrl.move_joint('right_wrist_1_joint', inverse_kinematics.in_bound('right_wrist_1_joint', out_angle['right_wrist_1_joint']))
+        manipulator_ctrl.move_joint('right_wrist_2_joint', inverse_kinematics.in_bound('right_wrist_2_joint', out_angle['right_wrist_2_joint']))
+        manipulator_ctrl.move_joint('right_wrist_3_joint', inverse_kinematics.in_bound('right_wrist_3_joint', out_angle['right_wrist_3_joint']))
+        raw_input()
+
         rospy.loginfo("-----CLOSE GRIPPER + Move relative-----")
-        manipulator_ctrl.move_relative([0, 0, 0], [0, 0, 0])
-        self.pub_right_gripper.publish(0.1)
+        # manipulator_ctrl.move_relative([0, 0, 0], [0, 0, 0])
+        # self.set_torque_limit()
+        self.pub_right_gripper.publish(0.2)
         raw_input()
 
         rospy.loginfo("-----AFTER GRASP-----")

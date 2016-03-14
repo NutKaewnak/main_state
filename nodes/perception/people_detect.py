@@ -17,7 +17,6 @@ class PeopleDetection(AbstractPerception):
     def callback_people_array(self, data):
         person_array = []
         for x in data.persons:
-            print 'x = ' + str(x)
             temp = PointStamped()
             temp.header = data.header
             temp.point = x.personpoints
