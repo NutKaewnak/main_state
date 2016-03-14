@@ -1,8 +1,7 @@
-import math
 import rospy
 from include.abstract_subtask import AbstractSubtask
 from math import atan, sqrt
-from geometry_msgs.msg import Twist, Vector3, Point
+from geometry_msgs.msg import Twist, Vector3
 
 __author__ = 'AThousandYears'
 
@@ -12,26 +11,22 @@ class FollowPerson(AbstractSubtask):
         AbstractSubtask.__init__(self, planning_module)
         self.skill = None
         self.move = None
+        self.turn_base = None
         self.turn_neck = None
         self.last_point = Vector3()
         self.person_id = None
         self.distance_from_last = 9999.0
-        self.offset_from_person = 0.6
+        self.offset_from_person = 0.4
 
     def set_person_id(self, person_id):
         self.person_id = person_id
         self.change_state('follow')
 
     def perform(self, perception_data):
-        if perception_data.device is self.Devices.VOICE:
-            if perception_data.input == 'robot waiting':
-                self.skillBook.get_skill(self, 'Say').say('I stop.')
-                self.move.stop()
-                self.change_state('abort')
-
         if self.state is 'init':
             self.move = self.skillBook.get_skill(self, 'MoveBaseRelative')
             self.turn_neck = self.skillBook.get_skill(self, 'TurnNeck')
+            self.turn_base = rospy.Publisher('/base/cmd_vel', Twist)
             self.turn_neck.turn(-0.1, 0.0)
             self.change_state('wait')
 
@@ -41,30 +36,45 @@ class FollowPerson(AbstractSubtask):
             for person in perception_data.input:
                 if person.id == self.person_id:
                     point = person.personpoints
+
             if point is not None:
                 theta = atan(point.y/point.x)
-                self.turn_neck.turn(-0.2, theta)
+                self.turn_neck.turn(-0.1, theta)
 
-                size = math.hypot(point.x, point.y)
-                x = point.x/size*(size-self.offset_from_person)
-                y = point.y/size*(size-self.offset_from_person)
+                size = sqrt(point.x**2 + point.y**2)
 
-                self.distance_from_last = math.hypot((point.x - self.last_point.x), (point.y - self.last_point.y))
+                x = max(point.x/size*(size-self.offset_from_person), 0)
+                y = max(point.y/size*(size-self.offset_from_person), 0)
+                angle = Twist()
+                if theta >= 0.1:
+                    angle.angular.z = theta/2
+                    # self.turn_base.publish(angle)
+                elif theta <= -0.1:
+                    angle.angular.z = theta/2
+
+                if x >= 0.1:
+                    angle.linear.x = 0.2
+                    # self.turn_base.publish(angle)
+                elif x <= -0.1:
+                    angle.linear.x = -0.2
+
+                print angle
+                self.turn_base.publish(angle)
+
+                # self.move.set_position(x, y, theta)
+                self.distance_from_last = sqrt((point.x - self.last_point.x) ** 2 + (point.y - self.last_point.y) ** 2)
                 self.last_point = point
 
-                self.change_state('move_to_theta')
-                self.move.set_position(x, y, theta)
             else:
                 rospy.loginfo("Stop Robot")
+                # self.skillBook.get_skill(self, 'Say').say('I cannot find you. Please come in front of me.')
                 self.turn_neck.turn(-0.1, 0.0)
                 self.move.stop()
+                self.turn_base.publish(Twist())
                 self.change_state('abort')
 
-        elif self.state is 'move_to_theta':
-            self.move.set_position(0, 0, atan(self.last_point.y/self.last_point.x))
-            self.change_state('move_to_person')
-
-        elif self.state is 'move_to_person':
-            if self.move.state is 'succeeded':.;4aaqqqqqqqqq
-                self.move.set_position(self.last_point.x, self.last_point.y, atan(self.last_point.y/self.last_point.x))
-                self.change_state('follow')
+        elif perception_data.device is self.Devices.VOICE:
+            if perception_data.input == 'robot waiting':
+                self.skillBook.get_skill(self, 'Say').say('I stop.')
+                self.move.stop()
+                self.change_state('abort')

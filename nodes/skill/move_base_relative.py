@@ -7,6 +7,7 @@ __author__ = "AThousandYears"
 class MoveBaseRelative(AbstractSkill):
     def __init__(self, control_module):
         AbstractSkill.__init__(self, control_module)
+        self.is_active = False
 
     def stop(self):
         self.change_state('active')
@@ -20,5 +21,7 @@ class MoveBaseRelative(AbstractSkill):
         if self.state is 'active':
             # check if base succeed
             if perception_data.device is self.Devices.BASE_STATUS:
+                # TODO: Bad code here!!
+                self.is_active = MoveBaseStatus.is_active(perception_data.input)
                 state = MoveBaseStatus.get_state_from_status(perception_data.input)
                 self.change_state(state)

@@ -28,7 +28,6 @@ class FollowMe(AbstractTask):
 
         elif self.state is 'follow_init':
             if perception_data.device is self.Devices.PEOPLE:
-                print 'kuy'
                 distance = 9999.0  # set to maximum
                 id = None
                 for person in perception_data.input:

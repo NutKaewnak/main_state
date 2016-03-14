@@ -22,5 +22,4 @@ class MoveBaseAbsolute(AbstractSkill):
             # check if base succeed
             if perception_data.device is self.Devices.BASE_STATUS:
                 state = MoveBaseStatus.get_state_from_status(perception_data.input)
-                print state
                 self.change_state(state)
