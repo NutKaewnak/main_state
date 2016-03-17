@@ -37,32 +37,25 @@ class FollowPerson(AbstractSubtask):
                 if person.id == self.person_id:
                     point = person.personpoints
 
-            self.turn_base.publish(Twist())
             if point is not None:
                 theta = atan(point.y/point.x)
-                self.turn_neck.turn(-0.1, theta)
+                self.turn_neck.turn(-0.2, theta)
 
                 size = sqrt(point.x**2 + point.y**2)
 
-                x = max(point.x/size*(size-self.offset_from_person), 0)
-                y = max(point.y/size*(size-self.offset_from_person), 0)
                 angle = Twist()
                 if theta >= 0.1:
                     angle.angular.z = theta/2
                     # self.turn_base.publish(angle)
                 elif theta <= -0.1:
                     angle.angular.z = theta/2
-
-                if x >= 0.1:
-                    angle.linear.x = 0.2
-                    # self.turn_base.publish(angle)
-                elif x <= -0.1:
-                    angle.linear.x = -0.2
-
-                print angle
                 self.turn_base.publish(angle)
 
-                # self.move.set_position(x, y, theta)
+                # rospy.sleep(0.01)
+
+                x = max(point.x/size*(size-self.offset_from_person), 0)
+                y = max(point.y/size*(size-self.offset_from_person), 0)
+                self.move.set_position(x, y, theta)
                 self.distance_from_last = sqrt((point.x - self.last_point.x) ** 2 + (point.y - self.last_point.y) ** 2)
                 self.last_point = point
 
@@ -71,7 +64,6 @@ class FollowPerson(AbstractSubtask):
                 # self.skillBook.get_skill(self, 'Say').say('I cannot find you. Please come in front of me.')
                 self.turn_neck.turn(-0.1, 0.0)
                 self.move.stop()
-                self.turn_base.publish(Twist())
                 self.change_state('abort')
 
         elif perception_data.device is self.Devices.VOICE:
