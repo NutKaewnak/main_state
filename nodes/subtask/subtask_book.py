@@ -27,6 +27,7 @@ from turn_neck import TurnNeck
 from detect_phone import DetectPhone
 from detect_blanket import DetectBlanket
 from detect_cane import DetectCane
+from follow_me import FollowMe
 
 # from object_recognition_subtask import ObjectRecognition
 
@@ -65,6 +66,7 @@ class SubtaskBook:
         self.book['DetectPhone'] = DetectPhone(planning_module)
         self.book['DetectBlanket'] = DetectBlanket(planning_module)
         self.book['DetectCane'] = DetectCane(planning_module)
+        self.book['FollowMe'] = FollowMe(planning_module)
 
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()
