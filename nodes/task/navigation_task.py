@@ -1,8 +1,8 @@
-import rospy
 import math
 
+import rospy
 import tf
-from geometry_msgs.msg import PointStamped, Point
+from geometry_msgs.msg import Point
 
 from include.abstract_task import AbstractTask
 from include.delay import Delay

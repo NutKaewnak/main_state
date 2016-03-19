@@ -1,28 +1,25 @@
 import rospy
 from include.abstract_subtask import AbstractSubtask
+from include.get_distance import get_distance
+from subprocess import call
+from geometry_msgs.msg import Vector3
 from std_msgs.msg import Float64
-from math import sqrt
 
 __author__ = 'Frank'
 
+
 class FollowMe(AbstractSubtask):
     def __init__(self, planning_module):
+        AbstractSubtask.__init__(self, planning_module)
         self.follow = None
         self.move = None
         self.count = 0
 
-    def get_distance(point_a, point_b):
-        return sqrt((point_a.x - point_b.x)**2 + (point_a.y - point_b.y)**2)
-
     def perform(self, perception_data):
-        # if self.state is 'init':
-        #     set_pan_angle_topic = rospy.Publisher('/dynamixel/tilt_controller/command', Float64)
-        #     set_pan_angle_topic.publish(Float64(0))
-        #     set_angle_topic = rospy.Publisher('/dynamixel/pan_controller/command', Float64)
-        #     set_angle_topic.publish(Float64(0))
-        #     self.change_state('wait_for_command')
+        if self.state is 'init':
+            self.follow = self.subtaskBook.get_subtask(self, 'FollowPerson')
 
-        if self.state is 'follow_init':
+        elif self.state is 'follow_init':
             if perception_data.device is self.Devices.PEOPLE:
                 distance = 9999.0  # set to maximum
                 id = None
@@ -40,7 +37,7 @@ class FollowMe(AbstractSubtask):
                 min_distance = 0.7  # set to maximum
                 id = None
                 for person in perception_data.input:
-                    distance = self.get_distance(person.personpoints, self.follow.last_point)
+                    distance = get_distance(person.personpoints, self.follow.last_point)
                     if person.personpoints.x >= self.follow.last_point.x - 0.25 and distance < min_distance:
                         min_distance = distance
                         id = person.id
