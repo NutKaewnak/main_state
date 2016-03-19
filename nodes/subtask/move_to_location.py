@@ -32,7 +32,7 @@ class MoveToLocation(AbstractSubtask):
             print 'move state = ' + str(self.move.state)
             print 'move.is_active = ' + str(self.move.is_active)
             # check if base succeed
-            if self.move.state is 'succeeded' or self.move.is_active:
+            if self.move.state is 'succeeded' or not self.move.is_active:
                 self.location = None
                 self.change_state('finish')
             elif self.move.state is 'aborted':

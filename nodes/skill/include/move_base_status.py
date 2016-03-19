@@ -24,7 +24,7 @@ class MoveBaseStatus:
 
     @staticmethod
     def is_active(status):
-        return status in [0, 1, 2, 6, 7]
+        return status in [0, 1, 6, 7]
 
 if __name__ == "__main__":
     print MoveBaseStatus.get_state_from_status(4)
