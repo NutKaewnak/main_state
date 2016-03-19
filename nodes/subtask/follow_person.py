@@ -3,7 +3,8 @@ from std_msgs.msg import Float64
 
 from include.abstract_subtask import AbstractSubtask
 from math import atan, sqrt
-from geometry_msgs.msg import Twist, Vector3
+from geometry_msgs.msg import Twist, Vector3, PoseStamped
+from tf.transformations import quaternion_from_euler
 
 __author__ = 'AThousandYears'
 
@@ -31,6 +32,7 @@ class FollowPerson(AbstractSubtask):
             self.move = self.skillBook.get_skill(self, 'MoveBaseRelative')
             self.turn_neck = self.skillBook.get_skill(self, 'TurnNeck')
             self.turn_base = rospy.Publisher('/base/cmd_vel', Twist)
+            self.publish_goal = rospy.Publisher('/people/goal', PoseStamped)
             self.turn_neck.turn(-0.1, 0.0)
             self.change_state('wait')
 
@@ -60,7 +62,19 @@ class FollowPerson(AbstractSubtask):
 
                 # rospy.sleep(0.01)
                 x = max(point.x/size*(size-self.offset_from_person), 0)
-                y = max(point.y/size*(size-self.offset_from_person), 0)
+                y = point.y/size*(size-self.offset_from_person)
+                publish_pose = PoseStamped()
+                publish_pose.header.stamp = rospy.Time.now()
+                publish_pose.header.frame_id = 'base_link'
+
+                publish_pose.pose.position.x = x
+                publish_pose.pose.position.y = y
+
+                quaternion = quaternion_from_euler(0,0,theta)
+                publish_pose.pose.orientation.z = quaternion[2]
+                publish_pose.pose.orientation.w = quaternion[3]
+                self.publish_goal.publish(publish_pose)
+                
                 self.move.set_position(x, y, theta)
                 self.distance_from_last = sqrt((point.x - self.last_point.x) ** 2 + (point.y - self.last_point.y) ** 2)
 
