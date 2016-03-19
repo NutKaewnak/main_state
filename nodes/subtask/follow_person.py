@@ -16,7 +16,7 @@ class FollowPerson(AbstractSubtask):
         self.last_point = Vector3()
         self.person_id = None
         self.distance_from_last = 9999.0
-        self.offset_from_person = 0.4
+        self.offset_from_person = 0.2
 
     def set_person_id(self, person_id):
         self.person_id = person_id
@@ -45,16 +45,16 @@ class FollowPerson(AbstractSubtask):
 
                 angle = Twist()
                 if theta >= 0.1:
-                    angle.angular.z = theta/2
-                    # self.turn_base.publish(angle)
+                    angle.angular.z = 0.1
+                    self.turn_base.publish(angle)
                 elif theta <= -0.1:
-                    angle.angular.z = theta/2
-                self.turn_base.publish(angle)
+                    angle.angular.z = -0.1
+                    self.turn_base.publish(angle)
 
                 # rospy.sleep(0.01)
-
                 x = max(point.x/size*(size-self.offset_from_person), 0)
                 y = max(point.y/size*(size-self.offset_from_person), 0)
+                print 'send goal na ja'
                 self.move.set_position(x, y, theta)
                 self.distance_from_last = sqrt((point.x - self.last_point.x) ** 2 + (point.y - self.last_point.y) ** 2)
                 self.last_point = point
@@ -63,7 +63,7 @@ class FollowPerson(AbstractSubtask):
                 rospy.loginfo("Stop Robot")
                 # self.skillBook.get_skill(self, 'Say').say('I cannot find you. Please come in front of me.')
                 self.turn_neck.turn(-0.1, 0.0)
-                self.move.stop()
+                # self.move.stop()
                 self.change_state('abort')
 
         elif perception_data.device is self.Devices.VOICE:
