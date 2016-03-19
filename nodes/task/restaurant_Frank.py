@@ -23,7 +23,7 @@ class RestaurantFrank(AbstractTask):
         self.food = ['noodles', 'peanuts', 'hamburger', 'fries', 'orange juice', 'water']
         self.say = self.subtaskBook.get_subtask(self, 'Say')
         self.follow = self.subtaskBook.get_subtask(self, 'FollowMe')
-        self.moveTo = self.subtaskBook.get_subreltask(self, 'MoveToLocation')
+        self.moveTo = self.subtaskBook.get_subtask(self, 'MoveToLocation')
         self.moveAbs = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
         self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
         self.search_waving_people = self.subtaskBook.get_subtask(self, 'SearchWavingPeople')

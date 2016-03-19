@@ -16,8 +16,10 @@ class FollowMe(AbstractSubtask):
         self.count = 0
 
     def perform(self, perception_data):
+        if self.state is 'init':
+            self.follow = self.subtaskBook.get_subtask(self, 'FollowPerson')
 
-        if self.state is 'follow_init':
+        elif self.state is 'follow_init':
             if perception_data.device is self.Devices.PEOPLE:
                 distance = 9999.0  # set to maximum
                 id = None
