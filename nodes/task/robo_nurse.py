@@ -54,7 +54,7 @@ class RoboNurse(AbstractTask):
                 print "granny pos = " + str(self.granny_pos)
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
                 size = sqrt(self.granny_pos.point.x**2 + self.granny_pos.point.y**2)
-                self.subtask.set_position(self.granny_pos.point.x/size*(size-0.5), self.granny_pos.point.y/size*size, atan(self.granny_pos.point.y/self.granny_pos.point.x))
+                self.subtask.set_position(self.granny_pos.point.x/size*(size-0.6), self.granny_pos.point.y/size*size, atan(self.granny_pos.point.y/self.granny_pos.point.x))
                 self.change_state('move_to_granny')
 
         elif self.state is 'move_to_granny':
@@ -74,7 +74,7 @@ class RoboNurse(AbstractTask):
             if self.subtask.state is 'finish':
                 rospy.loginfo('---watching granny---')
                 self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
-                self.subtask.setPositon(-0.2, 0)
+                self.subtask.setPositon(-0.25, 0)
                 self.change_state('tell_granny_to_ask_for_pill')
 
         elif self.state is 'tell_granny_to_ask_for_pill':
@@ -122,7 +122,7 @@ class RoboNurse(AbstractTask):
                 rospy.loginfo('---collect_pills---')
                 self.pill_dic = self.subtask.pills_dic
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
-                self.subtask.set_position(self.granny_pos.x, self.granny_pos.y, self.granny_pos.z)
+                self.subtask.set_position(self.granny_pos.point.x, self.granny_pos.point.y, self.granny_pos.point.z)
                 self.change_state('take_pill_order')
 
         elif self.state is 'take_pill_order':
@@ -143,7 +143,8 @@ class RoboNurse(AbstractTask):
 
         elif self.state is 'move_to_pill':
             print self.pill_dic[self.pill_name]
-            self.subtask.set_position((self.pill_dic[self.pill_name].x - 0.8),
+            size = sqrt(self.pill_dic[self.pill_name].x**2 + self.pill_dic[self.pill_name].y**2)
+            self.subtask.set_position(self.pill_dic[self.pill_name].x/size*(size-0.8),
                                       self.pill_dic[self.pill_name].y, self.pill_dic[self.pill_name].z)
             self.change_state('pick_pill')
 
@@ -158,7 +159,7 @@ class RoboNurse(AbstractTask):
             if self.subtask.state is 'finish':
                 rospy.loginfo('---prepare_give_pill---')
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
-                self.subtask.set_position(self.granny_pos.x, self.granny_pos.y, self.granny_pos.z)
+                self.subtask.set_position(self.granny_pos.point.x, self.granny_pos.point.y, self.granny_pos.point.z)
                 self.change_state('give_pill')
 
         elif self.state is 'give_pill':

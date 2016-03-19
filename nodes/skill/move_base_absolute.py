@@ -7,6 +7,7 @@ __author__ = "AThousandYears"
 class MoveBaseAbsolute(AbstractSkill):
     def __init__(self, control_module):
         AbstractSkill.__init__(self, control_module)
+        self.is_active = False
 
     def set_point(self, point):
         self.set_position(point.x, point.y, point.z)
@@ -22,4 +23,6 @@ class MoveBaseAbsolute(AbstractSkill):
             # check if base succeed
             if perception_data.device is self.Devices.BASE_STATUS:
                 state = MoveBaseStatus.get_state_from_status(perception_data.input)
+                # TODO: Bad code here!!
+                self.is_active = MoveBaseStatus.is_active(perception_data.input)
                 self.change_state(state)
