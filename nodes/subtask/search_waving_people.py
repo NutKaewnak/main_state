@@ -86,7 +86,7 @@ class SearchWavingPeople(AbstractSubtask):
                 self.pan = perception_data.input.pan
                 # self.skill = self.skillBook.get_skill(self, 'TurnNeck')
                 self.skill.turn_relative(0, self.new_neck_point)
-                self.timer.wait(5)
+                self.timer.wait(3)
                 self.change_state("wait_turn_neck_relative")
 
         elif self.state is "wait_turn_neck_relative" and not self.timer.is_waiting():
