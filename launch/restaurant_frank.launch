@@ -1,0 +1,11 @@
+<launch>
+  <include file="$(find speech_processing)/launch/restaurant.launch"/>
+  <node name="main_state" pkg="main_state" type="main.py" output="screen" args="RestaurantFrank" />
+
+  <!--<node ns="people" name="people_detection" pkg="people_detection" type="people_detection_node">
+    <remap from="peoplearray" to="/people_detection/people_array"/>
+  </node> -->
+
+  <node name="static_pub" pkg="rostopic" type="rostopic" args="pub /door/status std_msgs/String hello "/>
+
+</launch>

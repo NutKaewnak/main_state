@@ -20,6 +20,7 @@ from recognition_testing import TestRecognition
 from test_object3ds_detection import TestObject3DsDetection
 from restaurant_vdo import RestaurantVDO
 from test_neck import TestNeck
+from restaurant_Frank import RestaurantFrank
 
 
 class TaskBook:
@@ -46,6 +47,7 @@ class TaskBook:
         self.book['TestObject3DsDetection'] = TestObject3DsDetection(planning_module)
         self.book['RestaurantVDO'] = RestaurantVDO(planning_module)
         self.book['TestNeck'] = TestNeck(planning_module)
+        self.book['RestaurantFrank'] = RestaurantFrank(planning_module)
 
     def set_perception(self, perception_module):
         for task in self.book:
