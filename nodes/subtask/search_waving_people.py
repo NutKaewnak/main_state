@@ -23,8 +23,8 @@ class SearchWavingPeople(AbstractSubtask):
         # print self.state, '&&&&&&&'
         if self.state is 'init':
             # self.skill = self.skillBook.get_skill(self, 'TurnNeck')
-            self.skill.turn(0, 0)
-            self.timer.wait(5)
+            self.skill.turn(-0.2, 0)
+            self.timer.wait(3)
             self.change_state("wait_turn_neck_0_0")
 
         elif self.state is "wait_turn_neck_0_0" and not self.timer.is_waiting():
@@ -72,7 +72,7 @@ class SearchWavingPeople(AbstractSubtask):
                     if pan - 0.3 >= self.limit_down:
                         self.new_neck_point = -0.3
                     else:
-                        self.new_neck_point = self.limit_down + pan
+                        self.new_neck_point = self.limit_down - pan
                         self.neck_direction = 'left'
                 print 'new_neck = ' + str(self.new_neck_point)
                 self.change_state('turn_neck')

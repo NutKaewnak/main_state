@@ -3,6 +3,7 @@ import subprocess
 from random import randint
 import tf
 from include.abstract_task import AbstractTask
+from math import atan,sqrt
 from include.delay import Delay
 from geometry_msgs.msg import PointStamped
 
@@ -13,7 +14,7 @@ class RoboNurse(AbstractTask):
     def __init__(self, planning_module):
         AbstractTask.__init__(self, planning_module)
         self.subtask = None
-        self.shelf_pos = [-4.837, -1.250, -1.571]
+        # self.shelf_pos =
         self.granny_pos = None
         self.pill_dic = {}
         self.pill_name = None
@@ -49,16 +50,17 @@ class RoboNurse(AbstractTask):
             # print 'Searching.state =' + self.subtask.state
             if self.subtask.state is 'finish':
                 rospy.loginfo('---searching_granny---')
-                self.granny_pos = self.tf_listener.transformPoint('odom', self.subtask.waving_people_point)
+                self.granny_pos = self.tf_listener.transformPoint('map', self.subtask.waving_people_point)
                 print "granny pos = " + str(self.granny_pos)
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
-                self.subtask.set_position(self.granny_pos.point.x, self.granny_pos.point.y, self.granny_pos.point.z)
+                size = sqrt(self.granny_pos.point.x**2 + self.granny_pos.point.y**2)
+                self.subtask.set_position(self.granny_pos.point.x/size*(size-0.6), self.granny_pos.point.y/size*size, atan(self.granny_pos.point.y/self.granny_pos.point.x))
                 self.change_state('move_to_granny')
 
         elif self.state is 'move_to_granny':
             if perception_data.device is self.Devices.BASE_STATUS:
                 rospy.loginfo('---move_to_granny---')
-                print perception_data.input
+                print '---- *****'+str(perception_data.input)
             if self.subtask.state is 'error':
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
                 self.subtask.say('I\'m sorry granny. I can\'t walk any closer to you.')
@@ -66,35 +68,45 @@ class RoboNurse(AbstractTask):
             elif self.subtask.state is 'finish':
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
                 self.subtask.say('I reached you granny.')
+                self.change_state('watch_granny')
+
+        elif self.state is 'watch_granny':
+            if self.subtask.state is 'finish':
+                rospy.loginfo('---watching granny---')
+                self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
+                self.subtask.setPositon(-0.25, 0)
                 self.change_state('tell_granny_to_ask_for_pill')
 
         elif self.state is 'tell_granny_to_ask_for_pill':
             if self.subtask.state is 'finish':
                 rospy.loginfo('---tell_granny_ask_pill---')
                 self.change_state('wait_for_granny_command')
+                self.subtask = self.subtaskBook.get_subtask(self, 'Say')
                 self.subtask.say('If you want me to give you a pill. Say. Robot gives me pill.')
                 self.reg_voice = self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode')
                 self.reg_voice.recognize(3)
                 # self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode').recognize(1)
 
         elif self.state is 'wait_for_granny_command':
-            if self.subtask.state is 'finish':
-                rospy.loginfo('---wait_for_granny_command---')
-                if perception_data.device is self.Devices.VOICE:
-                    print perception_data.input
-                    print perception_data.input == 'robot gives me pill'
-                    if 'pill' in perception_data.input:
-                        self.subtask.say('Okay, granny.')
-                        self.change_state('init_move')
+            # rospy.loginfo('---wait_for_granny_command---')
+            if perception_data.device is self.Devices.VOICE:
+                # print 'helloo'
+                print perception_data.input
+                print perception_data.input == 'robot gives me pill'
+                if 'pill' in perception_data.input:
+                    self.subtask.say('Okay, granny.')
+                    self.change_state('init_move')
 
         elif self.state is 'init_move':
-            if self.subtask.state is 'finish':
-                rospy.loginfo('---init_move---')
-                self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
-                self.subtask.set_position(self.shelf_pos[0], self.shelf_pos[1], self.shelf_pos[2])
-                self.change_state('move_to_shelf')
+            print self.state
+            # if self.subtask.state is 'finish':
+            rospy.loginfo('---init_move---')
+            self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
+            self.subtask.to_location('shelf')
+            self.change_state('move_to_shelf')
 
         elif self.state is 'move_to_shelf':
+            print 'state =' + str(self.subtask.state)
             if self.subtask.state is 'finish':
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
                 self.subtask.say('I saw The leftmost bottle')
@@ -110,7 +122,7 @@ class RoboNurse(AbstractTask):
                 rospy.loginfo('---collect_pills---')
                 self.pill_dic = self.subtask.pills_dic
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
-                self.subtask.set_position(self.granny_pos.x, self.granny_pos.y, self.granny_pos.z)
+                self.subtask.set_position(self.granny_pos.point.x, self.granny_pos.point.y, self.granny_pos.point.z)
                 self.change_state('take_pill_order')
 
         elif self.state is 'take_pill_order':
@@ -131,7 +143,8 @@ class RoboNurse(AbstractTask):
 
         elif self.state is 'move_to_pill':
             print self.pill_dic[self.pill_name]
-            self.subtask.set_position((self.pill_dic[self.pill_name].x - 0.8),
+            size = sqrt(self.pill_dic[self.pill_name].x**2 + self.pill_dic[self.pill_name].y**2)
+            self.subtask.set_position(self.pill_dic[self.pill_name].x/size*(size-0.8),
                                       self.pill_dic[self.pill_name].y, self.pill_dic[self.pill_name].z)
             self.change_state('pick_pill')
 
@@ -146,7 +159,7 @@ class RoboNurse(AbstractTask):
             if self.subtask.state is 'finish':
                 rospy.loginfo('---prepare_give_pill---')
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
-                self.subtask.set_position(self.granny_pos.x, self.granny_pos.y, self.granny_pos.z)
+                self.subtask.set_position(self.granny_pos.point.x, self.granny_pos.point.y, self.granny_pos.point.z)
                 self.change_state('give_pill')
 
         elif self.state is 'give_pill':

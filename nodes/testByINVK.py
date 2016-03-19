@@ -42,9 +42,9 @@ class TestInvKine:
         GRIPPER_EFFORT = 0.4
 
         self.obj_pos = Point()
-        self.obj_pos.x = 0.66-0.25
-        self.obj_pos.y = -0.188 + 0.04
-        self.obj_pos.z = 0.82
+        self.obj_pos.x = 0.715-0.25
+        self.obj_pos.y = -0.281 + 0.04
+        self.obj_pos.z = 0.84
 
         # rospy.loginfo("-----ARM NORMAL-----")
         # manipulator_ctrl.static_pose('right_normal')
@@ -52,20 +52,21 @@ class TestInvKine:
 
         rospy.loginfo("-----ARM PREPARE-----")
         manipulator_ctrl.static_pose('right_picking_prepare')
-        raw_input()
+        # raw_input()
 
         rospy.loginfo("-----INIT POSITION-----")
         invK.init_position(self.obj_pos)
-        raw_input()
+        # raw_input()
 
-        rospy.loginfo("-----OPEN GRIPPER-----")
-        self.pub_right_gripper.publish(0.8)
-        raw_input()
+        # rospy.loginfo("-----OPEN GRIPPER-----")
+        # self.pub_right_gripper.publish(0.8)
+        # # raw_input()
+        rospy.sleep(3)
 
         #out_angle = inverse_kinematics.inverse_kinematic(manipulator_ctrl.transform_point(invK.prepare_point_to_invert_kinematic(self.obj_pos)))
         # manipulator_ctrl.transform_point(self.obj_pos)
         out_angle = inverse_kinematics.inverse_kinematic(manipulator_ctrl.transform_point(self.obj_pos), 0)
-        raw_input()
+        # raw_input()
         print 'ANGLE = ' + str(out_angle['right_shoulder_1_joint'])
         manipulator_ctrl.move_joint('right_shoulder_1_joint', inverse_kinematics.in_bound('right_shoulder_1_joint', out_angle['right_shoulder_1_joint']))
         manipulator_ctrl.move_joint('right_shoulder_2_joint', inverse_kinematics.in_bound('right_shoulder_2_joint', out_angle['right_shoulder_2_joint']))
@@ -73,11 +74,12 @@ class TestInvKine:
         manipulator_ctrl.move_joint('right_wrist_1_joint', inverse_kinematics.in_bound('right_wrist_1_joint', out_angle['right_wrist_1_joint']))
         manipulator_ctrl.move_joint('right_wrist_2_joint', inverse_kinematics.in_bound('right_wrist_2_joint', out_angle['right_wrist_2_joint']))
         manipulator_ctrl.move_joint('right_wrist_3_joint', inverse_kinematics.in_bound('right_wrist_3_joint', out_angle['right_wrist_3_joint']))
-        raw_input()
+        # raw_input()
+        rospy.sleep(5)
 
-        self.obj_pos.x += 0.1
+        self.obj_pos.x += 0.08
         out_angle = inverse_kinematics.inverse_kinematic(manipulator_ctrl.transform_point(self.obj_pos), 0)
-        raw_input()
+        # raw_input()
         print 'ANGLE = ' + str(out_angle['right_shoulder_1_joint'])
         manipulator_ctrl.move_joint('right_shoulder_1_joint', inverse_kinematics.in_bound('right_shoulder_1_joint', out_angle['right_shoulder_1_joint']))
         manipulator_ctrl.move_joint('right_shoulder_2_joint', inverse_kinematics.in_bound('right_shoulder_2_joint', out_angle['right_shoulder_2_joint']))
@@ -85,11 +87,12 @@ class TestInvKine:
         manipulator_ctrl.move_joint('right_wrist_1_joint', inverse_kinematics.in_bound('right_wrist_1_joint', out_angle['right_wrist_1_joint']))
         manipulator_ctrl.move_joint('right_wrist_2_joint', inverse_kinematics.in_bound('right_wrist_2_joint', out_angle['right_wrist_2_joint']))
         manipulator_ctrl.move_joint('right_wrist_3_joint', inverse_kinematics.in_bound('right_wrist_3_joint', out_angle['right_wrist_3_joint']))
-        raw_input()
+        # raw_input()
+        rospy.sleep(5)
 
         self.obj_pos.x += 0.05
         out_angle = inverse_kinematics.inverse_kinematic(manipulator_ctrl.transform_point(self.obj_pos), 0)
-        raw_input()
+        # raw_input()
         print 'ANGLE = ' + str(out_angle['right_shoulder_1_joint'])
         manipulator_ctrl.move_joint('right_shoulder_1_joint', inverse_kinematics.in_bound('right_shoulder_1_joint', out_angle['right_shoulder_1_joint']))
         manipulator_ctrl.move_joint('right_shoulder_2_joint', inverse_kinematics.in_bound('right_shoulder_2_joint', out_angle['right_shoulder_2_joint']))
@@ -97,13 +100,67 @@ class TestInvKine:
         manipulator_ctrl.move_joint('right_wrist_1_joint', inverse_kinematics.in_bound('right_wrist_1_joint', out_angle['right_wrist_1_joint']))
         manipulator_ctrl.move_joint('right_wrist_2_joint', inverse_kinematics.in_bound('right_wrist_2_joint', out_angle['right_wrist_2_joint']))
         manipulator_ctrl.move_joint('right_wrist_3_joint', inverse_kinematics.in_bound('right_wrist_3_joint', out_angle['right_wrist_3_joint']))
-        raw_input()
+        # raw_input()
+        rospy.sleep(5)
+
+        # self.obj_pos.x += 0.05
+        # out_angle = inverse_kinematics.inverse_kinematic(manipulator_ctrl.transform_point(self.obj_pos), 0)
+        # # raw_input()
+        # print 'ANGLE = ' + str(out_angle['right_shoulder_1_joint'])
+        # manipulator_ctrl.move_joint('right_shoulder_1_joint', inverse_kinematics.in_bound('right_shoulder_1_joint', out_angle['right_shoulder_1_joint']))
+        # manipulator_ctrl.move_joint('right_shoulder_2_joint', inverse_kinematics.in_bound('right_shoulder_2_joint', out_angle['right_shoulder_2_joint']))
+        # manipulator_ctrl.move_joint('right_elbow_joint', inverse_kinematics.in_bound('right_elbow_joint', out_angle['right_elbow_joint']))
+        # manipulator_ctrl.move_joint('right_wrist_1_joint', inverse_kinematics.in_bound('right_wrist_1_joint', out_angle['right_wrist_1_joint']))
+        # manipulator_ctrl.move_joint('right_wrist_2_joint', inverse_kinematics.in_bound('right_wrist_2_joint', out_angle['right_wrist_2_joint']))
+        # manipulator_ctrl.move_joint('right_wrist_3_joint', inverse_kinematics.in_bound('right_wrist_3_joint', out_angle['right_wrist_3_joint']))
+        # # raw_input()
+        # rospy.sleep(5)
+        #
+        # self.obj_pos.x += 0.05
+        # out_angle = inverse_kinematics.inverse_kinematic(manipulator_ctrl.transform_point(self.obj_pos), 0)
+        # # raw_input()
+        # print 'ANGLE = ' + str(out_angle['right_shoulder_1_joint'])
+        # manipulator_ctrl.move_joint('right_shoulder_1_joint', inverse_kinematics.in_bound('right_shoulder_1_joint', out_angle['right_shoulder_1_joint']))
+        # manipulator_ctrl.move_joint('right_shoulder_2_joint', inverse_kinematics.in_bound('right_shoulder_2_joint', out_angle['right_shoulder_2_joint']))
+        # manipulator_ctrl.move_joint('right_elbow_joint', inverse_kinematics.in_bound('right_elbow_joint', out_angle['right_elbow_joint']))
+        # manipulator_ctrl.move_joint('right_wrist_1_joint', inverse_kinematics.in_bound('right_wrist_1_joint', out_angle['right_wrist_1_joint']))
+        # manipulator_ctrl.move_joint('right_wrist_2_joint', inverse_kinematics.in_bound('right_wrist_2_joint', out_angle['right_wrist_2_joint']))
+        # manipulator_ctrl.move_joint('right_wrist_3_joint', inverse_kinematics.in_bound('right_wrist_3_joint', out_angle['right_wrist_3_joint']))
+        # # raw_input()
+        # rospy.sleep(8)
+        #
+        # self.obj_pos.x += 0.05
+        # out_angle = inverse_kinematics.inverse_kinematic(manipulator_ctrl.transform_point(self.obj_pos), 0)
+        # # raw_input()
+        # print 'ANGLE = ' + str(out_angle['right_shoulder_1_joint'])
+        # manipulator_ctrl.move_joint('right_shoulder_1_joint', inverse_kinematics.in_bound('right_shoulder_1_joint', out_angle['right_shoulder_1_joint']))
+        # manipulator_ctrl.move_joint('right_shoulder_2_joint', inverse_kinematics.in_bound('right_shoulder_2_joint', out_angle['right_shoulder_2_joint']))
+        # manipulator_ctrl.move_joint('right_elbow_joint', inverse_kinematics.in_bound('right_elbow_joint', out_angle['right_elbow_joint']))
+        # manipulator_ctrl.move_joint('right_wrist_1_joint', inverse_kinematics.in_bound('right_wrist_1_joint', out_angle['right_wrist_1_joint']))
+        # manipulator_ctrl.move_joint('right_wrist_2_joint', inverse_kinematics.in_bound('right_wrist_2_joint', out_angle['right_wrist_2_joint']))
+        # manipulator_ctrl.move_joint('right_wrist_3_joint', inverse_kinematics.in_bound('right_wrist_3_joint', out_angle['right_wrist_3_joint']))
+        # # raw_input()
+        # rospy.sleep(8)
+        #
+        # self.obj_pos.x += 0.05
+        # out_angle = inverse_kinematics.inverse_kinematic(manipulator_ctrl.transform_point(self.obj_pos), 0)
+        # # raw_input()
+        # print 'ANGLE = ' + str(out_angle['right_shoulder_1_joint'])
+        # manipulator_ctrl.move_joint('right_shoulder_1_joint', inverse_kinematics.in_bound('right_shoulder_1_joint', out_angle['right_shoulder_1_joint']))
+        # manipulator_ctrl.move_joint('right_shoulder_2_joint', inverse_kinematics.in_bound('right_shoulder_2_joint', out_angle['right_shoulder_2_joint']))
+        # manipulator_ctrl.move_joint('right_elbow_joint', inverse_kinematics.in_bound('right_elbow_joint', out_angle['right_elbow_joint']))
+        # manipulator_ctrl.move_joint('right_wrist_1_joint', inverse_kinematics.in_bound('right_wrist_1_joint', out_angle['right_wrist_1_joint']))
+        # manipulator_ctrl.move_joint('right_wrist_2_joint', inverse_kinematics.in_bound('right_wrist_2_joint', out_angle['right_wrist_2_joint']))
+        # manipulator_ctrl.move_joint('right_wrist_3_joint', inverse_kinematics.in_bound('right_wrist_3_joint', out_angle['right_wrist_3_joint']))
+        # # raw_input()
+        # rospy.sleep(5)
 
         rospy.loginfo("-----CLOSE GRIPPER + Move relative-----")
         # manipulator_ctrl.move_relative([0, 0, 0], [0, 0, 0])
         # self.set_torque_limit()
         self.pub_right_gripper.publish(0.2)
-        raw_input()
+        # raw_input()
+        rospy.sleep(4)
 
         rospy.loginfo("-----AFTER GRASP-----")
         manipulator_ctrl.static_pose('right_picking_prepare')

@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 import rospy
+from std_msgs.msg import Float64
 from controller.manipulator_controller import ManipulateController
 from skill.include import inverse_kinematics
 from task.include.delay import Delay
 from geometry_msgs.msg import Point
+from dynamixel_controllers.srv import SetTorqueLimit
 
 
 __author__ = 'fptrainnie'
@@ -16,6 +18,10 @@ class PickTextile:
         rospy.init_node('pick_textile')
         invK = inverse_kinematics.InverseKinematics()
         manipulator_ctrl = ManipulateController()
+        manipulator_ctrl.init_controller()
+        self.pub_right_gripper = rospy.Publisher('dynamixel/right_gripper_joint_controller/command', Float64)
+        self.pub_left_gripper = rospy.Publisher('dynamixel/left_gripper_joint_controller/command', Float64)
+        self.set_torque_limit = rospy.ServiceProxy('/dynamixel/right_gripper/set_torque_limit', SetTorqueLimit)
         self.invKine()
 
     def invKine(self):
@@ -47,12 +53,21 @@ class PickTextile:
         manipulator_ctrl.move_joint('right_shoulder_2_joint', inverse_kinematics.in_bound('right_shoulder_2_joint', out_angle['right_shoulder_2_joint']))
         manipulator_ctrl.move_joint('right_elbow_joint', inverse_kinematics.in_bound('right_elbow_joint', out_angle['right_elbow_joint']))
         manipulator_ctrl.move_joint('right_wrist_1_joint', inverse_kinematics.in_bound('right_wrist_1_joint', out_angle['right_wrist_1_joint']))
-        manipulator_ctrl.move_joint('right_wrist_2_joint', inverse_kinematics.in_bound('right_wrist_2_joint', out_angle['right_wrist_2_joint']))
+        manipulator_ctrl.move_joint('right_wrist_2_joint', inverse_kinematics.in_bound('right_wrist_2_joint', 1.5))
         manipulator_ctrl.move_joint('right_wrist_3_joint', inverse_kinematics.in_bound('right_wrist_3_joint', out_angle['right_wrist_3_joint']))
-        manipulator_ctrl.move_relative([0, 0, 0], [0, 0, 0])
+        raw_input()
+
+        rospy.loginfo("-----CLOSE GRIPPER-----")
         self.pub_right_gripper.publish(0.1)
         raw_input()
 
+        rospy.loginfo("-----PICKING-----")
+        manipulator_ctrl.move_joint('right_wrist_2_joint', inverse_kinematics.in_bound('right_wrist_2_joint', -0.6))
+        raw_input()
+
+        rospy.loginfo("-----AFTER GRASP-----")
+        manipulator_ctrl.static_pose('right_picking_prepare')
+        raw_input()
 
 if __name__ == '__main__':
     try:
