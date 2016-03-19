@@ -34,10 +34,6 @@ class DetectWavingPeople(AbstractSubtask):
 
             else:
                 self.change_state('not_found')
-                # else:
-                #     for i in xrange(20):
-                #         print 'hello'
-                #     self.change_state('not_found')
 
     def start(self):
         self.gesture_pos = None
