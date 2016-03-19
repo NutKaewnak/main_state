@@ -27,5 +27,5 @@ class PlanningModule:
         if self.perceptionModule is not None:
             if self.perceptionModule.delay.is_waiting():
                 return
-
+        # print perception_data
         self.taskBook.book[self.task].act(perception_data)

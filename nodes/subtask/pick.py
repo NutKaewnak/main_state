@@ -51,7 +51,7 @@ class Pick(AbstractSubtask):
         self.change_state('receive_point')
 
     def open_gripper(self):
-        self.skillBook.get_skill(self, 'Graps').open_gripper()
+        self.skillBook.get_skill(self, 'Grasp').open_gripper()
 
     def close_gripper(self):
-        self.skill = self.skillBook.get_skill(self, 'Graps').close_gripper()
+        self.skill = self.skillBook.get_skill(self, 'Grasp').close_gripper()

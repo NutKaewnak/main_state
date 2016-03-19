@@ -1,5 +1,5 @@
 <launch>
-  <include file="$(find speech_processing)/launch/restaurant.launch"/>
+  <!--<include file="$(find speech_processing)/launch/restaurantJapan.launch"/>-->
   <node name="main_state" pkg="main_state" type="main.py" output="screen" args="RestaurantFrank" />
 
   <!--<node ns="people" name="people_detection" pkg="people_detection" type="people_detection_node">

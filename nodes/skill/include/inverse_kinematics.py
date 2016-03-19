@@ -101,7 +101,7 @@ def inverse_kinematic(target_point, orientation = 0.0):
         try:
             as21 = math.atan2(pos_y, (r + VERY_SMALL_NUMBER))
             print 'as21 = ' + str(as21)
-            as26 = as21
+            as26 = -1 * as21
             print 'as26 = ' + str(as26)
         except ValueError:
             print 'FALSE as21 as26'
@@ -162,7 +162,7 @@ def inverse_kinematic(target_point, orientation = 0.0):
         return out_angles
     except ValueError:
         print "CAN'T CALCULATE R or r"
-        return false
+        return False
 
 class InverseKinematics:
     def __init__(self, arm_group='right_arm'):
@@ -207,19 +207,3 @@ class InverseKinematics:
         point_to_calculate.y = self.object_point.y
         point_to_calculate.z = self.object_point.z
         return self.prepare_point_to_invert_kinematic(point_to_calculate)
-
-    def prepare_point_to_invert_kinematic(self, point):
-        """
-        Prepare the point for invert kinematic calculation.
-        :param point: (geometry/Point)
-        :return: (geometry/Point) tuned point for inverse kinematic method.
-        """
-        # TODO: fix this tf
-        out_point = Point()
-        out_point.x = point.x-0.1
-        if self.arm_group == 'right_arm':
-            out_point.y = point.y + 0.17
-        elif self.arm_group == 'left_arm':
-            out_point.y = point.y - 0.17
-        out_point.z = point.z-0.81+0.35
-        return out_point

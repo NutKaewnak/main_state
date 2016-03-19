@@ -1,9 +1,7 @@
 import rospy
-from include.abstract_task import AbstractTask
-from include.get_distance import get_distance
-from subprocess import call
-from geometry_msgs.msg import Vector3
+from include.abstract_subtask import AbstractSubtask
 from std_msgs.msg import Float64
+from math import sqrt
 
 __author__ = 'Frank'
 
@@ -12,6 +10,9 @@ class FollowMe(AbstractSubtask):
         self.follow = None
         self.move = None
         self.count = 0
+
+    def get_distance(point_a, point_b):
+        return sqrt((point_a.x - point_b.x)**2 + (point_a.y - point_b.y)**2)
 
     def perform(self, perception_data):
         # if self.state is 'init':
@@ -39,7 +40,7 @@ class FollowMe(AbstractSubtask):
                 min_distance = 0.7  # set to maximum
                 id = None
                 for person in perception_data.input:
-                    distance = get_distance(person.personpoints, self.follow.last_point)
+                    distance = self.get_distance(person.personpoints, self.follow.last_point)
                     if person.personpoints.x >= self.follow.last_point.x - 0.25 and distance < min_distance:
                         min_distance = distance
                         id = person.id

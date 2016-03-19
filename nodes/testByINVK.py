@@ -42,9 +42,9 @@ class TestInvKine:
         GRIPPER_EFFORT = 0.4
 
         self.obj_pos = Point()
-        self.obj_pos.x = 0.66-0.25
-        self.obj_pos.y = -0.188 + 0.04
-        self.obj_pos.z = 0.82
+        self.obj_pos.x = 0.715-0.25
+        self.obj_pos.y = -0.281 + 0.04
+        self.obj_pos.z = 0.84
 
         # rospy.loginfo("-----ARM NORMAL-----")
         # manipulator_ctrl.static_pose('right_normal')
@@ -75,7 +75,7 @@ class TestInvKine:
         manipulator_ctrl.move_joint('right_wrist_3_joint', inverse_kinematics.in_bound('right_wrist_3_joint', out_angle['right_wrist_3_joint']))
         raw_input()
 
-        self.obj_pos.x += 0.1
+        self.obj_pos.x += 0.08
         out_angle = inverse_kinematics.inverse_kinematic(manipulator_ctrl.transform_point(self.obj_pos), 0)
         raw_input()
         print 'ANGLE = ' + str(out_angle['right_shoulder_1_joint'])

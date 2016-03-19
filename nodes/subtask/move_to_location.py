@@ -27,6 +27,7 @@ class MoveToLocation(AbstractSubtask):
         self.change_state('move')
 
     def perform(self, perception_data):
+        print '9999999999999999'
         if self.state is 'move':
             # check if base succeed
             if self.move.state is 'succeeded':

@@ -10,12 +10,12 @@ class Say(AbstractSubtask):
         self.speak = self.skillBook.get_skill(self, 'Say')
         self.message = None
 
-    def say(self, message):
-        self.message = message
-        self.speak.say(self.message)
-        self.change_state('saying')
-
     def perform(self, perception_data):
         if self.state is 'saying':
             if self.speak.state is 'succeeded':
                 self.change_state('finish')
+
+    def say(self, message):
+        self.message = message
+        self.speak.say(self.message)
+        self.change_state('saying')

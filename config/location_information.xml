@@ -28,4 +28,5 @@
     <location name="waypoint_3" position="14.018, -0.013" rotation="0.000" height="1.29"/>
     <location name="hallway table" position="2.981, 2.737" rotation="-1.600" height="1.29"/>
     <location name="gpsr_start" position="25.972, 3.633" rotation="-0.795" height="1.29"/>
+    <location name="shelf" position="12.146, -5.924 " rotation="3.138" height="1.29"/>
 </location_information>
