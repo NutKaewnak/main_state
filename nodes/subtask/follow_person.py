@@ -54,15 +54,15 @@ class FollowPerson(AbstractSubtask):
                 # rospy.sleep(0.01)
                 x = max(point.x/size*(size-self.offset_from_person), 0)
                 y = max(point.y/size*(size-self.offset_from_person), 0)
-                print 'send goal na ja'
                 self.move.set_position(x, y, theta)
                 self.distance_from_last = sqrt((point.x - self.last_point.x) ** 2 + (point.y - self.last_point.y) ** 2)
+
                 self.last_point = point
 
             else:
                 rospy.loginfo("Stop Robot")
                 # self.skillBook.get_skill(self, 'Say').say('I cannot find you. Please come in front of me.')
-                self.turn_neck.turn(-0.1, 0.0)
+                self.turn_neck.turn(0, 0)
                 # self.move.stop()
                 self.change_state('abort')
 
