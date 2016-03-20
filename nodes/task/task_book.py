@@ -1,4 +1,3 @@
-__author__ = "AThousandYears"
 from basic_functional import BasicFunctional
 from cocktail import Cocktail
 from rips import RIPS
@@ -21,6 +20,9 @@ from test_object3ds_detection import TestObject3DsDetection
 from restaurant_vdo import RestaurantVDO
 from test_neck import TestNeck
 from restaurant_Frank import RestaurantFrank
+from test_bug_arm import TestBugArm
+
+__author__ = "AThousandYears"
 
 
 class TaskBook:
@@ -43,11 +45,12 @@ class TaskBook:
         self.book['RoboZoo'] = RoboZoo(planning_module)
         self.book['RoboNurse'] = RoboNurse(planning_module)
         self.book['TodayShow'] = TodayShow(planning_module)
-        self.book['RecognitionTesting'] =TestRecognition(planning_module)
+        self.book['RecognitionTesting'] = TestRecognition(planning_module)
         self.book['TestObject3DsDetection'] = TestObject3DsDetection(planning_module)
         self.book['RestaurantVDO'] = RestaurantVDO(planning_module)
         self.book['TestNeck'] = TestNeck(planning_module)
         self.book['RestaurantFrank'] = RestaurantFrank(planning_module)
+        self.book['TestBugArm'] = TestBugArm(planning_module)
 
     def set_perception(self, perception_module):
         for task in self.book:
