@@ -92,7 +92,7 @@ class RoboNurse(AbstractTask):
             if perception_data.device is self.Devices.VOICE:
                 # print 'helloo'
                 print perception_data.input
-                print perception_data.input == 'robot gives me pill'
+                print perception_data.input == 'robot I need my pill'
                 if 'pill' in perception_data.input:
                     self.subtask.say('Okay, granny.')
                     self.change_state('init_move')

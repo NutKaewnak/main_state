@@ -26,7 +26,7 @@ class RestaurantFrank(AbstractTask):
         self.order = {'table one': [], 'table two': [], 'table three': []}
         self.food = ['noodles', 'peanuts', 'hamburger', 'fries', 'orange juice', 'water']
         self.say = None
-        self.follow = self.subtaskBook.get_subtask(self, 'FollowMe')
+        self.follow = None
         self.move_to = None
         self.move_abs = None
         self.move_relative = None
@@ -37,7 +37,7 @@ class RestaurantFrank(AbstractTask):
         self.delay = Delay()
 
     def perform(self, perception_data):
-        print self.state, '***'
+        # print self.state, '***'
         # print self.say.state, '------'
         # if self.say.speak.controlModule.speaker.process is not None:
         # print self.say.speak.controlModule.speaker.is_finish(), "++++++++"
@@ -47,6 +47,7 @@ class RestaurantFrank(AbstractTask):
         elif self.state is 'follow_init':
             if self.say.state is not 'finish':
                 return
+            self.follow = self.subtaskBook.get_subtask(self, 'FollowMe')
             self.follow.start()
             self.change_state("follow")
 

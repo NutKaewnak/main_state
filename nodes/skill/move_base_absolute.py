@@ -26,6 +26,8 @@ class MoveBaseAbsolute(AbstractSkill):
                 # TODO: Bad code here!!
                 print '*****move****'
                 print 'perception = '+str(perception_data.input)
+                print 'move_base_state = ' + str(state) +str(perception_data.input)
                 self.is_active = MoveBaseStatus.is_active(perception_data.input)
                 print "movebase_isactive" + str(self.is_active)
+                print 'is_active = ' + str(self.is_active) + str(perception_data.input)
                 self.change_state(state)
