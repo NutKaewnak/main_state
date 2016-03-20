@@ -76,7 +76,7 @@ class FollowPerson(AbstractSubtask):
                 publish_pose.pose.orientation.w = quaternion[3]
                 self.publish_goal.publish(publish_pose)
                 
-                #self.move.set_position(x, y, theta)
+                self.move.set_position(x, y, theta)
                 self.distance_from_last = sqrt((point.x - self.last_point.x) ** 2 + (point.y - self.last_point.y) ** 2)
 
                 self.last_point = point
