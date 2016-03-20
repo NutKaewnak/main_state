@@ -4,6 +4,8 @@ from include.moveit_initiator import MoveItInitiator
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Pose2D
 from geometry_msgs.msg import PointStamped
+from skill.include import inverse_kinematics
+
 
 __author__ = "ftprainnie"
 
@@ -29,6 +31,7 @@ class ManipulateController:
         self.scene = None
         self.tf_listener = None
         self.moveit_initiator = None
+        self.obj_pos = None
 
     def init_controller(self):
         self.moveit_initiator = MoveItInitiator()
@@ -36,6 +39,19 @@ class ManipulateController:
         self.scene = self.moveit_initiator.scene
         self.tf_listener = self.moveit_initiator.tf_listener
         self.arm_group = self.moveit_initiator.init_controller(self.arm_side)
+
+    def init_position(self, point):
+        """
+        Init position and flip y-axis for invert kinematic
+        :param point: (geometry/Point)
+        :return: None
+        """
+        rospy.loginfo("-----INVK INIT POSITION-----")
+        if self.arm_group == 'right_arm':
+            pass
+        elif self.arm_group == 'left_arm':
+            point.y *= -1
+        self.obj_pos = point
 
     def transform_point(self, pos, origin_frame='base_link'):
         """
@@ -135,3 +151,49 @@ class ManipulateController:
         self.arm_group.set_goal_orientation_tolerance(tolerance[1])
         self.arm_group.set_named_target(posture)
         self.arm_group.go(False)  # async_move
+
+    def move_arm_pick_object_first(self):
+        """
+        Move arm to object position : x - 25 cm
+        :param (none)
+        :return: (none)
+        """
+        self.obj_pos.x -= 0.25
+        angle = inverse_kinematics.inverse_kinematic(self.transform_point(self.obj_pos), 0)
+        self.move_arm_pick(angle)
+
+    def move_arm_pick_object_second(self):
+        """
+        Move arm to object position
+        :param (none)
+        :return: (None)
+        """
+        self.obj_pos.x += 0.1
+        angle = inverse_kinematics.inverse_kinematic(self.transform_point(self.obj_pos), 0)
+        self.move_arm_pick(angle)
+
+    def move_arm_pick(self, angle):
+        """
+        Move arm joints with specific angle.
+        :param angle: (dict()) dict of angle and arm_joint
+        :return: (None)
+        """
+        self.move_joint('right_shoulder_1_joint', inverse_kinematics.in_bound('right_shoulder_1_joint', angle['right_shoulder_1_joint']))
+        self.move_joint('right_shoulder_2_joint', inverse_kinematics.in_bound('right_shoulder_2_joint', angle['right_shoulder_2_joint']))
+        self.move_joint('right_elbow_joint', inverse_kinematics.in_bound('right_elbow_joint', angle['right_elbow_joint']))
+        self.move_joint('right_wrist_1_joint', inverse_kinematics.in_bound('right_wrist_1_joint', angle['right_wrist_1_joint']))
+        self.move_joint('right_wrist_2_joint', inverse_kinematics.in_bound('right_wrist_2_joint', angle['right_wrist_2_joint']))
+        self.move_joint('right_wrist_3_joint', inverse_kinematics.in_bound('right_wrist_3_joint', angle['right_wrist_3_joint']))
+
+    def move_arm_before_pick_cloth(self):
+        """
+        Move arm joints with specific angle.
+        :param angle: (dict()) dict of angle and arm_joint
+        :return: (None)
+        """
+        self.obj_pos.z += 0.08
+        angle = inverse_kinematics.inverse_kinematic(self.transform_point(self.obj_pos), 0.5*math.pi)
+        self.move_arm_pick(angle)
+
+    def move_arm_after_pick_cloth(self):
+        self.static_pose('right_after_pick_cloth')

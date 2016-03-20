@@ -15,7 +15,7 @@ class PillsDetection(AbstractSubtask):
         self.limit_left = 0.4  # pan
         self.limit_right = -0.4
         self.limit_up = 0      # tilt
-        self.limit_down = -0.5
+        self.limit_down = -0.8
         self.new_pan_point = -0.11
         self.new_tilt_point = -0.12
 
@@ -54,24 +54,25 @@ class PillsDetection(AbstractSubtask):
                 self.change_state('get_data')
 
         elif self.state is 'get_data':
-            print 'get_data'
+            # print 'get_data'
             if self.detect_objects.state is 'finish':
-                if self.detect_objects.objects is not None:
-                    print 'objects = ' + str(self.detect_objects.objects)
-                    pill_width = self.detect_objects.objects[0].width.data
-                    pill_depth = self.detect_objects.objects[0].depth.data
-                    pill_height = self.detect_objects.objects[0].height.data
-                    self.count += 1
-                    # self.pill_pos = []
-                    # temp = PointStamped()
-                    # temp.header = self.detect_objects.objects.header
-                    self.pill_pos = self.tf_listener.transformPoint('map', self.detect_objects.objects[0].point)
-                    self.pill_name = 'bottle number ' + str(self.count)
-                    self.pills_dic[self.pill_name] = self.pill_pos
-                    self.speak = self.subtaskBook.get_subtask(self, 'Say')
-                    self.speak.say(self.pill_name + ' has width ' + str(pill_width) + ' height ' + str(
+                print 'objects = ' + str(self.detect_objects.objects)
+                pill_width = self.detect_objects.objects[0].width.data
+                pill_depth = self.detect_objects.objects[0].depth.data
+                pill_height = self.detect_objects.objects[0].height.data
+                self.count += 1
+                # self.pill_pos = []
+                # temp = PointStamped()
+                # temp.header = self.detect_objects.objects.header
+                self.pill_pos = self.tf_listener.transformPoint('map', self.detect_objects.objects[0].point)
+                self.pill_name = 'bottle number ' + str(self.count)
+                self.pills_dic[self.pill_name] = self.pill_pos
+                self.speak = self.subtaskBook.get_subtask(self, 'Say')
+                self.speak.say(self.pill_name + ' has width ' + str(pill_width) + ' height ' + str(
                         pill_height) + ' depth ' + str(pill_depth))
-                    self.change_state('turn_neck')
+                self.change_state('turn_neck')
+            elif self.detect_objects.state is 'not_found':
+                self.change_state('turn_neck')
 
         elif self.state is 'turn_neck':
             if self.speak.state is 'finish':
