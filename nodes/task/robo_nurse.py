@@ -54,7 +54,7 @@ class RoboNurse(AbstractTask):
                 print "granny pos = " + str(self.granny_pos)
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
                 size = sqrt(self.granny_pos.point.x**2 + self.granny_pos.point.y**2)
-                self.subtask.set_position(self.granny_pos.point.x/size*(size-0.6), self.granny_pos.point.y/size*size, atan(self.granny_pos.point.y/self.granny_pos.point.x))
+                self.subtask.set_position(self.granny_pos.point.x/size*(size-0.5), self.granny_pos.point.y/size*size, atan(self.granny_pos.point.y/self.granny_pos.point.x))
                 self.change_state('move_to_granny')
 
         elif self.state is 'move_to_granny':
@@ -111,6 +111,7 @@ class RoboNurse(AbstractTask):
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
                 self.subtask.say('I saw The leftmost bottle')
                 self.change_state('detect_pills')
+
         elif self.state is 'detect_pills':
             if self.subtask.state is 'finish':
                 self.subtask = self.subtaskBook.get_subtask(self, 'PillsDetection')

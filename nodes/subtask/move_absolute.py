@@ -20,6 +20,7 @@ class MoveAbsolute(AbstractSubtask):
         if self.state is 'move':
             # check if base succeed
             if self.moveAbsolute.state is 'succeeded':
+                print 'succeeded'
                 self.change_state('finish')
             elif self.moveAbsolute.state is 'aborted':
                 rospy.loginfo('Aborted')
