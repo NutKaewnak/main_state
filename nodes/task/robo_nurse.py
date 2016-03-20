@@ -82,9 +82,9 @@ class RoboNurse(AbstractTask):
                 rospy.loginfo('---tell_granny_ask_pill---')
                 self.change_state('wait_for_granny_command')
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                self.subtask.say('If you want me to give you a pill. Say. Robot gives me pill.')
+                self.subtask.say('If you want me to give you a pill. Say. Robot I need my pill.')
                 self.reg_voice = self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode')
-                self.reg_voice.recognize(3)
+                self.reg_voice.recognize(4)
                 # self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode').recognize(1)
 
         elif self.state is 'wait_for_granny_command':

@@ -15,7 +15,7 @@ class PillsDetection(AbstractSubtask):
         self.limit_left = 0.4  # pan
         self.limit_right = -0.4
         self.limit_up = 0      # tilt
-        self.limit_down = -0.8
+        self.limit_down = -0.5
         self.new_pan_point = -0.11
         self.new_tilt_point = -0.12
 

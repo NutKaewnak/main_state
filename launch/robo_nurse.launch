@@ -9,5 +9,5 @@
     <remap from="/scan" to="/laser/scan"/>
   </node>
   <include file="$(find speech_processing)/launch/switch.launch"/>
-
+  <node name="cluster_extraction" pkg="object_3d_detector" type="cluster_extraction" output="screen"/>
 </launch>
