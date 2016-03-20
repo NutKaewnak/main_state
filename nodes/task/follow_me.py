@@ -12,7 +12,7 @@ class FollowMe(AbstractTask):
 
     def perform(self, perception_data):
         if self.state is 'init':
-            self.subtaskBook.get_subtask(self, 'TurnNeck').setPositon(0, 0)
+            self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(0, 0)
             self.change_state('wait_for_command')
 
         elif self.state is 'wait_for_command':

@@ -80,12 +80,12 @@ class SearchWavingPeople(AbstractSubtask):
         elif self.state is 'turn_neck':
             print '--turn^^^'
             # rospy.sleep(5000)
-            # self.skill.turn_relative(0, self.new_neck_point)
+            # self.skill.turn(0, self.new_neck_point)
             # rospy.sleep(5000)
             if perception_data.device is 'NECK':
                 self.pan = perception_data.input.pan
                 # self.skill = self.skillBook.get_skill(self, 'TurnNeck')
-                self.skill.turn_relative(0, self.new_neck_point)
+                self.skill.turn(0, self.new_neck_point)
                 self.timer.wait(3)
                 self.change_state("wait_turn_neck_relative")
 

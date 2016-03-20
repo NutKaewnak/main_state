@@ -20,7 +20,11 @@ class Test(AbstractTask):
             if self.pick.state is 'wait_for_point':
                 rospy.loginfo('---in test---')
                 self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
-                self.subtask.turn(-0.4, 0)
+                self.subtask.turn_absolute(-0.4, 0.0)
+                self.change_state('wait_for_turn_neck')
+
+        elif self.state is 'wait_for_turn_neck':
+            if self.subtask.state is 'finish':
                 self.change_state('find_object')
 
         elif self.state is 'find_object':

@@ -20,10 +20,10 @@ class TurnNeck(AbstractSubtask):
             elif self.skill.state is 'aborted':
                 self.change_state('error')
 
-    def turn(self, pitch, yaw):
+    def turn_relative(self, pitch, yaw):
         self.skill.turn_relative(pitch, yaw)
         self.change_state('receive_command')
 
-    def setPositon(self, pitch, yaw):
+    def turn_absolute(self, pitch, yaw):
         self.skill.turn(pitch, yaw)
         self.change_state('receive_command')

@@ -74,7 +74,7 @@ class RoboNurse(AbstractTask):
             if self.subtask.state is 'finish':
                 rospy.loginfo('---watching granny---')
                 self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
-                self.subtask.setPositon(-0.25, 0)
+                self.subtask.turn_absolute(-0.25, 0)
                 self.change_state('tell_granny_to_ask_for_pill')
 
         elif self.state is 'tell_granny_to_ask_for_pill':

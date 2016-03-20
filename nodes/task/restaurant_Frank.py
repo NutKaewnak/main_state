@@ -32,7 +32,8 @@ class RestaurantFrank(AbstractTask):
         self.move_relative = None
         self.detect_waving_people = {'table one': False, 'table two': False, 'table three': False}
         self.turn_neck = self.subtaskBook.get_subtask(self, 'TurnNeck')
-        self.turn_neck.setPositon(0, 0)
+        print "Don't do that bitch. line 35 in restaurant_Frank.py"
+        # self.turn_neck.turn_absolute(0, 0)
         self.tf_listener = tf.TransformListener()
         self.delay = Delay()
 

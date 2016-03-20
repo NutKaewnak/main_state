@@ -15,4 +15,4 @@ class TestBugArm(AbstractTask):
             self.change_state("pub")
 
         elif self.state is 'pub':
-            self.subtask.setPositon(0, 0)
+            self.subtask.turn_absolute(0, 0)

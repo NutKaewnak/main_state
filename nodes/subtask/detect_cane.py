@@ -16,7 +16,7 @@ class DetectCane(AbstractSubtask):
     def perform(self, perception_data):
         if self.state is 'init':
             self.skill = self.skillBook.get_skill(self, 'TurnNeck')
-            self.turn(0, 0)
+            self.skill.turn(0, 0)
             # self.subtask = self.subtaskBook.get_subtask(self, '')
             # self.timer.wait(3)
             self.change_state('searching')
@@ -61,7 +61,7 @@ class DetectCane(AbstractSubtask):
                 self.change_state('turn_neck')
 
         elif self.state is 'turn_neck':
-            self.skill.turn_relative(0, self.new_neck_point)
+            self.skill.turn(0, self.new_neck_point)
             print('----turn_neck----')
             # self.timer.wait(3)
             self.change_state('searching')

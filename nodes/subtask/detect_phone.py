@@ -60,7 +60,7 @@ class DetectPhone(AbstractSubtask):
                 self.change_state('turn_neck')
 
         elif self.state is 'turn_neck':
-            self.skill.turn_relative(0, self.new_neck_point)
+            self.skill.turn(0, self.new_neck_point)
             print('----turn_neck----')
             # self.timer.wait(3)
             self.change_state('searching')

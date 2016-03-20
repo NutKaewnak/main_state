@@ -86,7 +86,7 @@ class PillsDetection(AbstractSubtask):
                         # add +y turn range
                         if pan + self.new_pan_point < self.limit_right:
                             self.new_pan_point = self.limit_right - pan
-                        self.turn_neck.turn_relative(0, self.new_pan_point)
+                        self.turn_neck.turn(0, self.new_pan_point)
                         self.timer.wait(2)
                         self.change_state('detecting')
                     else:

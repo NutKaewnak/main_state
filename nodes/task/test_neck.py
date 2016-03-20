@@ -8,7 +8,8 @@ class TestNeck(AbstractTask):
     def __init__(self, planning_module):
         AbstractTask.__init__(self, planning_module)
         self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
-        self.subtask.setPositon(0, -0.4)
+        print "Do not set neck in init, Frank"
+        # self.subtask.turn_absolute(0, -0.4)
         self.delay = Delay()
         self.delay.wait(10)
 
@@ -17,13 +18,13 @@ class TestNeck(AbstractTask):
         if self.state is 'init' and not self.delay.is_waiting():
             if self.subtask.state is 'finish':
 
-                self.subtask.turn(0, 0.8)
+                self.subtask.turn_relative(0, 0.8)
                 self.delay.wait(5)
                 self.change_state("init_2")
         if self.state == 'init_2' and not self.delay.is_waiting():
             if self.subtask.state == 'finish':
-                self.subtask.turn(0, -0.8)
+                self.subtask.turn_relative(0, -0.8)
                 self.delay.wait(5)
                 self.change_state("init")
 
-        # self.subtask.turn(0, -0.1)
+        # self.subtask.turn_relative(0, -0.1)

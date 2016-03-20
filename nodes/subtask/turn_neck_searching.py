@@ -18,7 +18,7 @@ class TurnNeckSearching(AbstractSubtask):
         if self.state is 'start':
             if self.timer.is_waiting():
                 return
-            self.skill.turn_relative(0, 0.3)
+            self.skill.turn(0, 0.3)
 
             if not self.minute.is_waiting():
                 self.change_state('succeeded')
