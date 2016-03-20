@@ -92,7 +92,7 @@ class RoboNurse(AbstractTask):
             if perception_data.device is self.Devices.VOICE:
                 # print 'helloo'
                 print perception_data.input
-                print perception_data.input == 'robot gives me pill'
+                print perception_data.input == 'robot I need my pill'
                 if 'pill' in perception_data.input:
                     self.subtask.say('Okay, granny.')
                     self.change_state('init_move')
@@ -100,10 +100,10 @@ class RoboNurse(AbstractTask):
         elif self.state is 'init_move':
             print self.state
             # if self.subtask.state is 'finish':
+            self.change_state('move_to_shelf')
             rospy.loginfo('---init_move---')
             self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
             self.subtask.to_location('shelf')
-            self.change_state('move_to_shelf')
 
         elif self.state is 'move_to_shelf':
             print 'state =' + str(self.subtask.state)

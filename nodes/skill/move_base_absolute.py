@@ -24,5 +24,7 @@ class MoveBaseAbsolute(AbstractSkill):
             if perception_data.device is self.Devices.BASE_STATUS:
                 state = MoveBaseStatus.get_state_from_status(perception_data.input)
                 # TODO: Bad code here!!
+                print 'move_base_state = ' + str(state) +str(perception_data.input)
                 self.is_active = MoveBaseStatus.is_active(perception_data.input)
+                print 'is_active = ' + str(self.is_active) + str(perception_data.input)
                 self.change_state(state)

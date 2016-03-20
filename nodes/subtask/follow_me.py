@@ -16,12 +16,14 @@ class FollowMe(AbstractSubtask):
         self.count = 0
 
     def perform(self, perception_data):
+        # print self.state, '+++++', self.follow
         if self.state is 'init':
             self.follow = self.subtaskBook.get_subtask(self, 'FollowPerson')
+            self.change_state('follow_init')
 
         elif self.state is 'follow_init':
             if perception_data.device is self.Devices.PEOPLE:
-                distance = 9999.0  # set to maximum
+                distance = 3.0  # set to maximum
                 id = None
                 for person in perception_data.input:
                     if person.personpoints.x < distance:
@@ -49,7 +51,7 @@ class FollowMe(AbstractSubtask):
         set_pan_angle_topic.publish(Float64(0))
         set_angle_topic = rospy.Publisher('/dynamixel/pan_controller/command', Float64)
         set_angle_topic.publish(Float64(0))
-        self.change_state('follow_init')
+        self.change_state('init')
 
     def stop(self):
         set_pan_angle_topic = rospy.Publisher('/dynamixel/tilt_controller/command', Float64)

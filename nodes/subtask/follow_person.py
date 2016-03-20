@@ -51,6 +51,7 @@ class FollowPerson(AbstractSubtask):
                 self.set_tilt.publish(-0.1)
 
                 size = sqrt(point.x**2 + point.y**2)
+                print size
 
                 # angle = Twist()
                 # if theta >= 0.4:
@@ -61,8 +62,8 @@ class FollowPerson(AbstractSubtask):
                 #     self.turn_base.publish(angle)
 
                 # rospy.sleep(0.01)
-                x = max(point.x/size*(size-self.offset_from_person), 0)
-                y = point.y/size*(size-self.offset_from_person)
+                x = max(point.x/size*(size*0.5), 0)
+                y = point.y/size*(size*0.5)
                 publish_pose = PoseStamped()
                 publish_pose.header.stamp = rospy.Time.now()
                 publish_pose.header.frame_id = 'base_link'
@@ -75,7 +76,7 @@ class FollowPerson(AbstractSubtask):
                 publish_pose.pose.orientation.w = quaternion[3]
                 self.publish_goal.publish(publish_pose)
                 
-                self.move.set_position(x, y, theta)
+                #self.move.set_position(x, y, theta)
                 self.distance_from_last = sqrt((point.x - self.last_point.x) ** 2 + (point.y - self.last_point.y) ** 2)
 
                 self.last_point = point
