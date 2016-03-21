@@ -26,8 +26,8 @@ class FollowMe(AbstractSubtask):
                 distance = 3.0  # set to maximum
                 id = None
                 for person in perception_data.input:
-                    if person.personpoints.x < distance:
-                        distance = person.personpoints.x
+                    if person.personpoints.point.x < distance:
+                        distance = person.personpoints.point.x
                         id = person.id
                 if id is not None:
                     self.follow.set_person_id(id)
@@ -39,12 +39,15 @@ class FollowMe(AbstractSubtask):
                 min_distance = 0.7  # set to maximum
                 id = None
                 for person in perception_data.input:
-                    distance = get_distance(person.personpoints, self.follow.last_point)
-                    if person.personpoints.x >= self.follow.last_point.x - 0.25 and distance < min_distance:
+                    distance = get_distance(person.personpoints.point, self.follow.last_point)
+                    if person.personpoints.point.x >= self.follow.last_point.x - 0.25 and distance < min_distance:
                         min_distance = distance
                         id = person.id
                 if id is not None:
                     self.follow.set_person_id(id)
+
+            elif perception_data.device is 'VOICE' and perception_data.input is 'robot stop':
+                self.change_state('abort')
 
     def start(self):
         set_pan_angle_topic = rospy.Publisher('/dynamixel/tilt_controller/command', Float64)

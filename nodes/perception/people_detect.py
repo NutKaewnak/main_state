@@ -15,12 +15,12 @@ class PeopleDetection(AbstractPerception):
         rospy.Subscriber("/people/people_detection/peoplearray", PersonObjectArray, self.callback_people_array)
         # rospy.Subscriber("/people_detection_node/peoplearray", PersonObjectArray, self.callback_people_array)
 
-
     def callback_people_array(self, data):
         person_array = []
         for x in data.persons:
             temp = PointStamped()
             temp.header = data.header
             temp.point = x.personpoints
+            x.personpoints = temp
             person_array.append(x)
         self.broadcast(Devices.PEOPLE, person_array)
