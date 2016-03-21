@@ -23,7 +23,7 @@ class RoboNurse(AbstractTask):
         self.reg_voice = None
         self.tf_listener = tf.TransformListener()
         self.object_pos = None
-        self.chk_shelf_pos = [12.396, -5.975, 3.131]
+        self.chk_shelf_pos = False
 
     def perform(self, perception_data):
         # if self.state is 'init':
@@ -35,7 +35,7 @@ class RoboNurse(AbstractTask):
         # elif self.state is 'move_to_hallway':
         if self.state is 'init':
             self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-            self.change_state('tell_granny_to_ask_for_pill')
+            self.change_state('detect_pills')
             # self.change_state('init_detecting')
             rospy.loginfo('---in task---')
             # self.subtask = self.subtaskBook.get_subtask(self, 'Say')
@@ -84,7 +84,7 @@ class RoboNurse(AbstractTask):
                 rospy.loginfo('---tell_granny_ask_pill---')
                 self.change_state('wait_for_granny_command')
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                self.subtask.say('If you want me to give you a pill.Say.I need my pill.')
+                self.subtask.say('If you want me to give you a pill. Say. I need my pill.')
                 self.reg_voice = self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode')
                 self.reg_voice.recognize(4)
                 # self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode').recognize(1)
@@ -109,12 +109,19 @@ class RoboNurse(AbstractTask):
 
         elif self.state is 'move_to_shelf':
             print 'state =' + str(self.subtask.state)
-            if perception_data.device is self.Devices.BASE_STATUS:
-                print 'perception_module_base_pos = ' + str(self.perception_module.base_status.position)
-                if self.subtask.state is 'finish' or self.perception_module.base_status.position is self.chk_shelf_pos:
-                    self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                    self.subtask.say('I saw The leftmost bottle')
-                    self.change_state('detect_pills')
+            print 'perception_module_base_pos = ' + str(self.perception_module.base_status.position)
+            chk_shelf = self.perception_module.base_status.position
+            print 'chk = ' + str(chk_shelf)
+            #  need to change if setting new position
+            if 12.100 <= chk_shelf[0] <= 12.500:
+                if -6.000 <= chk_shelf[1] <= -5.600:
+                    if 2.600 <= chk_shelf[2] <= 3.000 or -3.300 <= chk_shelf[2] <= -2.700:
+                        self.chk_shelf_pos = True
+            print 'self.chk_shelf = ' + str(self.chk_shelf_pos)
+            if self.subtask.state is 'finish' or self.chk_shelf_pos:
+                self.subtask = self.subtaskBook.get_subtask(self, 'Say')
+                self.subtask.say('I saw The leftmost bottle')
+                self.change_state('detect_pills')
 
         elif self.state is 'detect_pills':
             if self.subtask.state is 'finish':
