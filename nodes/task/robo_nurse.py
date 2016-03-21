@@ -38,14 +38,12 @@ class RoboNurse(AbstractTask):
             self.change_state('detect_pills')
             # self.change_state('init_detecting')
             rospy.loginfo('---in task---')
-            # self.subtask = self.subtaskBook.get_subtask(self, 'Say')
             self.subtask.say('I am in position granny. If you want to call me. Please wave your hand.')
 
         elif self.state is 'init_detecting':
             if self.subtask.state is 'finish':
                 rospy.loginfo('---init_detecting---')
                 self.subtask = self.subtaskBook.get_subtask(self, 'SearchWavingPeople')
-                # self.subtask.start()
                 self.change_state('searching_granny')
 
         elif self.state is 'searching_granny':
@@ -56,19 +54,22 @@ class RoboNurse(AbstractTask):
                 print "granny pos = " + str(self.granny_pos)
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
                 size = sqrt(self.granny_pos.point.x**2 + self.granny_pos.point.y**2)
-                self.subtask.set_position(self.granny_pos.point.x/size*(size-0.5), self.granny_pos.point.y/size*size, atan(self.granny_pos.point.y/self.granny_pos.point.x))
+                self.granny_pos.point.x = self.granny_pos.point.x/size*(size-0.5)
+                self.granny_pos.point.y = self.granny_pos.point.y/size*size
+                self.granny_pos.point.z = atan(self.granny_pos.point.y/self.granny_pos.point.x)
+                self.subtask.set_position(self.granny_pos.point.x, self.granny_pos.point.y,
+                                          self.granny_pos.point.z)
                 self.change_state('move_to_granny')
 
         elif self.state is 'move_to_granny':
             if perception_data.device is self.Devices.BASE_STATUS:
                 rospy.loginfo('---move_to_granny---')
                 print '---- *****'+str(perception_data.input)
+            self.subtask = self.subtaskBook.get_subtask(self, 'Say')
             if self.subtask.state is 'error':
-                self.subtask = self.subtaskBook.get_subtask(self, 'Say')
                 self.subtask.say('I\'m sorry granny. I can\'t walk any closer to you.')
                 self.change_state('tell_granny_to_ask_for_pill')
             elif self.subtask.state is 'finish':
-                self.subtask = self.subtaskBook.get_subtask(self, 'Say')
                 self.subtask.say('I reached you granny.')
                 self.change_state('watch_granny')
 
@@ -135,6 +136,12 @@ class RoboNurse(AbstractTask):
                 self.pill_dic = self.subtask.pills_dic
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
                 self.subtask.set_position(self.granny_pos.point.x, self.granny_pos.point.y, self.granny_pos.point.z)
+                self.change_state('turn_to_granny')
+
+        elif self.state is 'turn_to_granny':
+            if self.subtask.state is 'finish':
+                self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
+                self.subtask.turn_absolute(-0.25, 0)
                 self.change_state('take_pill_order')
 
         elif self.state is 'take_pill_order':
@@ -155,16 +162,29 @@ class RoboNurse(AbstractTask):
 
         elif self.state is 'move_to_pill':
             print self.pill_dic[self.pill_name]
-            size = sqrt(self.pill_dic[self.pill_name].x**2 + self.pill_dic[self.pill_name].y**2)
-            self.subtask.set_position(self.pill_dic[self.pill_name].x/size*(size-0.8),
-                                      self.pill_dic[self.pill_name].y, self.pill_dic[self.pill_name].z)
-            self.change_state('pick_pill')
+            size = sqrt(self.pill_dic[self.pill_name]['x']**2 + self.pill_dic[self.pill_name]['y']**2)
+            self.subtask.set_position(self.pill_dic[self.pill_name]['x']/size*(size-0.8),
+                                      self.pill_dic[self.pill_name]['y'], self.pill_dic[self.pill_name]['z'])
+            self.change_state('prepare_pick_pill')
+
+        elif self.state is 'prepare_pick_pill':
+            if self.subtask.state is 'finish':
+                rospy.loginfo('---prepare_pick_pill---')
+                self.subtask = self.subtaskBook.get_subtask(self, 'ObjectsDetection')
+                self.subtask.start()
+                self.change_state('pick_pill')
 
         elif self.state is 'pick_pill':
             if self.subtask.state is 'finish':
-                rospy.loginfo('---pick_pill---')
-                # self.pick = self.subtaskBook.get_subtask(self, 'Pick')
-                # self.pick.pick_object(self, self.pill_dic[self.pill_name])
+                min = 2
+                point = []
+                for goal in self.subtask.objects:
+                    temp = sqrt(pow(self.pill_dic[self.pill_name]['x'] - goal.point.x, 2) - pow(self.pill_dic[self.pill_name]['y'] - goal.point.y, 2))
+                    if min >= temp:
+                        min = temp
+                        point = goal.point
+                self.pick = self.subtaskBook.get_subtask(self, 'Pick')
+                self.pick.pick_object(self, point)
                 self.change_state('prepare_give_pill')
 
         elif self.state is 'prepare_give_pill':
@@ -176,73 +196,73 @@ class RoboNurse(AbstractTask):
 
         elif self.state is 'give_pill':
             if self.subtask.state is 'finish':
-                self.Delay.wait(4000)
+                # self.Delay.wait(4)
                 # self.pick.gripper_open()
                 self.change_state('finish')
 
-        elif self.state is 'detecting_granny':
-            print 'random subtask'
-            rand = randint(0, 2)
-            self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-            if rand == 0:
-                print 'drop blanket'
-                self.subtask.say('Granny you drop blanket.')
-                self.change_state('drop_blanket')
-            elif rand == 1:
-                print 'falling granny'
-                self.subtask.say('Help! granny fell')
-                self.change_state('falling_granny')
-            elif rand == 2:
-                print 'granny stands up and walk away + sit'
-                self.subtask.say('granny you forgot your cane')
-                self.change_state('granny_walk')
-
-        elif self.state is 'drop_blanket':
-            if self.subtask.state is 'finish':
-                print 'drop blanket'
-                self.subtask = self.subtaskBook.get_subtask('DetectBlanket')
-                self.change_state('detect_blanket')
-
-        elif self.state is 'falling_granny':
-            if self.subtask.state is 'finish':
-                print 'find phone'
-                self.subtask = self.subtaskBook.get_subtask('DetectPhone')
-                self.change_state('detect_phone')
-
-        elif self.state is 'granny_walk':
-            if self.subtask.state is 'finish':
-                print 'find cane'
-                self.subtask = self.subtaskBook.get_subtask('DetectCane')
-                self.change_state('detect_cane')
-
-        elif self.state is 'detect_blanket':
-            if self.subtask.state is 'finish':
-                print 'detect_blanket'
-                self.object_pos = [5, 5, 5]
-                self.change_state('move_to_object')
-
-        elif self.state is 'detect_phone':
-            if self.subtask.state is 'finish':
-                print 'detect_phone'
-                self.object_pos = [5, 5, 5]
-                self.change_state('move_to_object')
-
-        elif self.state is 'detect_cane':
-            if self.subtask.state is 'finish':
-                print 'detect_cane'
-                self.object_pos = [5, 5, 5]
-                self.change_state('move_to_object')
-
-        elif self.state is 'move_to_object':
-            if self.subtask.state is 'finish':
-                self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
-                self.subtask.set_position(self.object_pos[0], self.object_pos[1], self.object_pos[2])
-                self.change_state('pick_object')
-
-        elif self.state is 'pick_object':
-            if self.subtask.state is 'finish':
-                # self.pick.pick_object(self, self.object_pos)
-                self.change_state('finish')
+        # elif self.state is 'detecting_granny':
+        #     print 'random subtask'
+        #     rand = randint(0, 2)
+        #     self.subtask = self.subtaskBook.get_subtask(self, 'Say')
+        #     if rand == 0:
+        #         print 'drop blanket'
+        #         self.subtask.say('Granny you drop blanket.')
+        #         self.change_state('drop_blanket')
+        #     elif rand == 1:
+        #         print 'falling granny'
+        #         self.subtask.say('Help! granny fell')
+        #         self.change_state('falling_granny')
+        #     elif rand == 2:
+        #         print 'granny stands up and walk away + sit'
+        #         self.subtask.say('granny you forgot your cane')
+        #         self.change_state('granny_walk')
+        #
+        # elif self.state is 'drop_blanket':
+        #     if self.subtask.state is 'finish':
+        #         print 'drop blanket'
+        #         self.subtask = self.subtaskBook.get_subtask('DetectBlanket')
+        #         self.change_state('detect_blanket')
+        #
+        # elif self.state is 'falling_granny':
+        #     if self.subtask.state is 'finish':
+        #         print 'find phone'
+        #         self.subtask = self.subtaskBook.get_subtask('DetectPhone')
+        #         self.change_state('detect_phone')
+        #
+        # elif self.state is 'granny_walk':
+        #     if self.subtask.state is 'finish':
+        #         print 'find cane'
+        #         self.subtask = self.subtaskBook.get_subtask('DetectCane')
+        #         self.change_state('detect_cane')
+        #
+        # elif self.state is 'detect_blanket':
+        #     if self.subtask.state is 'finish':
+        #         print 'detect_blanket'
+        #         self.object_pos = [5, 5, 5]
+        #         self.change_state('move_to_object')
+        #
+        # elif self.state is 'detect_phone':
+        #     if self.subtask.state is 'finish':
+        #         print 'detect_phone'
+        #         self.object_pos = [5, 5, 5]
+        #         self.change_state('move_to_object')
+        #
+        # elif self.state is 'detect_cane':
+        #     if self.subtask.state is 'finish':
+        #         print 'detect_cane'
+        #         self.object_pos = [5, 5, 5]
+        #         self.change_state('move_to_object')
+        #
+        # elif self.state is 'move_to_object':
+        #     if self.subtask.state is 'finish':
+        #         self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
+        #         self.subtask.set_position(self.object_pos[0], self.object_pos[1], self.object_pos[2])
+        #         self.change_state('pick_object')
+        #
+        # elif self.state is 'pick_object':
+        #     if self.subtask.state is 'finish':
+        #         # self.pick.pick_object(self, self.object_pos)
+        #         self.change_state('finish')
 
         # elif self.state is 'prepare_leave_arena':
         #     rospy.loginfo('leave arena')
