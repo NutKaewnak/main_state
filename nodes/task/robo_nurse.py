@@ -3,7 +3,7 @@ import subprocess
 from random import randint
 import tf
 from include.abstract_task import AbstractTask
-from math import atan,sqrt
+from math import atan, sqrt
 from include.delay import Delay
 from geometry_msgs.msg import PointStamped
 
@@ -23,6 +23,7 @@ class RoboNurse(AbstractTask):
         self.reg_voice = None
         self.tf_listener = tf.TransformListener()
         self.object_pos = None
+        self.chk_shelf_pos = [12.396, -5.975, 3.131]
 
     def perform(self, perception_data):
         # if self.state is 'init':
@@ -34,7 +35,8 @@ class RoboNurse(AbstractTask):
         # elif self.state is 'move_to_hallway':
         if self.state is 'init':
             self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-            self.change_state('init_detecting')
+            self.change_state('tell_granny_to_ask_for_pill')
+            # self.change_state('init_detecting')
             rospy.loginfo('---in task---')
             # self.subtask = self.subtaskBook.get_subtask(self, 'Say')
             self.subtask.say('I am in position granny. If you want to call me. Please wave your hand.')
@@ -82,7 +84,7 @@ class RoboNurse(AbstractTask):
                 rospy.loginfo('---tell_granny_ask_pill---')
                 self.change_state('wait_for_granny_command')
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                self.subtask.say('If you want me to give you a pill. Say. Robot I need my pill.')
+                self.subtask.say('If you want me to give you a pill.Say.I need my pill.')
                 self.reg_voice = self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode')
                 self.reg_voice.recognize(4)
                 # self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode').recognize(1)
@@ -100,17 +102,19 @@ class RoboNurse(AbstractTask):
         elif self.state is 'init_move':
             print self.state
             # if self.subtask.state is 'finish':
-            self.change_state('move_to_shelf')
-            rospy.loginfo('---init_move---')
             self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
             self.subtask.to_location('shelf')
+            self.change_state('move_to_shelf')
+            rospy.loginfo('---init_move---')
 
         elif self.state is 'move_to_shelf':
             print 'state =' + str(self.subtask.state)
-            if self.subtask.state is 'finish':
-                self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                self.subtask.say('I saw The leftmost bottle')
-                self.change_state('detect_pills')
+            if perception_data.device is self.Devices.BASE_STATUS:
+                print 'perception_module_base_pos = ' + str(self.perception_module.base_status.position)
+                if self.subtask.state is 'finish' or self.perception_module.base_status.position is self.chk_shelf_pos:
+                    self.subtask = self.subtaskBook.get_subtask(self, 'Say')
+                    self.subtask.say('I saw The leftmost bottle')
+                    self.change_state('detect_pills')
 
         elif self.state is 'detect_pills':
             if self.subtask.state is 'finish':

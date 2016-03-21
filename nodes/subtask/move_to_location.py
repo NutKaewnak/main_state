@@ -30,10 +30,8 @@ class MoveToLocation(AbstractSubtask):
         print '9999999999999999'
         if self.state is 'move':
             print 'move state = ' + str(self.move.state)
-            print 'perception = ' + str(perception_data.input)
-            print 'move.is_active = ' + str(self.move.is_active)
             # check if base succeed
-            if self.move.state is 'succeeded' or not self.move.is_active:
+            if self.move.state is 'succeeded':
                 self.location = None
                 self.change_state('finish')
             elif self.move.state is 'aborted':
