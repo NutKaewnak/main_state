@@ -75,10 +75,7 @@ class FollowPerson(AbstractSubtask):
                 self.publish_goal.publish(publish_pose)
                 
                 self.move.set_position(x, y, theta)
-                pose = Pose2D()
-                pose.x = x
-                pose.y = y
-                pose.theta = theta
+                pose = self.perception_module.base_status.position
                 self.goal_array.append(pose)
                 self.distance_from_last = sqrt((point.x - self.last_point.x) ** 2 + (point.y - self.last_point.y) ** 2)
 

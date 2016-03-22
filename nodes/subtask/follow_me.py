@@ -14,6 +14,7 @@ class FollowMe(AbstractSubtask):
         self.follow = None
         self.move = None
         self.count = 0
+        self.goal_array = []
 
     def perform(self, perception_data):
         # print self.state, '+++++', self.follow
@@ -46,7 +47,8 @@ class FollowMe(AbstractSubtask):
                 if id is not None:
                     self.follow.set_person_id(id)
 
-            elif perception_data.device is 'VOICE' and perception_data.input is 'robot stop':
+            elif perception_data.device is 'VOICE' and 'no' in perception_data.input:
+                self.goal_array = self.follow.goal_array
                 self.change_state('abort')
 
     def start(self):

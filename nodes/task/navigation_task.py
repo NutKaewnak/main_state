@@ -33,9 +33,9 @@ class NavigationTask(AbstractTask):
             self.tf_listener = tf.TransformListener()
             self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.3, 0)
             rospy.loginfo('NavigationTask init')
-            # self.subtaskBook.get_subtask(self, 'MovePassDoor')
-            # self.change_state('move_pass_door')
-            self.change_state('prepare_follow')
+            self.subtaskBook.get_subtask(self, 'MovePassDoor')
+            self.change_state('move_pass_door')
+            # self.change_state('prepare_follow')
 
         elif self.state is 'move_pass_door':
             if self.current_subtask.state is 'finish':
@@ -132,7 +132,7 @@ class NavigationTask(AbstractTask):
 
         elif self.state is 'going_to_waypoint3':
             if self.subtask.state is 'finish' or not self.delay.is_waiting():
-                self.subtask = self.subtaskBook.get_subtask(self, 'FollowPerson')
+                self.follow = self.subtaskBook.get_subtask(self, 'FollowMe')
                 self.change_state('prepare_follow')
 
         elif self.state is 'prepare_follow':
@@ -143,8 +143,25 @@ class NavigationTask(AbstractTask):
                 self.change_state('follow_init')
 
         elif self.state is 'follow_init':
-            if self.subtask.state is 'abort':
-                self.change_state('prepare_leave_arena')
+            if self.follow.state is 'abort':
+                print 'abort'
+                self.subtaskBook.get_subtask(self, 'Say').say('I will go back.')
+                self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
+                self.subtask.state = 'finish'
+                self.change_state('prepare_back_to_waypoint_3')
+
+        elif self.state is 'prepare_back_to_waypoint_3':
+            if self.subtask.state is 'finish':
+                if not self.follow.goal_array:
+                    self.change_state('back_to_waypoint_3')
+                else:
+                    self.change_state('prepare_leave_arena')
+
+        elif self.state is 'back_to_waypoint_3':
+            pose = self.follow.goal_array.pop()
+            self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
+            self.subtask.set_postion(pose.x, pose.y, math.pi-pose.theta)
+            self.change_state('prepare_back_to_waypoint_3')
 
         elif self.state is 'prepare_leave_arena':
             rospy.loginfo('leave arena')
