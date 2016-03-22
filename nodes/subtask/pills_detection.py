@@ -10,7 +10,7 @@ __author__ = 'CinDy'
 class PillsDetection(AbstractSubtask):
     def __init__(self, planning_module):
         AbstractSubtask.__init__(self, planning_module)
-        self.turn_neck = self.skillBook.get_skill(self, 'TurnNeck')
+        self.turn_neck = None
         self.timer = Delay()
         self.limit_left = 0.3  # pan
         self.limit_right = -0.3
@@ -34,6 +34,7 @@ class PillsDetection(AbstractSubtask):
     def start(self):
         # self.shelf_height = 60
         self.tilt_neck = -0.3
+        self.turn_neck = self.skillBook.get_skill(self, 'TurnNeck')
         self.change_state('set_neck')
 
     def perform(self, perception_data):
@@ -169,7 +170,7 @@ class PillsDetection(AbstractSubtask):
                 if pan is None:
                     pan = 0
                 print 'pan = ' + str(pan)
-                if pan >= self.limit_right:
+                if pan > self.limit_right:
                     # add +y turn range
                     if pan + self.new_pan_point < self.limit_right:
                         self.new_pan_point = self.limit_right - pan
@@ -177,6 +178,7 @@ class PillsDetection(AbstractSubtask):
                     self.turn_neck.turn_relative(0, self.new_pan_point)
                     self.timer.wait(1)
                     self.change_state('detecting')
+                # if pan < self.limit_right:
                 else:
                     self.change_state('speak')
 

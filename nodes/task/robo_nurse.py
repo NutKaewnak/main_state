@@ -34,9 +34,12 @@ class RoboNurse(AbstractTask):
         #
         # elif self.state is 'move_to_hallway':
         if self.state is 'init':
-            self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-            self.change_state('detect_pills')
-            # self.change_state('init_detecting')
+            self.change_state('say')
+
+        elif self.state is 'say':
+            self.subtask = self.subtask = self.subtaskBook.get_subtask(self, 'Say')
+            # self.change_state('detect_pills')
+            self.change_state('init_detecting')
             rospy.loginfo('---in task---')
             self.subtask.say('I am in position granny. If you want to call me. Please wave your hand.')
 
@@ -147,7 +150,7 @@ class RoboNurse(AbstractTask):
             if self.subtask.state is 'finish':
                 rospy.loginfo('---take_pill_order---')
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                self.subtask.say('Granny.I\'m ready to take an order.')
+                self.subtask.say('Granny. I\'m ready to take an order.')
                 self.change_state('wait_for_order')
 
         elif self.state is 'wait_for_order':
