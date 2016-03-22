@@ -27,5 +27,5 @@ class FollowMe(AbstractTask):
 
         elif self.state is 'follow':
             # recovery follow
-            if perception_data.device is self.Devices.VOICE and 'robot stop' in perception_data.input:
+            if perception_data.device is self.Devices.VOICE and 'stop' in perception_data.input:
                 self.change_state('init')

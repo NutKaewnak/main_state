@@ -1,9 +1,8 @@
 import rospy
-from std_msgs.msg import Float64
-
 from include.abstract_subtask import AbstractSubtask
 from math import atan, sqrt
-from geometry_msgs.msg import Twist, Vector3, PoseStamped
+from std_msgs.msg import Float64
+from geometry_msgs.msg import Twist, Vector3, PoseStamped, Pose2D
 from tf.transformations import quaternion_from_euler
 
 __author__ = 'AThousandYears'
@@ -22,6 +21,7 @@ class FollowPerson(AbstractSubtask):
         self.person_id = None
         self.distance_from_last = 9999.0
         self.offset_from_person = 0.3
+        self.goal_array = []
 
     def set_person_id(self, person_id):
         self.person_id = person_id
@@ -33,7 +33,6 @@ class FollowPerson(AbstractSubtask):
             self.turn_neck = self.skillBook.get_skill(self, 'TurnNeck')
             self.turn_base = rospy.Publisher('/base/cmd_vel', Twist)
             self.publish_goal = rospy.Publisher('/people/goal', PoseStamped)
-            self.turn_neck.turn(-0.1, 0.0)
             self.change_state('wait')
 
         elif self.state is 'follow' and perception_data.device is self.Devices.PEOPLE:
@@ -41,7 +40,7 @@ class FollowPerson(AbstractSubtask):
             point = None
             for person in perception_data.input:
                 if person.id == self.person_id:
-                    point = person.personpoints
+                    point = person.personpoints.point
 
             if point is not None:
                 theta = atan(point.y/point.x)
@@ -51,7 +50,6 @@ class FollowPerson(AbstractSubtask):
                 self.set_tilt.publish(-0.1)
 
                 size = sqrt(point.x**2 + point.y**2)
-                print size
 
                 # angle = Twist()
                 # if theta >= 0.4:
@@ -71,12 +69,14 @@ class FollowPerson(AbstractSubtask):
                 publish_pose.pose.position.x = x
                 publish_pose.pose.position.y = y
 
-                quaternion = quaternion_from_euler(0,0,theta)
+                quaternion = quaternion_from_euler(0, 0, theta)
                 publish_pose.pose.orientation.z = quaternion[2]
                 publish_pose.pose.orientation.w = quaternion[3]
                 self.publish_goal.publish(publish_pose)
                 
                 self.move.set_position(x, y, theta)
+                pose = self.perception_module.base_status.position
+                self.goal_array.append(pose)
                 self.distance_from_last = sqrt((point.x - self.last_point.x) ** 2 + (point.y - self.last_point.y) ** 2)
 
                 self.last_point = point
@@ -89,7 +89,7 @@ class FollowPerson(AbstractSubtask):
                 self.change_state('abort')
 
         elif perception_data.device is self.Devices.VOICE:
-            if perception_data.input == 'robot waiting':
+            if perception_data.input == 'stop':
                 self.skillBook.get_skill(self, 'Say').say('I stop.')
                 self.move.stop()
                 self.change_state('abort')

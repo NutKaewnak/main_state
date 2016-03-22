@@ -1,8 +1,7 @@
-__author__ = "AThousandYears"
-
 import rospy
-
 from include.abstract_subtask import AbstractSubtask
+
+__author__ = "AThousandYears"
 
 
 class MoveAbsolute(AbstractSubtask):
@@ -22,6 +21,6 @@ class MoveAbsolute(AbstractSubtask):
             if self.moveAbsolute.state is 'succeeded':
                 print 'succeeded'
                 self.change_state('finish')
-            elif self.moveAbsolute.state is 'aborted':
+            elif self.moveAbsolute.state is 'aborted' or self.moveAbsolute.state is 'preempted':
                 rospy.loginfo('Aborted')
                 self.change_state('error')

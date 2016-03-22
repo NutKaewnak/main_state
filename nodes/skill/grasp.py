@@ -56,8 +56,8 @@ class Grasp(AbstractSkill):
         elif self.state is 'init_pos':
             print 'goal_point', self.goal_point
             if self.goal_point is not None:
-                self.goal_point.y += 0.04
-                self.goal_point.z -= 0.06
+                self.goal_point.y += 0.00
+                self.goal_point.z -= 0.00
                 self.right_arm.init_position(self.goal_point)
                 self.change_state('open_gripper')
 

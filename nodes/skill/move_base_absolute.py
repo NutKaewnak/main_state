@@ -15,7 +15,6 @@ class MoveBaseAbsolute(AbstractSkill):
     def set_position(self, x, y, theta):
         self.change_state('active')
         self.controlModule.base.clear_costmaps()
-        # print('--clear costmap--')
         self.controlModule.base.set_absolute_position(x, y, theta)
 
     def perform(self, perception_data):
@@ -24,7 +23,5 @@ class MoveBaseAbsolute(AbstractSkill):
             if perception_data.device is self.Devices.BASE_STATUS:
                 state = MoveBaseStatus.get_state_from_status(perception_data.input)
                 # TODO: Bad code here!!
-                print '*****move****'
-                print 'move_base_state = ' + str(state) + str(perception_data.input)
                 self.is_active = MoveBaseStatus.is_active(perception_data.input)
                 self.change_state(state)
