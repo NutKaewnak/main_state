@@ -14,19 +14,20 @@ class DetectObject3Ds(AbstractSkill):
         self.controlModule.object_3d_detector.set_new_goal()
 
     def perform(self, perception_data):
+        # print 'state_object_skill = ' + self.state
         if self.state is 'active':
             # check if base succeed
+            # print 'state_object_skill = ' + self.state
             if perception_data.device is self.Devices.OBJECT_3DS_DETECTOR:
-                print 'input= '+str(perception_data.input)
-                print 'result.object = '+str(perception_data.input.result.objects)
-                print 'result.object[0].point = '+str(perception_data.input.result.objects[0].point)
-                print 'result.object[0].width = '+str(perception_data.input.result.objects[0].width)
+                # print 'input= '+str(perception_data.input)
                 status = MoveBaseStatus.get_state_from_status(perception_data.input.status.status)
+                # print 'state_object_skill 222= ' + self.state
                 self.change_state(status)
-                print 'state_object = ' + self.state
-                if self.state is 'succeeded':
-                    if not perception_data.input.result.objects:
-                        self.change_state('not_found')
-                    self.objects = perception_data.input.result.objects
+                # print 'state_object_skill = ' + self.state
 
-                    print self.objects
+            if self.state is 'succeeded':
+                if not perception_data.input.result.objects:
+                    self.change_state('not_found')
+                self.objects = perception_data.input.result.objects
+
+                    # print self.objects

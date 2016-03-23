@@ -2,9 +2,9 @@ import rospy
 import tf
 from include.moveit_initiator import MoveItInitiator
 from geometry_msgs.msg import Pose
-from geometry_msgs.msg import Pose2D
 from geometry_msgs.msg import PointStamped
 from skill.include import inverse_kinematics
+import math
 
 
 __author__ = "ftprainnie"
@@ -32,6 +32,7 @@ class ManipulateController:
         self.tf_listener = None
         self.moveit_initiator = None
         self.obj_pos = None
+        self.pos = None
 
     def init_controller(self):
         self.moveit_initiator = MoveItInitiator()
@@ -52,6 +53,10 @@ class ManipulateController:
         elif self.arm_group == 'left_arm':
             point.y *= -1
         self.obj_pos = point
+        self.obj_pos.x -= 0.15
+        self.obj_pos.y += 0.04
+        self.obj_pos.z -= 0.06
+        self.pos = self.obj_pos
 
     def transform_point(self, pos, origin_frame='base_link'):
         """
@@ -158,8 +163,12 @@ class ManipulateController:
         :param (none)
         :return: (none)
         """
-        self.obj_pos.x -= 0.25
-        angle = inverse_kinematics.inverse_kinematic(self.transform_point(self.obj_pos), 0)
+        self.pos.x = self.obj_pos.x-0.1
+        print "obj_pos.x 1 = " + str(self.obj_pos.x)
+        print "pos.x 1 = " + str(self.pos.x)
+        self.pos.y = self.obj_pos.y
+        self.pos.z = self.obj_pos.z
+        angle = inverse_kinematics.inverse_kinematic(self.transform_point(self.pos), 0)
         self.move_arm_pick(angle)
 
     def move_arm_pick_object_second(self):
@@ -168,8 +177,12 @@ class ManipulateController:
         :param (none)
         :return: (None)
         """
-        self.obj_pos.x += 0.1
-        angle = inverse_kinematics.inverse_kinematic(self.transform_point(self.obj_pos), 0)
+        self.pos.x = self.obj_pos.x+0.1
+        print "obj_pos.x 2 = " + str(self.obj_pos.x)
+        print "pos.x 2 = " + str(self.pos.x)
+        self.pos.y = self.obj_pos.y
+        self.pos.z = self.obj_pos.z
+        angle = inverse_kinematics.inverse_kinematic(self.transform_point(self.pos), 0)
         self.move_arm_pick(angle)
 
     def move_arm_pick(self, angle):
@@ -191,8 +204,10 @@ class ManipulateController:
         :param angle: (dict()) dict of angle and arm_joint
         :return: (None)
         """
-        self.obj_pos.z += 0.08
-        angle = inverse_kinematics.inverse_kinematic(self.transform_point(self.obj_pos), 0.5*math.pi)
+        self.pos.x = self.obj_pos.x+0.04
+        self.pos.y = self.obj_pos.y
+        self.pos.z = self.obj_pos.z+0.15
+        angle = inverse_kinematics.inverse_kinematic(self.transform_point(self.pos), 1.0/2.5*math.pi)
         self.move_arm_pick(angle)
 
     def move_arm_after_pick_cloth(self):
