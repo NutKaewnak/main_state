@@ -17,7 +17,6 @@ class FollowMe(AbstractSubtask):
         self.goal_array = []
 
     def perform(self, perception_data):
-        # print self.state, '+++++', self.follow
         if self.state is 'init':
             self.follow = self.subtaskBook.get_subtask(self, 'FollowPerson')
             self.change_state('follow_init')
@@ -47,8 +46,13 @@ class FollowMe(AbstractSubtask):
                 if id is not None:
                     self.follow.set_person_id(id)
 
-            elif perception_data.device is 'VOICE' and 'no' in perception_data.input:
+            elif perception_data.device is 'VOICE' and 'go back' in perception_data.input:
                 self.goal_array = self.follow.goal_array
+
+                # TODO: erase this debug code
+                print 'follow me subtask goal array'
+                print self.goal_array
+
                 self.change_state('abort')
 
     def start(self):

@@ -13,9 +13,8 @@ class MoveItInitiator(object):
             self.tf_listener = tf.TransformListener()
 
         def init_controller(self, arm_group):
-            print arm_group
-            print arm_group in self.robot.get_group_names()
-            return moveit_commander.MoveGroupCommander(arm_group)
+            if arm_group in self.robot.get_group_names():
+                return moveit_commander.MoveGroupCommander(arm_group)
 
         def __del__(self):
             moveit_commander.roscpp_shutdown()

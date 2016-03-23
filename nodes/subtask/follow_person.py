@@ -54,17 +54,9 @@ class FollowPerson(AbstractSubtask):
 
                 size = sqrt(point.x**2 + point.y**2)
 
-                # angle = Twist()
-                # if theta >= 0.4:
-                #     angle.angular.z = 0.1
-                #     self.turn_base.publish(angle)
-                # elif theta <= -0.4:
-                #     angle.angular.z = -0.1
-                #     self.turn_base.publish(angle)
-
-                # rospy.sleep(0.01)
                 x = max(point.x/size*(size*0.5), 0)
                 y = point.y/size*(size*0.5)
+
                 publish_pose = PoseStamped()
                 publish_pose.header.stamp = rospy.Time.now()
                 publish_pose.header.frame_id = 'base_link'
@@ -79,9 +71,18 @@ class FollowPerson(AbstractSubtask):
                 
                 self.move.set_position(x, y, theta)
                 pose = self.perception_module.base_status.position
+
+                # TODO: erase this debug code when done
+                print 'follow person pose'
                 print pose
-                pose = transform_point(self.tf_listener, publish_pose, 'map')
+                temp = transform_point(self.tf_listener, publish_pose, 'map')
+                print 'follow person temp'
+                print temp
+                pose = temp
                 self.goal_array.append(pose)
+                print 'follow person subtask goal array'
+                print self.goal_array
+
                 self.distance_from_last = sqrt((point.x - self.last_point.x) ** 2 + (point.y - self.last_point.y) ** 2)
 
                 self.last_point = point

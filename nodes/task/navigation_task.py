@@ -31,11 +31,11 @@ class NavigationTask(AbstractTask):
 
         if self.state is 'init':
             self.tf_listener = tf.TransformListener()
-            self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.3, 0)
+            self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.4, 0)
             rospy.loginfo('NavigationTask init')
-            self.subtaskBook.get_subtask(self, 'MovePassDoor')
+            # self.subtaskBook.get_subtask(self, 'MovePassDoor')
             # self.change_state('move_pass_door')
-            self.change_state('prepare_follow')
+            self.change_state('blocked_by_chair')
 
         elif self.state is 'move_pass_door':
             if self.current_subtask.state is 'finish':
@@ -102,16 +102,19 @@ class NavigationTask(AbstractTask):
             self.change_state('enter_waypoint2')
 
         elif self.state is 'blocked_by_chair':
-            # TODO: implement arm here!
-            self.delay.wait(5)
+            self.subtask = self.subtaskBook.get_subtask(self, 'ArmStaticPose')
+            self.subtask.static_pose('right_push_chair_push')
+            self.delay.wait(20)
             self.change_state('enter_waypoint2')
 
+            self.is_performing = False
+
         elif self.state is 'enter_waypoint2':
-            if not self.delay.is_waiting():
-                self.change_state('wait_enter_waypoint2')
+            if self.subtask.state is 'finish' or not self.delay.is_waiting():
                 self.delay.wait(20)
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
                 self.subtask.to_location('waypoint_2')
+                self.change_state('wait_enter_waypoint2')
 
         elif self.state is 'wait_enter_waypoint2':
             if self.subtask.state is 'finish':
@@ -153,6 +156,7 @@ class NavigationTask(AbstractTask):
 
         elif self.state is 'prepare_back_to_waypoint_3':
             if self.subtask.state is 'finish':
+                print self.follow.goal_array
                 if not self.follow.goal_array:
                     self.change_state('back_to_waypoint_3')
                 else:

@@ -13,6 +13,7 @@ class ArmStaticPose(AbstractSkill):
         if self.state is 'receive_pose':
             if perception_data.device is self.device:
                 state = ArmStatus.get_state_from_status(perception_data.input)
+                print state
                 self.change_state(state)
 
     def static_pose(self, pose):
@@ -27,5 +28,6 @@ class ArmStaticPose(AbstractSkill):
         elif 'left' in pose:
             self.arm = self.controlModule.left_arm
             self.device = 'LEFT_ARM'
+        self.arm.init_controller()
         self.arm.static_pose(pose)
         self.change_state('receive_pose')
