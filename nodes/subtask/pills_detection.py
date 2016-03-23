@@ -26,7 +26,7 @@ class PillsDetection(AbstractSubtask):
         self.pill_pos = None
         self.pill_name = None
         self.pills_dic = {}
-        self.speak = self.speak = self.subtaskBook.get_subtask(self, 'Say')
+        self.speak = None
         # self.shelf_height = None
         self.tilt_neck = None
         self.count = 0
@@ -40,6 +40,7 @@ class PillsDetection(AbstractSubtask):
     def perform(self, perception_data):
         if self.state is 'set_neck':
             print '---set_neck---'
+            self.speak = self.subtaskBook.get_subtask(self, 'Say')
             # set neck to left most shelf
             self.turn_neck.turn(self.tilt_neck, self.limit_left)
             self.timer.wait(2)

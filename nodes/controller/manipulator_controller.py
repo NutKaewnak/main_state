@@ -78,7 +78,6 @@ class ManipulateController:
         self.tf_listener.waitForTransform(destination_frame, origin_frame, rospy.Time(0), rospy.Duration(4.00))
         print "Success Waiting"
         point_out = self.tf_listener.transformPoint(destination_frame, tf_points)
-        print 'HERRREEEE >>>>> ' + str(point_out.point.x) + ', ' + str(point_out.point.y) + ', ' + str(point_out.point.z)
         return point_out.point
 
     def manipulate(self, pose_target, orientation_rpy=[0, 0, 0], ref_frame="base_link", planning_time=50.00):

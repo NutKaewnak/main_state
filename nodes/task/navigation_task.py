@@ -34,8 +34,8 @@ class NavigationTask(AbstractTask):
             self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.3, 0)
             rospy.loginfo('NavigationTask init')
             self.subtaskBook.get_subtask(self, 'MovePassDoor')
-            self.change_state('move_pass_door')
-            # self.change_state('prepare_follow')
+            # self.change_state('move_pass_door')
+            self.change_state('prepare_follow')
 
         elif self.state is 'move_pass_door':
             if self.current_subtask.state is 'finish':
@@ -98,11 +98,12 @@ class NavigationTask(AbstractTask):
         elif self.state is 'blocked_by_people':
             self.subtask = self.subtaskBook.get_subtask(self, 'Say')
             self.subtask.say('Excuse me. May I pass')
-            self.delay.wait(10)
+            self.delay.wait(5)
             self.change_state('enter_waypoint2')
 
         elif self.state is 'blocked_by_chair':
             # TODO: implement arm here!
+            self.delay.wait(5)
             self.change_state('enter_waypoint2')
 
         elif self.state is 'enter_waypoint2':
