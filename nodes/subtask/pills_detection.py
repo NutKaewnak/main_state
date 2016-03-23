@@ -176,10 +176,12 @@ class PillsDetection(AbstractSubtask):
                         self.new_pan_point = self.limit_right - pan
                     print 'new_pan_point = ' + str(self.new_pan_point)
                     self.turn_neck.turn_relative(0, self.new_pan_point)
-                    self.timer.wait(1)
+                    # self.timer.wait(1)
+                    print 'state detect', self.state
                     self.change_state('detecting')
                 # if pan < self.limit_right:
                 else:
+                    print '--------speak-------'
                     self.change_state('speak')
 
         elif self.state is 'speak':
