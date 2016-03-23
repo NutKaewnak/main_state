@@ -34,9 +34,12 @@ class RoboNurse(AbstractTask):
         #
         # elif self.state is 'move_to_hallway':
         if self.state is 'init':
-            self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-            self.change_state('detect_pills')
-            # self.change_state('init_detecting')
+            self.change_state('say')
+
+        elif self.state is 'say':
+            self.subtask = self.subtask = self.subtaskBook.get_subtask(self, 'Say')
+            # self.change_state('detect_pills')
+            self.change_state('init_detecting')
             rospy.loginfo('---in task---')
             self.subtask.say('I am in position granny. If you want to call me. Please wave your hand.')
 
@@ -93,7 +96,6 @@ class RoboNurse(AbstractTask):
         elif self.state is 'wait_for_granny_command':
             # rospy.loginfo('---wait_for_granny_command---')
             if perception_data.device is self.Devices.VOICE:
-                # print 'helloo'
                 print perception_data.input
                 print perception_data.input == 'robot I need my pill'
                 if 'pill' in perception_data.input:
@@ -148,7 +150,7 @@ class RoboNurse(AbstractTask):
             if self.subtask.state is 'finish':
                 rospy.loginfo('---take_pill_order---')
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                self.subtask.say('Granny.I\'m ready to take an order.')
+                self.subtask.say('Granny. I\'m ready to take an order.')
                 self.change_state('wait_for_order')
 
         elif self.state is 'wait_for_order':
@@ -176,12 +178,12 @@ class RoboNurse(AbstractTask):
 
         elif self.state is 'pick_pill':
             if self.subtask.state is 'finish':
-                min = 2
+                minimum = 2
                 point = []
                 for goal in self.subtask.objects:
                     temp = sqrt(pow(self.pill_dic[self.pill_name]['x'] - goal.point.x, 2) - pow(self.pill_dic[self.pill_name]['y'] - goal.point.y, 2))
-                    if min >= temp:
-                        min = temp
+                    if minimum >= temp:
+                        minimum = temp
                         point = goal.point
                 self.pick = self.subtaskBook.get_subtask(self, 'Pick')
                 self.pick.pick_object(self, point)
@@ -273,6 +275,6 @@ class RoboNurse(AbstractTask):
         #     if self.subtask.state is 'finish':
         #         self.change_state('finish')
 
-    def speak(self, message):
-        rospy.loginfo("Robot HACKED speak: " + message)
-        self.process = subprocess.Popen(["espeak", "-ven+f4", message, "-s 120"])
+    # def speak(self, message):
+    #     rospy.loginfo("Robot HACKED speak: " + message)
+    #     self.process = subprocess.Popen(["espeak", "-ven+f4", message, "-s 120"])

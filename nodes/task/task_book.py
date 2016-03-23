@@ -21,6 +21,7 @@ from restaurant_vdo import RestaurantVDO
 from test_neck import TestNeck
 from restaurant_Frank import RestaurantFrank
 from test_bug_arm import TestBugArm
+from test_pill import TestPill
 
 __author__ = "AThousandYears"
 
@@ -51,6 +52,7 @@ class TaskBook:
         self.book['TestNeck'] = TestNeck(planning_module)
         self.book['RestaurantFrank'] = RestaurantFrank(planning_module)
         self.book['TestBugArm'] = TestBugArm(planning_module)
+        self.book['TestPill'] = TestPill(planning_module)
 
     def set_perception(self, perception_module):
         for task in self.book:
