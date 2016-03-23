@@ -44,6 +44,7 @@ class PillsDetection(AbstractSubtask):
 
         if self.state is 'set_neck':
             print '---set_neck---'
+            self.speak = self.subtaskBook.get_subtask(self, 'Say')
             # set neck to left most shelf
             self.turn_neck.turn(self.tilt_neck, self.limit_left)
             # self.timer.wait(2)

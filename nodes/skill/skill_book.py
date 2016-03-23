@@ -10,6 +10,7 @@ from grasp import Grasp
 from recognize_objects import RecognizeObjects
 from detect_object_3ds import DetectObject3Ds
 from voice_recognition_mode import VoiceRecognitionMode
+from arm_static_pose import ArmStaticPose
 
 __author__ = "AThousandYears"
 
@@ -29,6 +30,7 @@ class SkillBook:
         self.book['RecognizeObjects'] = RecognizeObjects(control_module)
         self.book['DetectObject3Ds'] = DetectObject3Ds(control_module)
         self.book['VoiceRecognitionMode'] = VoiceRecognitionMode(control_module)
+        self.book['ArmStaticPose'] = ArmStaticPose(control_module)
 
     def get_skill(self, subtask, skill_name):
         self.book[skill_name].reset()

@@ -1,9 +1,11 @@
 import rospy
+import tf
 from include.abstract_subtask import AbstractSubtask
 from math import atan, sqrt
 from std_msgs.msg import Float64
 from geometry_msgs.msg import Twist, Vector3, PoseStamped, Pose2D
 from tf.transformations import quaternion_from_euler
+from include.transform_point import transform_point
 
 __author__ = 'AThousandYears'
 
@@ -22,6 +24,7 @@ class FollowPerson(AbstractSubtask):
         self.distance_from_last = 9999.0
         self.offset_from_person = 0.3
         self.goal_array = []
+        self.tf_listener = tf.TransformListener()
 
     def set_person_id(self, person_id):
         self.person_id = person_id
@@ -76,6 +79,8 @@ class FollowPerson(AbstractSubtask):
                 
                 self.move.set_position(x, y, theta)
                 pose = self.perception_module.base_status.position
+                print pose
+                pose = transform_point(self.tf_listener, publish_pose, 'map')
                 self.goal_array.append(pose)
                 self.distance_from_last = sqrt((point.x - self.last_point.x) ** 2 + (point.y - self.last_point.y) ** 2)
 
