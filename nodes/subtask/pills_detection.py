@@ -44,6 +44,7 @@ class PillsDetection(AbstractSubtask):
 
         if self.state is 'set_neck':
             print '---set_neck---'
+            self.speak = self.subtaskBook.get_subtask(self, 'Say')
             # set neck to left most shelf
             self.turn_neck.turn(self.tilt_neck, self.limit_left)
             # self.timer.wait(2)
@@ -141,13 +142,14 @@ class PillsDetection(AbstractSubtask):
                 elif self.pills_dic:
                     print 'len_pills_dic = ', len(self.pills_dic)
                     while True:
-                        chk_len = 1
+                        chk_len = len(self.pills_dic)
                         for it in self.pills_dic:
                             print 'it =', it
                             print 'pill_dic[it] =', self.pills_dic[it]
                             chk_len = len(self.pills_dic)
                             if sqrt(pow(self.pills_dic[it]['x'] - obj_goal.x, 2) +
                                     pow(self.pills_dic[it]['y'] - obj_goal.y, 2)) >= 0.17:
+                                print 'bottle different'
                                 chk_len -= 1
                             else:
                                 break

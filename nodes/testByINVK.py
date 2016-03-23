@@ -67,7 +67,8 @@ class TestInvKine:
         # rospy.loginfo("-----OPEN GRIPPER-----")
         # self.pub_right_gripper.publish(0.8)
         # # raw_input()
-        # rospy.sleep(3)
+
+        # rospy.sleep(2)
 
         # rospy.loginfo("-----First step go to object position-----")
         # manipulator_ctrl.move_arm_pick_object_first()
@@ -79,15 +80,14 @@ class TestInvKine:
 
         # rospy.loginfo("-----Before pick cloth-----")
         # manipulator_ctrl.move_arm_before_pick_cloth()
-        # rospy.sleep(7)
-        #
+        # rospy.sleep(3)
+
         # rospy.loginfo("-----CLOSE GRIPPER + Move relative-----")
         # # manipulator_ctrl.move_relative([0, 0, 0], [0, 0, 0])
         # self.set_torque_limit()
-        # self.pub_right_gripper.publish(-0.2)
-        # rospy.sleep(5)
+        # self.pub_right_gripper.publish(0.0)
+        # rospy.sleep(8)
         #
-        # rospy.loginfo("-----AFTER GRASP CLOTH-----")
         # manipulator_ctrl.move_arm_after_pick_cloth()
         # rospy.sleep(3)
 
