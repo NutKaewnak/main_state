@@ -1,5 +1,5 @@
 <launch>
 
-  <node name="main_state" pkg="main_state" type="main.py" output="screen" args="Test" />
+  <node name="main_state" pkg="main_state" type="main.py" output="screen" args="TestPill" />
   <include file="$(find object_3d_detector)/launch/object_3d_detector.launch"/>
 </launch>

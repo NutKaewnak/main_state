@@ -31,7 +31,7 @@ class RestaurantFrank(AbstractTask):
         self.move_abs = None
         self.move_relative = None
         self.detect_waving_people = {'table one': False, 'table two': False, 'table three': False}
-        self.turn_neck = self.subtaskBook.get_subtask(self, 'TurnNeck')
+        self.turn_neck = None
         print "Don't do that bitch. line 35 in restaurant_Frank.py"
         # self.turn_neck.turn_absolute(0, 0)
         self.tf_listener = tf.TransformListener()
@@ -43,6 +43,8 @@ class RestaurantFrank(AbstractTask):
         # if self.say.speak.controlModule.speaker.process is not None:
         # print self.say.speak.controlModule.speaker.is_finish(), "++++++++"
         if self.state is 'init':
+            self.turn_neck = self.subtaskBook.get_subtask(self, 'TurnNeck')
+            self.turn_neck.turn_absolute(0, 0)
             self.change_state('wait_for_command')
 
         elif self.state is 'follow_init':
