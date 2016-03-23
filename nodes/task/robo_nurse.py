@@ -123,7 +123,7 @@ class RoboNurse(AbstractTask):
             print 'self.chk_shelf = ' + str(self.chk_shelf_pos)
             if self.subtask.state is 'finish' or self.chk_shelf_pos:
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                self.subtask.say('I saw The leftmost bottle')
+                self.subtask.say('From left to right. I saw The leftmost bottle')
                 self.change_state('detect_pills')
 
         elif self.state is 'detect_pills':
