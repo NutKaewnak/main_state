@@ -23,6 +23,7 @@ class NavigationTask(AbstractTask):
         self.waypoint_2.x = 11.997
         self.waypoint_2.y = -6.004
         self.is_performing = False
+        self.say = None
 
     def perform(self, perception_data):
         if self.is_performing:
@@ -31,11 +32,10 @@ class NavigationTask(AbstractTask):
 
         if self.state is 'init':
             self.tf_listener = tf.TransformListener()
-            self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.4, 0)
+            self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.3, 0)
             rospy.loginfo('NavigationTask init')
-            # self.subtaskBook.get_subtask(self, 'MovePassDoor')
-            # self.change_state('move_pass_door')
-            self.change_state('blocked_by_chair')
+            self.subtaskBook.get_subtask(self, 'MovePassDoor')
+            self.change_state('move_pass_door')
 
         elif self.state is 'move_pass_door':
             if self.current_subtask.state is 'finish':
@@ -135,13 +135,21 @@ class NavigationTask(AbstractTask):
                 self.change_state('going_to_waypoint3')
 
         elif self.state is 'going_to_waypoint3':
-            if self.subtask.state is 'finish' or not self.delay.is_waiting():
+            # if self.subtask.state is 'finish' or not self.delay.is_waiting():
+                self.say = self.subtaskBook.get_subtask(self, 'Say')
+                self.say.say('please come in front of me and say \'follow me\'.')
                 self.follow = self.subtaskBook.get_subtask(self, 'FollowMe')
+                self.delay.wait(5)
+                self.change_state('instruct')
+
+        elif self.state is 'instruct':
+            if self.say.state is 'finish' or not self.delay.is_waiting():
+                self.say.say('please say \'robot stop\' to stop.')
                 self.change_state('prepare_follow')
 
         elif self.state is 'prepare_follow':
             if perception_data.device is self.Devices.VOICE and 'follow me' in perception_data.input:
-                self.subtaskBook.get_subtask(self, 'Say').say('I will follow you.')
+                self.say.say('I will follow you.')
                 self.follow = self.subtaskBook.get_subtask(self, 'FollowMe')
                 self.follow.start()
                 self.change_state('follow_init')
@@ -155,17 +163,21 @@ class NavigationTask(AbstractTask):
                 self.change_state('prepare_back_to_waypoint_3')
 
         elif self.state is 'prepare_back_to_waypoint_3':
-            if self.subtask.state is 'finish':
-                print self.follow.goal_array
-                if not self.follow.goal_array:
+            # if self.subtask.state is 'finish' or self.subtask.state is 'error':
+                # print self.follow.goal_array
+                if self.follow.goal_array:
                     self.change_state('back_to_waypoint_3')
                 else:
+                    self.subtaskBook.get_subtask(self, 'Say').say('I will leave arena.')
                     self.change_state('prepare_leave_arena')
 
         elif self.state is 'back_to_waypoint_3':
             pose = self.follow.goal_array.pop()
+            print 'kuy'
+            print pose
             self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
-            self.subtask.set_postion(pose.x, pose.y, math.pi-pose.theta)
+            self.subtask.set_position(pose.pose.position.x, pose.pose.position.y, math.pi-pose.pose.position.z)
+            print self.subtask.state
             self.change_state('prepare_back_to_waypoint_3')
 
         elif self.state is 'prepare_leave_arena':

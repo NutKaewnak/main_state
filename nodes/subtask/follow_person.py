@@ -3,7 +3,7 @@ import tf
 from include.abstract_subtask import AbstractSubtask
 from math import atan, sqrt
 from std_msgs.msg import Float64
-from geometry_msgs.msg import Twist, Vector3, PoseStamped, Pose2D
+from geometry_msgs.msg import Twist, Vector3, PoseStamped, Pose2D, PointStamped
 from tf.transformations import quaternion_from_euler
 from include.transform_point import transform_point
 
@@ -58,6 +58,7 @@ class FollowPerson(AbstractSubtask):
                 y = point.y/size*(size*0.5)
 
                 publish_pose = PoseStamped()
+                # publish_pose = PointStamped()
                 publish_pose.header.stamp = rospy.Time.now()
                 publish_pose.header.frame_id = 'base_link'
 
@@ -75,13 +76,33 @@ class FollowPerson(AbstractSubtask):
                 # TODO: erase this debug code when done
                 print 'follow person pose'
                 print pose
-                temp = transform_point(self.tf_listener, publish_pose, 'map')
+                input_pts = PointStamped()
+                input_pts.header.stamp = rospy.Time(0)
+                input_pts.header.frame_id = 'base_link'
+                input_pts.point.x = x
+                input_pts.point.y = y
+                input_pts.point.z = 0
+
+                temp = transform_point(self.tf_listener, input_pts, '/map')
                 print 'follow person temp'
                 print temp
-                pose = temp
-                self.goal_array.append(pose)
-                print 'follow person subtask goal array'
-                print self.goal_array
+                # convert back to pose
+                out = PoseStamped()
+                out.header.stamp = rospy.Time.now()
+                out.header.frame_id = '/map'
+                out.pose.position.x = temp.x
+                out.pose.position.y = temp.y
+                out.pose.position.z = theta
+                # theta2 = atan(temp.point.y/temp.point.x)
+                # quaternion = quaternion_from_euler(0, 0, theta2)
+                # HACKING find pose of person
+                # out.pose.orientation.z = quaternion[2]
+                # out.pose.orientation.w = quaternion[3]
+
+                # out.pose.position.x = temp.point.x
+                # pose = temp
+
+                self.goal_array.append(out)
 
                 self.distance_from_last = sqrt((point.x - self.last_point.x) ** 2 + (point.y - self.last_point.y) ** 2)
 
