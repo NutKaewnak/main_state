@@ -144,7 +144,7 @@ class NavigationTask(AbstractTask):
 
         elif self.state is 'instruct':
             if self.say.state is 'finish' or not self.delay.is_waiting():
-                self.say.say('please say \'robot stop\' to stop.')
+                self.say.say('And \'robot go back\' to go back.')
                 self.change_state('prepare_follow')
 
         elif self.state is 'prepare_follow':
