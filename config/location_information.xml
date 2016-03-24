@@ -21,11 +21,13 @@
     </room>
 
 	<location name="entrance" position="2.656, -7.349" rotation="3.126" height="1.29"/>
-    <location name="exit" position="-0.310, 6.381" rotation="3.140" height="1.29"/>
-    <location name="waypoint_1" position="7.937, 0.047" rotation="0.000" height="1.29"/>
-    <location name="pre_waypoint_2" position="12.735, -5.995" rotation="-3.138" height="1.29"/>
-    <location name="waypoint_2" position="11.997, -6.004" rotation="-3.1312" height="1.29"/>
-    <location name="waypoint_3" position="14.018, -0.013" rotation="0.000" height="1.29"/>
+    <location name="exit" position="11.672, -6.486" rotation="-1.864" height="1.29"/>
+
+    <location name="waypoint_1" position="14.766, 4.079" rotation="1.153" height="1.29"/>
+    <location name="pre_waypoint_2" position="15.349, 0.244" rotation="0.660" height="1.29"/>
+    <location name="waypoint_2" position="15.386, 0.358" rotation="0.675" height="1.29"/>
+    <location name="waypoint_3" position="11.065, -5.846" rotation="-0.734" height="1.29"/>
+
     <location name="hallway table" position="2.981, 2.737" rotation="-1.600" height="1.29"/>
     <location name="gpsr_start" position="25.972, 3.633" rotation="-0.795" height="1.29"/>
     <location name="shelf" position="12.396, -5.975  " rotation="3.131" height="1.29"/>

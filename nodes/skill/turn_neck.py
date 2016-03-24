@@ -15,6 +15,8 @@ class TurnNeck(AbstractSkill):
         self.is_active = False
 
     def perform(self, perception_data):
+        # print 'perception ', perception_data
+        # print 'state_turn ', self.state
         # if self.state is 'init':
         #     self.pan = 0
         #     self.tilt = 0
@@ -29,7 +31,7 @@ class TurnNeck(AbstractSkill):
             if perception_data.device is 'NECK':
                 state = NeckStatus.get_state_from_status(perception_data.input.status)
                 # TODO: Bad code here!!
-                # self.is_active = NeckStatus.is_active(perception_data.input.status)
+                self.is_active = NeckStatus.is_active(perception_data.input.status)
                 self.change_state(state)
 
         elif self.state is 'receive':

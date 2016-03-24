@@ -17,7 +17,6 @@ class FollowMe(AbstractSubtask):
         self.goal_array = []
 
     def perform(self, perception_data):
-        # print self.state, '+++++', self.follow
         if self.state is 'init':
             self.follow = self.subtaskBook.get_subtask(self, 'FollowPerson')
             self.change_state('follow_init')
@@ -41,13 +40,13 @@ class FollowMe(AbstractSubtask):
                 id = None
                 for person in perception_data.input:
                     distance = get_distance(person.personpoints.point, self.follow.last_point)
-                    if person.personpoints.point.x >= self.follow.last_point.x - 0.25 and distance < min_distance:
+                    if person.personpoints.point.x >= self.follow.last_point.x - 0.3 and distance < min_distance:
                         min_distance = distance
                         id = person.id
                 if id is not None:
                     self.follow.set_person_id(id)
 
-            elif perception_data.device is 'VOICE' and 'no' in perception_data.input:
+            elif perception_data.device is 'VOICE' and 'go back' in perception_data.input:
                 self.goal_array = self.follow.goal_array
                 self.change_state('abort')
 
