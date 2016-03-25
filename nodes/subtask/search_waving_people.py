@@ -18,6 +18,7 @@ class SearchWavingPeople(AbstractSubtask):
         self.pan = 0
 
     def perform(self, perception_data):
+
         # if perception_data.device is 'NECK':
         #     self.pan = perception_data.input.pan
         # print self.state, '&&&&&&&'

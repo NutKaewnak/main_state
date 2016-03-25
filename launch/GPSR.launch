@@ -3,5 +3,10 @@
   <node ns="door" name="door_detection" pkg="door_detection" type="door_detection_node">
     <remap from="/scan" to="/laser/scan"/>
   </node>
-  <include file="$(find speech_processing)/dic/GPSR_Frank/GPSR_Frank.launch"/>
+  <node name="NIHandtracker" pkg="gesture_detection" type="NIHandtracker" output="screen" >
+    <remap from="points" to="/gesture/points"/>
+  </node>
+
+  <!--<include file="$(find speech_processing)/dic/GPSR_Frank/GPSR_Frank.launch"/>-->
+  <include file="$(find speech_processing)/launch/switch.launch"/>
 </launch>

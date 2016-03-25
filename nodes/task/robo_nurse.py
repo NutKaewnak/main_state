@@ -37,7 +37,7 @@ class RoboNurse(AbstractTask):
             self.change_state('say')
 
         elif self.state is 'say':
-            self.subtask = self.subtask = self.subtaskBook.get_subtask(self, 'Say')
+            self.subtask = self.subtaskBook.get_subtask(self, 'Say')
             # self.change_state('detect_pills')
             self.change_state('init_detecting')
             rospy.loginfo('---in task---')
