@@ -12,8 +12,8 @@ class PillsDetection(AbstractSubtask):
         AbstractSubtask.__init__(self, planning_module)
         self.turn_neck = None
         self.timer = Delay()
-        self.limit_left = 0  # pan
-        self.limit_right = -0.3
+        self.limit_left = 0.2  # pan
+        self.limit_right = -0.2
         self.limit_up = 0  # tilt
         self.limit_down = -0.5
         self.new_pan_point = -0.2
@@ -34,15 +34,12 @@ class PillsDetection(AbstractSubtask):
 
     def start(self):
         # self.shelf_height = 60
-        self.tilt_neck = -0.4
+        self.tilt_neck = -0.5
         self.rem_id = 0
         self.turn_neck = self.skillBook.get_skill(self, 'TurnNeck')
         self.change_state('set_neck')
 
     def perform(self, perception_data):
-        if self.is_performing:
-            return
-        self.is_performing = True
 
         if self.state is 'set_neck':
             print '---set_neck---'
@@ -78,43 +75,6 @@ class PillsDetection(AbstractSubtask):
                 # self.pills_dic[self.pill_name] = self.pill_pos
                 self.change_state('collect_data')
 
-                # print '*********len', len(self.detect_objects.objects)
-                # for i in range(len(self.detect_objects.objects)):
-                #     obj_goal = transform_point(self.tf_listener, self.detect_objects.objects[i], "map")
-                #     pill_width = round(self.detect_objects.objects[i].width.data, 2)
-                #     pill_depth = round(self.detect_objects.objects[i].depth.data, 2)
-                #     pill_height = round(self.detect_objects.objects[i].height.data, 2)
-                #     obj_goal.x = round(obj_goal.x, 5)
-                #     obj_goal.y = round(obj_goal.y, 5)
-                #     obj_goal.z = round(obj_goal.z, 5)
-                #
-                #     print 'obj_goal = ', obj_goal
-                #     if not self.pills_dic:
-                #         self.count += 1
-                #         if self.count is 1:
-                #             self.pill_name = 'bottle number ' + str(self.count)
-                #             self.pills_dic[self.pill_name] = {'width': pill_width, 'height': pill_height,
-                #                                           'depth': pill_depth, 'x': obj_goal.x, 'y': obj_goal.y,
-                #                                           'z': obj_goal.z}
-                #     elif self.pills_dic:
-                #         for it in self.pills_dic:
-                #             print 'it =', it
-                #             print 'pill_dic =', self.pills_dic
-                #             if sqrt(pow(self.pills_dic[it]['x'] - obj_goal.x, 2) +
-                #                             pow(self.pills_dic[it]['y'] - obj_goal.y, 2)) > 0.3:
-                #                 self.count += 1
-                #                 self.pill_name = 'bottle number ' + str(self.count)
-                #                 self.pills_dic[self.pill_name] = {'width': pill_width, 'height': pill_height,
-                #                                                   'depth': pill_depth, 'x': obj_goal.x,
-                #                                                   'y': obj_goal.y, 'z': obj_goal.z}
-                # print 'pills = ', self.pills_dic
-                # temp = PointStamped()
-                # temp.header = self.detect_objects.objects[0].header
-                # temp.header.stamp = rospy.Time(0)
-                # temp.point = self.detect_objects.objects[0].point
-                # self.speak = self.subtaskBook.get_subtask(self, 'Say')
-                # self.change_state('turn_neck')
-                # self.speak.say('measuring.')
             elif self.detect_objects.state is 'not_found':
                 print 'get_data:not_found'
                 # self.speak = self.subtaskBook.get_subtask(self, 'Say')
@@ -166,8 +126,8 @@ class PillsDetection(AbstractSubtask):
                                                           'y': obj_goal.y, 'z': obj_goal.z}
                         print 'pills_dic = ', self.pills_dic
                         # break
-            # self.change_state('turn_neck')
-            self.change_state('add_word')
+            self.change_state('turn_neck')
+            # self.change_state('add_word')
 
         elif self.state is 'turn_neck':
             # if self.speak.state is 'finish':
@@ -180,14 +140,11 @@ class PillsDetection(AbstractSubtask):
                 print 'pan = ' + str(pan)
                 if pan > self.limit_right:
                     # add +y turn range
-                    # if pan + self.new_pan_point < self.limit_right:
-                    #     self.new_pan_point = self.limit_right - pan
                     print 'new_pan_point = ' + str(self.new_pan_point)
                     self.turn_neck.turn_relative(0, self.new_pan_point)
                     self.timer.wait(5)
                     print 'state detect', self.state
                     self.change_state('detecting')
-                # if pan < self.limit_right:
                 else:
                     print '--------add_word-------'
                     self.change_state('add_word')
@@ -207,7 +164,7 @@ class PillsDetection(AbstractSubtask):
                 # self.timer.wait(3)
                 # self.is_waiting()
             self.rem_id = len(self.pills_dic)
-            self.change_state('speak')
+            self.change_state('finish')
 
         elif self.state is 'speak':
             for i in range(len(self.pill_data_to_say)):
@@ -215,26 +172,24 @@ class PillsDetection(AbstractSubtask):
                 self.timer.wait(10)
                 while self.timer.is_waiting():
                     pass
-            self.change_state('get_next_line')
+            self.change_state('finish')
 
-        elif self.state is 'get_next_line':
-            # add +z
-            print '---get_next_line---'
-            if perception_data.device is 'NECK':
-                tilt = perception_data.input.tilt
-                if tilt is None:
-                    tilt = 0
-                print 'tilt = ' + str(tilt)
-                # self.tilt_neck -= 0.1225
-                if tilt >= self.limit_down:
-                    if tilt + self.new_tilt_point < self.limit_down:
-                        self.tilt_neck = self.limit_down
-                    else:
-                        self.tilt_neck = tilt + self.new_tilt_point
-                    self.pill_data_to_say = []
-                    self.change_state('set_neck')
-                else:
-                    print 'pills_dic = ', self.pills_dic
-                    self.change_state('finish')
-
-        self.is_performing = False
+        # elif self.state is 'get_next_line':
+        #     # add +z
+        #     print '---get_next_line---'
+        #     if perception_data.device is 'NECK':
+        #         tilt = perception_data.input.tilt
+        #         if tilt is None:
+        #             tilt = 0
+        #         print 'tilt = ' + str(tilt)
+        #         # self.tilt_neck -= 0.1225
+        #         if tilt >= self.limit_down:
+        #             if tilt + self.new_tilt_point < self.limit_down:
+        #                 self.tilt_neck = self.limit_down
+        #             else:
+        #                 self.tilt_neck = tilt + self.new_tilt_point
+        #             self.pill_data_to_say = []
+        #             self.change_state('set_neck')
+        #         else:
+        #             print 'pills_dic = ', self.pills_dic
+        #             self.change_state('finish')
