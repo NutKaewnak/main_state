@@ -23,7 +23,7 @@ class TestInvKine:
         self.pub_left_gripper = rospy.Publisher('dynamixel/left_gripper_joint_controller/command', Float64)
         self.invKine()
 
-    def set_torque_limit(self, limit = 0.3):
+    def set_torque_limit(self, limit=0.3):
         rospy.wait_for_service('/dynamixel/right_gripper_joint_controller/set_torque_limit')
         try:
             rospy.loginfo('settorque')
@@ -68,7 +68,7 @@ class TestInvKine:
         # self.pub_right_gripper.publish(0.8)
         # # raw_input()
 
-        # rospy.sleep(2)
+        # rospy.sleep(32)
 
         # rospy.loginfo("-----First step go to object position-----")
         # manipulator_ctrl.move_arm_pick_object_first()
