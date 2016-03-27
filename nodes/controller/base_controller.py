@@ -14,7 +14,7 @@ class BaseController:
 
     def set_absolute_position(self, x, y, theta):
         rospy.loginfo("Move robot to " + str((x, y, theta)) + ' in map')
-        self.set_new_goal(x, y, theta, 'map')
+        self.set_new_goal(x, y, theta, 'odom')
 
     def set_relative_position(self, x, y, theta):
         rospy.loginfo("Move robot to " + str((x, y, theta)) + ' from current pose')

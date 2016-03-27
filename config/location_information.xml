@@ -45,13 +45,14 @@
 	</room>
 
     <room name="dining room" position=" 9.091, 1.497" rotation="1.003" height="0.70">
-		<location name="dining table" position="-4.076, 0.520" rotation=" -1.885" height="0.70"/>
-		<!--<location name="dining table 1" position=" 11.690, 2.090 " rotation="-0.446 " height="0.70"/>-->
+		<!--<location name="dining table" position=" 0.235, 5.881" rotation=" -0.398" height="0.70"/>-->
+		<!--<location name="dining table1" position="-0.383, 6.163" rotation="-0.344" height="0.70" />-->
+		<location name="dining table 1" position=" 11.690, 2.090 " rotation="-0.446 " height="0.70"/>
 		<locaiton name="table set" position="10.019, 1.295" rotation="1.288" height="0.70"/>
-        <!--<locaiton name="dining table" position="11.699, 2.044 " rotation="-0.259" height="0.70"/>-->
-		<location name="granny" position="-0.519, -0.859" rotation="-0.342" height="0.70"/>
+        <locaiton name="dining table" position="11.699, 2.044 " rotation="-0.259" height="0.70"/>
+		<!--<location name="granny" position=" -3.803, 2.424 " rotation="1.293" height="0.70"/>-->
         <!--<locaiton name="granny" position="0.010, 5.852" rotation="1.203" height="0.70"/>-->
-		<!--<locaiton name="granny" position="8.086, 1.545" rotation="0.753" height="0.70"/>-->
+		<locaiton name="granny" position=" 9.369, 3.183" rotation="0.689" height="0.70"/>
 		<locaiton name="side table" position="12.877, 4.978" rotation="-0.325" height="0.70"/>
 	</room>
 

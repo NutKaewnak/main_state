@@ -112,7 +112,7 @@ class PillsDetection(AbstractSubtask):
                         print 'pill_dic[it] =', self.pills_dic[it]
                         # chk_len = len(self.pills_dic)
                         if sqrt(pow(self.pills_dic[it]['x'] - obj_goal.x, 2) +
-                                        pow(self.pills_dic[it]['y'] - obj_goal.y, 2)) >= 0.17:
+                                        pow(self.pills_dic[it]['y'] - obj_goal.y, 2)) >= 0.10:
                             print 'bottle different'
                             chk_len -= 1
                         else:

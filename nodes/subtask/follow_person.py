@@ -83,16 +83,16 @@ class FollowPerson(AbstractSubtask):
                 input_pts.point.y = y
                 input_pts.point.z = 0
 
-                temp = transform_point(self.tf_listener, input_pts, '/map')
-                print 'follow person temp'
-                print temp
+                #temp = transform_point(self.tf_listener, input_pts, '/map')
+                #print 'follow person temp'
+                #print temp
                 # convert back to pose
-                out = PoseStamped()
-                out.header.stamp = rospy.Time.now()
-                out.header.frame_id = '/map'
-                out.pose.position.x = temp.x
-                out.pose.position.y = temp.y
-                out.pose.position.z = theta
+                #out = PoseStamped()
+                #out.header.stamp = rospy.Time.now()
+                #out.header.frame_id = '/map'
+                #out.pose.position.x = temp.x
+                #out.pose.position.y = temp.y
+                #out.pose.position.z = theta
                 # theta2 = atan(temp.point.y/temp.point.x)
                 # quaternion = quaternion_from_euler(0, 0, theta2)
                 # HACKING find pose of person
@@ -102,7 +102,7 @@ class FollowPerson(AbstractSubtask):
                 # out.pose.position.x = temp.point.x
                 # pose = temp
 
-                self.goal_array.append(out)
+                self.goal_array.append([0,0,0])
 
                 self.distance_from_last = sqrt((point.x - self.last_point.x) ** 2 + (point.y - self.last_point.y) ** 2)
 

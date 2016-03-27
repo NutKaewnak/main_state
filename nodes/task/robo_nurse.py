@@ -45,7 +45,7 @@ class RoboNurse(AbstractTask):
 
         elif self.state is 'say':
             self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-            # self.change_state('detect_pills')
+            # self.change_state('tell_granny_to_ask_for_pill')
             self.change_state('init_detecting')
             rospy.loginfo('---in task---')
             self.subtask.say('I am in position granny. If you want to call me. Please wave your hand.')
@@ -53,6 +53,7 @@ class RoboNurse(AbstractTask):
         elif self.state is 'init_detecting':
             if self.subtask.state is 'finish':
                 # rospy.loginfo('---init_detecting---')
+                self.timer.wait(13)
                 self.subtask = self.subtaskBook.get_subtask(self, 'SearchWavingPeople')
                 # self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
                 # self.subtask.to_location('granny')
@@ -62,7 +63,7 @@ class RoboNurse(AbstractTask):
                 self.change_state('searching_granny')
 
         elif self.state is 'searching_granny':
-            if self.subtask.state is 'finish':
+            if self.subtask.state is 'finish' or not self.timer.is_waiting():
                 rospy.loginfo('---searching_granny---')
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
                 self.subtask.say('I found you granny')
@@ -134,7 +135,7 @@ class RoboNurse(AbstractTask):
             print self.state
             # if self.subtask.state is 'finish':
             self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
-            self.subtask.to_location('dining table 1')
+            self.subtask.to_location('dining table1')
             self.change_state('move_to_shelf1')
             rospy.loginfo('---init_move---')
 
@@ -192,7 +193,12 @@ class RoboNurse(AbstractTask):
                 # self.subtask.set_position(self.granny_pos.point.x, self.granny_pos.point.y, self.granny_pos.point.z)
                 # self.change_state('turn_to_granny')
                 # self.change_state('wait_for_order')
-                self.change_state('move_to_shelf')
+                self.change_state('roll_back')
+
+        elif self.state is 'roll_back':
+            self.subtask = self.subtaskBook.get_subtask(self, 'MoveRelative')
+            self.subtaskBook.set_position(-1, 0, 0)
+            self.change_state('move_to_shelf')
 
         elif self.state is 'turn_to_granny':
             if self.subtask.state is 'finish':
@@ -221,7 +227,7 @@ class RoboNurse(AbstractTask):
         elif self.state is 'move_to_pill':
             print self.pill_dic[self.pill_name]
             # size = sqrt(self.pill_dic[self.pill_name]['x']**2 + self.pill_dic[self.pill_name]['y']**2)
-            self.subtask.set_position(self.pill_dic[self.pill_name]['x']-0.8,
+            self.subtask.set_position(self.pill_dic[self.pill_name]['x']+0.8,
                                       self.pill_dic[self.pill_name]['y'], self.pill_dic[self.pill_name]['z'])
             self.change_state('prepare_pick_pill')
 

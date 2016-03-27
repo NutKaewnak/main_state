@@ -112,8 +112,9 @@ class inverseKinematics:
         else:
             self.theta6 = math.acos((self.x - (self.UL * math.sin(self.As20))) / (self.FL+0.00000001))
         
-        self.Ah41 = self.theta6
-        print 'Ah41 = ' + str(self.Ah41)
+        # self.Ah41 = self.theta6
+        self.Ah41 = 0.5
+        # print 'Ah41 = ' + str(self.Ah41)
         
         self.Ah42 = -self.Ah40
         print 'Ah42 = ' + str(self.Ah42)

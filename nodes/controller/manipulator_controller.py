@@ -55,7 +55,7 @@ class ManipulateController:
         self.obj_pos = point
         self.obj_pos.x -= 0.15
         self.obj_pos.y += 0.04
-        self.obj_pos.z -= 0.06
+        self.obj_pos.z += 0.02
         self.pos = self.obj_pos
 
     def transform_point(self, pos, origin_frame='base_link'):
@@ -162,11 +162,11 @@ class ManipulateController:
         :param (none)
         :return: (none)
         """
-        self.pos.x = self.obj_pos.x-0.1
+        self.pos.x = self.obj_pos.x
         print "obj_pos.x 1 = " + str(self.obj_pos.x)
         print "pos.x 1 = " + str(self.pos.x)
         self.pos.y = self.obj_pos.y
-        self.pos.z = self.obj_pos.z
+        self.pos.z = self.obj_pos.z+0.1
         angle = inverse_kinematics.inverse_kinematic(self.transform_point(self.pos), 0)
         self.move_arm_pick(angle)
 
@@ -176,9 +176,7 @@ class ManipulateController:
         :param (none)
         :return: (None)
         """
-        self.pos.x = self.obj_pos.x+0.1
-        print "obj_pos.x 2 = " + str(self.obj_pos.x)
-        print "pos.x 2 = " + str(self.pos.x)
+        self.pos.x = self.obj_pos.x
         self.pos.y = self.obj_pos.y
         self.pos.z = self.obj_pos.z
         angle = inverse_kinematics.inverse_kinematic(self.transform_point(self.pos), 0)
@@ -203,11 +201,17 @@ class ManipulateController:
         :param angle: (dict()) dict of angle and arm_joint
         :return: (None)
         """
-        self.pos.x = self.obj_pos.x+0.04
+        self.pos.x = self.obj_pos.x
         self.pos.y = self.obj_pos.y
-        self.pos.z = self.obj_pos.z+0.15
-        angle = inverse_kinematics.inverse_kinematic(self.transform_point(self.pos), 1.0/2.5*math.pi)
+        self.pos.z = self.obj_pos.z
+        angle = inverse_kinematics.inverse_kinematic(self.transform_point(self.pos), 1.0/6.0*math.pi)
         self.move_arm_pick(angle)
 
     def move_arm_after_pick_cloth(self):
         self.static_pose('right_after_pick_cloth')
+
+    def move_arm_turn_left(self):
+        self.static_pose('turn_arm_left')
+
+    def move_arm_turn_right(self):
+        self.static_pose('turn_arm_right')
