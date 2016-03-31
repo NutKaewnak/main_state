@@ -13,6 +13,7 @@ from perception.left_arm import LeftArm
 from perception.circle_detection import CircleDetection
 from perception.height import Height
 # from perception.joy import JoyInput
+from perception.clothes_detector_status import ClothesDetectorPerception
 from perception.recognize_objects_status import RecognizeObjectsPerception
 from perception.voice_recognition_mode_status import VoiceRecognitionModePerception
 
@@ -39,3 +40,4 @@ class PerceptionModule:
         # self.joy = JoyInput(main_state.planningModule)
         self.recosgnize_objects = RecognizeObjectsPerception(main_state.planningModule)
         self.voice_recognition_mode = VoiceRecognitionModePerception(main_state.planningModule)
+        self.clothes_detector_perception = ClothesDetectorPerception(main_state.planningModule)

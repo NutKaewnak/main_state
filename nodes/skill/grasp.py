@@ -61,13 +61,12 @@ class Grasp(AbstractSkill):
                 self.right_arm.init_position(self.goal_point)
                 self.change_state('open_gripper')
 
-
         elif self.state is 'open_gripper':
             if perception_data.device == self.arm_device:
                 arm_status = ArmStatus.get_state_from_status(perception_data.input)
                 if arm_status == 'succeeded':
                     # TODO: fix side
-                    gripper_opened = 0.8
+                    gripper_opened = 1.0
                     self.gripper.move_joint("right_gripper_joint", gripper_opened)
                     self.change_state('wait_open_gripper')
 
@@ -116,9 +115,6 @@ class Grasp(AbstractSkill):
                 arm_status = ArmStatus.get_state_from_status(perception_data.input)
                 if arm_status == 'succeeded' or arm_status == "preempted":
                     self.change_state('succeeded')
-
-
-
 
         elif self.state is 'prepare_object':
             angles = inverse_kinematics.inverse_kinematic(self.kinematic.pick_prepare())

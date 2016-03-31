@@ -10,10 +10,11 @@ class FindCloth(AbstractSubtask):
         AbstractSubtask.__init__(self, planning_module)
         self.skill = None
         self.detected_clothes = None
+        self.trials = None
 
     def perform(self, perception_data):
         if self.state is 'init':
-            self.skill = self.skillBook.get_skill('DetectClothes')
+            self.skill = self.skillBook.get_skill(self, 'DetectClothes')
             self.trials = 1
             self.change_state('try_to_detect')
 
@@ -39,7 +40,6 @@ class FindCloth(AbstractSubtask):
             non_white = 0
             unknown = 0
             for i in self.detected_clothes:
-                i = Clothes(i)
                 if i.type == 1:
                     if i.color == 2:
                         white += 1
@@ -48,5 +48,6 @@ class FindCloth(AbstractSubtask):
                     elif i.color == 4:
                         unknown += 1
 
-            return 'From clothes in front of me, I found ' + str(white) + ' white clothes and, '\
-                   + str(non_white) + ' coloured clothes, '
+            return 'From clothes in front of me, I found ' + str(white) + ' white clothes and, ' \
+                   + str(non_white) + ' coloured clothes, ' \
+                   + str(unknown) + ' unknown coloured clothes.'

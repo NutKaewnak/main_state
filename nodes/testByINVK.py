@@ -15,7 +15,7 @@ class TestInvKine:
     def __init__(self):
         global invK, manipulator_ctrl
         self.delay = Delay()
-        rospy.init_node('TestInverseKinematic')
+        # rospy.init_node('TestInverseKinematic')
         invK = inverse_kinematics.InverseKinematics()
         manipulator_ctrl = ManipulateController()
         manipulator_ctrl.init_controller()
@@ -41,7 +41,7 @@ class TestInvKine:
 
         self.obj_pos = Point()
         self.obj_pos.x = 0.68
-        self.obj_pos.y = -0.189
+        self.obj_pos.y = -0.23
         self.obj_pos.z = 0.58
 
         # rospy.loginfo("-----ARM NORMAL-----")
@@ -68,7 +68,7 @@ class TestInvKine:
 
 
         rospy.loginfo("-----OPEN GRIPPER-----")
-        self.pub_right_gripper.publish(1.0)
+        self.pub_right_gripper.publish(0.2)
         # raw_input()
         rospy.sleep(2)
 
@@ -88,23 +88,21 @@ class TestInvKine:
         rospy.loginfo("-----CLOSE GRIPPER + Move relative-----")
         # manipulator_ctrl.move_relative([0, 0, 0], [0, 0, 0])
         # self.set_torque_limit()
-        self.pub_right_gripper.publish(0.0)
+        self.pub_right_gripper.publish(-0.8)
         rospy.sleep(10)
         #
         manipulator_ctrl.move_arm_after_pick_cloth()
-        raw_input()
+        # raw_input()
         rospy.sleep(3)
 
-        manipulator_ctrl.move_arm_turn_left()
-        raw_input()
-        rospy.sleep(3)
+        # manipulator_ct
 
         manipulator_ctrl.move_arm_turn_right()
-        raw_input()
+        # raw_input()
         rospy.sleep(3)
 
         rospy.loginfo("-----OPEN GRIPPER-----")
-        self.pub_right_gripper.publish(0.8)
+        self.pub_right_gripper.publish(0.2)
         # raw_input()
         rospy.sleep(2)
 
@@ -163,8 +161,8 @@ class TestInvKine:
         #
         # rospy.spin()
 
-if __name__ == '__main__':
-    try:
-        TestInvKine()
-    except rospy.ROSInterruptException:
-        pass
+# if __name__ == '__main__':
+#     try:
+#         TestInvKine()
+#     except rospy.ROSInterruptException:
+#         pass

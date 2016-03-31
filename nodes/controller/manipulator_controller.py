@@ -39,6 +39,7 @@ class ManipulateController:
         self.robot = self.moveit_initiator.robot
         self.scene = self.moveit_initiator.scene
         self.tf_listener = self.moveit_initiator.tf_listener
+        print self.arm_side
         self.arm_group = self.moveit_initiator.init_controller(self.arm_side)
 
     def init_position(self, point):
