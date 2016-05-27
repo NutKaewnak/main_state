@@ -156,7 +156,6 @@ class NavigationTask(AbstractTask):
 
         elif self.state is 'follow_init':
             if self.follow.state is 'abort':
-                print 'abort'
                 self.subtaskBook.get_subtask(self, 'Say').say('I will go back.')
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
                 self.subtask.state = 'finish'
@@ -173,11 +172,8 @@ class NavigationTask(AbstractTask):
 
         elif self.state is 'back_to_waypoint_3':
             pose = self.follow.goal_array.pop()
-            print 'kuy'
-            print pose
             self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
             self.subtask.set_position(pose.pose.position.x, pose.pose.position.y, math.pi-pose.pose.position.z)
-            print self.subtask.state
             self.change_state('prepare_back_to_waypoint_3')
 
         elif self.state is 'prepare_leave_arena':
