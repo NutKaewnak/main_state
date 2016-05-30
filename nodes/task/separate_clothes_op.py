@@ -90,7 +90,7 @@ class SeparateClothesOP(AbstractTask):
                 self.right_side = None
 
         elif self.state is 'manual':
-            self.testByInvk.TestInvKine()
+            # self.testByInvk.TestInvKine()
             if self.timer.is_waiting():
                 self.change_state('goodbye')
 

@@ -114,7 +114,6 @@ class ManipulateController:
                                                         last_pose.pose.orientation.y,
                                                         last_pose.pose.orientation.z,
                                                         last_pose.pose.orientation.w])
-
         new_pose = Pose()
         new_pose.position.x = last_pose.pose.position.x + relative_goal_translation[0]
         new_pose.position.y = last_pose.pose.position.y + relative_goal_translation[1]
