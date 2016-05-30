@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import rospy
 import sys
-import testByINVK
 
 from control_module import ControlModule
 from planning_module import PlanningModule
@@ -21,8 +20,6 @@ class MainState:
         self.perceptionModule = PerceptionModule(self)
         # set reference to perception module
         self.planningModule.set_perception(self.perceptionModule)
-
-        self.planningModule.taskBook.book['SeparateClothesOP'].testByInvk = testByINVK
 
         rospy.loginfo('initial complete')
         rospy.spin()
