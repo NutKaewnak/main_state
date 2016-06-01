@@ -7,6 +7,7 @@ from controller.recognize_objects_controller import RecognizeObjectsObController
 from controller.object_3d_detector_controller import Object3dsDetectorController
 from controller.voice_recognition_mode_controller import VoiceRecognitionModeController
 from controller.clothes_detector_controller import ClothesDetectorController
+from controller.gripper_controller import GripperController
 
 __author__ = "AThousandYears"
 
@@ -19,7 +20,7 @@ class ControlModule:
     left_arm = ManipulateController("left_arm")
     left_gripper = ManipulateController('right_left')
     right_arm = ManipulateController("right_arm")
-    right_gripper = ManipulateController('right_gripper')
+    right_gripper = GripperController()
     recognize_objects = RecognizeObjectsObController()
     object_3d_detector = Object3dsDetectorController()
     voice_recognition_mode = VoiceRecognitionModeController()
