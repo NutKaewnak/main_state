@@ -51,15 +51,15 @@ class FollowMe(AbstractSubtask):
                 self.change_state('abort')
 
     def start(self):
-        set_pan_angle_topic = rospy.Publisher('/dynamixel/tilt_controller/command', Float64)
+        set_pan_angle_topic = rospy.Publisher('/dynamixel/tilt_controller/command', Float64, queue_size=10)
         set_pan_angle_topic.publish(Float64(0))
-        set_angle_topic = rospy.Publisher('/dynamixel/pan_controller/command', Float64)
+        set_angle_topic = rospy.Publisher('/dynamixel/pan_controller/command', Float64, queue_size=10)
         set_angle_topic.publish(Float64(0))
         self.change_state('init')
 
     def stop(self):
-        set_pan_angle_topic = rospy.Publisher('/dynamixel/tilt_controller/command', Float64)
+        set_pan_angle_topic = rospy.Publisher('/dynamixel/tilt_controller/command', Float64, queue_size=10)
         set_pan_angle_topic.publish(Float64(0))
-        set_angle_topic = rospy.Publisher('/dynamixel/pan_controller/command', Float64)
+        set_angle_topic = rospy.Publisher('/dynamixel/pan_controller/command', Float64, queue_size=10)
         set_angle_topic.publish(Float64(0))
         self.change_state('wait_for_command')

@@ -17,8 +17,8 @@ class FollowPerson(AbstractSubtask):
         self.move = None
         self.turn_base = None
         self.turn_neck = None
-        self.set_tilt = rospy.Publisher('/dynamixel/tilt_controller/command', Float64)
-        self.set_pan = rospy.Publisher('/dynamixel/pan_controller/command', Float64)
+        self.set_tilt = rospy.Publisher('/dynamixel/tilt_controller/command', Float64, queue_size=10)
+        self.set_pan = rospy.Publisher('/dynamixel/pan_controller/command', Float64, queue_size=10)
         self.last_point = Vector3()
         self.person_id = None
         self.distance_from_last = 9999.0
