@@ -1,8 +1,8 @@
 <location_information>
-    <location name="gpsr_start" position="5.242, -2.043" rotation="-0.301" height="0.70"/>
+    <location name="gpsr_start" position="8.571, -0.042 " rotation="0.057" height="0.70"/>
 
-    <room name="living room" position="14.602, -0.885" rotation="1.219" height="0.70">
-		<locaiton name="living table" position="14.266, 1.379" rotation="-0.157" height="0.70"/>
+    <room name="living room" position=" 12.700, -0.766" rotation=" -1.594 " height="0.70">
+		<locaiton name="living table" position="13.369, -3.148" rotation="-0.082" height="0.70"/>
 		<locaiton name="sofa" position="15.978, 3.264" rotation="-1.870" height="0.70"/>
         <location name="tv board" position="16.100, 3.919" rotation="1.240" height="0.70"/>
 	</room>
@@ -34,13 +34,13 @@
 	<location name="entrance" position="2.656, -7.349" rotation="3.126" height="1.29"/>
     <location name="exit" position="11.672, -6.486" rotation="-1.864" height="1.29"/>
 
-    <location name="waypoint_1" position="14.766, 4.079" rotation="1.153" height="1.29"/>
-    <location name="pre_waypoint_2" position="15.349, 0.244" rotation="0.660" height="1.29"/>
-    <location name="waypoint_2" position="15.386, 0.358" rotation="0.675" height="1.29"/>
-    <location name="waypoint_3" position="11.065, -5.846" rotation="-0.734" height="1.29"/>
+    <location name="waypoint_1" position="-8.879, -6.725" rotation="-2.417" height="1.29"/>
+    <location name="pre_waypoint_2" position="-10.956, -5.210" rotation="0.000" height="1.29"/>
+    <location name="waypoint_2" position="-10.418, -3.727" rotation=" 0.558" height="1.29"/>
+    <location name="waypoint_3" position="-10.908, -5.535" rotation="-2.563" height="1.29"/>
 
     <location name="hallway table" position="2.981, 2.737" rotation="-1.600" height="1.29"/>
-    <location name="gpsr_start" position="25.972, 3.633" rotation="-0.795" height="1.29"/>
+    <!--<location name="gpsr_start" position="25.972, 3.633" rotation="-0.795" height="1.29"/>-->
     <location name="shelf" position="12.396, -5.975  " rotation="3.131" height="1.29"/>
 
 </location_information>
