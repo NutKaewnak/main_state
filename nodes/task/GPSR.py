@@ -8,6 +8,7 @@ import tf
 
 __author__ = 'nicole'
 
+
 class GPSR(AbstractTask):
     def __init__(self, planning_module):
         AbstractTask.__init__(self, planning_module)
@@ -20,13 +21,13 @@ class GPSR(AbstractTask):
         self.person_pos = None
 
     def perform(self, perception_data):
-        # print self.state
+        print self.state
         #rospy.loginfo('state in: ' + self.state + ' from: ' + str(perception_data.device) +
-                      #' data: ' + str(perception_data.input))
+        #' data: ' + str(perception_data.input))
         if self.state is 'init':
             self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
             self.subtask.turn_absolute(-0.2, 0)
-            # self.subtask = self.subtaskBook.get_subtask(self, 'MovePassDoor')
+            self.subtask = self.subtaskBook.get_subtask(self, 'MovePassDoor')
             self.change_state('move_pass_door')
             # self.change_state('move_to_start')
 
@@ -50,7 +51,7 @@ class GPSR(AbstractTask):
 
         elif self.state == 'searching_commander':
             if self.subtask.state is 'finish':
-                rospy.loginfo('---searching_granny---')
+                rospy.loginfo('---searching_commander---')
                 self.person_pos = self.tf_listener.transformPoint('map', self.subtask.waving_people_point)
                 print "person pos = " + str(self.person_pos)
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
@@ -103,18 +104,18 @@ class GPSR(AbstractTask):
 
         elif self.state == 'confirm':
             if self.say.state == 'finish' or not self.timer.is_waiting():
-                    if perception_data.device is 'VOICE':
-                        if 'robot yes' in perception_data.input:
-                            self.say = self.subtaskBook.get_subtask(self, 'Say')
-                            self.say.say('OK, I will do it.')
-                            self.change_state('action')
+                if perception_data.device is 'VOICE':
+                    if 'robot yes' in perception_data.input:
+                        self.say = self.subtaskBook.get_subtask(self, 'Say')
+                        self.say.say('OK, I will do it.')
+                        self.change_state('action')
 
-                        elif 'robot no' in perception_data.input:
-                            self.say = self.subtaskBook.get_subtask(self, 'Say')
-                            self.say.say('Sorry, Please say again.')
-                            self.voice_mode = self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode')
-                            self.voice_mode.recognize(7)
-                            self.change_state('wait_for_command')
+                    elif 'robot no' in perception_data.input:
+                        self.say = self.subtaskBook.get_subtask(self, 'Say')
+                        self.say.say('Sorry, Please say again.')
+                        self.voice_mode = self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode')
+                        self.voice_mode.recognize(7)
+                        self.change_state('wait_for_command')
 
         # elif self.state == 'action_1':
         #     if self.say.state == 'finish':
@@ -189,8 +190,6 @@ class GPSR(AbstractTask):
                     self.timer.wait(4)
                     self.voice_mode.recognize(8)
                     self.command.pop(0)
-
-
             else:
                 self.change_state('finish')
 

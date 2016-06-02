@@ -35,7 +35,7 @@ class NavigationTask(AbstractTask):
             self.tf_listener = tf.TransformListener()
             self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.3, 0)
             rospy.loginfo('NavigationTask init')
-            self.subtaskBook.get_subtask(self, 'MovePassDoor')
+            # self.subtaskBook.get_subtask(self, 'MovePassDoor')
             self.change_state('move_pass_door')
 
         elif self.state is 'move_pass_door':
@@ -72,7 +72,9 @@ class NavigationTask(AbstractTask):
 
         elif self.state is 'finding_obstacle_waypoint2':
             if perception_data.device is 'PEOPLE' and perception_data.input is not []:
+                print 'people' + str(perception_data.input)
                 for x in perception_data.input:
+                    print 'x =' + str(x)
                     point_tf = transform_point(self.tf_listener, x.personpoints, 'map')
                     if point_tf:
                         distance = math.hypot(self.waypoint_2.x - point_tf.x, self.waypoint_2.y - point_tf.y)
@@ -91,10 +93,12 @@ class NavigationTask(AbstractTask):
                     else:
                         self.change_state('blocked_by_pet')
 
-            elif self.subtask.state is 'error aborted':
-                self.subtask = self.subtaskBook.get_subtask(self, 'MoveRelative')
-                self.subtask.set_postion(0, 0, math.pi)
-                self.change_state('move_back')
+            elif self.subtask.state is 'error':
+                # self.subtask = self.subtaskBook.get_subtask(self, 'MoveRelative')
+                # self.subtask.set_postion(0, 0, math.pi)
+                self.subtask.to_location('pre_waypoint_2')
+                # self.change_state('move_back')
+                self.change_state('finding_obstacle_waypoint2')
 
         elif self.state is 'move_back':
             if self.subtask.state is 'finish':
@@ -140,6 +144,9 @@ class NavigationTask(AbstractTask):
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
                 self.subtask.say('I will go to waypoint 3')
                 self.change_state('prepare_to_waypoint3')
+            elif self.subtask.state is 'error':
+                self.subtask.to_location('wayppoint_2')
+                self.change_state('wait_enter_waypoint2')
 
         elif self.state is 'prepare_to_waypoint3':
             if self.current_subtask.state is 'finish':
@@ -155,6 +162,9 @@ class NavigationTask(AbstractTask):
                 self.say.say('please come in front of me and say \'follow me\'.')
                 self.delay.wait(5)
                 self.change_state('instruct')
+            elif self.subtask.state is 'error':
+                self.subtask.to_location('waypoint_3')
+                self.change_state('going_to_waypoint3')
 
         elif self.state is 'instruct':
             if self.say.state is 'finish' or not self.delay.is_waiting():

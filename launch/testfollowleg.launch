@@ -4,5 +4,5 @@
 
   <node name="main_state" pkg="main_state" type="main.py" output="screen" args="TestFollowLeg" />
   <!-- <node ns="people" name="people_detection" pkg="people_detection" type="people_detection_node"> -->
-  </node>
+  <!-- </node> -->
 </launch>

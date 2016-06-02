@@ -39,8 +39,9 @@ class ManipulateController:
         self.robot = self.moveit_initiator.robot
         self.scene = self.moveit_initiator.scene
         self.tf_listener = self.moveit_initiator.tf_listener
-        print self.arm_side
         self.arm_group = self.moveit_initiator.init_controller(self.arm_side)
+        print 'self.arm_side', self.arm_side
+        print 'self.arm_group', self.arm_group
 
     def init_position(self, point):
         """
@@ -125,10 +126,10 @@ class ManipulateController:
         self.manipulate(new_pose)
 
     def move_joint(self, joint_name, joint_value):
-        print joint_name
-        print joint_value
-        print self.arm_side
-        print self.arm_group
+        print 'joint_name', joint_name
+        print 'joint_value', joint_value
+        print 'self.arm_side', self.arm_side
+        print 'self.arm_group', self.arm_group
         if (type(joint_name) == str) and (type(joint_value) == float):
             self.arm_group.clear_pose_targets()
             self.arm_group.set_joint_value_target(joint_name, joint_value)

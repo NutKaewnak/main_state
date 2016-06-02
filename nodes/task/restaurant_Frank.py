@@ -33,8 +33,6 @@ class RestaurantFrank(AbstractTask):
         self.detect_waving_people = {'table one': False, 'table two': False, 'table three': False}
         self.turn_neck = None
         self.first_table = True
-        print "Don't do that bitch. line 35 in restaurant_Frank.py"
-        # self.turn_neck.turn_absolute(0, 0)
         self.tf_listener = tf.TransformListener()
         self.delay = Delay()
 

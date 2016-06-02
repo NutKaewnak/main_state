@@ -5,7 +5,7 @@ from dynamixel_controllers.srv import SetTorqueLimit
 
 __author__ = 'Nicole'
 
-GRIPPER_EFFORT = 0.0
+GRIPPER_EFFORT = 0.5
 
 
 class GripperActionController:

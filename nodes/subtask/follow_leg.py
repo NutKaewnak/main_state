@@ -1,11 +1,11 @@
 import rospy
 import tf
 from include.abstract_subtask import AbstractSubtask
-from math import atan, sqrt
-from std_msgs.msg import Float64
+from math import atan, sqrt, pi
 from geometry_msgs.msg import Twist, Vector3, PoseStamped, Pose2D, PointStamped
 from tf.transformations import quaternion_from_euler
 from include.transform_point import transform_point
+from include.delay import Delay
 
 __author__ = 'Frank Tower'
 
@@ -20,6 +20,7 @@ class FollowLeg(AbstractSubtask):
         self.distance_from_last = 9999.0
         self.offset_from_person = 0.3
         self.tf_listener = tf.TransformListener()
+        self.isLost = False
 
     def set_person_id(self, person_id):
         self.person_id = person_id
@@ -29,12 +30,14 @@ class FollowLeg(AbstractSubtask):
         if self.state is 'init':
             self.move = self.skillBook.get_skill(self, 'MoveBaseRelative')
             self.turn_neck = self.skillBook.get_skill(self, 'TurnNeck')
+            self.timer = Delay()
             self.change_state('wait')
 
-        elif self.state is 'follow' and perception_data.device is self.Devices.PEOPLE:
-            rospy.loginfo("Track Person id %d", self.person_id)
+        elif self.state is 'follow' and perception_data.device is self.Devices.PEOPLE_LEG:
+            # rospy.loginfo("Track Person id %d", self.person_id)
             position = None
             orientation = None
+            print self.state
             for person in perception_data.input.people:
                 if person.id == self.person_id:
                     position = person.pose.position
@@ -42,83 +45,61 @@ class FollowLeg(AbstractSubtask):
 
             if position is not None:
                 theta = atan(position.y/position.x)
+                # self.move.set_position(position.x/2, position.y/2, theta)
+                print theta
+                self.distance_from_last = sqrt(
+                    (position.x - self.last_point.x) ** 2 + (position.y - self.last_point.y) ** 2)
 
-                # self.set_pan.publish(theta)
-                # self.set_tilt.publish(-0.1)
+                if theta > 0.5 and not self.timer.is_waiting():
+                    self.move.set_position(0, 0, 0.5)
+                    self.last_theta = theta
+                    self.timer.wait(1)
+                elif theta < -0.5 and not self.timer.is_waiting():
+                    self.move.set_position(0, 0, -0.5)
+                    self.last_theta = theta
+                    self.timer.wait(1)
+                # elif self.distance_from_last > 0.4 and not self.timer.is_waiting():
+                #     self.timer.wait(1)
+                #     self.move.set_position(position.x - 0.4, position.y, theta)
+                # position_map = self.tf_listener.transformPoint('map', PointStamped(header=perception_data.input.header, point=position))
 
-                # size = sqrt(position.x**2 + position.y**2)
-                #
-                # x = max(position.x/size*(size*0.5), 0)
-                # y = position.y/size*(size*0.5)
+                # distance = sqrt(
+                #     (position.x - self.last_point.x) ** 2 + (position.y - self.last_point.y) ** 2)
 
-                # publish_pose = PoseStamped()
-                # publish_pose = PointStamped()
-                # publish_pose.header.stamp = rospy.Time.now()
-                # publish_pose.header.frame_id = 'base_link'
+                # self.distance_from_last = sqrt(
+                #     (position.x - self.last_point.x) ** 2 + (position.y - self.last_point.y) ** 2)
+                #     self.last_point = position
+                #     self.last_theta = theta
+                # print self.last_point
+            elif position is None:
+                # print self.move.state
+                if not self.isLost:
+                    self.move.set_position(self.last_point.x - 0.5, self.last_point.y, self.last_theta)
+                    self.isLost = True
+                    print "Lost + " + self.isLost
+                elif self.isLost:
+                    min_distance = 99
+                    guess_id = -1
+                    for person in perception_data.input.people:
+                        # if person.id == self.person_id:
+                        position = person.pose.position
+                        orientation = person.pose.orientation
 
-                # publish_pose.pose.position.x = x
-                # publish_pose.pose.position.y = y
+                        # position_map = self.tf_listener.transformPoint('map',
+                        #                                                PointStamped(header=perception_data.input.header,
+                        #                                                             point=position))
 
-                # quaternion = quaternion_from_euler(0, 0, theta)
-                # publish_pose.pose.orientation.z = quaternion[2]
-                # publish_pose.pose.orientation.w = quaternion[3]
-                # self.publish_goal.publish(publish_pose)
-                
-                self.move.set_position(position.x, position.y, theta)
-                # pose = self.perception_module.base_status.position
+                        distance = sqrt(
+                            (position.x - self.last_point.x) ** 2 + (position.y - self.last_point.y) ** 2)
+                        if distance < min_distance:
+                            min_distance = distance
+                            guess_id = person.id
 
-                # TODO: erase this debug code when done
-                # print 'follow person pose'
-                # print pose
-                # input_pts = PointStamped()
-                # input_pts.header.stamp = rospy.Time(0)
-                # input_pts.header.frame_id = 'base_link'
-                # input_pts.point.x = x
-                # input_pts.point.y = y
-                # input_pts.point.z = 0
+                        print guess_id, distance
 
-                #temp = transform_point(self.tf_listener, input_pts, '/map')
-                #print 'follow person temp'
-                #print temp
-                # convert back to pose
-                #out = PoseStamped()
-                #out.header.stamp = rospy.Time.now()
-                #out.header.frame_id = '/map'
-                #out.pose.position.x = temp.x
-                #out.pose.position.y = temp.y
-                #out.pose.position.z = theta
-                # theta2 = atan(temp.point.y/temp.point.x)
-                # quaternion = quaternion_from_euler(0, 0, theta2)
-                # HACKING find pose of person
-                # out.pose.orientation.z = quaternion[2]
-                # out.pose.orientation.w = quaternion[3]
-
-                # out.pose.position.x = temp.point.x
-                # pose = temp
-
-                # self.goal_array.append([0,0,0])
-                position_map = self.tf_listener.transformPoint('map', PointStamped(header=perception_data.input.header, point=position))
-                self.distance_from_last = sqrt((position_map.x - self.last_point.x) ** 2 + (position_map.y - self.last_point.y) ** 2)
-                self.last_point = position_map
-            else:
-                min_distance = 99
-                guess_id = -1
-                for person in perception_data.input.people:
-                    # if person.id == self.person_id:
-                    position = person.pose.position
-                    orientation = person.pose.orientation
-
-                    position_map = self.tf_listener.transformPoint('map',
-                                                                   PointStamped(header=perception_data.input.header,
-                                                                                point=position))
-                    distance = sqrt(
-                        (position_map.x - self.last_point.x) ** 2 + (position_map.y - self.last_point.y) ** 2)
-                    if distance < min_distance:
-                        guess_id = person.id
-
-                if min_distance < 0.5:
-                    self.set_person_id(guess_id)
-                    rospy.loginfo("Change To Person ID:" + guess_id)
+                    if min_distance < 1 and guess_id != -1:
+                        self.set_person_id(guess_id)
+                        rospy.loginfo("Change To Person ID:" + guess_id)
 
             # else:
             #     rospy.loginfo("Stop Robot")
