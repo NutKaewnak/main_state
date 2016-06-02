@@ -25,7 +25,7 @@ class Grasp(AbstractSkill):
             if not self.is_init:
                 self.is_init = True
                 self.right_arm.init_controller()
-                self.gripper.init_controller()
+                # self.gripper.init_controller()
             self.change_state('wait_for_point')
 
         elif self.state is 'prepare_arm_normal':
@@ -34,8 +34,8 @@ class Grasp(AbstractSkill):
             elif self.side is 'left_arm':
                 self.right_arm.static_pose('left_normal')
             # edit pass arm_normal state
-            # self.change_state('arm_normal')
-            self.change_state('prepare_pick')
+            self.change_state('arm_normal')
+            # self.change_state('prepare_pick')
 
         elif self.state is 'arm_normal':
             if perception_data.device == self.arm_device:
@@ -58,6 +58,7 @@ class Grasp(AbstractSkill):
             if self.goal_point is not None:
                 self.goal_point.y += 0.00
                 self.goal_point.z -= 0.00
+                # But why?
                 self.right_arm.init_position(self.goal_point)
                 self.change_state('open_gripper')
 
