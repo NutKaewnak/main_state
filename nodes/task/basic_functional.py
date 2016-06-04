@@ -12,7 +12,7 @@ class BasicFunctional(AbstractTask):
     def __init__(self, planning_module):
         AbstractTask.__init__(self, planning_module)
         self.subtask = None
-        set_neck_angle_topic = rospy.Publisher('/hardware_bridge/set_neck_angle', Vector3)
+        set_neck_angle_topic = rospy.Publisher('/hardware_bridge/set_neck_angle', Vector3, queue_size=10)
         set_neck_angle_topic.publish(Vector3())
         self.state = 'place'
         # call(["espeak", "-ven+f4", 'init basic functionality.', "-s 120"])

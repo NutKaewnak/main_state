@@ -29,5 +29,4 @@ class DetectObject3Ds(AbstractSkill):
                 if not perception_data.input.result.objects:
                     self.change_state('not_found')
                 self.objects = perception_data.input.result.objects
-
-                    # print self.objects
+                # print self.objects

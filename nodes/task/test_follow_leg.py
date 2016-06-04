@@ -12,6 +12,7 @@ class TestFollowLeg(AbstractTask):
         self.count = 0
 
     def perform(self, perception_data):
+        # print self.state
         if self.state is 'init':
             self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(0, 0)
             self.change_state('wait_for_command')
@@ -23,15 +24,17 @@ class TestFollowLeg(AbstractTask):
                 self.change_state('follow_init')
 
         elif self.state is 'follow_init' and perception_data.device is self.Devices.PEOPLE_LEG:
+            # print 1111
             min_distance = 99
             track_id = -1
-            for person in perception_data.data.persons:
-                if (person.pose.x > 0 and person.pose.x < 2
-                    and person.pose.y < -1 and person.pose.y < 1):
-                    distance = hypot(person.pose.x, person.pose.y)
+            for person in perception_data.input.people:
+                if (person.pose.position.x > 0 and person.pose.position.x < 2
+                    and person.pose.position.y > -1 and person.pose.position.y < 1):
+                    distance = hypot(person.pose.position.x, person.pose.position.y)
                     if distance < min_distance:
                         track_id = person.id
             if track_id != -1:
+                print person.id
                 self.follow.set_person_id(person.id)
                 self.change_state('follow')
 

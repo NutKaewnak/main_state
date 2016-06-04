@@ -17,7 +17,7 @@ class ManipulationTask(AbstractTask):
         self.delay = Delay()
         self.latex = None
         self.is_make_latex = False
-        self.pub = rospy.Publisher('/dynamixel/prismatic_controller/command', Float64)
+        self.pub = rospy.Publisher('/dynamixel/prismatic_controller/command', Float64, queue_size=10)
 
     def perform(self, perception_data):
         if perception_data.device == 'HEIGHT':

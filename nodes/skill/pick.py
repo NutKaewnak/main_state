@@ -23,7 +23,6 @@ class Pick(AbstractSkill):
         self.device = None
 
     def perform(self, perception_data):
-        print self.state
         if self.state is 'init_pick':
             self.manipulator.init_controller()
             self.set_static_pos()
