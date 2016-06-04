@@ -34,8 +34,8 @@ class FollowPerson(AbstractSubtask):
         if self.state is 'init':
             self.move = self.skillBook.get_skill(self, 'MoveBaseRelative')
             self.turn_neck = self.skillBook.get_skill(self, 'TurnNeck')
-            self.turn_base = rospy.Publisher('/base/cmd_vel', Twist)
-            self.publish_goal = rospy.Publisher('/people/goal', PoseStamped)
+            self.turn_base = rospy.Publisher('/base/cmd_vel', Twist, queue_size=10)
+            self.publish_goal = rospy.Publisher('/people/goal', PoseStamped, queue_size=10)
             self.change_state('wait')
 
         elif self.state is 'follow' and perception_data.device is self.Devices.PEOPLE:
