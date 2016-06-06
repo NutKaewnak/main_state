@@ -24,7 +24,6 @@ class TestFollowLeg(AbstractTask):
                 self.change_state('follow_init')
 
         elif self.state is 'follow_init' and perception_data.device is self.Devices.PEOPLE_LEG:
-            # print 1111
             min_distance = 99
             track_id = -1
             for person in perception_data.input.people:

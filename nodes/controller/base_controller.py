@@ -22,7 +22,7 @@ class BaseController:
 
     def set_new_goal(self, x, y, theta, frame_id):
         self.move_base.cancel_goal()
-        self.clear_costmap()
+        # self.clear_costmap()
 
         new_goal = MoveBaseGoal()
         new_goal.target_pose.header.frame_id = frame_id

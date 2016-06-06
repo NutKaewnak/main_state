@@ -1,5 +1,6 @@
 from math import hypot, atan, sin, cos
 from include.abstract_task import AbstractTask
+from include.delay import Delay
 
 __author__ = 'CinDy'
 
@@ -9,27 +10,39 @@ class FollowGuiding(AbstractTask):
         AbstractTask.__init__(self, planning_module)
         self.subtask = None
         self.follow = None
+        self.timer = Delay()
         self.track_id = None
+
     def perform(self, perception_data):
+        # print 'state = ' + self.state
         if self.state is 'init':
             self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(0, 0)
-            self.change_state('training_phase')
+            # self.change_state('training_phase')
+            self.change_state('wait_for_command')
 
         elif self.state is 'training_phase':
             if perception_data.device is self.Devices.VOICE and perception_data.input == 'robot start':
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                self.subtask.say('please come in front of me and say \'follow me\'. \'robot stop\' to stop. and \'guide me back\' to guide back')
+                self.subtask.say(
+                    'please come in front of me and say \'follow me\'. \'robot stop\' to stop. and \'guide back\' to guide back')
+                self.timer.wait(10)
                 self.change_state('wait_for_command')
-        elif self.state is ' wait_for_command':
-            if self.subtask.state is 'finish':
-                if perception_data.device is self.Devices.PEOPLE and perception_data.input is not None:
-                    if perception_data.device is self.Devices.VOICE and perception_data.input == 'follow me':
-                        self.subtaskBook.get_subtask(self, 'Say').say('I will follow you.')
-                        self.follow = self.subtaskBook.get_subtask(self, 'FollowLeg')
-                        self.change_state('follow_init')
+
+        elif self.state is 'wait_for_command':
+            # print 'subtask state ='+self.subtask.state
+            # print 'state =' + self.state
+            # if self.subtask.state is 'finish' or not self.timer.is_waiting():
+            if perception_data.device is self.Devices.VOICE:
+                print 'input = ' + str(perception_data.input)
+            if perception_data.device is self.Devices.VOICE and perception_data.input == 'follow me':
+                print 'hi'
+                self.subtaskBook.get_subtask(self, 'Say').say('I will follow you.')
+                self.follow = self.subtaskBook.get_subtask(self, 'FollowLeg')
+                self.change_state('follow_init')
 
         elif self.state is 'follow_init':
-            if perception_data.device is self.Devices.PEOPLE_LEG and perception_data.input is not None:
+            # print 'state =' + self.state
+            if perception_data.device is self.Devices.PEOPLE_LEG and perception_data.input:
                 min_distance = 99
                 self.track_id = -1
                 for person in perception_data.input.people:
@@ -43,19 +56,24 @@ class FollowGuiding(AbstractTask):
                     self.follow.set_person_id(person.id)
                     self.change_state('follow')
         elif self.state is 'follow':
+            print 'state =' + self.state
             # recovery follow
             if perception_data.device is self.Devices.VOICE and 'stop' in perception_data.input:
                 self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(0, 0)
+                self.follow.set_person_id(-1)
                 self.change_state('wait_for_command')
 
-            if perception_data.device is self.Devices.PEOPLE_LEG and perception_data.input is not None:
-                if self.track_id not in perception_data.input.people.id:
+            if perception_data.device is self.Devices.PEOPLE_LEG and perception_data.input.people:
+                for person in perception_data.input.people:
+                    if self.track_id == person.id:
+                        break
                     self.subtask = self.subtaskBook.get_subtask(self, 'Say')
                     self.subtask.say('I am lost tracking. Please wave your hand.')
+                    self.timer.wait(2)
                     self.change_state('detect_waving_people')
 
         elif self.state is 'detect_waving_people':
-            if self.subtask.state is 'finish':
+            if self.subtask.state is 'finish' and not self.timer.is_waiting():
                 self.subtask = self.subtaskBook.get_subtask(self, 'SearchWavingPeople')
                 self.change_state('searching_person')
 
@@ -63,10 +81,10 @@ class FollowGuiding(AbstractTask):
             if self.subtask.state is 'finish':
                 person_pos = self.subtask.waving_people_point
                 print "person pos = " + str(person_pos)
-                person_theta = atan(person_pos.point.x/person_pos.point.y)
+                person_theta = atan(person_pos.point.x / person_pos.point.y)
                 person_pos.point.x = person_pos.point.x * sin(person_theta)
                 person_pos.point.y = person_pos.point.y * cos(person_theta)
-                self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
+                self.subtask = self.subtaskBook.get_subtask(self, 'MoveRelative')
                 self.subtask.set_position(person_pos.point.x, person_pos.point.y,
                                           person_theta)
                 self.change_state('move_to_person')
