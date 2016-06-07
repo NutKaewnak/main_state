@@ -1,2 +1,5 @@
 .idea/*
 *.pyc
+SKUBA_*.tex
+SKUBA_*.log
+SKUBA_*.aux
