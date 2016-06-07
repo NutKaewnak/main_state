@@ -13,7 +13,7 @@ class RecognizeObjectsPerception(AbstractPerception):
 
     def callback_recognize_objects_status(self, data):
         self.broadcast(Devices.RECOGNIZE_OBJECTS, data)
-        self.broadcast(Devices.RECOGNIZE_OBJECTS, data.result)
+        # self.broadcast(Devices.RECOGNIZE_OBJECTS, data.result)
 
     def callback_base_position(self, data):
         position = data.feedback.base_position.pose.position
