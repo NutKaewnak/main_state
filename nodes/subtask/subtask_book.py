@@ -32,6 +32,7 @@ from detect_middle_object import DetectMiddleObject
 from arm_static_pose import ArmStaticPose
 from find_cloth import FindCloth
 from follow_leg import FollowLeg
+from  detect_door import DetectDoor
 
 # from object_recognition_subtask import ObjectRecognition
 
@@ -75,7 +76,7 @@ class SubtaskBook:
         self.book['ArmStaticPose'] = ArmStaticPose(planning_module)
         self.book['FindCloth'] = FindCloth(planning_module)
         self.book['FollowLeg'] = FollowLeg(planning_module)
-
+        self.book['DetectDoor'] = DetectDoor(planning_module)
 
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()

@@ -25,6 +25,7 @@ from test_pill import TestPill
 from separate_clothes_op import SeparateClothesOP
 from test_detect_object import TestDetectObject
 from test_follow_leg import TestFollowLeg
+from follow_guiding import FollowGuiding
 __author__ = "AThousandYears"
 
 
@@ -58,6 +59,7 @@ class TaskBook:
         self.book['SeparateClothesOP'] = SeparateClothesOP(planning_module)
         self.book['TestDetectObject'] = TestDetectObject(planning_module)
         self.book['TestFollowLeg'] = TestFollowLeg(planning_module)
+        self.book['FollowGuiding'] = FollowGuiding(planning_module)
 
     def set_perception(self, perception_module):
         for task in self.book:

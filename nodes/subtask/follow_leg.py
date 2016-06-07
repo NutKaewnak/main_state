@@ -21,6 +21,7 @@ class FollowLeg(AbstractSubtask):
         self.offset_from_person = 0.3
         self.tf_listener = tf.TransformListener()
         self.isLost = False
+        self.last_theta = 0
 
     def set_person_id(self, person_id):
         self.person_id = person_id
@@ -34,7 +35,7 @@ class FollowLeg(AbstractSubtask):
             self.change_state('wait')
 
         elif self.state is 'follow' and perception_data.device is self.Devices.PEOPLE_LEG:
-            # rospy.loginfo("Track Person id %d", self.person_id)
+            rospy.loginfo("Track Person id %d", self.person_id)
             position = None
             orientation = None
             print self.state
@@ -46,21 +47,21 @@ class FollowLeg(AbstractSubtask):
             if position is not None:
                 theta = atan(position.y/position.x)
                 # self.move.set_position(position.x/2, position.y/2, theta)
-                print theta
+
                 self.distance_from_last = sqrt(
                     (position.x - self.last_point.x) ** 2 + (position.y - self.last_point.y) ** 2)
-
-                if theta > 0.5 and not self.timer.is_waiting():
-                    self.move.set_position(0, 0, 0.5)
+                print theta, self.distance_from_last
+                if theta > 0.4 and not self.timer.is_waiting():
+                    self.move.set_position(0, 0, 0.4)
                     self.last_theta = theta
                     self.timer.wait(1)
-                elif theta < -0.5 and not self.timer.is_waiting():
-                    self.move.set_position(0, 0, -0.5)
+                elif theta < -0.4 and not self.timer.is_waiting():
+                    self.move.set_position(0, 0, -0.4)
                     self.last_theta = theta
                     self.timer.wait(1)
-                # elif self.distance_from_last > 0.4 and not self.timer.is_waiting():
-                #     self.timer.wait(1)
-                #     self.move.set_position(position.x - 0.4, position.y, theta)
+                elif self.distance_from_last > 0.4 is not self.timer.is_waiting():
+                    self.timer.wait(1)
+                    self.move.set_position(max(position.x - 0.4, 0.6), position.y, theta)
                 # position_map = self.tf_listener.transformPoint('map', PointStamped(header=perception_data.input.header, point=position))
 
                 # distance = sqrt(
@@ -68,9 +69,9 @@ class FollowLeg(AbstractSubtask):
 
                 # self.distance_from_last = sqrt(
                 #     (position.x - self.last_point.x) ** 2 + (position.y - self.last_point.y) ** 2)
-                #     self.last_point = position
-                #     self.last_theta = theta
-                # print self.last_point
+                    self.last_point = position
+                    self.last_theta = theta
+                print self.last_point
             elif position is None:
                 # print self.move.state
                 if not self.isLost:
@@ -97,9 +98,9 @@ class FollowLeg(AbstractSubtask):
 
                         print guess_id, distance
 
-                    if min_distance < 1 and guess_id != -1:
+                    if min_distance < 0.6 and guess_id != -1:
                         self.set_person_id(guess_id)
-                        rospy.loginfo("Change To Person ID:" + guess_id)
+                        rospy.loginfo("Change To Person ID:" + str(guess_id))
 
             # else:
             #     rospy.loginfo("Stop Robot")
