@@ -5,7 +5,7 @@ from dynamixel_controllers.srv import SetTorqueLimit
 
 __author__ = 'Nicole'
 
-GRIPPER_EFFORT = 0.5
+GRIPPER_EFFORT = 0.8
 
 
 class GripperActionController:
@@ -18,7 +18,7 @@ class GripperActionController:
 
     def gripper_open(self, gripper_effort=GRIPPER_EFFORT):
         action_open = GripperCommandGoal()
-        action_open.command.position = 0.6
+        action_open.command.position = 0.8
         self.set_torque_limit(gripper_effort)
         self.gripper_client.send_goal(action_open)
 
