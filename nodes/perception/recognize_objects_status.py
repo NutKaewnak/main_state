@@ -5,6 +5,7 @@ import rospy
 
 __author__ = "Frank"
 
+
 class RecognizeObjectsPerception(AbstractPerception):
     def __init__(self, planning_module):
         AbstractPerception.__init__(self, planning_module)
@@ -13,7 +14,6 @@ class RecognizeObjectsPerception(AbstractPerception):
 
     def callback_recognize_objects_status(self, data):
         self.broadcast(Devices.RECOGNIZE_OBJECTS, data)
-        # self.broadcast(Devices.RECOGNIZE_OBJECTS, data.result)
 
     def callback_base_position(self, data):
         position = data.feedback.base_position.pose.position

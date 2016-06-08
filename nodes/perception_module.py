@@ -16,7 +16,9 @@ from perception.clothes_detector_status import ClothesDetectorPerception
 from perception.recognize_objects_status import RecognizeObjectsPerception
 from perception.voice_recognition_mode_status import VoiceRecognitionModePerception
 from perception.people_leg_detect import PeopleLegDetection
+from perception.sound_source_localize import SoundSourceLocalize
 # from perception.joy import JoyInput
+
 __author__ = "AThousandYears"
 
 
@@ -41,4 +43,5 @@ class PerceptionModule:
         self.voice_recognition_mode = VoiceRecognitionModePerception(main_state.planningModule)
         self.clothes_detector_perception = ClothesDetectorPerception(main_state.planningModule)
         self.leg_people = PeopleLegDetection(main_state.planningModule)
+        self.sound_source_localize = SoundSourceLocalize(main_state.planningModule)
         # self.joy = JoyInput(main_state.planningModule)
