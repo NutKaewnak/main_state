@@ -9,7 +9,6 @@ class AbstractSkill:
         self.perception_module = None
         self.Devices = None
         self.perception_data = None
-        self.is_performing = False
 
     def reset(self):
         self.state = 'init'
@@ -21,10 +20,7 @@ class AbstractSkill:
 
     def act(self, perception_data):
         self.perception_data = perception_data
-        if not self.is_performing:
-            self.is_performing = True
-            self.perform(perception_data)
-            self.is_performing = False
+        self.perform(perception_data)
 
     def change_state(self, new_state):
         self.last_state = self.state
