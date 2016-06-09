@@ -24,6 +24,8 @@ class Grasp(AbstractSkill):
         self.state_to_print = ""
         self.timer = Delay()
 
+        self.result = 0
+
     def perform(self, perception_data):
         if self.state_to_print != self.state:
             self.state_to_print = self.state
@@ -32,12 +34,12 @@ class Grasp(AbstractSkill):
         if self.state is 'init':
             self.object_pose = None
             self.object_name = ""
+            self.gripper_close()
             if not self.is_init:
                 self.is_init = True
                 if not self.is_done_init:
                     self.right_arm.init_controller()
                     self.is_done_init = True
-                    print 'done init right side'
                     self.change_state('wait_for_point')
 
         elif self.state is 'prepare_arm_normal':
@@ -50,32 +52,40 @@ class Grasp(AbstractSkill):
         elif self.state is 'arm_normal':
             if perception_data.device == self.arm_device:
                 arm_status = ArmStatus.get_state_from_status(perception_data.input)
-                print arm_status, "--------------------"
                 if arm_status == 'succeeded' or arm_status == "preempted":
                     # TODO: fix side
-                    self.change_state('open_gripper')
+                    self.change_state('done_prepare')
+
+        elif self.state is 'receive_pick_object':
+            self.gripper_open()
+            if self.side is 'right_arm':
+                self.right_arm.static_pose('right_pregrasp')
+            elif self.side is 'left_arm':
+                self.right_arm.static_pose('left_pregrasp')
+            self.change_state('open_gripper')
 
         elif self.state is 'open_gripper':
-            if perception_data.device == self.arm_device:
-                arm_status = ArmStatus.get_state_from_status(perception_data.input)
-                if arm_status == 'succeeded':
+            if perception_data.device == self.gripper_device:
+                if ArmStatus.get_state_from_status(perception_data.input) == 'succeeded':
                     # TODO: fix side
-                    self.gripper_open()
-                    self.change_state('done_prepare')
+                    self.change_state('pick_object')
 
         elif self.state is 'pick_object':
             if self.object_pose is None:
                 rospy.logerr('No object_pose to pick')
                 self.change_state('rejected')
                 return
-
-            if perception_data.device == self.gripper_device:
-                gripper_status = ArmStatus.get_state_from_status(perception_data.input)
-                if gripper_status == 'succeeded':
-                    self.right_arm.pick(self.object_pose, self.object_name)
+            if perception_data.device == self.arm_device:
+                arm_status = ArmStatus.get_state_from_status(perception_data.input)
+                if arm_status == 'succeeded' or arm_status == "preempted":
+                    self.result = self.right_arm.pick(self.object_pose, self.object_name)
                     self.change_state('wait_succeeded')
 
         elif self.state is 'wait_succeeded':
+            if self.result == -1:
+                self.change_state('unreachable')
+                return
+
             if perception_data.device == self.arm_device:
                 if ArmStatus.get_state_from_status(perception_data.input) == 'succeeded':
                     # TODO: fix side
@@ -102,7 +112,7 @@ class Grasp(AbstractSkill):
         self.object_pose = pose_stamped
         self.object_name = object_name
         rospy.loginfo('----pick_object:grasp_skill---')
-        self.change_state('prepare_arm_normal')
+        self.change_state('receive_pick_object')
 
     def set_side(self, side='right_arm'):
         self.side = side
@@ -114,7 +124,7 @@ class Grasp(AbstractSkill):
             self.gripper_device = 'LEFT_GRIPPER'
 
     def after_prepare(self):
-        self.change_state('pick_object')
+        self.change_state('receive_pick_object')
 
     def gripper_open(self):
         self.gripper.gripper_open()

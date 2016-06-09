@@ -12,9 +12,9 @@ class Pick(AbstractSubtask):
         self.side_arm = None
         self.subtask = None
         self.neck = None
+        self.object_name = None
 
     def perform(self, perception_data):
-        # print self.state
         if self.state is 'init':
             # rospy.loginfo('pick subtask init')
             self.grasp = self.skillBook.get_skill(self, 'Grasp')
@@ -40,13 +40,14 @@ class Pick(AbstractSubtask):
             elif self.grasp.state is 'succeed':
                 self.change_state('finish')
 
-    def pick_object(self, pose_stamped):
+    def pick_object(self, pose_stamped, object_name='little_big'):
         """
         Let subtask pick object. Please make sure that side arm is already design (Default: 'right_arm').
         :param pose_stamped: (PoseStamped) point of object to pick.
         :return: None
         """
         self.input_object_point = pose_stamped
+        self.object_name = object_name
         if self.side_arm is None:
             self.side_arm = 'right_arm'
         self.change_state('receive_point')

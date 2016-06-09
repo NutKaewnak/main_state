@@ -27,15 +27,14 @@ class TurnNeck(AbstractSkill):
             self.pan = perception_data.input.pan
             self.tilt = perception_data.input.tilt
 
-        if self.state is 'active' or self.state is 'pending':
-            if perception_data.device is 'NECK':
-                state = NeckStatus.get_state_from_status(perception_data.input.status)
-                # TODO: Bad code here!!
-                self.is_active = NeckStatus.is_active(perception_data.input.status)
-                self.change_state(state)
+            state = NeckStatus.get_state_from_status(perception_data.input.status)
+            # TODO: Bad code here!!
+            self.is_active = NeckStatus.is_active(perception_data.input.status)
+            self.change_state(state)
 
         elif self.state is 'receive':
             if perception_data.device is 'NECK':
+                print perception_data.input
                 print 'receive'
                 self.pan = perception_data.input.pan
                 self.tilt = perception_data.input.tilt

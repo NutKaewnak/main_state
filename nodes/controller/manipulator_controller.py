@@ -31,7 +31,7 @@ class ManipulateController:
         self.tf_listener = self.moveit_initiator.tf_listener
         self.arm_group = self.moveit_initiator.init_controller(self.arm_side)
         self.arm_group.set_planning_time(100)
-        rospy.loginfo('Manipulator_controller init:', self.arm_side)
+        rospy.loginfo('Manipulator_controller init: ' + self.arm_side)
 
     def pick(self, object_pose, object_name='black_cock'):
         """
@@ -40,9 +40,13 @@ class ManipulateController:
         :param object_name: (str)
         :return:
         """
-        self.scene.add_sphere(object_name, object_pose, 0.05)
+        self.remove_object(object_name)
+        self.scene.add_sphere(object_name, object_pose, 0.01)
         self.world_object.append(object_name)
-        self.arm_group.pick(object_pose)
+        result = self.arm_group.pick(object_name)
+        print 'picking:', object_name
+        print result
+        return result
 
     def static_pose(self, pose_name):
         """
@@ -55,7 +59,10 @@ class ManipulateController:
 
     def remove_object(self, object_name):
         self.scene.remove_world_object(object_name)
-        self.world_object.remove(object_name)
+        try:
+            self.world_object.remove(object_name)
+        except ValueError:
+            pass
 
     def remove_all_object(self):
         for object_name in self.world_object:
