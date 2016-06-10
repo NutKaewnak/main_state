@@ -40,7 +40,9 @@ class Test(AbstractTask):
                 picking_object = self.subtask.objects.pop()
                 self.object_goal = PoseStamped()
                 self.object_goal.header = picking_object.header
+                self.object_goal.header.frame_id = '/odom_combined'
                 self.object_goal.pose.position = picking_object.point
+                self.object_goal.pose.position.y += 0.1
                 self.change_state('pick')
 
         elif self.state is 'pick':
@@ -50,16 +52,19 @@ class Test(AbstractTask):
 
         elif self.state is 'wait_for_pick':
             if self.pick.state is 'solve_unreachable':
-                if len(self.subtask.objects) == 0:
-                    self.change_state('find_object')
-                    rospy.sleep(5)
-                    return
-
-                picking_object = self.subtask.objects.pop()
-                self.object_goal = PoseStamped()
-                self.object_goal.header = picking_object.header
-                self.object_goal.pose.position = picking_object.point
-                self.change_state('pick')
+                # if len(self.subtask.objects) == 0:
+                #     self.change_state('find_object')
+                #     rospy.sleep(5)
+                #     return
+                #
+                # picking_object = self.subtask.objects.pop()
+                # self.object_goal = PoseStamped()
+                # self.object_goal.header = picking_object.header
+                # self.object_goal.header.frame_id = '/base_link'
+                # self.object_goal.pose.position = picking_object.point
+                # self.change_state('pick')
+                print 'error'
+                self.change_state('error')
 
             elif self.pick.state is 'finish':
                 self.change_state('finish')

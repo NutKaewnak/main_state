@@ -30,7 +30,7 @@ class ManipulateController:
         self.scene = self.moveit_initiator.scene
         self.tf_listener = self.moveit_initiator.tf_listener
         self.arm_group = self.moveit_initiator.init_controller(self.arm_side)
-        self.arm_group.set_planning_time(100)
+        self.arm_group.set_planning_time(60)
         rospy.loginfo('Manipulator_controller init: ' + self.arm_side)
 
     def pick(self, object_pose, object_name='black_cock'):
@@ -41,7 +41,12 @@ class ManipulateController:
         :return:
         """
         self.remove_object(object_name)
-        self.scene.add_sphere(object_name, object_pose, 0.01)
+        # if 'plane' not in self.world_object:
+        #     pose_stamped = PoseStamped()
+        #     pose_stamped.header.frame_id = '/odom_combined'
+        #     pose_stamped.pose.position.z = 0.73
+        #     self.scene.add_plane('plane', pose_stamped)
+        self.scene.add_box(object_name, object_pose, (0.05, 0.05, 0.05))
         self.world_object.append(object_name)
         result = self.arm_group.pick(object_name)
         print 'picking:', object_name
@@ -59,10 +64,11 @@ class ManipulateController:
 
     def remove_object(self, object_name):
         self.scene.remove_world_object(object_name)
-        try:
+        if object_name in self.world_object:
             self.world_object.remove(object_name)
-        except ValueError:
-            pass
+            rospy.loginfo("Remove " + str(object_name) + " from world.")
+        else:
+            rospy.loginfo("No such " + str(object_name) + " in world.")
 
     def remove_all_object(self):
         for object_name in self.world_object:

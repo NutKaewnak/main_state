@@ -75,11 +75,10 @@ class Grasp(AbstractSkill):
                 rospy.logerr('No object_pose to pick')
                 self.change_state('rejected')
                 return
-            if perception_data.device == self.arm_device:
-                arm_status = ArmStatus.get_state_from_status(perception_data.input)
-                if arm_status == 'succeeded' or arm_status == "preempted":
-                    self.result = self.right_arm.pick(self.object_pose, self.object_name)
-                    self.change_state('wait_succeeded')
+
+            self.result = self.right_arm.pick(self.object_pose, self.object_name)
+            print self.result
+            self.change_state('wait_succeeded')
 
         elif self.state is 'wait_succeeded':
             if self.result == -1:
