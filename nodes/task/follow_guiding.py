@@ -83,14 +83,14 @@ class FollowGuiding(AbstractTask):
                     self.subtask.say('I am lost tracking. Please wave your hand.')
                     self.timer.wait(2)
                     self.change_state('detect_waving_people')
-            if perception_data.device is self.Devices.BASE_STATUS and self.perception_module.base_status.position:
-                robot_position = self.perception_module.base_status.position
-                pos = Pose2D()
-                pos.x = robot_position[0]
-                pos.y = robot_position[1]
-                pos.theta = robot_position[2]
-                self.path.append(pos)
-                # self.path['x'].append(robot_position[0])
+            # if perception_data.device is self.Devices.BASE_STATUS and self.perception_module.base_status.position:
+            #     robot_position = self.perception_module.base_status.position
+            #     pos = Pose2D()
+            #     pos.x = robot_position[0]
+            #     pos.y = robot_position[1]
+            #     pos.theta = robot_position[2]
+            #     self.path.append(pos)
+            #     # self.path['x'].append(robot_position[0])
                 # self.path['y'].append(robot_position[1])
                 # self.path['theta'].append(robot_position[2])
 
@@ -115,8 +115,8 @@ class FollowGuiding(AbstractTask):
             self.change_state('wait_for_command')
 
         elif self.state is 'init_guide':
-            point = self.path.pop()
-            self.move.set_position(point.x,point.y,(point.theta+pi)%(2*pi))
+            point = self.follow.path.pop()
+            self.move.set_position(point.x, point.y, (point.theta+pi) % (2*pi))
             self.change_state('guide_back')
 
         elif self.state is 'guide_back':
