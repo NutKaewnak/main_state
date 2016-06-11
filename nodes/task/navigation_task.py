@@ -25,6 +25,8 @@ class NavigationTask(AbstractTask):
         self.waypoint_2.y = -6.004
         self.is_performing = False
         self.say = None
+        self.door_waypoint3_path = {}
+        self.waypoint4_door_path = {}
 
     def perform(self, perception_data):
         if self.is_performing:
@@ -32,6 +34,8 @@ class NavigationTask(AbstractTask):
         self.is_performing = True
 
         if self.state is 'init':
+            self.door_waypoint3_path = {'x', 'y', 'theta'}
+            self.waypoint4_door_path = {'x', 'y', 'theta'}
             self.tf_listener = tf.TransformListener()
             self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.3, 0)
             rospy.loginfo('NavigationTask init')
@@ -179,6 +183,11 @@ class NavigationTask(AbstractTask):
                 self.change_state('follow_init')
 
         elif self.state is 'follow_init':
+            if perception_data.device is self.Devices.BASE_STATUS and self.perception_module.base_status.position:
+                robo_position = self.perception_module.base_status.position
+                self.door_waypoint3_path['x'].append(robo_position[0])
+                self.door_waypoint3_path['y'].append(robo_position[1])
+                self.door_waypoint3_path['theta'].append(robo_position[2])
             if self.follow.state is 'abort':
                 print 'abort'
                 self.subtaskBook.get_subtask(self, 'Say').say('I will go back.')

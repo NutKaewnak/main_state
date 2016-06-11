@@ -59,9 +59,9 @@ class FollowLeg(AbstractSubtask):
                     self.move.set_position(0, 0, -0.4)
                     self.last_theta = theta
                     self.timer.wait(1)
-                elif self.distance_from_last > 0.4 is not self.timer.is_waiting():
+                elif self.distance_from_last > 0.4 and not self.timer.is_waiting() and position.x > 0.4:
                     self.timer.wait(1)
-                    self.move.set_position(max(position.x - 0.4, 0.6), position.y, theta)
+                    self.move.set_position(min(position.x - 0.4, 0.6), position.y, theta)
                 # position_map = self.tf_listener.transformPoint('map', PointStamped(header=perception_data.input.header, point=position))
 
                 # distance = sqrt(
@@ -77,7 +77,7 @@ class FollowLeg(AbstractSubtask):
                 if not self.isLost:
                     self.move.set_position(self.last_point.x - 0.5, self.last_point.y, self.last_theta)
                     self.isLost = True
-                    print "Lost + " + self.isLost
+                    print "Lost: ", self.isLost
                 elif self.isLost:
                     min_distance = 99
                     guess_id = -1

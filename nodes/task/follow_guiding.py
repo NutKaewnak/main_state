@@ -1,6 +1,7 @@
 from math import hypot, atan, sin, cos, pi
 from include.abstract_task import AbstractTask
 from include.delay import Delay
+from geometry_msgs.msg import Pose2D
 
 __author__ = 'CinDy'
 
@@ -12,15 +13,15 @@ class FollowGuiding(AbstractTask):
         self.follow = None
         self.timer = Delay()
         self.track_id = None
-        self.path = {}
+        self.path = []
         self.move = None
 
     def perform(self, perception_data):
         # print 'state = ' + self.state
         if self.state is 'init':
-            self.path['x'] = []
-            self.path['y'] = []
-            self.path['theta'] = []
+            # self.path['x'] = []
+            # self.path['y'] = []
+            # self.path['theta'] = []
 
             self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(0, 0)
             # self.change_state('training_phase')
@@ -49,7 +50,7 @@ class FollowGuiding(AbstractTask):
                 elif perception_data.input == 'guide back':
                     self.subtaskBook.get_subtask(self, 'Say').say('I will guide you back')
                     self.move = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
-                    self.change_state('guide_back')
+                    self.change_state('init_guide')
 
         elif self.state is 'follow_init':
             # print 'state =' + self.state
@@ -82,11 +83,16 @@ class FollowGuiding(AbstractTask):
                     self.subtask.say('I am lost tracking. Please wave your hand.')
                     self.timer.wait(2)
                     self.change_state('detect_waving_people')
-            if perception_data.device is self.Devices.BASE_STATUS and perception_data.input.position:
+            if perception_data.device is self.Devices.BASE_STATUS and self.perception_module.base_status.position:
                 robot_position = self.perception_module.base_status.position
-                self.path['x'].append(robot_position[0])
-                self.path['y'].append(robot_position[1])
-                self.path['theta'].append(robot_position[2])
+                pos = Pose2D()
+                pos.x = robot_position[0]
+                pos.y = robot_position[1]
+                pos.theta = robot_position[2]
+                self.path.append(pos)
+                # self.path['x'].append(robot_position[0])
+                # self.path['y'].append(robot_position[1])
+                # self.path['theta'].append(robot_position[2])
 
         elif self.state is 'detect_waving_people':
             if self.subtask.state is 'finish' and not self.timer.is_waiting():
@@ -96,21 +102,23 @@ class FollowGuiding(AbstractTask):
         elif self.state is 'searching_person':
             if self.subtask.state is 'finish':
                 person_pos = self.subtask.waving_people_point
+                theta = atan(person_pos.point.y / person_pos.point.x)
                 print "person pos = " + str(person_pos)
-                person_theta = atan(person_pos.point.x / person_pos.point.y)
-                person_pos.point.x = person_pos.point.x * sin(person_theta)
-                person_pos.point.y = person_pos.point.y * cos(person_theta)
+                # person_theta = atan(person_pos.point.x / person_pos.point.y)
+                # person_pos.point.x = person_pos.point.x * sin(person_theta)
+                # person_pos.point.y = person_pos.point.y * cos(person_theta)
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveRelative')
-                self.subtask.set_position(person_pos.point.x, person_pos.point.y,
-                                          person_theta)
+                self.subtask.set_position(person_pos.point.x - 0.5, person_pos.point.y,
+                                          theta)
                 self.change_state('move_to_person')
         elif self.state is 'move_to_person':
             self.change_state('wait_for_command')
 
+        elif self.state is 'init_guide':
+            point = self.path.pop()
+            self.move.set_position(point.x,point.y,(point.theta+pi)%(2*pi))
+            self.change_state('guide_back')
+
         elif self.state is 'guide_back':
-            index = len(self.path['x'])
-            self.path['x'].reverse()
-            self.path['y'].reverse()
-            self.path['theta'].reverse()
-            for i in index:
-                self.move.set_position(self.path['x'][i], self.path['y'][i], self.path['theta'][i]+pi)
+            if self.move.state is 'finish':
+                self.change_state('init_guide')
