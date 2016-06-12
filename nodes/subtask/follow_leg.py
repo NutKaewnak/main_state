@@ -22,6 +22,7 @@ class FollowLeg(AbstractSubtask):
         self.tf_listener = tf.TransformListener()
         self.isLost = False
         self.last_theta = 0
+        self.path = []
 
     def set_person_id(self, person_id):
         self.person_id = person_id
@@ -62,6 +63,7 @@ class FollowLeg(AbstractSubtask):
                 elif self.distance_from_last > 0.4 and not self.timer.is_waiting() and position.x > 0.4:
                     self.timer.wait(1)
                     self.move.set_position(min(position.x - 0.4, 0.6), position.y, theta)
+                    self.save_path(min(position.x - 0.4, 0.6), position.y, theta)
                 # position_map = self.tf_listener.transformPoint('map', PointStamped(header=perception_data.input.header, point=position))
 
                 # distance = sqrt(
@@ -76,6 +78,7 @@ class FollowLeg(AbstractSubtask):
                 # print self.move.state
                 if not self.isLost:
                     self.move.set_position(self.last_point.x - 0.5, self.last_point.y, self.last_theta)
+                    self.save_path(self.last_point.x - 0.5, self.last_point.y, self.last_theta)
                     self.isLost = True
                     print "Lost: ", self.isLost
                 elif self.isLost:
@@ -114,3 +117,10 @@ class FollowLeg(AbstractSubtask):
                 self.skillBook.get_skill(self, 'Say').say('I stop.')
                 self.move.stop()
                 self.change_state('abort')
+
+    def save_path(self, x, y, theta):
+        pos = Pose2D()
+        pos.x = x
+        pos.y = y
+        pos.theta = atan(y / x)
+        self.path.append(pos)
