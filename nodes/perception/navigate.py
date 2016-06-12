@@ -12,7 +12,7 @@ class Navigate(AbstractPerception):
     def __init__(self, planning_module):
         AbstractPerception.__init__(self, planning_module)
         # rospy.Subscriber('/base/status', String, self.callback_base_status)
-        # rospy.Subscriber("/navigate/move_base_node/TractoryPlannerROS/local_plan", , self.callback_local_plan)
+        rospy.Subscriber("/navigate/move_base_node/TrajectoryPlannerROS/local_plan", Path, self.callback_local_plan)
         rospy.Subscriber("/navigation/move_base_node/TrajectoryPlannerROS/global_plan", Path, self.callback_global_plan)
         self.position = (0, 0, 0)
 
@@ -32,4 +32,3 @@ class Navigate(AbstractPerception):
         rpy_angle = euler_from_quaternion(quaternion)
         self.position = (position.x, position.y, rpy_angle[2])
 
-    # Don't forget to add this perception into perception_module
