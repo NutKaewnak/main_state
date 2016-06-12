@@ -15,6 +15,7 @@ class Test(AbstractTask):
     def perform(self, perception_data):
         if self.state is 'init':
             self.subtask = self.subtaskBook.get_subtask(self, 'TestSubtaskSkill')
+            print 'done'
             self.change_state('wait_for_subtask')
 
         elif self.state is 'wait_for_subtask':

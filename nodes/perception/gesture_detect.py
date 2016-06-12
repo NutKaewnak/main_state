@@ -3,6 +3,7 @@ import tf
 from include.abstract_perception import AbstractPerception
 from include.devices import Devices
 from geometry_msgs.msg import PointStamped
+from math import atan
 
 __author__ = 'nicole'
 
@@ -18,5 +19,8 @@ class GestureDetection(AbstractPerception):
         # data.point.x *= -1
         data.header.stamp = rospy.Time(0)
         point_tf = self.tf_listener.transformPoint('base_link', data)
+        theta = atan(point_tf.point.y / point_tf.point.x)
+        # print point_tf
+        # print theta
         # print 'point_tf.point ' + str(point_tf.point)
         self.broadcast(Devices.GESTURE, point_tf)

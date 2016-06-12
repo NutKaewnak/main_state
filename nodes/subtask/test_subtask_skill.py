@@ -14,11 +14,12 @@ class TestSubtaskSkill(AbstractSubtask):
     def perform(self, perception_data):
         if self.state is 'init':
             self.skill = self.skillBook.get_skill(self, 'MoveBaseRelativeTwist')
-            self.skill.set_position(0, 0, 2*math.pi)
+            print 'send goal'
+            self.skill.set_position(0, 0.5, 0)
             self.change_state('wait_for_skill')
 
         elif self.state is 'wait_for_skill':
-            if self.skill.state is 'succeed':
+            if self.skill.state is 'succeeded':
                 self.change_state('finish')
             elif self.skill.state is 'aborted':
                 rospy.loginfo('Aborted')

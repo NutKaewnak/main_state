@@ -12,14 +12,14 @@ class BaseController:
     def __init__(self):
         self.move_base = actionlib.SimpleActionClient('/navigation/move_base', MoveBaseAction)
         self.clear_costmap = rospy.ServiceProxy('/navigation/move_base_node/clear_costmaps', Empty)
-        self.move_twist = rospy.Publisher('cmd_vel', Twist, queue_size=1)
+        self.move_twist = rospy.Publisher('/base/cmd_vel', Twist, queue_size=1)
 
     def set_twist(self, twist):
-        self.move_twist.pub(twist)
+        self.move_twist.publish(twist)
 
     def set_twist_stop(self):
         stop_twist = Twist()
-        self.move_twist(stop_twist)
+        self.move_twist.publish(stop_twist)
 
     def set_absolute_position(self, x, y, theta):
         rospy.loginfo("Move robot to " + str((x, y, theta)) + ' in map')
