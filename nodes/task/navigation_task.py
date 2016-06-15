@@ -49,10 +49,10 @@ class NavigationTask(AbstractTask):
                 self.change_state('prepare_to_waypoint1')
 
         elif self.state is 'prepare_to_waypoint1':
-            self.delay.wait(90)
-            self.change_state('going_to_waypoint1')
             self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
             self.subtask.to_location('waypoint_1')
+            self.delay.wait(90)
+            self.change_state('going_to_waypoint1')
 
         elif self.state is 'going_to_waypoint1':
             if self.subtask.state is 'finish':
@@ -81,7 +81,7 @@ class NavigationTask(AbstractTask):
                     print 'x =' + str(x)
                     point_tf = transform_point(self.tf_listener, x.personpoints, 'map')
                     if point_tf:
-                        distance = math.hypot(self.waypoint_2.x - point_tf.x, self.waypoint_2.y - point_tf.y)
+                        distance = get_distance(self.waypoint_2.x, point_tf)
                         print distance
                         if distance <= 2:
                             rospy.loginfo('Found people block the way')
@@ -208,8 +208,6 @@ class NavigationTask(AbstractTask):
 
         elif self.state is 'back_to_waypoint_3':
             pose = self.follow.goal_array.pop()
-            print 'kuy'
-            print pose
             self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
             self.subtask.set_position(pose.pose.position.x, pose.pose.position.y, math.pi-pose.pose.position.z)
             print self.subtask.state
