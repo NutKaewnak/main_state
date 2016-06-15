@@ -1,5 +1,6 @@
 from move_base_absolute import MoveBaseAbsolute
 from move_base_relative import MoveBaseRelative
+from move_base_relative_twist import MoveBaseRelativeTwist
 from rips_out import RipsOut
 from say import Say
 from confirm import Confirm
@@ -12,7 +13,6 @@ from detect_object_3ds import DetectObject3Ds
 from voice_recognition_mode import VoiceRecognitionMode
 from arm_static_pose import ArmStaticPose
 from detect_clothes import DetectClothes
-from move_base_relative_twist import MoveBaseRelativeTwist
 
 __author__ = "AThousandYears"
 
@@ -22,6 +22,7 @@ class SkillBook:
         self.book = dict()
         self.book['MoveBaseAbsolute'] = MoveBaseAbsolute(control_module)
         self.book['MoveBaseRelative'] = MoveBaseRelative(control_module)
+        self.book['MoveBaseRelativeTwist'] = MoveBaseRelativeTwist(control_module)
         self.book['RipsOut'] = RipsOut(control_module)
         self.book['Say'] = Say(control_module)
         self.book['Confirm'] = Confirm(control_module)
@@ -34,7 +35,6 @@ class SkillBook:
         self.book['VoiceRecognitionMode'] = VoiceRecognitionMode(control_module)
         self.book['ArmStaticPose'] = ArmStaticPose(control_module)
         self.book['DetectClothes'] = DetectClothes(control_module)
-        self.book['MoveBaseRelativeTwist'] = MoveBaseRelativeTwist(control_module)
 
     def get_skill(self, subtask, skill_name):
         self.book[skill_name].reset()

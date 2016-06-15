@@ -15,6 +15,7 @@ class BaseController:
         self.move_twist = rospy.Publisher('/base/cmd_vel', Twist, queue_size=1)
 
     def set_twist(self, twist):
+        rospy.loginfo("Send Twist " + str((twist.linear.x, twist.linear.y, twist.angular.z)) + ' to robot.')
         self.move_twist.publish(twist)
 
     def set_twist_stop(self):
