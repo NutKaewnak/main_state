@@ -16,6 +16,12 @@ class GripperActionController:
         self.set_torque_limit = rospy.ServiceProxy('/dynamixel/right_gripper_joint_controller/set_torque_limit',
                                                    SetTorqueLimit)
 
+    def set_position(self, position, gripper_effort=GRIPPER_EFFORT):
+        action = GripperCommandGoal()
+        action.command.position = position
+        self.set_torque_limit(gripper_effort)
+        self.gripper_client.send_goal(action)
+
     def gripper_open(self, gripper_effort=GRIPPER_EFFORT):
         action_open = GripperCommandGoal()
         action_open.command.position = 0.8

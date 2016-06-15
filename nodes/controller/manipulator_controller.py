@@ -46,6 +46,9 @@ class ManipulateController:
         #     pose_stamped.header.frame_id = '/odom_combined'
         #     pose_stamped.pose.position.z = 0.73
         #     self.scene.add_plane('plane', pose_stamped)
+        # object_pose.pose.position.x += -0.10
+        # object_pose.pose.position.y += 0.05
+        # object_pose.pose.position.z += 0.05
         self.scene.add_box(object_name, object_pose, (0.05, 0.05, 0.05))
         self.world_object.append(object_name)
         result = self.arm_group.pick(object_name)

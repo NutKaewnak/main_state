@@ -85,10 +85,11 @@ class Grasp(AbstractSkill):
                 self.change_state('unreachable')
                 return
 
-            if perception_data.device == self.arm_device:
-                if ArmStatus.get_state_from_status(perception_data.input) == 'succeeded':
+            # if perception_data.device == self.arm_device:
+            #     if ArmStatus.get_state_from_status(perception_data.input) == 'succeeded':
+            if self.result == -3:
                     # TODO: fix side
-                    self.gripper_close()
+                    self.gripper.set_position(0.4)
                     self.right_arm.static_pose('right_normal')
                     rospy.loginfo('--after_grasp--')
                     print '---current state = ' + self.state + '---'
