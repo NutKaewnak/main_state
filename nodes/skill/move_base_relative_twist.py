@@ -10,6 +10,7 @@ VEL_LINEAR_Y = 0.05
 VEL_ANGULAR_Z = 0.1
 
 
+
 class MoveBaseRelativeTwist(AbstractSkill):
     def __init__(self, control_module):
         AbstractSkill.__init__(self, control_module)

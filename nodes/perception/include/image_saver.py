@@ -10,12 +10,11 @@ DEFAULT_SAVE_DIR = roslib.packages.get_pkg_dir('main_state')+'/picture/'
 bridge = CvBridge()
 
 
-def save_image(image, image_name='test.png', save_dir=DEFAULT_SAVE_DIR):
+def save_image(image, image_path=DEFAULT_SAVE_DIR+'test.png'):
     """
 
     :param image: (sensor_msgs.msg.Image)
-    :param image_name: (str)
-    :param save_dir: (str)
+    :param image_path: (str)
     :return: (None)
     """
     try:
@@ -24,7 +23,7 @@ def save_image(image, image_name='test.png', save_dir=DEFAULT_SAVE_DIR):
     except CvBridgeError, e:
         print(e)
     else:
-        cv2.imwrite(save_dir + image_name, cv2_img)
+        cv2.imwrite(image_path, cv2_img)
 
 
 def image_subscriber(data):

@@ -8,6 +8,7 @@ from object_3d_detector.msg import Object3DsResult, Object3D
 from object_recognition_v2.msg import ObjectRecognition, ObjectRecognitions
 from subprocess import call
 from devices import Devices
+from image_saver import save_image
 
 
 class ReportGenerator:
@@ -48,12 +49,14 @@ class ReportGenerator:
         :param data: (ObjectRecognition)
         :return:
         """
+        image_path = roslib.packages.get_pkg_dir('main_state') + '/picture/' + str(data.name.data) + '.png'
+        save_image(data.image, image_path)
         pic_description = 'data_description\n\\begin{figure}\n\\centering\n\\includegraphics[height=5cm]{' \
                           'data_picture}\n\\label{fig:base}\n\\end{figure}\n'
         info_to_write = pic_description.replace('data_description', 'Time Stamped: ' + str(data.header.stamp.to_time())
                                                 + '\n' + 'Centroid: \n' + str(data.centriod)
                                                 + '\n' + 'Name: ' + data.name.data)
-        info_to_write = info_to_write.replace('data_picture', roslib.packages.get_pkg_dir('main_state') + '/picture/rock.jpg')
+        info_to_write = info_to_write.replace('data_picture', image_path)
         self.latex.write(info_to_write)
 
     def on_end_latex(self):
