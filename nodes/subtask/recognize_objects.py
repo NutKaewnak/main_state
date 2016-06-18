@@ -2,6 +2,7 @@ from include.abstract_subtask import AbstractSubtask
 
 __author__ = 'Frank'
 
+
 class RecognizeObjects(AbstractSubtask):
     def __init__(self, planning_module):
         AbstractSubtask.__init__(self, planning_module)

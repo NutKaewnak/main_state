@@ -4,15 +4,19 @@ from move_to_location import MoveToLocation
 from turn_neck import TurnNeck
 from say import Say
 from arm_static_pose import ArmStaticPose
+from pick import Pick
 from people_detect import PeopleDetect
+from follow_person import FollowPerson
+from follow_me import FollowMe
+from follow_leg import FollowLeg
+from objects_detection import ObjectsDetection
+from recognize_objects import RecognizeObjects
+from recognize_object_on_plane import RecognizeObjectOnPlane
 from detect_door import DetectDoor
 from detect_phone import DetectPhone
 from detect_blanket import DetectBlanket
 from detect_cane import DetectCane
 from detect_middle_object import DetectMiddleObject
-from pick import Pick
-from follow_person import FollowPerson
-from follow_me import FollowMe
 from register import Register
 from introduce import Introduce
 from leave_arena import LeaveArena
@@ -26,12 +30,9 @@ from search_waving_people import SearchWavingPeople
 from detect_front_person import DetectFrontPerson
 from set_height_relative import SetHeightRelative
 from scissor_rock_paper import ScissorRockPaper
-from recognize_objects import RecognizeObjects
-from objects_detection import ObjectsDetection
 from pills_detection import PillsDetection
 from voice_recognition_mode import VoiceRecognitionMode
 from find_cloth import FindCloth
-from follow_leg import FollowLeg
 
 from test_subtask_skill import TestSubtaskSkill
 
@@ -47,34 +48,39 @@ class SubtaskBook:
         self.book['TurnNeck'] = TurnNeck(planning_module)
         self.book['Say'] = Say(planning_module)
         self.book['ArmStaticPose'] = ArmStaticPose(planning_module)
+        self.book['Pick'] = Pick(planning_module)
+
         self.book['PeopleDetect'] = PeopleDetect(planning_module)
+        self.book['DetectAndMoveToPeople'] = DetectAndMoveToPeople(planning_module)
+        self.book['FollowPerson'] = FollowPerson(planning_module)
+        self.book['FollowMe'] = FollowMe(planning_module)
+        self.book['FollowLeg'] = FollowLeg(planning_module)
+
+        self.book['ObjectsDetection'] = ObjectsDetection(planning_module)
+        self.book['RecognizeObjects'] = RecognizeObjects(planning_module)
+        self.book['RecognizeObjectOnPlane'] = RecognizeObjectOnPlane(planning_module)
+
         self.book['DetectDoor'] = DetectDoor(planning_module)
         self.book['DetectPhone'] = DetectPhone(planning_module)
         self.book['DetectBlanket'] = DetectBlanket(planning_module)
         self.book['DetectCane'] = DetectCane(planning_module)
+
         self.book['Introduce'] = Introduce(planning_module)
         self.book['Register'] = Register(planning_module)
         self.book['LeaveArena'] = LeaveArena(planning_module)
         self.book['FindPeopleAndGetOrder'] = FindPeopleAndGetOrder(planning_module)
-        self.book['DetectAndMoveToPeople'] = DetectAndMoveToPeople(planning_module)
-        self.book['FollowPerson'] = FollowPerson(planning_module)
         self.book['BringGrabbingObjectToPerson'] = BringGrabbingObjectToPerson(planning_module)
         self.book['QuestionAnswer'] = QuestionAnswer(planning_module)
         self.book['MoveAbsolute'] = MoveAbsolute(planning_module)
-        self.book['Pick'] = Pick(planning_module)
         self.book['PillsDetection'] = PillsDetection(planning_module)
         self.book['DetectWavingPeople'] = DetectWavingPeople(planning_module)
         self.book['SearchWavingPeople'] = SearchWavingPeople(planning_module)
         self.book['DetectFrontPerson'] = DetectFrontPerson(planning_module)
         self.book['SetHeightRelative'] = SetHeightRelative(planning_module)
         self.book['ScissorRockPaper'] = ScissorRockPaper(planning_module)
-        self.book['RecognizeObjects'] = RecognizeObjects(planning_module)
-        self.book['ObjectsDetection'] = ObjectsDetection(planning_module)
         self.book['VoiceRecognitionMode'] = VoiceRecognitionMode(planning_module)
-        self.book['FollowMe'] = FollowMe(planning_module)
         self.book['DetectMiddleObject'] = DetectMiddleObject(planning_module)
         self.book['FindCloth'] = FindCloth(planning_module)
-        self.book['FollowLeg'] = FollowLeg(planning_module)
 
         self.book['TestSubtaskSkill'] = TestSubtaskSkill(planning_module)
 
