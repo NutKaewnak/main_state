@@ -26,8 +26,9 @@ class NavigationTask(AbstractTask):
         self.is_performing = False
         self.location_list = {}
         self.say = None
-        self.door_waypoint3_path = {}
-        self.waypoint4_door_path = {}
+        # self.door_waypoint3_path = {}
+        # self.waypoint4_door_path = {}
+        self.track_id = None
 
     def perform(self, perception_data):
         if self.is_performing:
@@ -35,8 +36,8 @@ class NavigationTask(AbstractTask):
         self.is_performing = True
 
         if self.state is 'init':
-            self.door_waypoint3_path = {'x', 'y', 'theta'}
-            self.waypoint4_door_path = {'x', 'y', 'theta'}
+            # self.door_waypoint3_path = {'x', 'y', 'theta'}
+            # self.waypoint4_door_path = {'x', 'y', 'theta'}
             self.tf_listener = tf.TransformListener()
             self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.3, 0)
             rospy.loginfo('NavigationTask init')
@@ -174,79 +175,123 @@ class NavigationTask(AbstractTask):
         elif self.state is 'instruct':
             if self.say.state is 'finish' or not self.delay.is_waiting():
                 self.say.say('And \'robot go back\' to go back.')
-                self.change_state('prepare_follow')
+                self.change_state('wait_for_command')
 
-        elif self.state is 'prepare_follow':
-            if perception_data.device is self.Devices.VOICE and 'follow me' in perception_data.input:
-                self.say.say('I will follow you.')
-                self.follow = self.subtaskBook.get_subtask(self, 'FollowMe')
-                self.follow.start()
-                self.change_state('follow_init')
+        elif self.state is 'wait_for_command':
+            if perception_data.device is self.Devices.VOICE:
+                if 'follow me' in perception_data.input:
+                    self.say.say('I will follow you.')
+                    # self.follow = self.subtaskBook.get_subtask(self, 'FollowMe')
+                    # self.follow.start()
+                    self.follow = self.subtaskBook.get_subtask(self, 'FollowLeg')
+                    self.change_state('follow_init')
+                elif 'go back' in perception_data.input:
+                    self.say.say('I will go back')
+                    self.subtask = self.subtaskBook.get_subtask(self, 'DetectDoor')
+                    self.change_state('prepare_back_to_waypoint_3')
 
         elif self.state is 'follow_init':
-            if perception_data.device is self.Devices.BASE_STATUS and self.perception_module.base_status.position:
-                robo_position = self.perception_module.base_status.position
-                if math.sqrt(math.hypot(robo_position[0],robo_position[1]) ==
-                self.door_waypoint3_path['x'].append(robo_position[0])
-                self.door_waypoint3_path['y'].append(robo_position[1])
-                self.door_waypoint3_path['theta'].append(robo_position[2])
-            if self.follow.state is 'abort':
-                print 'abort'
-                self.subtaskBook.get_subtask(self, 'Say').say('I will go back.')
-                self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
-                self.delay.wait(5)
-                # self.subtask.state = 'finish'
-                self.change_state('prepare_back_to_waypoint_3')
+            # if perception_data.device is self.Devices.BASE_STATUS and self.perception_module.base_status.position:
+            #     robo_position = self.perception_module.base_status.position
+            #     # if math.sqrt(math.hypot(robo_position[0],robo_position[1]) ==
+            #     self.door_waypoint3_path['x'].append(robo_position[0])
+            #     self.door_waypoint3_path['y'].append(robo_position[1])
+            #     self.door_waypoint3_path['theta'].append(robo_position[2])
+            # if self.follow.state is 'abort':
+            #     print 'abort'
+            #     self.subtaskBook.get_subtask(self, 'Say').say('I will go back.')
+            #     self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
+            #     self.delay.wait(5)
+            #     # self.subtask.state = 'finish'
+            #     self.change_state('prepare_back_to_waypoint_3')
+            if perception_data.device is self.Devices.PEOPLE_LEG and perception_data.input:
+                min_distance = 99
+                self.track_id = -1
+                for person in perception_data.input.people:
+                    if (person.pose.position.x > 0 and person.pose.position.x < 2
+                        and person.pose.position.y > -1 and person.pose.position.y < 1):
+                        distance = math.hypot(person.pose.position.x, person.pose.position.y)
+                        if distance < min_distance:
+                            self.track_id = person.id
+                if self.track_id != -1:
+                    print person.id
+                    self.follow.set_person_id(person.id)
+                    self.change_state('follow')
+
+        elif self.state is 'follow':
+            print 'state =' + self.state
+            # recovery follow
+            if perception_data.device is self.Devices.VOICE and 'stop' in perception_data.input:
+                self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(0, 0)
+                self.follow.set_person_id(-1)
+                self.change_state('wait_for_command')
+
+            if perception_data.device is self.Devices.PEOPLE_LEG and perception_data.input.people:
+                for person in perception_data.input.people:
+                    if self.track_id == person.id:
+                        break
+                    elif self.follow.guess_id == person.id:
+                        self.track_id = self.follow.guess_id
+                        print 'change track id = ', self.track_id
+                    self.subtask = self.subtaskBook.get_subtask(self, 'Say')
+                    self.subtask.say('I am lost tracking. Please wave your hand.')
+                    self.timer.wait(2)
+                    self.change_state('detect_waving_people')
 
         elif self.state is 'prepare_back_to_waypoint_3':
             # if self.subtask.state is 'finish' or self.subtask.state is 'error':
-            if not self.delay.is_waiting():
-                # print self.follow.goal_array
-                if self.follow.goal_array:
-                    self.change_state('back_to_waypoint_3')
-                else:
-                    self.subtaskBook.get_subtask(self, 'Say').say('I will leave arena.')
-                    self.change_state('prepare_leave_arena')
+            # if not self.delay.is_waiting():
+            #     print self.follow.goal_array
+            #     if self.follow.goal_array:
+            #         self.change_state('back_to_waypoint_3')
+            #     else:
+            #         self.subtaskBook.get_subtask(self, 'Say').say('I will leave arena.')
+            #         self.change_state('prepare_leave_arena')
+            if self.subtask.state is 'finish':
+                print self.subtask.state
+                self.delay.wait(150)
+                self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
+                self.subtask.to_location('waypoint_3')
+                self.change_state('back_to_waypoint_3')
 
         elif self.state is 'back_to_waypoint_3':
-            pose = self.follow.goal_array.pop()
-            self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
-            self.subtask.set_position(pose.pose.position.x, pose.pose.position.y, math.pi-pose.pose.position.z)
-            print self.subtask.state
-            self.change_state('prepare_back_to_waypoint_3')
-
-        elif self.state is 'prepare_leave_arena':
-            rospy.loginfo('leave arena')
-            self.subtask = self.subtaskBook.get_subtask(self, 'LeaveArena')
-            self.change_state('leave_arena')
+            # pose = self.follow.goal_array.pop()
+            # self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
+            # self.subtask.set_position(pose.pose.position.x, pose.pose.position.y, math.pi-pose.pose.position.z)
+            if self.subtask.state is 'finish':
+                rospy.loginfo('leave arena')
+                self.subtask = self.subtaskBook.get_subtask(self, 'LeaveArena')
+                self.change_state('leave_arena')
 
         elif self.state is 'leave_arena':
             if self.subtask.state is 'finish':
                 self.change_state('finish')
 
         self.is_performing = False
-
-    def detect_door(self,robot_pos):
-        to_location = Pose2D()
-        read_location_information(self.location_list)
-        for location_name in self.location_list:
-            if 'door' in location_name:
-                door_pos = Pose2D()
-                door_pos.x = self.location_list[location_name].position.x
-                door_pos.y = self.location_list[location_name].position.y
-                door_pos.theta = self.location_list[location_name].theta
-
-                distance = abs(math.hypot(door_pos.x, door_pos.y) - math.hypot(robot_pos[0], robot_pos[1]))
-                if distance < minimum:
-                    minimum = distance
-                    to_location.x = door_pos.x
-                    to_location.y = door_pos.y
-
-                if abs(math.atan(robot_pos[0], robot_pos[1]) - door_pos.theta) \
-                        < abs(math.atan(robot_pos[0], robot_pos[1]) - (door_pos.theta + math.pi) % math.pi):
-                    to_location.theta = (door_pos.theta + math.pi) % math.pi
-                else:
-                    to_location.theta = door_pos.theta
-                to_location.x = round(door_pos.x - 0.6 * math.sin(to_location.theta), 5)
-                to_location.y = round(door_pos.y - 0.6 * math.cos(to_location.theta), 5)
-        return to_location
+    #
+    # def detect_door(self, robot_pos):
+    #     to_location = Pose2D()
+    #     minimum = 99
+    #     read_location_information(self.location_list)
+    #     for location_name in self.location_list:
+    #         if 'door' in location_name:
+    #             door_pos = Pose2D()
+    #             door_pos.x = self.location_list[location_name].position.x
+    #             door_pos.y = self.location_list[location_name].position.y
+    #             door_pos.theta = self.location_list[location_name].theta
+    #
+    #             distance = abs(math.hypot(door_pos.x, door_pos.y) - math.hypot(robot_pos[0], robot_pos[1]))
+    #             if distance < minimum:
+    #                 minimum = distance
+    #                 to_location.x = door_pos.x
+    #                 to_location.y = door_pos.y
+    #                 to_location.theta = door_pos.theta
+    #
+    #             if abs(math.atan(robot_pos[0], robot_pos[1]) - door_pos.theta) \
+    #                     < abs(math.atan(robot_pos[0], robot_pos[1]) - (door_pos.theta + math.pi) % math.pi):
+    #                 to_location.theta = (door_pos.theta + math.pi) % math.pi
+    #             else:
+    #                 to_location.theta = door_pos.theta
+    #             to_location.x = round(door_pos.x - 0.6 * math.sin(to_location.theta), 5)
+    #             to_location.y = round(door_pos.y - 0.6 * math.cos(to_location.theta), 5)
+    #     return to_location
