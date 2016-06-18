@@ -15,7 +15,7 @@ class TestSubtaskSkill(AbstractSubtask):
         if self.state is 'init':
             self.skill = self.skillBook.get_skill(self, 'MoveBaseRelativeTwist')
             print 'send goal'
-            self.skill.set_position(0, 0.5, 0)
+            self.skill.set_position(0.20, -0.20, 0)
             self.change_state('wait_for_skill')
 
         elif self.state is 'wait_for_skill':
