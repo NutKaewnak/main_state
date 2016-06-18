@@ -6,7 +6,7 @@ from include.abstract_skill import AbstractSkill
 __author__ = "nicole"
 
 VEL_LINEAR_X = 0.2
-VEL_LINEAR_Y = 0.1
+VEL_LINEAR_Y = 0.05
 VEL_ANGULAR_Z = 0.1
 
 

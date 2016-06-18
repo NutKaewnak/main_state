@@ -23,10 +23,7 @@ class FollowLeg(AbstractSubtask):
         self.isLost = False
         self.last_theta = 0
         self.path = []
-        self.move = self.skillBook.get_skill(self, 'MoveBaseRelative')
-        # self.move.set_position(2, 0, 0)
-        # self.move.set_position(0, 0, -0.6)
-
+        self.guess_id = None
 
     def set_person_id(self, person_id):
         self.person_id = person_id
@@ -95,7 +92,7 @@ class FollowLeg(AbstractSubtask):
                     #     self.set_person_id(-1)
                     #     return
                     min_distance = 99
-                    guess_id = -1
+                    self.guess_id = -1
                     for person in perception_data.input.people:
                         # if person.id == self.person_id:
                         position = person.pose.position
@@ -109,13 +106,13 @@ class FollowLeg(AbstractSubtask):
                             (position.x - self.last_point.x) ** 2 + (position.y - self.last_point.y) ** 2)
                         if distance < min_distance:
                             min_distance = distance
-                            guess_id = person.id
+                            self.guess_id = person.id
 
-                        print guess_id, distance
+                        print self.guess_id, distance
 
-                    if min_distance < 0.6 and guess_id != -1:
-                        self.set_person_id(guess_id)
-                        rospy.loginfo("Change To Person ID:" + str(guess_id))
+                    if min_distance < 0.6 and self.guess_id != -1:
+                        self.set_person_id(self.guess_id)
+                        rospy.loginfo("Change To Person ID:" + str(self.guess_id))
 
             # else:
             #     rospy.loginfo("Stop Robot")

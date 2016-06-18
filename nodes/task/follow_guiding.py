@@ -79,6 +79,9 @@ class FollowGuiding(AbstractTask):
                 for person in perception_data.input.people:
                     if self.track_id == -1:
                         break
+                    elif self.follow.guess_id == person.id:
+                        self.track_id = self.track_id
+                        print 'change track id = ', self.track_id
                     self.subtask = self.subtaskBook.get_subtask(self, 'Say')
                     self.subtask.say('I am lost tracking. Please wave your hand.')
                     self.timer.wait(2)

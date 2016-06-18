@@ -31,7 +31,7 @@ class BaseController:
         self.set_new_goal(x, y, theta, 'base_link')
 
     def set_new_goal(self, x, y, theta, frame_id):
-        self.move_base.cancel_goal()
+        # self.move_base.cancel_goal()
         # self.clear_costmap()
 
         new_goal = MoveBaseGoal()
