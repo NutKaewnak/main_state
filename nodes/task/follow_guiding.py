@@ -82,7 +82,7 @@ class FollowGuiding(AbstractTask):
                     if self.track_id == person.id:
                         break
                     elif self.follow.guess_id == person.id:
-                        self.track_id = self.track_id
+                        self.track_id = self.follow.guess_id
                         print 'change track id = ', self.track_id
                     elif perception_data.input.people[-1]:
                         self.subtask = self.subtaskBook.get_subtask(self, 'Say')
