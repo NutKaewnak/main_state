@@ -1,9 +1,9 @@
 import math
-
 import rospy
 import tf
 import random
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import Point, Pose2D
+from include.location_information import read_location_information
 from include.transform_point import transform_point
 from include.abstract_task import AbstractTask
 from include.delay import Delay
@@ -24,6 +24,7 @@ class NavigationTask(AbstractTask):
         self.waypoint_2.x = 11.997
         self.waypoint_2.y = -6.004
         self.is_performing = False
+        self.location_list = {}
         self.say = None
         self.door_waypoint3_path = {}
         self.waypoint4_door_path = {}
@@ -185,6 +186,7 @@ class NavigationTask(AbstractTask):
         elif self.state is 'follow_init':
             if perception_data.device is self.Devices.BASE_STATUS and self.perception_module.base_status.position:
                 robo_position = self.perception_module.base_status.position
+                if math.sqrt(math.hypot(robo_position[0],robo_position[1]) ==
                 self.door_waypoint3_path['x'].append(robo_position[0])
                 self.door_waypoint3_path['y'].append(robo_position[1])
                 self.door_waypoint3_path['theta'].append(robo_position[2])
@@ -223,3 +225,28 @@ class NavigationTask(AbstractTask):
                 self.change_state('finish')
 
         self.is_performing = False
+
+    def detect_door(self,robot_pos):
+        to_location = Pose2D()
+        read_location_information(self.location_list)
+        for location_name in self.location_list:
+            if 'door' in location_name:
+                door_pos = Pose2D()
+                door_pos.x = self.location_list[location_name].position.x
+                door_pos.y = self.location_list[location_name].position.y
+                door_pos.theta = self.location_list[location_name].theta
+
+                distance = abs(math.hypot(door_pos.x, door_pos.y) - math.hypot(robot_pos[0], robot_pos[1]))
+                if distance < minimum:
+                    minimum = distance
+                    to_location.x = door_pos.x
+                    to_location.y = door_pos.y
+
+                if abs(math.atan(robot_pos[0], robot_pos[1]) - door_pos.theta) \
+                        < abs(math.atan(robot_pos[0], robot_pos[1]) - (door_pos.theta + math.pi) % math.pi):
+                    to_location.theta = (door_pos.theta + math.pi) % math.pi
+                else:
+                    to_location.theta = door_pos.theta
+                to_location.x = round(door_pos.x - 0.6 * math.sin(to_location.theta), 5)
+                to_location.y = round(door_pos.y - 0.6 * math.cos(to_location.theta), 5)
+        return to_location
