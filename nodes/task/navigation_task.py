@@ -3,7 +3,7 @@ import rospy
 import tf
 import random
 from geometry_msgs.msg import Point, Pose2D
-from include.location_information import read_location_information
+# from include.location_information import read_location_information
 from include.transform_point import transform_point
 from include.abstract_task import AbstractTask
 from include.delay import Delay
@@ -186,10 +186,10 @@ class NavigationTask(AbstractTask):
         elif self.state is 'follow_init':
             if perception_data.device is self.Devices.BASE_STATUS and self.perception_module.base_status.position:
                 robo_position = self.perception_module.base_status.position
-                if math.sqrt(math.hypot(robo_position[0],robo_position[1]) ==
-                self.door_waypoint3_path['x'].append(robo_position[0])
-                self.door_waypoint3_path['y'].append(robo_position[1])
-                self.door_waypoint3_path['theta'].append(robo_position[2])
+            #     if math.sqrt(math.hypot(robo_position[0],robo_position[1]) ==
+            #         self.door_waypoint3_path['x'].append(robo_position[0])
+            #         self.door_waypoint3_path['y'].append(robo_position[1])
+            #         self.door_waypoint3_path['theta'].append(robo_position[2])
             if self.follow.state is 'abort':
                 print 'abort'
                 self.subtaskBook.get_subtask(self, 'Say').say('I will go back.')
@@ -228,7 +228,7 @@ class NavigationTask(AbstractTask):
 
     def detect_door(self,robot_pos):
         to_location = Pose2D()
-        read_location_information(self.location_list)
+        # read_location_information(self.location_list)
         for location_name in self.location_list:
             if 'door' in location_name:
                 door_pos = Pose2D()
