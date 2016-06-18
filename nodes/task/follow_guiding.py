@@ -76,16 +76,19 @@ class FollowGuiding(AbstractTask):
                 self.change_state('wait_for_command')
 
             if perception_data.device is self.Devices.PEOPLE_LEG and perception_data.input.people:
+                print 'track_id =', self.track_id
                 for person in perception_data.input.people:
-                    if self.track_id == -1:
+                    print ' person.id =', person.id
+                    if self.track_id == person.id:
                         break
                     elif self.follow.guess_id == person.id:
                         self.track_id = self.track_id
                         print 'change track id = ', self.track_id
-                    self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                    self.subtask.say('I am lost tracking. Please wave your hand.')
-                    self.timer.wait(2)
-                    self.change_state('detect_waving_people')
+                    elif perception_data.input.people[-1]:
+                        self.subtask = self.subtaskBook.get_subtask(self, 'Say')
+                        self.subtask.say('I am lost tracking. Please wave your hand.')
+                        self.timer.wait(2)
+                        self.change_state('detect_waving_people')
             # if perception_data.device is self.Devices.BASE_STATUS and self.perception_module.base_status.position:
             #     robot_position = self.perception_module.base_status.position
             #     pos = Pose2D()
