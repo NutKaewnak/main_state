@@ -30,8 +30,8 @@ class FollowGuiding(AbstractTask):
         elif self.state is 'training_phase':
             if perception_data.device is self.Devices.VOICE and perception_data.input == 'robot start':
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                self.subtask.say(
-                    'please come in front of me and say \'follow me\'. \'robot stop\' to stop. and \'guide back\' to guide back')
+                self.subtask.say('please come in front of me and say \'follow me\'. '
+                                 '\'robot stop\' to stop. and \'guide back\' to guide back')
                 self.timer.wait(10)
                 self.change_state('wait_for_command')
 
@@ -72,12 +72,12 @@ class FollowGuiding(AbstractTask):
             # recovery follow
             if perception_data.device is self.Devices.VOICE and 'stop' in perception_data.input:
                 self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(0, 0)
-                self.follow.set_person_id(-1)
+                # self.follow.set_person_id(-1)
                 self.change_state('wait_for_command')
 
             if perception_data.device is self.Devices.PEOPLE_LEG and perception_data.input.people:
                 for person in perception_data.input.people:
-                    if self.track_id == person.id:
+                    if self.track_id == -1:
                         break
                     self.subtask = self.subtaskBook.get_subtask(self, 'Say')
                     self.subtask.say('I am lost tracking. Please wave your hand.')
@@ -90,9 +90,11 @@ class FollowGuiding(AbstractTask):
             #     pos.y = robot_position[1]
             #     pos.theta = robot_position[2]
             #     self.path.append(pos)
-            #     # self.path['x'].append(robot_position[0])
+                # self.path['x'].append(robot_position[0])
                 # self.path['y'].append(robot_position[1])
                 # self.path['theta'].append(robot_position[2])
+            if perception_data.device is self.Devices.NAVIGATE and perception_data.input:
+                print perception_data.input
 
         elif self.state is 'detect_waving_people':
             if self.subtask.state is 'finish' and not self.timer.is_waiting():
@@ -111,8 +113,10 @@ class FollowGuiding(AbstractTask):
                 self.subtask.set_position(person_pos.point.x - 0.5, person_pos.point.y,
                                           theta)
                 self.change_state('move_to_person')
+
         elif self.state is 'move_to_person':
-            self.change_state('wait_for_command')
+            if perception_data.device is 'BASE_STATUS' and perception_data.input == 3:
+                self.change_state('wait_for_command')
 
         elif self.state is 'init_guide':
             point = self.follow.path.pop()

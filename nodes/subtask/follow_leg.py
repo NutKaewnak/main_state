@@ -23,6 +23,10 @@ class FollowLeg(AbstractSubtask):
         self.isLost = False
         self.last_theta = 0
         self.path = []
+        self.move = self.skillBook.get_skill(self, 'MoveBaseRelative')
+        # self.move.set_position(2, 0, 0)
+        # self.move.set_position(0, 0, -0.6)
+
 
     def set_person_id(self, person_id):
         self.person_id = person_id
@@ -39,7 +43,7 @@ class FollowLeg(AbstractSubtask):
             rospy.loginfo("Track Person id %d", self.person_id)
             position = None
             orientation = None
-            print self.state
+            # print self.state
             for person in perception_data.input.people:
                 if person.id == self.person_id:
                     position = person.pose.position
@@ -55,15 +59,16 @@ class FollowLeg(AbstractSubtask):
                 if theta > 0.4 and not self.timer.is_waiting():
                     self.move.set_position(0, 0, 0.4)
                     self.last_theta = theta
-                    self.timer.wait(1)
+                    self.timer.wait(0.05)
                 elif theta < -0.4 and not self.timer.is_waiting():
                     self.move.set_position(0, 0, -0.4)
                     self.last_theta = theta
-                    self.timer.wait(1)
-                elif self.distance_from_last > 0.4 and not self.timer.is_waiting() and position.x > 0.4:
-                    self.timer.wait(1)
-                    self.move.set_position(min(position.x - 0.4, 0.6), position.y, theta)
-                    self.save_path(min(position.x - 0.4, 0.6), position.y, theta)
+                    self.timer.wait(0.5)
+                elif position.x > 0.9 and not self.timer.is_waiting():
+                    self.timer.wait(0.2)
+                    # new_x = min(position.x - 0.4, 0.6)
+                    self.move.set_position(0.4, position.y, theta)
+                    # self.save_path(new_x, position.y, theta)
                 # position_map = self.tf_listener.transformPoint('map', PointStamped(header=perception_data.input.header, point=position))
 
                 # distance = sqrt(
@@ -71,17 +76,24 @@ class FollowLeg(AbstractSubtask):
 
                 # self.distance_from_last = sqrt(
                 #     (position.x - self.last_point.x) ** 2 + (position.y - self.last_point.y) ** 2)
-                    self.last_point = position
-                    self.last_theta = theta
-                print self.last_point
+                self.last_point = position
+                    # self.last_point.x = new_x
+                self.last_theta = theta
+                # else:
+                #     self.timer.wait(5)
+
+                # print self.last_point
             elif position is None:
                 # print self.move.state
                 if not self.isLost:
-                    self.move.set_position(self.last_point.x - 0.5, self.last_point.y, self.last_theta)
-                    self.save_path(self.last_point.x - 0.5, self.last_point.y, self.last_theta)
+                    self.move.set_position(max(self.last_point.x - 0.7, 0), self.last_point.y, self.last_theta)
+                    # self.save_path(self.last_point.x - 0.5, self.last_point.y, self.last_theta)
                     self.isLost = True
-                    print "Lost: ", self.isLost
+                    # print "Lost: ", self.isLost
                 elif self.isLost:
+                    # if not self.timer.is_waiting():
+                    #     self.set_person_id(-1)
+                    #     return
                     min_distance = 99
                     guess_id = -1
                     for person in perception_data.input.people:
@@ -112,6 +124,7 @@ class FollowLeg(AbstractSubtask):
                 # self.move.stop()
                 # self.change_state('abort')
 
+
         elif perception_data.device is self.Devices.VOICE:
             if perception_data.input == 'stop':
                 self.skillBook.get_skill(self, 'Say').say('I stop.')
@@ -124,3 +137,4 @@ class FollowLeg(AbstractSubtask):
         pos.y = y
         pos.theta = atan(y / x)
         self.path.append(pos)
+        # print self.path
