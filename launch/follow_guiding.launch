@@ -1,5 +1,6 @@
 <launch>
 
+  <include file="$(find speech_processing)/launch/followme.launch"/>
   <node name="NIHandtracker" pkg="gesture_detection" type="NIHandtracker" output="screen" >
     <remap from="points" to="/gesture/points"/>
   </node>
