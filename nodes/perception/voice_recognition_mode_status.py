@@ -13,4 +13,4 @@ class VoiceRecognitionModePerception(AbstractPerception):
         # rospy.Subscriber('/object/recognize_objects/feedback', RecognizeObjectsFeedback, self.callback_base_position)
 
     def callback_voice_recognition_mode_status(self, data):
-        self.broadcast(Devices.VOICE_MODE, data)
+        self.broadcast(Devices.VOICE_MODE, data.data)

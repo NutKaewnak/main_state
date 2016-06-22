@@ -18,5 +18,5 @@ class TestRecognition(AbstractTask):
 
         if self.state is 'findObject':
             if self.recognize_objects.state is 'finish':
-                rospy.loginfo("Found: {0}".format(self.recognize_objects.objects))
+                rospy.loginfo("Found: {0}".format(self.recognize_objects.object))
                 self.change_state('done')
