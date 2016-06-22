@@ -11,6 +11,7 @@ class AbstractTask:
         self.subtaskBook = planning_module.subtaskBook
         self.current_subtask = None
         self.perception_data = None
+        self.is_performing = False
 
     def reset(self):
         self.state = 'init'
@@ -37,6 +38,7 @@ class AbstractTask:
         if self.current_subtask is not None:
             self.current_subtask.act(perception_data)
         self.perform(perception_data)
+        self.is_performing = False
 
     def perform(self, perception_data):
         # must define your own perform

@@ -6,7 +6,7 @@ __author__ = 'Frank'
 class RecognizeObjects(AbstractSubtask):
     def __init__(self, planning_module):
         AbstractSubtask.__init__(self, planning_module)
-        self.objects = None
+        self.object = None
         self.recognize_objects = None
 
     def start(self, object_names):
@@ -20,5 +20,5 @@ class RecognizeObjects(AbstractSubtask):
         #     self.change_state('recognizing')
         if self.state is 'recognizing':
             if self.recognize_objects.state is 'succeeded':
-                self.objects = self.recognize_objects.objects
+                self.object = self.recognize_objects.object
                 self.change_state('finish')

@@ -1,3 +1,4 @@
+from object_recognition_v2.msg import RecognizeObjectsResult, ObjectRecognition
 from include.abstract_skill import AbstractSkill
 from include.move_base_status import MoveBaseStatus
 
@@ -7,7 +8,7 @@ __author__ = "Frank"
 class RecognizeObjects(AbstractSkill):
     def __init__(self, control_module):
         AbstractSkill.__init__(self, control_module)
-        self.objects = None
+        self.object = None
 
     def recognize(self, object_names):
         self.change_state('active')
@@ -20,4 +21,4 @@ class RecognizeObjects(AbstractSkill):
                 status = MoveBaseStatus.get_state_from_status(perception_data.input.status.status)
                 self.change_state(status)
                 if self.state is 'succeeded':
-                    self.objects = perception_data.input.result
+                    self.object = perception_data.input
