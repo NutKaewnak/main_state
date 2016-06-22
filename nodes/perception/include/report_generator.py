@@ -7,7 +7,6 @@ from sensor_msgs.msg import Image
 from object_3d_detector.msg import Object3DsResult, Object3D
 from object_recognition_v2.msg import ObjectRecognition, ObjectRecognitions
 from subprocess import call
-from devices import Devices
 from image_saver import save_image
 
 
