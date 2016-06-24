@@ -15,6 +15,11 @@ class MoveRelative(AbstractSubtask):
         self.moveRelative.set_position(x, y, theta)
         self.change_state('move')
 
+    def set_position_without_clear_costmap(self, x, y, theta):
+        self.moveRelative = self.skillBook.get_skill(self, 'MoveBaseRelative')
+        self.moveRelative.set_position(x, y, theta)
+        self.change_state('move')
+
     def perform(self, perception_data):
         if self.state is 'move':
             # check if base succeed
