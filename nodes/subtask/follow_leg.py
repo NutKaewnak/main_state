@@ -4,7 +4,7 @@ from include.abstract_subtask import AbstractSubtask
 from math import atan, sqrt, pi, atan2
 from std_msgs.msg import Header
 from geometry_msgs.msg import Twist, Vector3, PoseStamped, Pose2D, PointStamped, Point
-from cob_perception_msgs.msg import PositionMeasurementArray
+# from cob_perception_msgs.msg import PositionMeasurementArray
 from tf.transformations import quaternion_from_euler
 from include.transform_point import transform_point
 from include.delay import Delay
