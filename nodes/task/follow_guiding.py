@@ -41,16 +41,34 @@ class FollowGuiding(AbstractTask):
             # if self.subtask.state is 'finish' or not self.timer.is_waiting():
             if perception_data.device is self.Devices.VOICE:
                 print 'input = ' + str(perception_data.input)
-            if perception_data.device is self.Devices.VOICE:
                 if perception_data.input == 'follow me':
-                    print 'hi'
+                    self.subtaskBook.get_subtask(self, 'Say').say('Did you say /'follow me/'? Please confirm by say /'robot yes/' or /'robot no/'.')
+                    self.timer.wait(10)
+                    self.change_state('confirm_follow')
+                elif perception_data.input == 'guide back':
+                    self.subtaskBook.get_subtask(self, 'Say').say('Did you say /'guide back/'? Please confirm by say /'robot yes/' or /'robot no/'.')
+                    self.timer.wait(10)
+                    self.change_state('confirm_guide')
+                    
+        elif self.state is 'confirm_follow':
+            if perception_data.device is self.Devices.VOICE:
+                if perception_data.input == 'robot yes':
                     self.subtaskBook.get_subtask(self, 'Say').say('I will follow you.')
                     self.follow = self.subtaskBook.get_subtask(self, 'FollowLeg')
                     self.change_state('follow_init')
-                elif perception_data.input == 'guide back':
+                elif perception_data.input == 'robot no':
+                    self.subtaskBook.get_subtask(self, 'Say').say('Sorry. Please tell me again.')
+                    self.change_state('wait_for_command')
+                    
+         elif self.state is 'confirm_guide':
+            if perception_data.device is self.Devices.VOICE:
+                if perception_data.input == 'robot yes':
                     self.subtaskBook.get_subtask(self, 'Say').say('I will guide you back')
-                    self.move = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
+                    self.follow = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
                     self.change_state('init_guide')
+                elif perception_data.input == 'robot no':
+                    self.subtaskBook.get_subtask(self, 'Say').say('Sorry. Please tell me again.')
+                    self.change_state('wait_for_command')
 
         elif self.state is 'follow_init':
             # print 'state =' + self.state

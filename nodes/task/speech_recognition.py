@@ -1,5 +1,6 @@
-__author__ = 'Nicole'
 from include.abstract_task import AbstractTask
+
+__author__ = 'Nicole'
 
 
 class SpeechRecognition(AbstractTask):
@@ -8,7 +9,6 @@ class SpeechRecognition(AbstractTask):
         self.subtask = None
 
     def perform(self, perception_data):
-	print perception_data
         if self.state is 'init':
             self.subtask = self.subtaskBook.get_subtask(self, 'QuestionAnswer')
             self.change_state('direct_asking')
