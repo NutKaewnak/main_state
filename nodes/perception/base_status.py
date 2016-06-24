@@ -13,7 +13,7 @@ class BaseStatusPerception(AbstractPerception):
         rospy.Subscriber('/navigation/move_base/result', MoveBaseActionResult, self.callback_base_status)
         rospy.Subscriber('/navigation/move_base/feedback', MoveBaseActionFeedback, self.callback_base_position)
 
-        self.position = (0, 0, 0)
+        self.position = None
 
     def callback_base_status(self, data):
         self.broadcast(Devices.BASE_STATUS, data.status.status)

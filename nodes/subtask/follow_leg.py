@@ -1,11 +1,15 @@
 import rospy
 import tf
 from include.abstract_subtask import AbstractSubtask
-from math import atan, sqrt, pi
-from geometry_msgs.msg import Twist, Vector3, PoseStamped, Pose2D, PointStamped
+from math import atan, sqrt, pi, atan2
+from std_msgs.msg import Header
+from geometry_msgs.msg import Twist, Vector3, PoseStamped, Pose2D, PointStamped, Point
+from cob_perception_msgs.msg import PositionMeasurementArray
 from tf.transformations import quaternion_from_euler
 from include.transform_point import transform_point
 from include.delay import Delay
+from visualization_msgs.msg import *
+from nav_msgs.srv import GetPlan
 
 __author__ = 'Frank Tower'
 
@@ -25,6 +29,7 @@ class FollowLeg(AbstractSubtask):
         self.path = []
         self.guess_id = None
 
+
     def set_person_id(self, person_id):
         self.person_id = person_id
         self.change_state('follow')
@@ -32,106 +37,77 @@ class FollowLeg(AbstractSubtask):
     def perform(self, perception_data):
         if self.state is 'init':
             self.move = self.skillBook.get_skill(self, 'MoveBaseRelative')
-            self.turn_neck = self.skillBook.get_skill(self, 'TurnNeck')
             self.timer = Delay()
+            self.marker_pub = rospy.Publisher("/visualization_marker", Marker)
+
             self.change_state('wait')
 
         elif self.state is 'follow' and perception_data.device is self.Devices.PEOPLE_LEG:
-            rospy.loginfo("Track Person id %d", self.person_id)
+            rospy.loginfo("Track Person id %s", self.person_id)
             position = None
             orientation = None
-            # print self.state
             for person in perception_data.input.people:
-                if person.id == self.person_id:
-                    position = person.pose.position
-                    orientation = person.pose.orientation
+                if person.object_id == self.person_id:
+                    position = person.pos
+                    # orientation = person.pose.orientation
 
             if position is not None:
-                theta = atan(position.y/position.x)
-                # self.move.set_position(position.x/2, position.y/2, theta)
+                theta = atan2(position.y, position.x)
 
                 self.distance_from_last = sqrt(
                     (position.x - self.last_point.x) ** 2 + (position.y - self.last_point.y) ** 2)
-                print theta, self.distance_from_last
-                if theta > 0.4 and not self.timer.is_waiting():
-                    self.move.set_position(0, 0, 0.4)
-                    self.last_theta = theta
-                    self.timer.wait(0.05)
-                elif theta < -0.4 and not self.timer.is_waiting():
-                    self.move.set_position(0, 0, -0.4)
-                    self.last_theta = theta
-                    self.timer.wait(0.5)
-                elif position.x > 0.9 and not self.timer.is_waiting():
-                    self.timer.wait(0.2)
-                    # new_x = min(position.x - 0.4, 0.6)
-                    self.move.set_position(0.4, position.y, theta)
-                    # self.save_path(new_x, position.y, theta)
-                # position_map = self.tf_listener.transformPoint('map', PointStamped(header=perception_data.input.header, point=position))
 
-                # distance = sqrt(
-                #     (position.x - self.last_point.x) ** 2 + (position.y - self.last_point.y) ** 2)
+                if position.x > 1 and not self.timer.is_waiting():
+                    self.timer.wait(1)
+                    size = sqrt(position.x ** 2 + position.y ** 2)
 
-                # self.distance_from_last = sqrt(
-                #     (position.x - self.last_point.x) ** 2 + (position.y - self.last_point.y) ** 2)
+                    x = max(position.x / size * (size * 0.5), 0)
+                    y = position.y / size * (size * 0.5)
+                    self.move.set_position_without_clear_costmap(x, y, theta)
+
                 self.last_point = position
-                    # self.last_point.x = new_x
                 self.last_theta = theta
-                # else:
-                #     self.timer.wait(5)
 
-                # print self.last_point
+                box_marker = Marker()
+
+                box_marker.header.frame_id = "/base_link"
+
+                box_marker.type = Marker.CUBE
+                box_marker.scale.x = 0.2
+                box_marker.scale.y = 0.2
+                box_marker.scale.z = 0.2
+                box_marker.color.r = 0.0
+                box_marker.color.g = 0.5
+                box_marker.color.b = 0.5
+                box_marker.color.a = 0.6
+
+                box_marker.pose.position.x = position.x + 0.2
+                box_marker.pose.position.y = position.y
+                box_marker.pose.position.z = 0.2
+
+                self.marker_pub.publish(box_marker)
+
             elif position is None:
-                # print self.move.state
                 if not self.isLost:
-                    self.move.set_position(max(self.last_point.x - 0.7, 0), self.last_point.y, self.last_theta)
-                    # self.save_path(self.last_point.x - 0.5, self.last_point.y, self.last_theta)
                     self.isLost = True
-                    # print "Lost: ", self.isLost
                 elif self.isLost:
-                    # if not self.timer.is_waiting():
-                    #     self.set_person_id(-1)
-                    #     return
                     min_distance = 99
                     self.guess_id = -1
                     for person in perception_data.input.people:
-                        # if person.id == self.person_id:
-                        position = person.pose.position
-                        orientation = person.pose.orientation
-
-                        # position_map = self.tf_listener.transformPoint('map',
-                        #                                                PointStamped(header=perception_data.input.header,
-                        #                                                             point=position))
-
+                        position = person.pos
+                        # orientation = person.pose.orientation
                         distance = sqrt(
                             (position.x - self.last_point.x) ** 2 + (position.y - self.last_point.y) ** 2)
                         if distance < min_distance:
                             min_distance = distance
-                            self.guess_id = person.id
-
-                        print self.guess_id, distance
-
-                    if min_distance < 0.6 and self.guess_id != -1:
+                            self.guess_id = person.object_id
+                    if min_distance < 0.4 and self.guess_id != -1:
                         self.set_person_id(self.guess_id)
                         rospy.loginfo("Change To Person ID:" + str(self.guess_id))
 
-            # else:
-            #     rospy.loginfo("Stop Robot")
-                # self.skillBook.get_skill(self, 'Say').say('I cannot find you. Please come in front of me.')
-                # self.turn_neck.turn(0, 0)
-                # self.move.stop()
-                # self.change_state('abort')
+        # elif perception_data.device is self.Devices.VOICE:
+        #     if perception_data.input == 'stop':
+        #         self.skillBook.get_skill(self, 'Say').say('I stop.')
+        #         self.move.stop()
+        #         self.change_state('abort')
 
-
-        elif perception_data.device is self.Devices.VOICE:
-            if perception_data.input == 'stop':
-                self.skillBook.get_skill(self, 'Say').say('I stop.')
-                self.move.stop()
-                self.change_state('abort')
-
-    def save_path(self, x, y, theta):
-        pos = Pose2D()
-        pos.x = x
-        pos.y = y
-        pos.theta = atan(y / x)
-        self.path.append(pos)
-        # print self.path
