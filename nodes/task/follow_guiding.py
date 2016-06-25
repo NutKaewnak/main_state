@@ -84,8 +84,8 @@ class FollowGuiding(AbstractTask):
                         if distance < min_distance:
                             self.track_id = person.id
                 if self.track_id != -1:
-                    print person.id
-                    self.follow.set_person_id(person.id)
+                    print self.track_id.id
+                    self.follow.set_person_id(self.track_id.id)
                     self.change_state('follow')
         elif self.state is 'follow':
             print 'state =' + self.state
