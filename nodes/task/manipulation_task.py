@@ -3,6 +3,7 @@ from include.abstract_task import AbstractTask
 from include.delay import Delay
 from include.report_generator import ReportGenerator
 from std_msgs.msg import Float64
+from geometry_msgs.msg import Pose
 
 __author__ = 'Nicole'
 
@@ -15,14 +16,16 @@ class ManipulationTask(AbstractTask):
         self.subtask = None
         self.object_array = []
         self.object_array_name = []
+        self.object_to_generate = []
         self.timer = Delay()
         self.report_generator = None
         self.height_pos = None
         self.height = rospy.Publisher('/dynamixel/prismatic_controller/command', Float64, queue_size=10)
 
     def perform(self, perception_data):
-        if not self.is_performing:
-            self.is_performing = True
+        if self.is_performing:
+            return
+        self.is_performing = True
 
         if perception_data.device == 'HEIGHT':
             if perception_data.input.position != self.height_pos:
@@ -33,88 +36,120 @@ class ManipulationTask(AbstractTask):
         if self.state is 'init':
             self.report_generator = ReportGenerator('Object Recognition and Manipulation')
             self.change_state('prepare_to_recognition')
-            self.height.publish(0.04)
-            self.timer.wait(5)
+            self.height.publish(0.047)
+            self.timer.wait(15)
 
         elif self.state is 'prepare_to_recognition':
             if not self.timer.is_waiting():
+                self.height.publish(self.height_pos)
                 self.subtask = self.subtaskBook.get_subtask(self, 'RecognizeObjectOnPlane')
-                self.subtask.set_report_generator(self.report_generator)
-                self.subtask.found_objects = [] + self.object_array
                 self.subtask.found_objects_name = [] + self.object_array_name
                 self.change_state('recognition_object_on_1st_plane')
 
         elif self.state is 'recognition_object_on_1st_plane':
-            if self.subtask.state is 'finish':
-                self.change_state('finish_detect')
-            elif self.subtask.state is 'time_out':
+            if self.subtask.state is 'finish' or self.subtask.state is 'time_out':
                 self.object_array += self.subtask.found_objects
                 self.object_array_name += self.subtask.found_objects_name
-                self.change_state('finish_1_plane')
+                if len(self.object_array) >= TOTAL_OBJECT:
+                    self.object_to_generate = [] + self.object_array
+                    self.change_state('generate_report')
+                else:
+                    self.change_state('finish_1_plane')
 
         elif self.state is 'finish_1_plane':
+            print 'len(self.object_array)', len(self.object_array)
             self.height.publish(0.08)
-            self.subtask = self.subtaskBook.get_subtask(self, 'RecognizeObjectOnPlane')
-            self.subtask.set_report_generator(self.report_generator)
-            self.subtask.found_objects = [] + self.object_array
-            self.subtask.found_objects_name = [] + self.object_array_name
-            self.change_state('recognition_object_on_2_plane')
+            self.timer.wait(5)
+            self.change_state('prepare_2_plane')
+
+        elif self.state is 'prepare_2_plane':
+            if not self.timer.is_waiting():
+                self.height.publish(self.height_pos)
+                self.subtask = self.subtaskBook.get_subtask(self, 'RecognizeObjectOnPlane')
+                self.subtask.found_objects_name = [] + self.object_array_name
+                self.change_state('recognition_object_on_2_plane')
 
         elif self.state is 'recognition_object_on_2_plane':
-            if self.subtask.state is 'finish':
+            if self.subtask.state is 'finish' or self.subtask.state is 'time_out':
                 self.change_state('finish_detect')
-            elif self.subtask.state is 'time_out':
                 self.object_array += self.subtask.found_objects
                 self.object_array_name += self.subtask.found_objects_name
                 if len(self.object_array) >= TOTAL_OBJECT:
-                    self.change_state('finish_detect')
+                    self.object_to_generate = [] + self.object_array
+                    self.change_state('generate_report')
                 else:
-                    # self.change_state('finish_2_plane')
-                    self.change_state('finish_detect')
+                    self.change_state('finish_2_plane')
 
         elif self.state is 'finish_2_plane':
+            print 'len(self.object_array)', len(self.object_array)
             self.height.publish(0.12)
-            self.subtask = self.subtaskBook.get_subtask(self, 'RecognizeObjectOnPlane')
-            self.subtask.set_report_generator(self.report_generator)
-            self.change_state('recognition_object_on_3_plane')
+            self.timer.wait(5)
+            self.change_state('prepare_3_plane')
+
+        elif self.state is 'prepare_3_plane':
+            if not self.timer.is_waiting():
+                self.subtask = self.subtaskBook.get_subtask(self, 'RecognizeObjectOnPlane')
+                self.subtask.found_objects_name = [] + self.object_array_name
+                self.change_state('recognition_object_on_3_plane')
 
         elif self.state is 'recognition_object_on_3_plane':
-            if self.subtask.state is 'finish':
-                self.change_state('finish_detect')
-            elif self.subtask.state is 'time_out':
+            if self.subtask.state is 'finish' or self.subtask.state is 'time_out':
                 self.object_array += self.subtask.found_objects
+                self.object_array_name += self.subtask.found_objects_name
                 if len(self.object_array) >= TOTAL_OBJECT:
-                    self.change_state('finish_detect')
+                    self.object_to_generate = [] + self.object_array
+                    self.change_state('generate_report')
                 else:
                     self.change_state('finish_3_plane')
 
         elif self.state is 'finish_3_plane':
+            print 'len(self.object_array)', len(self.object_array)
             self.height.publish(0.16)
-            self.subtask = self.subtaskBook.get_subtask(self, 'RecognizeObjectOnPlane')
-            self.subtask.set_report_generator(self.report_generator)
-            self.change_state('recognition_object_on_4_plane')
+            self.timer.wait(5)
+            self.change_state('prepare_4_plane')
+
+        elif self.state is 'prepare_4_plane':
+            if not self.timer.is_waiting():
+                self.subtask = self.subtaskBook.get_subtask(self, 'RecognizeObjectOnPlane')
+                self.subtask.found_objects_name = [] + self.object_array_name
+                self.change_state('recognition_object_on_4_plane')
 
         elif self.state is 'recognition_object_on_4_plane':
             if self.subtask.state is 'finish' or self.subtask.state is 'time_out':
-                self.change_state('finish_detect')
+                self.object_array += self.subtask.found_objects
+                self.object_to_generate = [] + self.object_array
+                print 'len(self.object_array)', len(self.object_array)
+                self.change_state('generate_report')
+
+        elif self.state is 'generate_report':
+            print 'len(self.object_array)', len(self.object_array)
+            for found_object in self.object_to_generate:
+                print 'generate report for', found_object.name.data
+                self.report_generator.generate_object_report(found_object)
+                self.object_to_generate.pop(0)
+            self.change_state('finish_detect')
 
         elif self.state is 'finish_detect':
-            self.object_array += self.subtask.found_objects
             self.subtaskBook.get_subtask(self, 'Say').say('I\'m finish detecting')
-            # self.change_state('prepare_to_pick_object')
             self.change_state('finish')
             self.report_generator.on_end_latex()
 
-        elif self.state is 'prepare_to_pick_object':
-            self.subtask = self.subtaskBook.get_subtask(self, 'Pick')
-            found_object = self.object_array.pop()
-            # TODO: bug nae norn
-            self.subtask.pick_object(found_object.pose, found_object.name)
-            rospy.loginfo('Picking ' + str(found_object.name))
-            self.change_state('pick_object')
-
         elif self.state is 'pick_object':
-            if len(self.object_array) is 0:
+            if len(self.object_array) == 0:
                 self.change_state('finish')
             elif self.subtask.state is 'finish':
                 self.change_state('prepare_to_pick_object')
+
+        elif self.state is 'prepare_to_pick_object':
+            if self.object_array:
+                self.subtask = self.subtaskBook.get_subtask(self, 'Pick')
+                found_object = self.object_array.pop()
+                # TODO: bug nae norn
+                obj_pose = Pose()
+                obj_pose.position = found_object.centriod
+                self.subtask.pick_object(obj_pose, found_object.name)
+                rospy.loginfo('Picking ' + str(found_object.name))
+                self.change_state('pick_object')
+            else:
+                self.change_state('finish')
+

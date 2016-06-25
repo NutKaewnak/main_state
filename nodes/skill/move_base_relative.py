@@ -21,6 +21,10 @@ class MoveBaseRelative(AbstractSkill):
         self.change_state('active')
         self.controlModule.base.set_relative_position_without_clear_costmap(dx, dy, dtheta)
 
+    def clear_point_costmaps(self, x, y, box_size):
+        self.change_state('active')
+        self.controlModule.base.clear_point_costmaps(x, y, box_size)
+
     def perform(self, perception_data):
         if self.state is 'active':
             # check if base succeed

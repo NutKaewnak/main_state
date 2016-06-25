@@ -64,8 +64,7 @@ class ReportGenerator:
         self.latex.close()
         output_dir = roslib.packages.get_pkg_dir('main_state')
         output_name = roslib.packages.get_pkg_dir('main_state') + self.filename
-        call(['pdflatex', '-output-directory=' + output_dir, output_name,
-              '|', 'perl', '-0777', '-ne \'print m/\\n! .*?\\nl\.\d.*?\\n.*?(?=\\n)/gs\''])
+        call(['pdflatex', '-output-directory=' + output_dir, output_name])
 
 
 if __name__ == "__main__":

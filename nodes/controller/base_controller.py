@@ -4,6 +4,7 @@ from geometry_msgs.msg import Twist
 from tf.transformations import quaternion_from_euler
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from std_srvs.srv import Empty
+from athome_move_base.srv import ClearPointCostmap
 
 __author__ = "AThousandYears"
 
@@ -12,6 +13,7 @@ class BaseController:
     def __init__(self):
         self.move_base = actionlib.SimpleActionClient('/navigation/move_base', MoveBaseAction)
         self.clear_costmap = rospy.ServiceProxy('/navigation/move_base_node/clear_costmaps', Empty)
+        self.clear_point_costmap = rospy.ServiceProxy('/navigation/move_base_node/clear_point_costmaps', ClearPointCostmap)
         self.move_twist = rospy.Publisher('/base/cmd_vel', Twist, queue_size=1)
 
     def set_twist(self, twist):
@@ -56,3 +58,9 @@ class BaseController:
     def clear_costmaps(self):
         rospy.loginfo("Clear Costmaps")
         self.clear_costmap()
+
+    def clear_point_costmaps(self, x, y, box_size):
+        rospy.loginfo("Clear Point Costmaps")
+        self.clear_point_costmap(x, y, box_size)
+
+
