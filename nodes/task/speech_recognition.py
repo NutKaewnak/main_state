@@ -20,6 +20,7 @@ class SpeechRecognition(AbstractTask):
         elif self.state is 'prepare_for_indirect':
             # face detection here NOT FINISH
             # may have change structure of this code
+            self.subtask = self.subtaskBook.get_subtask(self, 'QuestionAnswerIndirect')
             self.subtask.change_state('init')
             self.change_state('indirect_asking')
 
