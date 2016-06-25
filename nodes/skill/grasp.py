@@ -34,7 +34,6 @@ class Grasp(AbstractSkill):
         if self.state is 'init':
             self.object_pose = None
             self.object_name = ""
-            self.gripper_close()
             if not self.is_init:
                 self.is_init = True
                 if not self.is_done_init:
@@ -47,6 +46,7 @@ class Grasp(AbstractSkill):
                 self.right_arm.static_pose('right_normal')
             elif self.side is 'left_arm':
                 self.right_arm.static_pose('left_normal')
+            self.gripper_close()
             self.change_state('arm_normal')
 
         elif self.state is 'arm_normal':

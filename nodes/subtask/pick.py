@@ -25,6 +25,7 @@ class Pick(AbstractSubtask):
                 self.change_state('wait_for_point')
 
         elif self.state is 'receive_point':
+            self.grasp = self.skillBook.get_skill(self, 'Grasp')
             self.grasp.set_side(self.side_arm)
             self.change_state('setting_arm')
 
