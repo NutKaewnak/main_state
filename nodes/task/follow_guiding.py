@@ -42,11 +42,13 @@ class FollowGuiding(AbstractTask):
             if perception_data.device is self.Devices.VOICE:
                 print 'input = ' + str(perception_data.input)
                 if perception_data.input == 'follow me':
-                    self.subtaskBook.get_subtask(self, 'Say').say('Did you say /'follow me/'? Please confirm by say /'robot yes/' or /'robot no/'.')
+                    self.subtaskBook.get_subtask(self, 'Say').say('Did you say \'follow me\'? '
+                                                                  'Please confirm by say \'robot yes\' or \'robot no\'.')
                     self.timer.wait(10)
                     self.change_state('confirm_follow')
                 elif perception_data.input == 'guide back':
-                    self.subtaskBook.get_subtask(self, 'Say').say('Did you say /'guide back/'? Please confirm by say /'robot yes/' or /'robot no/'.')
+                    self.subtaskBook.get_subtask(self, 'Say').say('Did you say \'guide back\'? '
+                                                                  'Please confirm by say \'robot yes\' or \'robot no\'.')
                     self.timer.wait(10)
                     self.change_state('confirm_guide')
                     
@@ -60,7 +62,7 @@ class FollowGuiding(AbstractTask):
                     self.subtaskBook.get_subtask(self, 'Say').say('Sorry. Please tell me again.')
                     self.change_state('wait_for_command')
                     
-         elif self.state is 'confirm_guide':
+        elif self.state is 'confirm_guide':
             if perception_data.device is self.Devices.VOICE:
                 if perception_data.input == 'robot yes':
                     self.subtaskBook.get_subtask(self, 'Say').say('I will guide you back')

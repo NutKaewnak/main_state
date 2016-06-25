@@ -22,7 +22,7 @@ class ReportGenerator:
                        '\\title{SKUBA 2016 Task Report}',
                        '\\author{ }',
                        '\institute{ }',
-                       '\maketitle', '']
+                       '\maketitle', '\\newline']
         self.latex = None
         self.set_task_name(task_name)
         self.is_make_latex = False
@@ -46,23 +46,26 @@ class ReportGenerator:
         """
 
         :param data: (ObjectRecognition)
-        :return:
+        :return: None
         """
         image_path = roslib.packages.get_pkg_dir('main_state') + '/picture/' + str(data.name.data) + '.png'
         save_image(data.image, image_path)
-        pic_description = 'data_description\n\\begin{figure}\n\\centering\n\\includegraphics[height=5cm]{' \
-                          'data_picture}\n\\label{fig:base}\n\\end{figure}\n'
+        pic_description = 'data_description\\\\\n\\begin{figure}\n\\centering\n\\includegraphics[height=5cm]{' \
+                          'data_picture}\n\\label{fig:base}\\\n\\end{figure}\n\\newpage\n'
         info_to_write = pic_description.replace('data_description', 'Time Stamped: ' + str(data.header.stamp.to_time())
-                                                + '\n' + 'Centroid: \n' + str(data.centriod)
-                                                + '\n' + 'Name: ' + data.name.data)
+                                                + '\n\\\\' + 'Centroid: \n\\\\' + str(data.centriod)
+                                                + '\n\\\\' + 'Name: ' + data.name.data)
         info_to_write = info_to_write.replace('data_picture', image_path)
+        info_to_write = info_to_write.replace('fig:base', 'fig:' + data.name.data)
         self.latex.write(info_to_write)
 
     def on_end_latex(self):
         self.latex.write('\end{document}')
         self.latex.close()
-        call(['pdflatex', '-output-directory=' + roslib.packages.get_pkg_dir('main_state'),
-              roslib.packages.get_pkg_dir('main_state') + self.filename])
+        output_dir = roslib.packages.get_pkg_dir('main_state')
+        output_name = roslib.packages.get_pkg_dir('main_state') + self.filename
+        call(['pdflatex', '-output-directory=' + output_dir, output_name,
+              '|', 'perl', '-0777', '-ne \'print m/\\n! .*?\\nl\.\d.*?\\n.*?(?=\\n)/gs\''])
 
 
 if __name__ == "__main__":
