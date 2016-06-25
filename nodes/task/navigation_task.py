@@ -37,8 +37,8 @@ class NavigationTask(AbstractTask):
 
         if self.state is 'init':
             # self.door_waypoint3_path = {'x', 'y', 'theta'}
-            # self.waypoint4_door_path = {'x', 'y', 'theta'}
             self.tf_listener = tf.TransformListener()
+            # self.waypoint4_door_path = {'x', 'y', 'theta'}
             self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.3, 0)
             rospy.loginfo('NavigationTask init')
             self.subtaskBook.get_subtask(self, 'MovePassDoor')
@@ -180,15 +180,35 @@ class NavigationTask(AbstractTask):
         elif self.state is 'wait_for_command':
             if perception_data.device is self.Devices.VOICE:
                 if 'follow me' in perception_data.input:
-                    self.say.say('I will follow you.')
-                    # self.follow = self.subtaskBook.get_subtask(self, 'FollowMe')
-                    # self.follow.start()
+                    self.subtaskBook.get_subtask(self, 'Say').say('Did you say \'follow me\'? '
+                                                                  'Please confirm by say \'robot yes\' or \'robot no\'.')
+                    self.delay.wait(10)
+                    self.change_state('confirm_follow')
+                elif 'go back' in perception_data.input:
+                    self.subtaskBook.get_subtask(self, 'Say').say('Did you say \'go back\'? '
+                                                                  'Please confirm by say \'robot yes\' or \'robot no\'.')
+                    self.delay.wait(10)
+                    self.change_state('confirm_back')
+
+        elif self.state is 'confirm_follow':
+            if perception_data.device is self.Devices.VOICE:
+                if perception_data.input == 'robot yes':
+                    self.subtaskBook.get_subtask(self, 'Say').say('I will follow you.')
                     self.follow = self.subtaskBook.get_subtask(self, 'FollowLeg')
                     self.change_state('follow_init')
-                elif 'go back' in perception_data.input:
-                    self.say.say('I will go back')
+                elif perception_data.input == 'robot no':
+                    self.subtaskBook.get_subtask(self, 'Say').say('Sorry. Please tell me again.')
+                    self.change_state('wait_for_command')
+
+        elif self.state is 'confirm_back':
+            if perception_data.device is self.Devices.VOICE:
+                if perception_data.input == 'robot yes':
+                    self.subtaskBook.get_subtask(self, 'Say').say('I will go back')
                     self.subtask = self.subtaskBook.get_subtask(self, 'DetectDoor')
                     self.change_state('prepare_back_to_waypoint_3')
+                elif perception_data.input == 'robot no':
+                    self.subtaskBook.get_subtask(self, 'Say').say('Sorry. Please tell me again.')
+                    self.change_state('wait_for_command')
 
         elif self.state is 'follow_init':
             # if perception_data.device is self.Devices.BASE_STATUS and self.perception_module.base_status.position:
@@ -214,8 +234,8 @@ class NavigationTask(AbstractTask):
                         if distance < min_distance:
                             self.track_id = person.id
                 if self.track_id != -1:
-                    print person.id
-                    self.follow.set_person_id(person.id)
+                    print self.track_id.id
+                    self.follow.set_person_id(self.track_id.id)
                     self.change_state('follow')
 
         elif self.state is 'follow':
@@ -235,7 +255,7 @@ class NavigationTask(AbstractTask):
                         print 'change track id = ', self.track_id
                     self.subtask = self.subtaskBook.get_subtask(self, 'Say')
                     self.subtask.say('I am lost tracking. Please wave your hand.')
-                    self.timer.wait(2)
+                    self.delay.wait(2)
                     self.change_state('detect_waving_people')
 
         elif self.state is 'prepare_back_to_waypoint_3':
