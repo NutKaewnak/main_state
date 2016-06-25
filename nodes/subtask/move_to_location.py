@@ -40,6 +40,10 @@ class MoveToLocation(AbstractSubtask):
     def perform(self, perception_data):
         if self.state is 'move':
             # check if base succeed
+            print 'get_distance'
+            print 'position', self.perception_module.base_status.position
+            print 'goal', self.goal
+
             if self.move.state is 'succeeded':
                 if get_distance(self.perception_module.base_status.position, self.goal) > 1:
                     self.change_state('move_slide_to_goal')

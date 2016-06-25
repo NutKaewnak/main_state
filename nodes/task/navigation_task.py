@@ -3,7 +3,7 @@ import rospy
 import tf
 import random
 from geometry_msgs.msg import Point, Pose2D
-from include.location_information import read_location_information
+# from include.location_information import read_location_information
 from include.transform_point import transform_point
 from include.abstract_task import AbstractTask
 from include.delay import Delay
@@ -41,7 +41,7 @@ class NavigationTask(AbstractTask):
             self.tf_listener = tf.TransformListener()
             self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.3, 0)
             rospy.loginfo('NavigationTask init')
-            # self.subtaskBook.get_subtask(self, 'MovePassDoor')
+            self.subtaskBook.get_subtask(self, 'MovePassDoor')
             self.change_state('move_pass_door')
 
         elif self.state is 'move_pass_door':
