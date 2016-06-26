@@ -35,6 +35,7 @@ from voice_recognition_mode import VoiceRecognitionMode
 from find_cloth import FindCloth
 
 from test_subtask_skill import TestSubtaskSkill
+from question_answer_indirect import QuestionAnswerIndirect
 
 __author__ = "AThousandYears"
 
@@ -83,6 +84,7 @@ class SubtaskBook:
         self.book['FindCloth'] = FindCloth(planning_module)
 
         self.book['TestSubtaskSkill'] = TestSubtaskSkill(planning_module)
+        self.book['QuestionAnswerIndirect'] = QuestionAnswerIndirect(planning_module)
 
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()

@@ -25,7 +25,6 @@ class MoveBaseRelativeTwist(AbstractSkill):
         self.controlModule.base.set_twist_stop()
 
     def set_position(self, dx, dy, dtheta):
-        print 'move wa'
         self.goal_pose_2d = Pose2D()
         self.goal_pose_2d.x = dx
         self.goal_pose_2d.y = dy
@@ -103,6 +102,7 @@ class MoveBaseRelativeTwist(AbstractSkill):
                 self.change_state('send_xy_goal')
 
         elif self.state is 'send_xy_goal':
+            print (not self.timer_linear.is_waiting()), (not self.timer_angular.is_waiting())
             if not self.timer_linear.is_waiting() and not self.timer_angular.is_waiting():
                 twist = Twist()
                 if self.goal_pose_2d.theta > 0:

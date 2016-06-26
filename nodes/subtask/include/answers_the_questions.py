@@ -2,6 +2,8 @@ __author__ = 'Frank'
 
 
 def answers(question):
+    print question
+    print type(question)
     if "zeppelin" in question:
         return "Count von Zeppelin"
     elif "president" in question:

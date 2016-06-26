@@ -3,7 +3,7 @@ from include.abstract_task import AbstractTask
 from include.delay import Delay
 from include.report_generator import ReportGenerator
 from std_msgs.msg import Float64
-from geometry_msgs.msg import Pose
+from geometry_msgs.msg import PoseStamped
 
 __author__ = 'Nicole'
 
@@ -36,20 +36,19 @@ class ManipulationTask(AbstractTask):
         if self.state is 'init':
             self.report_generator = ReportGenerator('Object Recognition and Manipulation')
             self.change_state('prepare_to_recognition')
-            self.height.publish(0.047)
+            self.height.publish(0.03)
             self.timer.wait(15)
 
         elif self.state is 'prepare_to_recognition':
             if not self.timer.is_waiting():
                 self.height.publish(self.height_pos)
                 self.subtask = self.subtaskBook.get_subtask(self, 'RecognizeObjectOnPlane')
-                self.subtask.found_objects_name = [] + self.object_array_name
+                self.subtask.found_objects = self.object_array
+                self.subtask.found_objects_name = self.object_array_name
                 self.change_state('recognition_object_on_1st_plane')
 
         elif self.state is 'recognition_object_on_1st_plane':
             if self.subtask.state is 'finish' or self.subtask.state is 'time_out':
-                self.object_array += self.subtask.found_objects
-                self.object_array_name += self.subtask.found_objects_name
                 if len(self.object_array) >= TOTAL_OBJECT:
                     self.object_to_generate = [] + self.object_array
                     self.change_state('generate_report')
@@ -66,14 +65,13 @@ class ManipulationTask(AbstractTask):
             if not self.timer.is_waiting():
                 self.height.publish(self.height_pos)
                 self.subtask = self.subtaskBook.get_subtask(self, 'RecognizeObjectOnPlane')
-                self.subtask.found_objects_name = [] + self.object_array_name
+                self.subtask.found_objects = self.object_array
+                self.subtask.found_objects_name = self.object_array_name
                 self.change_state('recognition_object_on_2_plane')
 
         elif self.state is 'recognition_object_on_2_plane':
             if self.subtask.state is 'finish' or self.subtask.state is 'time_out':
                 self.change_state('finish_detect')
-                self.object_array += self.subtask.found_objects
-                self.object_array_name += self.subtask.found_objects_name
                 if len(self.object_array) >= TOTAL_OBJECT:
                     self.object_to_generate = [] + self.object_array
                     self.change_state('generate_report')
@@ -89,13 +87,12 @@ class ManipulationTask(AbstractTask):
         elif self.state is 'prepare_3_plane':
             if not self.timer.is_waiting():
                 self.subtask = self.subtaskBook.get_subtask(self, 'RecognizeObjectOnPlane')
-                self.subtask.found_objects_name = [] + self.object_array_name
+                self.subtask.found_objects = self.object_array
+                self.subtask.found_objects_name = self.object_array_name
                 self.change_state('recognition_object_on_3_plane')
 
         elif self.state is 'recognition_object_on_3_plane':
             if self.subtask.state is 'finish' or self.subtask.state is 'time_out':
-                self.object_array += self.subtask.found_objects
-                self.object_array_name += self.subtask.found_objects_name
                 if len(self.object_array) >= TOTAL_OBJECT:
                     self.object_to_generate = [] + self.object_array
                     self.change_state('generate_report')
@@ -111,28 +108,31 @@ class ManipulationTask(AbstractTask):
         elif self.state is 'prepare_4_plane':
             if not self.timer.is_waiting():
                 self.subtask = self.subtaskBook.get_subtask(self, 'RecognizeObjectOnPlane')
-                self.subtask.found_objects_name = [] + self.object_array_name
+                self.subtask.found_objects = self.object_array
+                self.subtask.found_objects_name = self.object_array_name
                 self.change_state('recognition_object_on_4_plane')
 
         elif self.state is 'recognition_object_on_4_plane':
             if self.subtask.state is 'finish' or self.subtask.state is 'time_out':
-                self.object_array += self.subtask.found_objects
                 self.object_to_generate = [] + self.object_array
-                print 'len(self.object_array)', len(self.object_array)
                 self.change_state('generate_report')
 
         elif self.state is 'generate_report':
+            self.timer.wait(10)
             print 'len(self.object_array)', len(self.object_array)
-            for found_object in self.object_to_generate:
+            while self.object_to_generate:
+                print 'len(self.object_to_generate) before pop', len(self.object_to_generate)
+                found_object = self.object_to_generate.pop(0)
                 print 'generate report for', found_object.name.data
                 self.report_generator.generate_object_report(found_object)
-                self.object_to_generate.pop(0)
+                print 'len(self.object_to_generate)', len(self.object_to_generate)
             self.change_state('finish_detect')
 
         elif self.state is 'finish_detect':
-            self.subtaskBook.get_subtask(self, 'Say').say('I\'m finish detecting')
-            self.change_state('finish')
-            self.report_generator.on_end_latex()
+            if not self.timer.is_waiting():
+                self.subtaskBook.get_subtask(self, 'Say').say('I\'m finish detecting')
+                self.change_state('pick_object')
+                self.report_generator.on_end_latex()
 
         elif self.state is 'pick_object':
             if len(self.object_array) == 0:
@@ -145,8 +145,9 @@ class ManipulationTask(AbstractTask):
                 self.subtask = self.subtaskBook.get_subtask(self, 'Pick')
                 found_object = self.object_array.pop()
                 # TODO: bug nae norn
-                obj_pose = Pose()
-                obj_pose.position = found_object.centriod
+                obj_pose = PoseStamped()
+                obj_pose.header = found_object.header
+                obj_pose.pose.position = found_object.centriod
                 self.subtask.pick_object(obj_pose, found_object.name)
                 rospy.loginfo('Picking ' + str(found_object.name))
                 self.change_state('pick_object')

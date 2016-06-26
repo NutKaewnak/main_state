@@ -16,7 +16,7 @@ class ReportGenerator:
         self.header = ['\documentclass[10pt,a4paper]{article}',
                        '\usepackage[latin1]{inputenc}',
                        '\usepackage{graphicx}',
-                       '',
+                       '\\nonstopmode',
                        '\\begin{document}',
                        '',
                        '\\title{SKUBA 2016 Task Report}',

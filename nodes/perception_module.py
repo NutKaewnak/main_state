@@ -17,8 +17,8 @@ from perception.recognize_objects_status import RecognizeObjectsPerception
 from perception.voice_recognition_mode_status import VoiceRecognitionModePerception
 # from perception.people_leg_detect import PeopleLegDetection
 from perception.navigate import Navigate
-# from perception.sound_source_localize_front import SoundSourceLocalizeFront
-# from perception.sound_source_localize_back import SoundSourceLocalizeBack
+from perception.sound_source_localize_front import SoundSourceLocalizeFront
+from perception.sound_source_localize_back import SoundSourceLocalizeBack
 # from perception.joy import JoyInput
 
 __author__ = "AThousandYears"
@@ -48,5 +48,5 @@ class PerceptionModule:
         self.navigate_path = Navigate(main_state.planningModule)
         # self.sound_source_localize = SoundSourceLocalize(main_state.planningModule)
         # self.joy = JoyInput(main_state.planningModule)
-        # self.sound_source_localize_front = SoundSourceLocalizeFront(main_state.planningModule)
-        # self.sound_source_localize_back = SoundSourceLocalizeBack(main_state.planningModule)
+        self.sound_source_localize_front = SoundSourceLocalizeFront(main_state.planningModule)
+        self.sound_source_localize_back = SoundSourceLocalizeBack(main_state.planningModule)

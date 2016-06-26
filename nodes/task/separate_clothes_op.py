@@ -85,7 +85,7 @@ class SeparateClothesOP(AbstractTask):
 
         elif self.state is 'wait_turn_side':
             if self.subtask.state is 'finish' or not self.timer.is_waiting():
-                self.subtask.open_gripper()
+                self.subtask.gripper_open()
                 self.change_state('prepare_pick')
                 self.right_side = None
 

@@ -251,7 +251,7 @@ class RoboNurse(AbstractTask):
                         minimum = temp
                         point = goal.point
                 self.pick = self.subtaskBook.get_subtask(self, 'Pick')
-                self.pick.pick_object(self, point)
+                self.pick.pick_object(self)
                 self.change_state('prepare_give_pill')
 
         elif self.state is 'prepare_give_pill':

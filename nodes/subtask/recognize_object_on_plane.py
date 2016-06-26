@@ -24,7 +24,7 @@ class RecognizeObjectOnPlane(AbstractSubtask):
 
         if self.state is 'init':
             self.timer.wait(20)
-            self.skillBook.get_skill(self, 'TurnNeck').turn(-0.3, 0)
+            self.skillBook.get_skill(self, 'TurnNeck').turn(-0.35, 0)
             self.skill = self.skillBook.get_skill(self, 'RecognizeObjects')
             self.skill.recognize(['*'])
             self.change_state('wait_for_object')
@@ -35,6 +35,10 @@ class RecognizeObjectOnPlane(AbstractSubtask):
                     if found_object.name.data not in self.found_objects_name:
                         self.found_objects_name.append(found_object.name.data)
                         self.found_objects.append(found_object)
+                    else:
+                        for x in xrange(len(self.found_objects)):
+                            if found_object.name.data == self.found_objects[x].name.data:
+                                print dir(found_object)
                 rospy.loginfo('Found: ' + str(len(self.skill.object.result.objects)) + ' object(s).')
 
                 self.change_state('finish')

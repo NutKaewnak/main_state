@@ -10,7 +10,8 @@ class SpeechRecognition(AbstractTask):
 
     def perform(self, perception_data):
         if self.state is 'init':
-            self.subtask = self.subtaskBook.get_subtask(self, 'QuestionAnswer')
+            # self.subtask = self.subtaskBook.get_subtask(self, 'QuestionAnswer')
+            self.subtask = self.subtaskBook.get_subtask(self, 'QuestionAnswerIndirect')
             self.change_state('direct_asking')
 
         elif self.state is 'direct_asking':
@@ -20,6 +21,7 @@ class SpeechRecognition(AbstractTask):
         elif self.state is 'prepare_for_indirect':
             # face detection here NOT FINISH
             # may have change structure of this code
+            self.subtask = self.subtaskBook.get_subtask(self, 'QuestionAnswerIndirect')
             self.subtask.change_state('init')
             self.change_state('indirect_asking')
 

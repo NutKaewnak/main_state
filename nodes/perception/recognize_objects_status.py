@@ -13,6 +13,10 @@ class RecognizeObjectsPerception(AbstractPerception):
         rospy.Subscriber('/object/recognize_objects/feedback', RecognizeObjectsFeedback, self.callback_base_position)
 
     def callback_recognize_objects_status(self, data):
+        header = data.header
+
+        for obj in data.result.objects:
+            obj.header = header
         self.broadcast(Devices.RECOGNIZE_OBJECTS, data)
 
     def callback_base_position(self, data):
