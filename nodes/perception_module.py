@@ -15,12 +15,13 @@ from perception.height import Height
 from perception.clothes_detector_status import ClothesDetectorPerception
 from perception.recognize_objects_status import RecognizeObjectsPerception
 from perception.voice_recognition_mode_status import VoiceRecognitionModePerception
-# from perception.people_leg_detect import PeopleLegDetection
+from perception.people_leg_detect import PeopleLegDetection
 from perception.navigate import Navigate
 from perception.sound_source_localize_front import SoundSourceLocalizeFront
 from perception.sound_source_localize_back import SoundSourceLocalizeBack
 # from perception.joy import JoyInput
 from perception.guess_object import GuessObjectPerception
+from perception.door_handle_detect import DoorHandleDetection
 
 __author__ = "AThousandYears"
 
@@ -52,3 +53,4 @@ class PerceptionModule:
         self.sound_source_localize_front = SoundSourceLocalizeFront(main_state.planningModule)
         self.sound_source_localize_back = SoundSourceLocalizeBack(main_state.planningModule)
         self.guess_object = GuessObjectPerception(main_state.planningModule)
+        self.door_handle = DoorHandleDetection(main_state.planningModule)
