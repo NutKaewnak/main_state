@@ -20,6 +20,7 @@ from perception.navigate import Navigate
 from perception.sound_source_localize_front import SoundSourceLocalizeFront
 from perception.sound_source_localize_back import SoundSourceLocalizeBack
 # from perception.joy import JoyInput
+from perception.guess_object import GuessObjectPerception
 
 __author__ = "AThousandYears"
 
@@ -44,9 +45,10 @@ class PerceptionModule:
         self.recognize_objects = RecognizeObjectsPerception(main_state.planningModule)
         self.voice_recognition_mode = VoiceRecognitionModePerception(main_state.planningModule)
         self.clothes_detector_perception = ClothesDetectorPerception(main_state.planningModule)
-        # self.leg_people = PeopleLegDetection(main_state.planningModule)
+        self.leg_people = PeopleLegDetection(main_state.planningModule)
         self.navigate_path = Navigate(main_state.planningModule)
         # self.sound_source_localize = SoundSourceLocalize(main_state.planningModule)
         # self.joy = JoyInput(main_state.planningModule)
         self.sound_source_localize_front = SoundSourceLocalizeFront(main_state.planningModule)
         self.sound_source_localize_back = SoundSourceLocalizeBack(main_state.planningModule)
+        self.guess_object = GuessObjectPerception(main_state.planningModule)
