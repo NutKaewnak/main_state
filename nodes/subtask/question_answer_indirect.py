@@ -12,6 +12,7 @@ class QuestionAnswerIndirect(AbstractSubtask):
     def __init__(self, planning_module):
         AbstractSubtask.__init__(self, planning_module)
         self.skill = self.current_skill
+        self.move_base = None
         self.counter = 1
         self.limit = 5
         # self.has_direction = False
@@ -35,20 +36,21 @@ class QuestionAnswerIndirect(AbstractSubtask):
             self.change_state('turn_neck')
 
         elif self.state is 'turn_neck':
-            self.say.say('Please ask the question indirect ' + str(self.counter))
+            self.say.say('Please ask the indirect question ' + str(self.counter))
+            self.timer.wait(5)
             self.change_state('speak_ready')
             # print self.skill.state
             # if self.skill.state == 'succeeded':
             #     self.change_state('prepare_to_answer')
 
         elif self.state is 'speak_ready':
-            if self.say.state == 'succeeded':
+            if not self.timer.is_waiting():
                 self.change_state('prepare_to_answer')
 
         elif self.state is 'prepare_to_answer':
             # print 'prepare-----------------------------------------'
-            if perception_data.device is self.Devices.HARK_SOURCE_FRONT and self.question == None:
             # if perception_data.device is self.Devices.HARK_SOURCE_FRONT and self.has_direction is False:
+            if perception_data.device is self.Devices.HARK_SOURCE_FRONT and self.question is None:
                 if perception_data.input.src:
                     temp = 99
                     checker = 0
@@ -60,8 +62,8 @@ class QuestionAnswerIndirect(AbstractSubtask):
                         degree = perception_data.input.src[i].azimuth
                         distance = hypot(x, y)
 
-                        print 'Degree ', degree
-                        print 'Distance ', distance
+                        print 'Degree', degree
+                        print 'Distance', distance
 
                         if distance < 1.50 and degree <= 90 or degree >= -90:
                             if temp > distance:
@@ -75,7 +77,7 @@ class QuestionAnswerIndirect(AbstractSubtask):
                         # if self.question != None:
                         #     self.has_direction = True
 
-            if perception_data.device is self.Devices.HARK_SOURCE_BACK and self.question == None:
+            if perception_data.device is self.Devices.HARK_SOURCE_BACK and self.question is None:
             # if perception_data.device is self.Devices.HARK_SOURCE_BACK and self.has_direction is False:
                 if perception_data.input.src:
                     temp = 99
@@ -113,16 +115,16 @@ class QuestionAnswerIndirect(AbstractSubtask):
                 print perception_data.device, "----------", perception_data.input
                 if perception_data.input is 'robot stop':
                     self.change_state('finish')
-                elif perception_data.input != None:
+                elif perception_data.input is not None:
                     self.question = perception_data.input
                 # elif perception_data.input == 'what color is cobalt':
                 #     self.question = perception_data.input
 
                     print 'get input voice---------------------------------------'
 
-            if self.question != None and self.choosen_degree != None:
             # if self.has_direction is True and self.question != None:
             # if self.question is not None and self.has_direction is True:
+            if self.question is not None and self.choosen_degree is not None:
                 print 'change to turn----------------------------------------'
                 self.change_state('turning')
 
@@ -146,6 +148,7 @@ class QuestionAnswerIndirect(AbstractSubtask):
             self.say = self.skillBook.get_skill(self, 'Say')
             self.say.say('The answer of the question ' + str(self.question) + ' is ' +
                          str(answers_the_questions.answers(self.question)))
+            self.counter += 1
             # self.has_direction = False
             self.question = None
             self.choosen_degree = None
@@ -155,7 +158,6 @@ class QuestionAnswerIndirect(AbstractSubtask):
             print 'Speak========================================'
             if self.say.state == 'succeeded':
                 print 'next----------------------------------'
-                self.counter += 1
                 if self.counter < 5:
                     self.change_state('turn_neck')
                 else:
