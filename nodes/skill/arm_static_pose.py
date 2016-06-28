@@ -22,7 +22,6 @@ class ArmStaticPose(AbstractSkill):
         :param pose: (str)
         :return: None
         """
-        print pose
         if 'right' in pose:
             self.arm = self.controlModule.right_arm
             self.device = 'RIGHT_ARM'

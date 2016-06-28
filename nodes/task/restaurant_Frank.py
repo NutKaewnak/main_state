@@ -37,7 +37,7 @@ class RestaurantFrank(AbstractTask):
         self.delay = Delay()
 
     def perform(self, perception_data):
-        print self.state, '***'
+        # print self.state, '***'
         # print self.say.state, '------'
         # if self.say.speak.controlModule.speaker.process is not None:
         # print self.say.speak.controlModule.speaker.is_finish(), "++++++++"
@@ -417,16 +417,47 @@ class RestaurantFrank(AbstractTask):
             if perception_data.device is self.Devices.VOICE and 'robot yes' in perception_data.input:
                 self.say = self.subtaskBook.get_subtask(self, 'Say')
                 self.say.say('Ok')
-                if self.first_table == True:
-                    # self.say.say('I will go to ' + self.stack_table + ' to get a order.')
-                    self.first_table = False
-                    self.change_state('turning_1_2')
+                # if self.first_table == True:
+                #     # self.say.say('I will go to ' ted_local_planner_params.yaml+ self.stack_table + ' to get a order.')
+                #     self.first_table = False
+                self.detect_waving_people[self.current_table] = True
+                for i in self.detect_waving_people:
+                    if self.detect_waving_people[i] == False:
+                        self.command = i
+                        self.change_state('move_to_another_table')
                 else:
                     self.change_state('move_to_kitchen')
             elif perception_data.device is self.Devices.VOICE and 'robot no' in perception_data.input:
                 self.say = self.subtaskBook.get_subtask(self, 'Say')
                 self.say.say('Sorry , What did you say ?')
                 self.change_state('wait_for_order')
+
+
+        elif self.state == 'move_to_another_table':
+            # self.command = location
+            self.say = self.subtaskBook.get_subtask(self, 'Say')
+            self.say.say('I am going to' + self.command + '.')
+            # self.delay.wait(5)
+            self.change_state('confirm_command_auto')
+
+        elif self.state == 'confirm_command_auto':
+            if self.say.state is not 'finish':
+                return
+            self.move_abs = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
+            self.move_abs.set_position(self.location_list[self.command][0], self.location_list[self.command][1],
+                                       self.location_list[self.command][2])
+            self.change_state('move_to_location_auto')
+
+        elif self.state == 'move_to_location_auto':
+
+
+
+
+
+
+
+
+
 
         elif self.state is 'turning_1_2':
             self.say = self.subtaskBook.get_subtask(self, 'Say')
