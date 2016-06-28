@@ -1,5 +1,6 @@
 import rospy
 from include.abstract_subtask import AbstractSubtask
+from include.pick_available_range import is_in_range
 
 __author__ = 'CinDy'
 
@@ -8,15 +9,17 @@ class Pick(AbstractSubtask):
     def __init__(self, planning_module):
         AbstractSubtask.__init__(self, planning_module)
         self.grasp = None
-        self.input_object_point = None
+        self.input_object_pose = None
         self.side_arm = None
-        self.subtask = None
         self.neck = None
+        self.base = None
         self.object_name = None
+        self.is_tried_to_solve = False
 
     def perform(self, perception_data):
         if self.state is 'init':
             # rospy.loginfo('pick subtask init')
+            self.is_tried_to_solve = True
             self.grasp = self.skillBook.get_skill(self, 'Grasp')
             self.change_state('wait_for_skill_init')
 
@@ -30,16 +33,24 @@ class Pick(AbstractSubtask):
             self.change_state('setting_arm')
 
         elif self.state is 'setting_arm':
-            self.grasp.pick_object(self.input_object_point)
+            self.grasp.pick_object(self.input_object_pose)
             self.change_state('wait_for_skill')
 
         elif self.state is 'wait_for_skill':
             if self.grasp.state is 'done_prepare':
                 self.grasp.after_prepare()
             elif self.grasp.state is 'unreachable':
-                self.change_state('solve_unreachable')
+                if not self.is_tried_to_solve:
+                    self.is_tried_to_solve = True
+                    self.change_state('solve_unreachable')
+                else:
+                    self.change_state('error')
             elif self.grasp.state is 'succeed':
                 self.change_state('finish')
+
+        elif self.state is 'solve_unreachable':
+            if not is_in_range(self.input_object_pose):
+                self.base = self.skillBook.get_skill(self, 'MoveBaseRelativeTwist')
 
     def pick_object(self, pose_stamped, object_name='little_big'):
         """
@@ -47,7 +58,7 @@ class Pick(AbstractSubtask):
         :param pose_stamped: (PoseStamped) point of object to pick.
         :return: None
         """
-        self.input_object_point = pose_stamped
+        self.input_object_pose = pose_stamped
         self.object_name = object_name
         if self.side_arm is None:
             self.side_arm = 'right_arm'
