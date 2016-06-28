@@ -1,6 +1,6 @@
 import rospy
 from include.abstract_subtask import AbstractSubtask
-from include.pick_available_range import is_in_range
+from include.pick_available_range import is_in_range, find_new_available_point
 
 __author__ = 'CinDy'
 
@@ -45,11 +45,11 @@ class Pick(AbstractSubtask):
                     self.change_state('solve_unreachable')
                 else:
                     self.change_state('error')
-            elif self.grasp.state is 'succeed':
+            elif self.grasp.state is 'succeeded':
                 self.change_state('finish')
 
         elif self.state is 'solve_unreachable':
-            if not is_in_range(self.input_object_pose):
+            if not is_in_range(self.input_object_pose.pose.position):
                 self.base = self.skillBook.get_skill(self, 'MoveBaseRelativeTwist')
 
     def pick_object(self, pose_stamped, object_name='little_big'):
