@@ -9,18 +9,30 @@ class RIPS(AbstractTask):
     def __init__(self, planning_module):
         AbstractTask.__init__(self, planning_module)
         self.move = None
-
+        self.subtask = None
     def perform(self, perception_data):
         if self.state is 'init':
-            self.change_state_with_subtask('movePassDoor', 'MovePassDoor')
+            self.subtask = self.subtaskBook.get_subtask(self, 'MovePassDoor')
+            self.change_state('movePassDoor')
 
         elif self.state is 'movePassDoor':
-            subtask = self.change_state_with_subtask('moveToTable', 'MoveToLocation')
-            if subtask is not None:
-                subtask.to_location('hallway table')
+            if self.subtask.state is 'finished':
+                subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
+                subtask.to_location('check_point')
+                self.change_state('moveToCheckpoint')
 
-        elif self.state is 'moveToTable':
+        elif self.state is 'moveToCheckpoint':
             if self.current_subtask.state is 'finish':
+                if perception_data.device is 'VOICE' and perception_data.input:
+                    if perception_data.input == 'countinue':
+
+                    elif perception_data.input == 'yes':
+
+                    elif perception_data.input == 'no':
+
+                    elif perception_data.input == 'Go to the coach, find James and answer a question.':
+
+
                 self.subtaskBook.get_subtask('Register')
                 self.change_state('moveArm')
 

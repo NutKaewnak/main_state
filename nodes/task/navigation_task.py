@@ -5,6 +5,7 @@ import random
 from geometry_msgs.msg import Point, Pose2D
 # from include.location_information import read_location_information
 from include.transform_point import transform_point
+from std_msgs.msg import Empty
 from include.abstract_task import AbstractTask
 from include.delay import Delay
 from include.get_distance import get_distance
@@ -27,8 +28,7 @@ class NavigationTask(AbstractTask):
         self.is_performing = False
         self.location_list = {}
         self.say = None
-        # self.door_waypoint3_path = {}
-        # self.waypoint4_door_path = {}
+        self.obstrucle = None
         self.track_id = None
         # self.subtask = self.subtaskBook.get_subtask(self, 'ArmStaticPose')
         # self.subtask.static_pose('right_push_chair_push')
@@ -39,11 +39,11 @@ class NavigationTask(AbstractTask):
         self.is_performing = True
 
         if self.state is 'init':
-            # self.door_waypoint3_path = {'x', 'y', 'theta'}
-            self.tf_listener = tf.TransformListener()
-            # self.waypoint4_door_path = {'x', 'y', 'theta'}
-            self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.3, 0)
             rospy.loginfo('NavigationTask init')
+            rospy.wait_for_service('xyz')
+            self.obstrucle = rospy.ServiceProxy('xyz/get', Empty)
+            self.tf_listener = tf.TransformListener()
+            self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.3, 0)
             self.subtaskBook.get_subtask(self, 'MovePassDoor')
             self.change_state('move_pass_door')
 
@@ -66,8 +66,10 @@ class NavigationTask(AbstractTask):
         elif self.state is 'going_to_waypoint1':
             print 'going to waypoint1'
             if self.perception_module.base_status.position:
+                print 'reset timer'
                 self.timer.wait(10)
-            if not self.timer.is_waiting():
+            elif not self.timer.is_waiting():
+                print 'clear_costmap'
                 self.subtask.clear_costmap()
 
             if self.subtask.state is 'finish':
@@ -78,7 +80,6 @@ class NavigationTask(AbstractTask):
                 self.subtaskBook.get_subtask(self, 'Say').say('I will go to waypoint 2.')
                 self.delay.wait(2)
                 self.change_state('prepare_to_waypoint2')
-
             elif self.subtask.state is 'error':
                 rospy.loginfo('resend goal in waypoint_1')
                 self.subtask.to_location('waypoint_1')
@@ -95,7 +96,7 @@ class NavigationTask(AbstractTask):
         elif self.state is 'finding_obstacle_waypoint2':
             if self.perception_module.base_status.position:
                 self.timer.wait(10)
-            if not self.timer.is_waiting():
+            elif not self.timer.is_waiting():
                 self.subtask.clear_costmap()
 
             if perception_data.device is 'PEOPLE' and perception_data.input is not []:
@@ -109,30 +110,21 @@ class NavigationTask(AbstractTask):
                         if distance <= 2:
                             rospy.loginfo('Found people block the way')
                             self.is_people_blocked_waypoint_2 = True
-            if perception_data.device is 'GUESS_OBJECT' and perception_data.input:
-                if perception_data.input == 'people':
-                    self.change_state('')
-                elif perception_data.input == 'pet':
-                    self.change_state('')
-                else:
-                    self.change_state('')
             if self.subtask.state is 'finish' or not self.delay.is_waiting():
+                obj = self.obstrucle()
                 if self.is_people_blocked_waypoint_2:
                     self.change_state('blocked_by_people')
-                else:
-                    rand = random.randint(0, 1)
-                    if rand == 0:
-                        self.change_state('blocked_by_object')
-                    else:
-                        self.change_state('blocked_by_pet')
+                elif obj == 'object':
+                    self.change_state('blocked_by_object')
+                elif obj == 'pet':
+                    self.change_state('blocked_by_pet')
 
             elif self.subtask.state is 'error':
                 # self.subtask = self.subtaskBook.get_subtask(self, 'MoveRelative')
                 # self.subtask.set_postion(0, 0, math.pi)
                 self.subtask.to_location('pre_waypoint_2')
-                # self.change_state('move_back')
                 self.timer.wait(10)
-                self.change_state('finding_obstacle_waypoint2')
+                # self.change_state('finding_obstacle_waypoint2')
 
         elif self.state is 'move_back':
             if self.subtask.state is 'finish':
@@ -155,10 +147,11 @@ class NavigationTask(AbstractTask):
             self.subtask.static_pose('right_push_chair_push')
             self.delay.wait(20)
             self.change_state('enter_waypoint2')
-
             self.is_performing = False
 
         elif self.state is 'blocked_by_pet':
+            self.subtask = self.subtaskBook.get_subtask(self, 'Say')
+            self.subtaskBook.say('I found a pet blocking my way.')
             self.delay.wait(30)
             self.change_state('enter_waypoiint2')
 
@@ -173,7 +166,7 @@ class NavigationTask(AbstractTask):
         elif self.state is 'wait_enter_waypoint2':
             if self.perception_module.base_status.position:
                 self.timer.wait(10)
-            if not self.timer.is_waiting():
+            elif not self.timer.is_waiting():
                 self.subtask.clear_costmap()
 
             if self.subtask.state is 'finish':
@@ -200,7 +193,8 @@ class NavigationTask(AbstractTask):
         elif self.state is 'going_to_waypoint3':
             if self.perception_module.base_status.position:
                 self.timer.wait(10)
-            if not self.timer.is_waiting():
+            elif not self.timer.is_waiting():
+                print 'clear_costmap'
                 self.subtask.clear_costmap()
 
             if self.subtask.state is 'finish' or not self.delay.is_waiting():
@@ -231,7 +225,7 @@ class NavigationTask(AbstractTask):
                     self.change_state('confirm_back')
 
         elif self.state is 'confirm_follow':
-            if perception_data.device is self.Devices.VOICE:
+            if perception_data.device is self.Devices.VOICE and not self.delay.is_waiting():
                 if perception_data.input == 'robot yes':
                     self.subtaskBook.get_subtask(self, 'Say').say('I will follow you.')
                     self.follow = self.subtaskBook.get_subtask(self, 'FollowLeg')
@@ -241,7 +235,7 @@ class NavigationTask(AbstractTask):
                     self.change_state('wait_for_command')
 
         elif self.state is 'confirm_back':
-            if perception_data.device is self.Devices.VOICE:
+            if perception_data.device is self.Devices.VOICE and not self.delay.is_waiting():
                 if perception_data.input == 'robot yes':
                     self.subtaskBook.get_subtask(self, 'Say').say('I will go back')
                     self.subtask = self.subtaskBook.get_subtask(self, 'DetectDoor')
