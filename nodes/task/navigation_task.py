@@ -5,7 +5,7 @@ import random
 from geometry_msgs.msg import Point, Pose2D
 # from include.location_information import read_location_information
 from include.transform_point import transform_point
-from std_msgs.msg import Empty
+from std_srvs.srv import Empty
 from include.abstract_task import AbstractTask
 from include.delay import Delay
 from include.get_distance import get_distance
@@ -38,25 +38,29 @@ class NavigationTask(AbstractTask):
             return
         self.is_performing = True
 
+        print self.state
         if self.state is 'init':
             rospy.loginfo('NavigationTask init')
-            rospy.wait_for_service('xyz')
-            self.obstrucle = rospy.ServiceProxy('xyz/get', Empty)
+            rospy.wait_for_service('/guess_detection/get')
+            self.obstrucle = rospy.ServiceProxy('/guess_detection/get', Empty)
             self.tf_listener = tf.TransformListener()
             self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.3, 0)
-            self.subtaskBook.get_subtask(self, 'MovePassDoor')
+            self.change_state('init_pass_door')
+
+        elif self.state is 'init_pass_door':
+            self.subtask = self.subtaskBook.get_subtask(self, 'MovePassDoor')
             self.change_state('move_pass_door')
 
         elif self.state is 'move_pass_door':
             if self.current_subtask.state is 'finish':
-                rospy.loginfo('going to waypoint 1')
-                self.subtaskBook.get_subtask(self, 'Say').say('I will go to waypoint 1.')
+                rospy.loginfo('going to waypoint 2')
+                self.subtaskBook.get_subtask(self, 'Say').say('I will go to waypoint 2.')
                 self.delay.wait(3)
-                self.change_state('prepare_to_waypoint1')
+                self.change_state('prepare_to_waypoint2')
 
         elif self.state is 'prepare_to_waypoint1':
             print 'prepare to waypoint 1'
-            if not self.delay.is_waiting():
+            if self.subtask.state is 'finish':
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
                 self.subtask.to_location('waypoint_1')
                 self.delay.wait(90)
@@ -75,17 +79,17 @@ class NavigationTask(AbstractTask):
             if self.subtask.state is 'finish':
                 self.subtaskBook.get_subtask(self, 'Say').say('I reached waypoint 1.')
                 self.delay.wait(2)
-                self.change_state('prepare_to_waypoint2')
+                self.change_state('prepare_to_waypoint3')
             elif not self.delay.is_waiting():
-                self.subtaskBook.get_subtask(self, 'Say').say('I will go to waypoint 2.')
+                self.subtaskBook.get_subtask(self, 'Say').say('I will go to waypoint 3.')
                 self.delay.wait(2)
-                self.change_state('prepare_to_waypoint2')
+                self.change_state('prepare_to_waypoint3')
             elif self.subtask.state is 'error':
                 rospy.loginfo('resend goal in waypoint_1')
                 self.subtask.to_location('waypoint_1')
 
         elif self.state is 'prepare_to_waypoint2':
-            if self.current_subtask.state is 'finish' and not self.delay.is_waiting():
+            if not self.delay.is_waiting():
                 rospy.loginfo('going to waypoint 2')
                 self.change_state('finding_obstacle_waypoint2')
                 self.delay.wait(150)
@@ -118,7 +122,6 @@ class NavigationTask(AbstractTask):
                     self.change_state('blocked_by_object')
                 elif obj == 'pet':
                     self.change_state('blocked_by_pet')
-
             elif self.subtask.state is 'error':
                 # self.subtask = self.subtaskBook.get_subtask(self, 'MoveRelative')
                 # self.subtask.set_postion(0, 0, math.pi)
@@ -126,10 +129,10 @@ class NavigationTask(AbstractTask):
                 self.timer.wait(10)
                 # self.change_state('finding_obstacle_waypoint2')
 
-        elif self.state is 'move_back':
-            if self.subtask.state is 'finish':
-                self.subtask.set_postion(1.5, 0, math.pi)
-                self.change_state('finding_obstacle_waypoint2')
+        # elif self.state is 'move_back':
+        #     if self.subtask.state is 'finish':
+        #         self.subtask.set_postion(1.5, 0, math.pi)
+        #         self.change_state('finding_obstacle_waypoint2')
 
         elif self.state is 'blocked_by_people':
             self.subtask = self.subtaskBook.get_subtask(self, 'Say')
@@ -171,18 +174,18 @@ class NavigationTask(AbstractTask):
 
             if self.subtask.state is 'finish':
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                self.subtask.say('I reach waypoint 2')
-                self.change_state('prepare_to_waypoint3')
+                self.subtask.say('I reached waypoint 2')
+                self.change_state('prepare_to_waypoint1')
             elif not self.delay.is_waiting():
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                self.subtask.say('I will go to waypoint 3')
-                self.change_state('prepare_to_waypoint3')
+                self.subtask.say('I will go to waypoint 1')
+                self.change_state('prepare_to_waypoint1')
             elif self.subtask.state is 'error':
                 self.subtask.to_location('wayppoint_2')
-                self.change_state('wait_enter_waypoint2')
+                # self.change_state('wait_enter_waypoint2')
 
         elif self.state is 'prepare_to_waypoint3':
-            if self.current_subtask.state is 'finish':
+            if not self.delay.is_waiting():
                 rospy.loginfo('prepare to waypoint 3')
                 self.delay.wait(150)
                 self.timer.wait(10)
@@ -203,8 +206,9 @@ class NavigationTask(AbstractTask):
                 self.delay.wait(5)
                 self.change_state('instruct')
             elif self.subtask.state is 'error':
+                self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
                 self.subtask.to_location('waypoint_3')
-                self.change_state('going_to_waypoint3')
+                # self.change_state('going_to_waypoint3')
 
         elif self.state is 'instruct':
             if self.say.state is 'finish' or not self.delay.is_waiting():

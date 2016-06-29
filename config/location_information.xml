@@ -34,13 +34,24 @@
 	<location name="entrance" position="2.656, -7.349" rotation="3.126" height="1.29"/>
     <location name="exit" position="11.672, -6.486" rotation="-1.864" height="1.29"/>
 
-    <location name="waypoint_1" position="10.573, -1.574 " rotation="-2.131" height="1.29"/>
-    <location name="pre_waypoint_2" position="11.143, -6.070" rotation="3.083" height="1.29"/>
-    <location name="waypoint_2" position="10.726, -5.583" rotation=" -3.038" height="1.29"/>
-    <location name="waypoint_3" position="12.294, -3.081 " rotation="1.243" height="1.29"/>
+    <!--navigate arena A -->
+    <location name="waypoint_1" position=" 4.303, -6.849" rotation=" -1.775" height="1.29"/>
+    <location name="pre_waypoint_2" position=" 6.294, -5.267" rotation=" -1.572" height="1.29"/>
+    <location name="waypoint_2" position=" 6.862, -8.177" rotation=" 0.001" height="1.29"/>
+    <location name="waypoint_3" position=" 4.122, -9.987" rotation=" -1.572" height="1.29"/>
+
+    <!--navigate arena B -->
+    <!--<location name="waypoint_1" position=" 10.337, -0.796" rotation=" 3.062" height="1.29"/>-->
+    <!--<location name="pre_waypoint_2" position=" 13.051, 1.381" rotation=" -1.624" height="1.29"/>-->
+    <!--<location name="waypoint_2" position=" 13.850, -1.163" rotation=" -1.558" height="1.29"/>-->
+    <!--<location name="waypoint_3" position=" 2.674, 1.763" rotation=" -3.126" height="1.29"/>-->
+
 
     <location name="hallway table" position="2.981, 2.737" rotation="-1.600" height="1.29"/>
     <!--<location name="gpsr_start" position="25.972, 3.633" rotation="-0.795" height="1.29"/>-->
     <location name="shelf" position="12.396, -5.975  " rotation="3.131" height="1.29"/>
 
+    <!--below this is in arena B -->
+    <location name="check_point" position=" 9.870, -0.441" rotation=" -0.024" height="1.29"/>
+    <location name="exit_arena" position=" 14.902, 5.800"  rotation=" 1.539" height="1.29"/>
 </location_information>

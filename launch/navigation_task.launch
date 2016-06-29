@@ -4,12 +4,13 @@
     <node ns="door" name="door_detection" pkg="door_detection" type="door_detection_node">
         <remap from="/scan" to="/laser/scan"/>
     </node>
+
     <node name="main_state" pkg="main_state" type="main.py" output="screen" args="NavigationTask" />
 
     <node ns="people" name="people_detection" pkg="people_detection" type="people_detection_node" />
 
     <node pkg="rosbag" type="record" name="logging_navigation_task" args="-o ../navigation_task_bag/logging_navigation_bag nav_msgs/path sensor_msgs/laserScan"  />
-
+    <node pkg="object_cluster" type="guess_object.py" name="guess_detection"/>
     <include file="$(find athome_leg_tracker)/launch/leg_detector.launch"/>
 
 </launch>
