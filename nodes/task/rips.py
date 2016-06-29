@@ -25,13 +25,7 @@ class RIPS(AbstractTask):
             if self.current_subtask.state is 'finish':
                 if perception_data.device is 'VOICE' and perception_data.input:
                     if perception_data.input == 'countinue':
-
-                    elif perception_data.input == 'yes':
-
-                    elif perception_data.input == 'no':
-
-                    elif perception_data.input == 'Go to the coach, find James and answer a question.':
-
+                        pass
 
                 self.subtaskBook.get_subtask('Register')
                 self.change_state('moveArm')
