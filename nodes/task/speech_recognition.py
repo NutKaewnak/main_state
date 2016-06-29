@@ -10,8 +10,8 @@ class SpeechRecognition(AbstractTask):
 
     def perform(self, perception_data):
         if self.state is 'init':
-            # self.subtask = self.subtaskBook.get_subtask(self, 'QuestionAnswer')
-            self.subtask = self.subtaskBook.get_subtask(self, 'QuestionAnswerIndirect')
+            self.subtask = self.subtaskBook.get_subtask(self, 'QuestionAnswer')
+            # self.subtask = self.subtaskBook.get_subtask(self, 'QuestionAnswerIndirect')
             self.change_state('direct_asking')
 
         elif self.state is 'direct_asking':
