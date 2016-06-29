@@ -4,6 +4,7 @@ from include.abstract_subtask import AbstractSubtask
 from math import hypot, radians
 from include.delay import Delay
 import threading
+from std_srvs.srv import *
 
 __author__ = 'ms.antonio'
 
@@ -25,6 +26,8 @@ class QuestionAnswerIndirect(AbstractSubtask):
         # self.is_performing = True
 
         if self.state is 'init':
+            self.self.mic_control_open = rospy.ServiceProxy("/recognizer_grammar/mic_control_open", Empty)
+            self.self.mic_control_close = rospy.ServiceProxy("/recognizer_grammar/mic_control_close", Empty)
             self.move_base = self.skillBook.get_skill(self, 'MoveBaseRelative')
             self.skill = self.skillBook.get_skill(self, 'TurnNeck')
             self.say = self.skillBook.get_skill(self, 'Say')
@@ -32,14 +35,16 @@ class QuestionAnswerIndirect(AbstractSubtask):
             self.counter = 1
             self.question = None
             self.choosen_degree = None
+            self.mic_control_close()
             self.say.say('I finish answering 5 direct questions. Please ask the indirect questions')
             self.change_state('speak_indirect')
-
+            
         elif self.state is 'speak_indirect':
             if self.say.state == 'succeeded':
                 self.change_state('turn_neck')
 
         elif self.state is 'turn_neck':
+            self.mic_control_close()
             self.say = self.skillBook.get_skill(self, 'Say')
             self.say.say('Please ask the indirect question ' + str(self.counter))
             # self.timer.wait(5)
@@ -51,6 +56,7 @@ class QuestionAnswerIndirect(AbstractSubtask):
         elif self.state is 'speak_ready':
             # if not self.timer.is_waiting():
             if self.say.state == 'succeeded':
+                self.mic_control_open()
                 self.change_state('prepare_to_answer')
 
         elif self.state is 'prepare_to_answer':
@@ -155,6 +161,7 @@ class QuestionAnswerIndirect(AbstractSubtask):
 
         elif self.state is 'speak_repeat_question':
             if not self.timer.is_waiting:
+                self.mic_control_close()
                 self.say = self.skillBook.get_skill(self, 'Say')
                 self.say.say('Sorry I do not understand the question. Please repeat the question ' + str(self.counter))
                 self.timer.wait(15)
@@ -162,6 +169,7 @@ class QuestionAnswerIndirect(AbstractSubtask):
 
         elif self.state is 'listen_repeat_question':
             if self.say.state == 'succeeded':
+                self.mic_control_open()
                 if timer.is_waiting:
                     if perception_data.device is 'VOICE':
                         print perception_data.device, "----------", perception_data.input
@@ -181,17 +189,20 @@ class QuestionAnswerIndirect(AbstractSubtask):
 
         elif self.state is 'finished_turning':
             if not self.timer.is_waiting():
+                self.mic_control_close()
                 self.say = self.skillBook.get_skill(self, 'Say')
                 self.say.say('finish turning')
                 self.change_state('answering')
 
         elif self.state is 'answering':
             if self.say.state == 'succeeded':
+                self.mic_control_open()
                 print 'state', self.state
                 print self.move_base.state
                 # if self.say.state == 'succeeded':
                 print 'Say Set========================================'
                 # self.say.say('the answer of the question what color is cobalt is blue.')
+                self.mic_control_close()
                 self.say = self.skillBook.get_skill(self, 'Say')
                 self.say.say('The answer of the question ' + str(self.question) + ' is ' +
                              str(answers_the_questions_Ger2016.answers(self.question)))
