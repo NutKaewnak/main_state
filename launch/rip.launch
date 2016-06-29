@@ -1,0 +1,4 @@
+<launch>
+  <node name="main_state" pkg="main_state" type="main.py" output="screen" args="RIPS" />
+  <node ns="z_bar" name="qr" pkg="zbar_ros" type="barcode_reader_node"/>
+</launch>
