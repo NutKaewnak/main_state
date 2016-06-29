@@ -33,3 +33,6 @@ class MoveBaseRelative(AbstractSkill):
                 self.is_active = MoveBaseStatus.is_active(perception_data.input)
                 state = MoveBaseStatus.get_state_from_status(perception_data.input)
                 self.change_state(state)
+
+    def clear_costmap(self):
+        self.controlModule.base.clear_costmap()

@@ -35,7 +35,7 @@
     <location name="exit" position="11.672, -6.486" rotation="-1.864" height="1.29"/>
 
     <location name="waypoint_1" position="10.573, -1.574 " rotation="-2.131" height="1.29"/>
-    <location name="pre_waypoint_2" position="11.630, -4.809 " rotation="-2.487" height="1.29"/>
+    <location name="pre_waypoint_2" position="11.143, -6.070" rotation="3.083" height="1.29"/>
     <location name="waypoint_2" position="10.726, -5.583" rotation=" -3.038" height="1.29"/>
     <location name="waypoint_3" position="12.294, -3.081 " rotation="1.243" height="1.29"/>
 

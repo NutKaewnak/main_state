@@ -25,3 +25,6 @@ class MoveBaseAbsolute(AbstractSkill):
                 # TODO: Bad code here!!
                 self.is_active = MoveBaseStatus.is_active(perception_data.input)
                 self.change_state(state)
+
+    def clear_cosmap(self):
+        self.controlModule.base.clear_costmap()

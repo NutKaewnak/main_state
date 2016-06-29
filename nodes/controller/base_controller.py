@@ -12,8 +12,8 @@ __author__ = "AThousandYears"
 class BaseController:
     def __init__(self):
         self.move_base = actionlib.SimpleActionClient('/navigation/move_base', MoveBaseAction)
-        self.clear_costmap = rospy.ServiceProxy('/navigation/move_base_node/clear_costmaps', Empty)
-        self.clear_point_costmap = rospy.ServiceProxy('/navigation/move_base_node/clear_point_costmaps', ClearPointCostmap)
+        self.clear_costmap = rospy.ServiceProxy('/navigation/athome_move_base_node/clear_costmaps', Empty)
+        self.clear_point_costmap = rospy.ServiceProxy('/navigation/athome_move_base_node/clear_point_costmaps', ClearPointCostmap)
         self.move_twist = rospy.Publisher('/base/cmd_vel', Twist, queue_size=1)
 
     def set_twist(self, twist):

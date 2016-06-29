@@ -10,9 +10,6 @@ class TestBugArm(AbstractTask):
 
     def perform(self, perception_data):
         if self.state is 'init':
-            # Do something
-            self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
-            self.change_state("pub")
-
-        elif self.state is 'pub':
-            self.subtask.turn_absolute(0, 0)
+            self.subtask = self.subtaskBook.get_subtask(self, 'ArmStaticPose')
+            self.subtask.static_pose('right_push_chair_push')
+            self.change_state('send_pose')
