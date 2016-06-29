@@ -1,5 +1,5 @@
 import rospy
-from include import answers_the_questions
+from include import answers_the_questions_Ger2016
 from include.abstract_subtask import AbstractSubtask
 from math import hypot, radians
 from include.delay import Delay
@@ -23,7 +23,7 @@ class QuestionAnswer(AbstractSubtask):
     def perform(self, perception_data):
         if self.debug_state != self.state:
             self.debug_state = self.state
-            print self.debug_state
+            print self.debug_state, '======================'
 
         if self.state is 'init':
             # self.move_base = self.skillBook.get_skill(self, 'MoveBaseRelative')
@@ -45,25 +45,27 @@ class QuestionAnswer(AbstractSubtask):
                 self.change_state('answering')
 
         elif self.state is 'answering':
-            if perception_data.device == 'VOICE':
-                print self.timer.is_waiting()
-                if self.timer.is_waiting():
-                    # print "-----------"
-                    if perception_data.device is 'VOICE':
-                        rospy.loginfo(perception_data.input)
-                        if perception_data.input is 'robot stop':
-                            self.change_state('finish')
-                        elif perception_data.input is not None:
-                            self.say.say('The answer of the question ' + str(perception_data.input) + ' is ' +
-                                         answers_the_questions.answers(perception_data.input))
-                            self.timer.wait(10)
-                            self.change_state("speak_answer")
+            if self.say.state == 'succeeded':
+                if perception_data.device == 'VOICE':
+                    # print self.timer.is_waiting()
+                    if self.timer.is_waiting():
+                        # print "-----------"
+                        if perception_data.device is 'VOICE':
+                            rospy.loginfo(perception_data.input)
+                            if perception_data.input is 'robot stop':
+                                self.change_state('finish')
+                            elif perception_data.input is not None:
+                                self.say.say('The answer of the question ' + str(perception_data.input) + ' is ' +
+                                             answers_the_questions_Ger2016.answers(perception_data.input))
+                                self.timer.wait(10)
+                                self.change_state("speak_answer")
 
-                else:
-                    self.counter += 1
-                    self.change_state('prepare_to_answer')
+                    else:
+                        self.counter += 1
+                        self.change_state('prepare_to_answer')
 
         elif self.state is 'speak_answer':
-            if not self.timer.is_waiting():
+            # if not self.timer.is_waiting():
+            if self.say.state == 'succeeded':
                 self.counter += 1
                 self.change_state('prepare_to_answer')
