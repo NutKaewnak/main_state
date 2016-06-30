@@ -121,18 +121,29 @@ class ManipulationTask(AbstractTask):
             self.timer.wait(10)
             print 'len(self.object_array)', len(self.object_array)
             while self.object_to_generate:
-                print 'len(self.object_to_generate) before pop', len(self.object_to_generate)
                 found_object = self.object_to_generate.pop(0)
-                print 'generate report for', found_object.name.data
                 self.report_generator.generate_object_report(found_object)
-                print 'len(self.object_to_generate)', len(self.object_to_generate)
             self.change_state('finish_detect')
 
         elif self.state is 'finish_detect':
+            self.object_to_generate = [] + self.object_array
             if not self.timer.is_waiting():
                 self.subtaskBook.get_subtask(self, 'Say').say('I\'m finish detecting')
-                self.change_state('pick_object')
+                self.change_state('say_report')
                 self.report_generator.on_end_latex()
+
+        elif self.state is 'say_report':
+            if self.object_to_generate:
+                obj_to_generate = self.object_to_generate.pop()
+                self.subtaskBook.get_subtask(self, 'Say').say('I found ' + obj_to_generate.name)
+                self.timer.wait(4)
+                self.change_state('wait_say_report')
+            else:
+                self.change_state('pick_object')
+
+        elif self.state is 'wait_say_report':
+            if not self.timer.is_waiting():
+                self.change_state('say_report')
 
         elif self.state is 'pick_object':
             if len(self.object_array) == 0:

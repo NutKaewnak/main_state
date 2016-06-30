@@ -1,6 +1,11 @@
 <launch>
 
-    <include file="$(find speech_processing)/launch/followme.launch"/>
+
+    <node name="gesture_detection" pkg="gesture_detection" type="NIHandtracker" output="screen" >
+        <remap from="/points" to="/gesture/points"/>
+    </node>
+
+    <include file="$(find speech_processing)/launch/navger_2016.launch"/>
     <node ns="door" name="door_detection" pkg="door_detection" type="door_detection_node">
         <remap from="/scan" to="/laser/scan"/>
     </node>
@@ -9,7 +14,7 @@
 
     <node ns="people" name="people_detection" pkg="people_detection" type="people_detection_node" />
 
-    <node pkg="rosbag" type="record" name="logging_navigation_task" args="-o ../navigation_task_bag/logging_navigation_bag nav_msgs/path sensor_msgs/laserScan"  />
+    <node pkg="rosbag" type="record" name="logging_navigation_task" args="-o ../navigation_task_bag/logging_navigation_bag /navigation/move_base_node/global_costmap/obstacle_layer_footprint/footprint_stamped /navigation/athome_move_base_node/TebLocalPlannerROS/teb_poses  /tf /navigation/move_base_node/TrajectoryPlannerROS/local_plan /laser/scan"  />
     <node pkg="object_cluster" type="guess_object.py" name="guess_detection"/>
     <include file="$(find athome_leg_tracker)/launch/leg_detector.launch"/>
 
