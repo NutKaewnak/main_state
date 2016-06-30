@@ -35,11 +35,12 @@
     <location name="exit" position="11.672, -6.486" rotation="-1.864" height="1.29"/>
 
     <!--navigate arena A -->
-    <location name="waypoint_1" position=" 4.303, -6.849" rotation=" -1.775" height="1.29"/>
-    <location name="pre_waypoint_2" position=" 6.294, -5.267" rotation=" -1.572" height="1.29"/>
-    <location name="waypoint_2" position=" 6.862, -8.177" rotation=" 0.001" height="1.29"/>
-    <location name="waypoint_3" position=" 4.122, -9.987" rotation=" -1.572" height="1.29"/>
-
+    <location name="waypoint_1" position=" 3.999, -7.135" rotation=" 3.084" height="1.29"/>
+    <location name="pre_waypoint_2" position=" 6.888, -7.170 " rotation=" -1.621" height="1.29"/>
+    <location name="waypoint_2" position=" 6.714, -8.077" rotation=" -1.852" height="1.29"/>
+    <location name="waypoint_3" position=" 4.584, -10.540" rotation=" -1.685" height="1.29"/>
+    <location name="door_1" position="3.606, -12.690" rotation=" 1.600" height="1.29"/>
+    <location name="door_2" position=" 6.027, -13.011" rotation=" 1.597" height="1.29"/>
     <!--navigate arena B -->
     <!--<location name="waypoint_1" position=" 10.337, -0.796" rotation=" 3.062" height="1.29"/>-->
     <!--<location name="pre_waypoint_2" position=" 13.051, 1.381" rotation=" -1.624" height="1.29"/>-->

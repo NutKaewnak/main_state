@@ -1,6 +1,6 @@
 import rospy
 import actionlib
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, PoseStamped
 from tf.transformations import quaternion_from_euler
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from std_srvs.srv import Empty
@@ -15,6 +15,21 @@ class BaseController:
         self.clear_costmap = rospy.ServiceProxy('/navigation/athome_move_base_node/clear_costmaps', Empty)
         self.clear_point_costmap = rospy.ServiceProxy('/navigation/athome_move_base_node/clear_point_costmaps', ClearPointCostmap)
         self.move_twist = rospy.Publisher('/base/cmd_vel', Twist, queue_size=1)
+        self.goal_with_clear_point = rospy.Publisher('navigation/goal_with_clear_costmap', PoseStamped)
+
+    def set_goal_with_clear_point(self, x, y, theta, frame_id):
+        new_goal = PoseStamped()
+        new_goal.header.frame_id = frame_id
+        new_goal.header.stamp = rospy.Time.now()
+
+        new_goal.pose.position.x = x
+        new_goal.pose.position.y = y
+
+        quaternion = quaternion_from_euler(0, 0, theta)
+        new_goal.pose.orientation.z = quaternion[2]
+        new_goal.pose.orientation.w = quaternion[3]
+        # self.move_base.send_goal(new_goal)
+        self.goal_with_clear_point(new_goal)
 
     def set_twist(self, twist):
         rospy.loginfo("Send Twist " + str((twist.linear.x, twist.linear.y, twist.angular.z)) + ' to robot.')

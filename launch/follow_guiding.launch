@@ -6,6 +6,6 @@
   </node>
 
   <node name="main_state" pkg="main_state" type="main.py" output="screen" args="FollowGuiding" />
-  <node pkg="rosbag" type="record" name="logging_follow_task" args="-o ../follow_guiding_task_bag/logging_follow_guide_bag nav_msgs/path /odom sensor_msgs/laserScan"  />
+  <node pkg="rosbag" type="record" name="logging_follow_task" args="-o ../follow_guiding_task_bag/logging_follow_guide_bag nav_msgs/Odometry tf2_msgs/TFMessage teb_local_planner/TrajectoryPointMsg sensor_msgs/laserScan"  />
 
 </launch>

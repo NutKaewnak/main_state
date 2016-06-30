@@ -17,6 +17,10 @@ class MoveBaseAbsolute(AbstractSkill):
         # self.controlModule.base.clear_costmaps()
         self.controlModule.base.set_absolute_position(x, y, theta)
 
+    def set_position_with_clear_point(self, dx, dy, dtheta):
+        self.change_state('active')
+        self.controlModule.base.set_goal_with_clear_point(dx, dy, dtheta)
+
     def perform(self, perception_data):
         if self.state is 'active':
             # check if base succeed

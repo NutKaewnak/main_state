@@ -63,7 +63,7 @@ class FollowLeg(AbstractSubtask):
 
                     x = max(position.x / size * (size * 0.5), 0)
                     y = position.y / size * (size * 0.5)
-                    self.move.set_position_without_clear_costmap(x, y, theta)
+                    self.move.set_position_with_clear_point(x, y, theta)
 
                 self.last_point = position
                 self.last_theta = theta
@@ -88,22 +88,21 @@ class FollowLeg(AbstractSubtask):
                 self.marker_pub.publish(box_marker)
 
             elif position is None:
-                if not self.isLost:
+                min_distance = 99
+                self.guess_id = -1
+                for person in perception_data.input.people:
+                    position = person.pos
+                    # orientation = person.pose.orientation
+                    distance = sqrt(
+                        (position.x - self.last_point.x) ** 2 + (position.y - self.last_point.y) ** 2)
+                    if distance < min_distance:
+                        min_distance = distance
+                        self.guess_id = person.object_id
+                if min_distance < 0.4 and self.guess_id != -1:
+                    self.set_person_id(self.guess_id)
+                    rospy.loginfo("Change To Person ID:" + str(self.guess_id))
+                else:
                     self.isLost = True
-                elif self.isLost:
-                    min_distance = 99
-                    self.guess_id = -1
-                    for person in perception_data.input.people:
-                        position = person.pos
-                        # orientation = person.pose.orientation
-                        distance = sqrt(
-                            (position.x - self.last_point.x) ** 2 + (position.y - self.last_point.y) ** 2)
-                        if distance < min_distance:
-                            min_distance = distance
-                            self.guess_id = person.object_id
-                    if min_distance < 0.4 and self.guess_id != -1:
-                        self.set_person_id(self.guess_id)
-                        rospy.loginfo("Change To Person ID:" + str(self.guess_id))
 
         # elif perception_data.device is self.Devices.VOICE:
         #     if perception_data.input == 'stop':
