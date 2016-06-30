@@ -19,6 +19,7 @@ class MovePassDoor(AbstractSubtask):
                 self.change_state('move')
         elif self.state is 'move':
             # check if base succeed
+            print self.moveRelative.state
             if self.moveRelative.state is 'succeeded':
                 self.change_state('finish')
             elif self.moveRelative.state is 'aborted':

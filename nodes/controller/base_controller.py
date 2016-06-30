@@ -57,10 +57,10 @@ class BaseController:
 
     def clear_costmaps(self):
         rospy.loginfo("Clear Costmaps")
-        self.clear_costmap()
+        # self.clear_costmap()
 
     def clear_point_costmaps(self, x, y, box_size):
         rospy.loginfo("Clear Point Costmaps")
-        self.clear_point_costmap(x, y, box_size)
+        # self.clear_point_costmap(x, y, box_size)
 
 
