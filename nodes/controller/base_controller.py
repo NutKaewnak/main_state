@@ -51,6 +51,18 @@ class BaseController:
         self.clear_costmaps()
         self.set_new_goal(x, y, theta, 'base_link')
 
+    def set_absolute_position_with_clear_point(self, x, y, theta):
+        rospy.loginfo("Move robot to " + str((x, y, theta)) + ' in map')
+        # self.move_base.cancel_goal()
+        # self.clear_costmaps()
+        self.set_goal_with_clear_point(x, y, theta, 'map')
+
+    def set_relative_position_with_clear_point(self, x, y, theta):
+        rospy.loginfo("Move robot to " + str((x, y, theta)) + ' from current pose')
+        # self.move_base.cancel_g/oal()
+        # self.clear_costmaps()
+        self.set_goal_with_clear_point(x, y, theta, 'base_link')
+
     def set_relative_position_without_clear_costmap(self, x, y, theta):
         rospy.loginfo("Move robot to " + str((x, y, theta)) + ' from current pose')
 
