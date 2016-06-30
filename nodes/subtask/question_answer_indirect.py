@@ -26,8 +26,8 @@ class QuestionAnswerIndirect(AbstractSubtask):
         # self.is_performing = True
 
         if self.state is 'init':
-            self.self.mic_control_open = rospy.ServiceProxy("/recognizer_grammar/mic_control_open", Empty)
-            self.self.mic_control_close = rospy.ServiceProxy("/recognizer_grammar/mic_control_close", Empty)
+            self.mic_control_open = rospy.ServiceProxy("/recognizer_grammar/mic_control_open", Empty)
+            self.mic_control_close = rospy.ServiceProxy("/recognizer_grammar/mic_control_close", Empty)
             self.move_base = self.skillBook.get_skill(self, 'MoveBaseRelative')
             self.skill = self.skillBook.get_skill(self, 'TurnNeck')
             self.say = self.skillBook.get_skill(self, 'Say')
@@ -35,6 +35,7 @@ class QuestionAnswerIndirect(AbstractSubtask):
             self.counter = 1
             self.question = None
             self.choosen_degree = None
+            self.flag = True
             self.mic_control_close()
             self.say.say('I finish answering 5 direct questions. Please ask the indirect questions')
             self.change_state('speak_indirect')
@@ -86,8 +87,11 @@ class QuestionAnswerIndirect(AbstractSubtask):
                     if checker == 1:
                         print 'get direction-------------------------------'
                         print self.choosen_degree
-                        if timer.is_waiting == False:
-                            timer.wait(15)
+                        print  self.timer.is_waiting(), '============='
+                        if not self.timer.is_waiting() and self.flag:
+                            self.flag = False
+                            self.timer.wait(25)
+                            print self.timer.is_waiting(), 'In============='
                         # if self.question != None:
                         #     self.has_direction = True
 
@@ -122,8 +126,9 @@ class QuestionAnswerIndirect(AbstractSubtask):
                     if checker == 1:
                         print 'get direction-------------------------------'
                         print self.choosen_degree
-                        if timer.is_waiting == False:
-                            timer.wait(15)
+                        if not self.timer.is_waiting() and self.flag:
+                            self.flag = False
+                            self.timer.wait(25)
                         # if self.question != None:
                         #     self.has_direction = True
 
@@ -143,7 +148,7 @@ class QuestionAnswerIndirect(AbstractSubtask):
                 print 'change to turn----------------------------------------'
                 self.change_state('turning')
 
-            if self.choosen_degree is not None and self.timer.is_waiting == False:
+            if self.choosen_degree is not None and self.timer.is_waiting() == False and not self.flag:
                 print 'change to turn no question----------------------------------------'
                 self.change_state('turning_no_question')
 
@@ -151,65 +156,77 @@ class QuestionAnswerIndirect(AbstractSubtask):
             self.move_base = self.skillBook.get_skill(self, 'MoveBaseRelative')
             self.move_base.set_position_without_clear_costmap(0, 0, radians(self.choosen_degree))
             self.timer.wait(5)
+            self.say.say('I am turning to you')
             self.change_state('finished_turning')
 
         elif self.state is 'turning_no_question':
             self.move_base = self.skillBook.get_skill(self, 'MoveBaseRelative')
             self.move_base.set_position_without_clear_costmap(0, 0, radians(self.choosen_degree))
             self.timer.wait(5)
+            self.say.say('I am turning to you')
             self.change_state('speak_repeat_question')
 
         elif self.state is 'speak_repeat_question':
-            if not self.timer.is_waiting:
+            if not self.timer.is_waiting():
                 self.mic_control_close()
                 self.say = self.skillBook.get_skill(self, 'Say')
-                self.say.say('Sorry I do not understand the question. Please repeat the question ' + str(self.counter))
-                self.timer.wait(15)
+                self.say.say('Sorry I do not understand the question. Please repeat the indirect question ' + str(self.counter))
+                self.timer.wait(20)
+                self.change_state('open_mic_listen_repeat')
+
+        elif self.state is 'open_mic_listen_repeat':
+            if self.say.state == 'succeeded':
+                self.mic_control_open()
                 self.change_state('listen_repeat_question')
 
         elif self.state is 'listen_repeat_question':
-            if self.say.state == 'succeeded':
-                self.mic_control_open()
-                if timer.is_waiting:
-                    if perception_data.device is 'VOICE':
-                        print perception_data.device, "----------", perception_data.input
-                        if perception_data.input is not None:
-                            self.question = perception_data.input
-                            print 'get input voice---------------------------------------'
-                            # say or not?
-                            self.change_state('answering')
+            if self.timer.is_waiting():
+                if perception_data.device is 'VOICE':
+                    print perception_data.device, "----------", perception_data.input
+                    if perception_data.input is not None:
+                        self.question = perception_data.input
+                        print 'get input voice---------------------------------------'
+                        # say or not?
+                        self.change_state('answering')
+            else:
+                if self.counter < 5:
+                    self.counter += 1
+                    self.question = None
+                    self.choosen_degree = None
+                    self.flag = True
+                    self.change_state('turn_neck')
                 else:
-                    if self.counter < 5:
-                        self.counter += 1
-                        self.change_state('turn_neck')
-                    else:
-                        print 'Finish==============-----------------===================='
-                        self.change_state('finish')
-
+                    print 'Finish==============-----------------===================='
+                    self.change_state('finish')
 
         elif self.state is 'finished_turning':
             if not self.timer.is_waiting():
                 self.mic_control_close()
                 self.say = self.skillBook.get_skill(self, 'Say')
                 self.say.say('finish turning')
+
+                self.change_state('open_mic_answering')
+
+        elif self.state is 'open_mic_answering':
+            if self.say.state == 'succeeded':
+                self.mic_control_open()
                 self.change_state('answering')
 
         elif self.state is 'answering':
-            if self.say.state == 'succeeded':
-                self.mic_control_open()
-                print 'state', self.state
-                print self.move_base.state
-                # if self.say.state == 'succeeded':
-                print 'Say Set========================================'
-                # self.say.say('the answer of the question what color is cobalt is blue.')
-                self.mic_control_close()
-                self.say = self.skillBook.get_skill(self, 'Say')
-                self.say.say('The answer of the question ' + str(self.question) + ' is ' +
-                             str(answers_the_questions_Ger2016.answers(self.question)))
-                # self.has_direction = False
-                self.question = None
-                self.choosen_degree = None
-                self.change_state('speaking')
+            print 'state', self.state
+            print self.move_base.state
+            # if self.say.state == 'succeeded':
+            print 'Say Set========================================'
+            # self.say.say('the answer of the question what color is cobalt is blue.')
+            self.mic_control_close()
+            self.say = self.skillBook.get_skill(self, 'Say')
+            self.say.say('The answer of the question ' + str(self.question) + ' is ' +
+                         str(answers_the_questions_Ger2016.answers(self.question)))
+            # self.has_direction = False
+            self.question = None
+            self.choosen_degree = None
+            self.flag = True
+            self.change_state('speaking')
 
         elif self.state is 'speaking':
             print 'Speak========================================'

@@ -53,26 +53,28 @@ class QuestionAnswer(AbstractSubtask):
                 self.say = self.skillBook.get_skill(self, 'Say')
                 self.say.say('Please ask the direct question ' + str(self.counter))
                 self.timer.wait(15)
-                self.change_state('answering')
+                self.change_state('answering_open_mic')
 
-        elif self.state is 'answering':
+        elif self.state is 'answering_open_mic':
             if self.say.state == 'succeeded':
                 self.mic_control_open()
-                if perception_data.device == 'VOICE':
-                    if self.timer.is_waiting():
-                        # print "-----------"
-                        if perception_data.device is 'VOICE':
-                            rospy.loginfo(perception_data.input)
-                            if perception_data.input is not None:
-                                self.mic_control_close()
-                                self.say.say('The answer of the question ' + str(perception_data.input) + ' is ' +
-                                             answers_the_questions_Ger2016.answers(perception_data.input))
-                                self.timer.wait(10)
-                                self.change_state("speak_answer")
+                self.change_state("answering")
 
-                    else:
-                        self.counter += 1
-                        self.change_state('prepare_to_answer')
+        elif self.state is 'answering':
+            if self.timer.is_waiting():
+                # print "-----------"
+                if perception_data.device is 'VOICE':
+                    rospy.loginfo(perception_data.input)
+                    if perception_data.input is not None:
+                        self.mic_control_close()
+                        self.say.say('The answer of the question ' + str(perception_data.input) + ' is ' +
+                                     answers_the_questions_Ger2016.answers(perception_data.input))
+                        self.timer.wait(10)
+                        self.change_state("speak_answer")
+
+            else:
+                self.counter += 1
+                self.change_state('prepare_to_answer')
 
         elif self.state is 'speak_answer':
             # if not self.timer.is_waiting():
