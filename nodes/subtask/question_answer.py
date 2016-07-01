@@ -21,6 +21,10 @@ class QuestionAnswer(AbstractSubtask):
         self.debug_state = None
 
     def perform(self, perception_data):
+
+        if not perception_data.device in ["VOICE", "DOOR"]:
+            return
+
         if self.debug_state != self.state:
             self.debug_state = self.state
             print self.debug_state, '======================'
@@ -37,7 +41,7 @@ class QuestionAnswer(AbstractSubtask):
             self.mic_control_close()
             self.skill = self.skillBook.get_skill(self, 'TurnNeck')
             self.say = self.skillBook.get_skill(self, 'Say')
-            self.skill.turn(0, 0)
+            self.skill.turn(-0.2, -0.1)
             self.counter = 1
             self.change_state('turn_neck')
 
@@ -52,7 +56,7 @@ class QuestionAnswer(AbstractSubtask):
                 self.mic_control_close()
                 self.say = self.skillBook.get_skill(self, 'Say')
                 self.say.say('Please ask the direct question ' + str(self.counter))
-                self.timer.wait(15)
+                self.timer.wait(10)
                 self.change_state('answering_open_mic')
 
         elif self.state is 'answering_open_mic':

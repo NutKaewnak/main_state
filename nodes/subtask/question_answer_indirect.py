@@ -24,6 +24,8 @@ class QuestionAnswerIndirect(AbstractSubtask):
         # if self.is_performing:
         #     return
         # self.is_performing = True
+        if not perception_data.device in ["VOICE", "HARK_SOURCE_FRONT", "HARK_SOURCE_BACK", "DOOR"]:
+            return
 
         if self.state is 'init':
             self.mic_control_open = rospy.ServiceProxy("/recognizer_grammar/mic_control_open", Empty)
@@ -31,7 +33,7 @@ class QuestionAnswerIndirect(AbstractSubtask):
             self.move_base = self.skillBook.get_skill(self, 'MoveBaseRelative')
             self.skill = self.skillBook.get_skill(self, 'TurnNeck')
             self.say = self.skillBook.get_skill(self, 'Say')
-            self.skill.turn(0, 0)
+            self.skill.turn(-0.2, -0.1)
             self.counter = 1
             self.question = None
             self.choosen_degree = None
@@ -90,7 +92,7 @@ class QuestionAnswerIndirect(AbstractSubtask):
                         print  self.timer.is_waiting(), '============='
                         if not self.timer.is_waiting() and self.flag:
                             self.flag = False
-                            self.timer.wait(25)
+                            self.timer.wait(10)
                             print self.timer.is_waiting(), 'In============='
                         # if self.question != None:
                         #     self.has_direction = True
@@ -128,7 +130,7 @@ class QuestionAnswerIndirect(AbstractSubtask):
                         print self.choosen_degree
                         if not self.timer.is_waiting() and self.flag:
                             self.flag = False
-                            self.timer.wait(25)
+                            self.timer.wait(10)
                         # if self.question != None:
                         #     self.has_direction = True
 
@@ -171,7 +173,7 @@ class QuestionAnswerIndirect(AbstractSubtask):
                 self.mic_control_close()
                 self.say = self.skillBook.get_skill(self, 'Say')
                 self.say.say('Sorry I do not understand the question. Please repeat the indirect question ' + str(self.counter))
-                self.timer.wait(20)
+                self.timer.wait(12)
                 self.change_state('open_mic_listen_repeat')
 
         elif self.state is 'open_mic_listen_repeat':
@@ -212,7 +214,7 @@ class QuestionAnswerIndirect(AbstractSubtask):
                 self.mic_control_open()
                 self.change_state('answering')
 
-        elif self.state is 'answering':
+        elif self.state is 'answering' and self.question != None:
             print 'state', self.state
             print self.move_base.state
             # if self.say.state == 'succeeded':
