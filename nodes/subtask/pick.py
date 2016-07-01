@@ -4,6 +4,7 @@ from include.pick_available_range import is_in_range, find_new_available_point
 
 __author__ = 'CinDy'
 
+LEFT_ARM_MINIMUM = 0.21
 
 class Pick(AbstractSubtask):
     def __init__(self, planning_module):
@@ -61,7 +62,10 @@ class Pick(AbstractSubtask):
         self.input_object_pose = pose_stamped
         self.object_name = object_name
         if self.side_arm is None:
-            self.side_arm = 'right_arm'
+            if input_object_pose.y > LEFT_ARM_MINIMUM :
+                self.side_arm = 'left_arm'
+            else :
+                self.side_arm = 'right_arm'
         self.change_state('receive_point')
 
     def gripper_open(self):

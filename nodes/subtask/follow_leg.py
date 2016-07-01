@@ -64,6 +64,12 @@ class FollowLeg(AbstractSubtask):
                     x = max(position.x / size * (size * 0.5), 0)
                     y = position.y / size * (size * 0.5)
                     self.move.set_position_with_clear_point(x, y, theta)
+                    pos = Pose2D()
+                    pos.x = x
+                    pos.y = y
+                    pos.theta = theta
+                    print 'pos', pos
+                    self.path.append(pos)
 
                 self.last_point = position
                 self.last_theta = theta
@@ -109,4 +115,5 @@ class FollowLeg(AbstractSubtask):
         #         self.skillBook.get_skill(self, 'Say').say('I stop.')
         #         self.move.stop()
         #         self.change_state('abort')
+
 

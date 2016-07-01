@@ -66,7 +66,7 @@ class FollowGuiding(AbstractTask):
             if perception_data.device is self.Devices.VOICE:
                 if perception_data.input == 'robot yes':
                     self.subtaskBook.get_subtask(self, 'Say').say('I will guide you back')
-                    self.follow = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
+                    self.move = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
                     self.change_state('init_guide')
                 elif perception_data.input == 'robot no':
                     self.subtaskBook.get_subtask(self, 'Say').say('Sorry. Please tell me again.')
@@ -78,22 +78,27 @@ class FollowGuiding(AbstractTask):
                 min_distance = 99
                 self.track_id = -1
                 for person in perception_data.input.people:
-                    if (person.pose.position.x > 0 and person.pose.position.x < 2
-                        and person.pose.position.y > -1 and person.pose.position.y < 1):
-                        distance = hypot(person.pose.position.x, person.pose.position.y)
+                    print 'person = ', person
+                    if (person.pos.x > 0.8 and person.pos.x < 1.8
+                        and person.pos.y > -1 and person.pos.y < 1):
+                        distance = hypot(person.pos.x, person.pos.y)
+                        print 'person id =', person.object_id
                         if distance < min_distance:
-                            self.track_id = person.id
+                            self.track_id = person.object_id
                 if self.track_id != -1:
-                    print self.track_id.id
-                    self.follow.set_person_id(self.track_id.id)
+                    print self.track_id
+                    self.follow.set_person_id(self.track_id)
                     self.change_state('follow')
+
         elif self.state is 'follow':
             print 'state =' + self.state
             # recovery follow
-            if perception_data.device is self.Devices.VOICE and 'stop' in perception_data.input:
+            if perception_data.device is self.Devices.VOICE and 'robot stop' in perception_data.input:
                 self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(0, 0)
+                self.subtaskBook.get_subtask(self, 'Say').say('Did you say \'robot stop\'? '
+                                                              'Please confirm by say \'robot yes\' or \'robot no\'.')
                 # self.follow.set_person_id(-1)
-                self.change_state('wait_for_command')
+                self.change_state('comfirm_stop')
 
             if perception_data.device is self.Devices.PEOPLE_LEG and perception_data.input.people:
                 print 'track_id =', self.track_id
@@ -104,7 +109,8 @@ class FollowGuiding(AbstractTask):
                     elif self.follow.guess_id == person.id:
                         self.track_id = self.follow.guess_id
                         print 'change track id = ', self.track_id
-                    elif perception_data.input.people[-1]:
+                    # elif perception_data.input.people[-1]:
+                    elif self.follow.isLost: 
                         self.subtask = self.subtaskBook.get_subtask(self, 'Say')
                         self.subtask.say('I am lost tracking. Please wave your hand.')
                         self.timer.wait(2)
@@ -144,8 +150,20 @@ class FollowGuiding(AbstractTask):
             if perception_data.device is 'BASE_STATUS' and perception_data.input == 3:
                 self.change_state('wait_for_command')
 
+        elif self.state is 'confirm_stop':
+            if perception_data.device is self.Devices.VOICE and not self.delay.is_waiting():
+                if perception_data.input == 'robot yes':
+                    self.subtaskBook.get_subtask(self, 'Say').say('I stop.')
+                    self.follow.set_person_id(-1)
+                    self.change_state('wait_for_command')
+                elif perception_data.input == 'robot no':
+                    self.subtaskBook.get_subtask(self, 'Say').say('continue following')
+                    self.change_state('follow')
+
         elif self.state is 'init_guide':
+            point = Pose2D()
             point = self.follow.path.pop()
+            print 'point = ',point
             self.move.set_position(point.x, point.y, (point.theta+pi) % (2*pi))
             self.change_state('guide_back')
 
