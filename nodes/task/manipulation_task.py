@@ -3,7 +3,8 @@ from include.abstract_task import AbstractTask
 from include.delay import Delay
 from include.report_generator import ReportGenerator
 from std_msgs.msg import Float64
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, Point
+from numpy import nan
 
 __author__ = 'Nicole'
 
@@ -159,9 +160,15 @@ class ManipulationTask(AbstractTask):
                 obj_pose = PoseStamped()
                 obj_pose.header = found_object.header
                 obj_pose.pose.position = found_object.centriod
+                if obj_pose.pose.position.x == 0.0 or obj_pose.pose.position.x is nan:
+                    if obj_pose.pose.position.y == 0.0 or obj_pose.pose.position.y is nan:
+                        if obj_pose.pose.position.z == 0.0 or obj_pose.pose.position.z is nan:
+                            self.change_state('pick_object')
                 self.subtask.pick_object(obj_pose, found_object.name)
                 rospy.loginfo('Picking ' + str(found_object.name))
-                self.change_state('pick_object')
+                self.change_state('wait_pick_object')
             else:
                 self.change_state('finish')
-
+        elif self.state is 'wait_pick_object':
+            if self.subtask.state == 'finish'
+                self.change_state('pick_object')

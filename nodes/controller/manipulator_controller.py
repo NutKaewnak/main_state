@@ -4,7 +4,13 @@ from include.moveit_initiator import MoveItInitiator
 from geometry_msgs.msg import PoseStamped, Pose, PointStamped
 import math
 
-__author__ = "ftprainnie"
+__author__ = "your mum"
+
+FIRST_SHELF = 1.40
+SECOND_SHELF = 1.09
+THIRD_SHELF = 0.70
+FOURTH_SHELF = 0.35
+FIFTH_SHELF = 0.10
 
 REFERENCE_FRAME = 'base_link'
 
@@ -49,6 +55,39 @@ class ManipulateController:
         # object_pose.pose.position.x += -0.10
         # object_pose.pose.position.y += 0.05
         # object_pose.pose.position.z += 0.05
+
+        p = PoseStamped()
+        p.header.frame_id = robot.get_planning_frame()
+        p.pose.position.x = 0.75
+        p.pose.position.y = 0.00
+        p.pose.position.z = FIRST_SHELF
+        scene.add_box("FIRST_SHELF", p, (0.33, 3.0, 0.05))
+        rospy.sleep(1)
+
+        p.pose.position.x = 0.75
+        p.pose.position.y = 0.00
+        p.pose.position.z = SECOND_SHELF
+        scene.add_box("SECOND_SHELF", p, (0.33, 3.0, 0.05))
+        rospy.sleep(1)
+
+        p.pose.position.x = 0.75
+        p.pose.position.y = 0.00
+        p.pose.position.z = THIRD_SHELF
+        scene.add_box("THIRD_SHELF", p, (0.33, 3.0, 0.05))
+        rospy.sleep(1)
+
+        p.pose.position.x = 0.75
+        p.pose.position.y = 0.00
+        p.pose.position.z = FOURTH_SHELF
+        scene.add_box("FOURTH_SHELF", p, (0.33, 3.0, 0.05))
+        rospy.sleep(1)
+
+        p.pose.position.x = 0.75
+        p.pose.position.y = 0.00
+        p.pose.position.z = FIFTH_SHELF
+        scene.add_box("FIFTH_SHELF", p, (0.33, 3.0, 0.05))
+        rospy.sleep(1)
+
         self.scene.add_box(object_name, object_pose, (0.05, 0.05, 0.05))
         self.world_object.append(object_name)
         result = self.arm_group.pick(object_name)
