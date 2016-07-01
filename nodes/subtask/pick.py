@@ -51,12 +51,24 @@ class Pick(AbstractSubtask):
 
         elif self.state is 'solve_unreachable':
             if not is_in_range(self.input_object_pose.pose.position):
+                new_point = find_new_available_point(self.input_object_pose.pose.position)
                 self.base = self.skillBook.get_skill(self, 'MoveBaseRelativeTwist')
+                self.base.set_position(self.input_object_pose.pose.position.x - new_point.x,
+                                       self.input_object_pose.pose.position.y - new_point.y,
+                                       0
+                                       )
+                self.input_object_pose.pose.position = new_point
+                self.change_state('wait_for_twist')
+
+        elif self.state is 'wait_for_twist':
+            if self.base.state == 'succeeded':
+                self.pick_object(self.input_object_pose, self.object_name)
 
     def pick_object(self, pose_stamped, object_name='little_big'):
         """
         Let subtask pick object. Please make sure that side arm is already design (Default: 'right_arm').
         :param pose_stamped: (PoseStamped) point of object to pick.
+        :param object_name:
         :return: None
         """
         self.input_object_pose = pose_stamped
