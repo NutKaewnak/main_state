@@ -22,13 +22,14 @@ class GPSR(AbstractTask):
 
     def perform(self, perception_data):
         print self.state
-        if not perception_data.device in ['DOOR', 'VOICE']:
-            return
+
         #rospy.loginfo('state in: ' + self.state + ' from: ' + str(perception_data.device) +
         #' data: ' + str(perception_data.input))
         if self.state is 'init':
             self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
-            self.subtask.turn_absolute(0, 0)
+            self.subtask.turn_absolute(-0.8, 0)
+
+            self.subtask = self.subtaskBook.get_subtask(self, 'MovePassDoor')
             # self.subtask = self.subtaskBook.get_subtask(self, 'MoveRelative')
             # self.subtask = self.subtask.set_position(2, 0, -1.7)
             self.time = Delay()
@@ -36,12 +37,17 @@ class GPSR(AbstractTask):
             # self.subtask = self.subtaskBook.get_subtask(self, 'MovePassDoor')
             self.change_state('pre_start')
             # self.change_state('move_to_start')
-        elif self.state == 'pre_start':
-            self.subtask = self.subtaskBook.get_subtask(self, 'MoveRelative')
-            self.subtask = self.subtask.set_position(2, 0, -1.7)
-            self.time = Delay()
-            self.time.wait(10)
-            self.change_state('move_to_start')
+
+        if not perception_data.device in ['DOOR', 'VOICE']:
+            return
+
+        if self.state == 'pre_start':
+            if not self.time.is_waiting():
+                self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
+                self.subtask = self.subtask.set_position(3, 1, -1.7)
+                self.time = Delay()
+                self.time.wait(10)
+                self.change_state('move_to_start')
 
         elif self.state is 'move_pass_door':
             if self.subtask.state is 'finish':
@@ -92,6 +98,8 @@ class GPSR(AbstractTask):
 
         elif self.state is 'move_to_start' and not self.time.is_waiting():
             # if self.subtask.state is 'finish' or not self.timer.is_waiting():
+            self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
+            self.subtask.turn_absolute(0, 0)
             self.subtask = self.subtaskBook.get_subtask(self, 'Introduce')
             self.change_state('introduce')
 

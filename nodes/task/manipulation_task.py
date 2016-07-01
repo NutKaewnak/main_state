@@ -170,5 +170,5 @@ class ManipulationTask(AbstractTask):
             else:
                 self.change_state('finish')
         elif self.state is 'wait_pick_object':
-            if self.subtask.state == 'finish'
+            if self.subtask.state == 'finish':
                 self.change_state('pick_object')

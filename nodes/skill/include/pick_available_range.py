@@ -28,7 +28,7 @@ def is_in_right_range(point):
                 return True
     return False
 
-def find_right_arm_nearest_area(point.y)
+def find_right_arm_nearest_area(point):
     output_point = point.y
     if abs(abs((Y_MAX_RIGHT_1 + Y_MIN_RIGHT_1)/2) - point) > abs(abs((Y_MAX_RIGHT_2 + Y_MIN_RIGHT_2)/2) - point):
         return "left_area"
@@ -63,7 +63,7 @@ def find_right_arm_available_point(point):
             out_point.z -= 0.05
         elif out_point.z < Z_MIN_RIGHT:
             out_point.z += 0.05
-    return out_pointfrom geometry_msgs.msg import Point
+    return out_point
 
 def is_in_left_range(point):
     """
@@ -97,4 +97,4 @@ def find_left_arm_available_point(point):
             out_point.z -= 0.05
         elif out_point.z < Z_MIN_LEFT:
             out_point.z += 0.05
-    return out_pointfrom geometry_msgs.msg import Point
+    return out_point
