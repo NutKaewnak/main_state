@@ -448,7 +448,7 @@ class RestaurantFrank(AbstractTask):
                                        self.location_list[self.command][2])
             self.change_state('move_to_location_auto')
 
-        elif self.state == 'move_to_location_auto':
+        # elif self.state == 'move_to_location_auto':
 
 
 

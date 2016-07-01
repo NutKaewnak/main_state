@@ -38,7 +38,10 @@ class RecognizeObjectOnPlane(AbstractSubtask):
                     else:
                         for x in xrange(len(self.found_objects)):
                             if found_object.name.data == self.found_objects[x].name.data:
-                                print dir(found_object)
+                                if found_object.confident > self.found_objects[x].confident:
+                                    self.found_objects.pop(x)
+                                    self.found_objects.append(found_object)
+
                 rospy.loginfo('Found: ' + str(len(self.skill.object.result.objects)) + ' object(s).')
 
                 self.change_state('finish')

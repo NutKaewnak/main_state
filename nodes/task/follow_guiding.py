@@ -17,7 +17,7 @@ class FollowGuiding(AbstractTask):
         self.move = None
 
     def perform(self, perception_data):
-        # print 'state = ' + self.state
+        print 'state = ' + self.state
         if self.state is 'init':
             # self.path['x'] = []
             # self.path['y'] = []
@@ -41,12 +41,12 @@ class FollowGuiding(AbstractTask):
             # if self.subtask.state is 'finish' or not self.timer.is_waiting():
             if perception_data.device is self.Devices.VOICE:
                 print 'input = ' + str(perception_data.input)
-                if perception_data.input == 'follow me':
+                if 'follow me' in perception_data.input :
                     self.subtaskBook.get_subtask(self, 'Say').say('Did you say \'follow me\'? '
                                                                   'Please confirm by say \'robot yes\' or \'robot no\'.')
                     self.timer.wait(10)
                     self.change_state('confirm_follow')
-                elif perception_data.input == 'guide back':
+                elif'guide back' in perception_data.input:
                     self.subtaskBook.get_subtask(self, 'Say').say('Did you say \'guide back\'? '
                                                                   'Please confirm by say \'robot yes\' or \'robot no\'.')
                     self.timer.wait(10)
@@ -74,7 +74,8 @@ class FollowGuiding(AbstractTask):
 
         elif self.state is 'follow_init':
             # print 'state =' + self.state
-            if perception_data.device is self.Devices.PEOPLE_LEG and perception_data.input:
+            if perception_data.device is self.Devices.PEOPLE_LEG:
+                print 'hi'
                 min_distance = 99
                 self.track_id = -1
                 for person in perception_data.input.people:
@@ -103,10 +104,10 @@ class FollowGuiding(AbstractTask):
             if perception_data.device is self.Devices.PEOPLE_LEG and perception_data.input.people:
                 print 'track_id =', self.track_id
                 for person in perception_data.input.people:
-                    print ' person.id =', person.id
-                    if self.track_id == person.id:
+                    print ' person.id =', person.object_id
+                    if self.track_id == person.object_id:
                         break
-                    elif self.follow.guess_id == person.id:
+                    elif self.follow.guess_id == person.object_id:
                         self.track_id = self.follow.guess_id
                         print 'change track id = ', self.track_id
                     # elif perception_data.input.people[-1]:
@@ -161,7 +162,7 @@ class FollowGuiding(AbstractTask):
                     self.change_state('follow')
 
         elif self.state is 'init_guide':
-            point = Pose2D()
+            # point = Pose2D()
             point = self.follow.path.pop()
             print 'point = ',point
             self.move.set_position(point.x, point.y, (point.theta+pi) % (2*pi))

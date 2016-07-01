@@ -22,14 +22,26 @@ class GPSR(AbstractTask):
 
     def perform(self, perception_data):
         print self.state
+        if not perception_data.device in ['DOOR', 'VOICE']:
+            return
         #rospy.loginfo('state in: ' + self.state + ' from: ' + str(perception_data.device) +
         #' data: ' + str(perception_data.input))
         if self.state is 'init':
             self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
-            self.subtask.turn_absolute(-0.2, 0)
-            self.subtask = self.subtaskBook.get_subtask(self, 'MovePassDoor')
-            self.change_state('move_pass_door')
+            self.subtask.turn_absolute(0, 0)
+            # self.subtask = self.subtaskBook.get_subtask(self, 'MoveRelative')
+            # self.subtask = self.subtask.set_position(2, 0, -1.7)
+            self.time = Delay()
+            self.time.wait(10)
+            # self.subtask = self.subtaskBook.get_subtask(self, 'MovePassDoor')
+            self.change_state('pre_start')
             # self.change_state('move_to_start')
+        elif self.state == 'pre_start':
+            self.subtask = self.subtaskBook.get_subtask(self, 'MoveRelative')
+            self.subtask = self.subtask.set_position(2, 0, -1.7)
+            self.time = Delay()
+            self.time.wait(10)
+            self.change_state('move_to_start')
 
         elif self.state is 'move_pass_door':
             if self.subtask.state is 'finish':
@@ -78,16 +90,16 @@ class GPSR(AbstractTask):
                 self.timer.wait(5)
                 self.change_state('move_to_start')
 
-        elif self.state is 'move_to_start':
-            if self.subtask.state is 'finish' or not self.timer.is_waiting():
-                self.subtask = self.subtaskBook.get_subtask(self, 'Introduce')
-                self.change_state('introduce')
+        elif self.state is 'move_to_start' and not self.time.is_waiting():
+            # if self.subtask.state is 'finish' or not self.timer.is_waiting():
+            self.subtask = self.subtaskBook.get_subtask(self, 'Introduce')
+            self.change_state('introduce')
 
         elif self.state is 'introduce':
             if self.subtask.state is 'finish':
                 # self.say.state = 'finish'
-                self.voice_mode = self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode')
-                self.voice_mode.recognize(7)
+                # self.voice_mode = self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode')
+                # self.voice_mode.recognize(7)
                 self.change_state('wait_for_command')
 
         elif self.state == 'wait_for_command':
@@ -97,8 +109,8 @@ class GPSR(AbstractTask):
                 self.say = self.subtaskBook.get_subtask(self, 'Say')
                 self.say.say(self.command_extractor.make_question(self.command) + ' Please say robot yes or robot no.')
                 rospy.loginfo(perception_data.input)
-                self.voice_mode = self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode')
-                self.voice_mode.recognize(6)
+                # self.voice_mode = self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode')
+                # self.voice_mode.recognize(6)
                 self.timer.wait(7)
                 self.change_state('confirm')
 
@@ -113,8 +125,8 @@ class GPSR(AbstractTask):
                     elif 'robot no' in perception_data.input:
                         self.say = self.subtaskBook.get_subtask(self, 'Say')
                         self.say.say('Sorry, Please say again.')
-                        self.voice_mode = self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode')
-                        self.voice_mode.recognize(7)
+                        # self.voice_mode = self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode')
+                        # self.voice_mode.recognize(7)
                         self.change_state('wait_for_command')
 
         # elif self.state == 'action_1':

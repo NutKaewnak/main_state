@@ -68,6 +68,7 @@ class FollowLeg(AbstractSubtask):
                     pos.x = x
                     pos.y = y
                     pos.theta = theta
+
                     print 'pos', pos
                     self.path.append(pos)
 
