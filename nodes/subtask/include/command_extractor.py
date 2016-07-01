@@ -177,7 +177,7 @@ class CommandExtractor(object):
                 # return sentence.strip()
         for verb in	[' take ', ' grasp ', ' get ', ' pick up ']:
             if verb in sentence:
-                sentence = sentence.replace(verb, ' take ')
+                sentence = sentence.replace(verb, ' grasp ')
                 # return sentence.strip()
         for verb in	[' tell ', ' say ', ' speak ']:
             # print sentence
@@ -279,6 +279,9 @@ class CommandExtractor(object):
         [(go, bedroom, None), (grasp, None, coke), (go, bathroom, None), (give, frank, None)]
         >>> CommandExtractor().make_question(CommandExtractor().getActions("could you please look for james in the living table and escort him to the office"))
         []
+        >>> CommandExtractor().getActions("pick up the pringles from the drawer deliver it to jacob in the cabinet and find mason in the tv stand")
+        []
+        >>> CommandExtractor().getActions("robot please find the waving person in the office follow him and guide ava from the living table to the dining room")
         """
         output = []
         for sentence in self.cut_sentence(command):
@@ -300,10 +303,12 @@ class CommandExtractor(object):
         return sentence.strip(), question
 
     def replace_question_beck(self, commands, question):
-        for command in commands:
-            sentence = " %s " % command
+
+        for i in range(len(commands)):
+            sentence = " %s " % commands[i]
             if ' <Q> ' in sentence:
                 sentence = sentence.replace(' <Q> ', " " + question + " ")
+            commands[i] = sentence.strip()
         return commands
 
 
@@ -311,7 +316,7 @@ class CommandExtractor(object):
         commands = []
         command = self.replace_verb(command)
         command, question = self.replace_question(command)
-        print question
+        # print question
         words = command.split()
         for i in xrange(0,len(words)):
             word = words[i].lower()
@@ -339,6 +344,7 @@ class CommandExtractor(object):
         object = self.getObject(sentence)
         data = self.getData(sentence)
         pronoun = None
+
         if object != None:
             pronoun = self.getPronoun(sentence.replace(object,''))
             object2 = self.getObject(sentence.replace(object,''))
@@ -496,8 +502,8 @@ class CommandExtractor(object):
                 sentence += 'go to '
                 sentence += '%s '%action.data
                 sentence = sentence.strip() + ', '
-            elif action.action == 'grasp':
-                sentence += 'grasp '
+            elif action.action == 'take':
+                sentence += 'take '
                 sentence += '%s '%action.object
                 if action.data != None:
                     sentence += 'to %s '%action.data
