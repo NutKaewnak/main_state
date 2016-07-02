@@ -12,7 +12,7 @@ from robozoo import RoboZoo
 from robo_nurse import RoboNurse
 from today_show import TodayShow
 from restaurant_vdo import RestaurantVDO
-# from restaurant_Frank import RestaurantFrank
+from restaurant_Frank import RestaurantFrank
 from separate_clothes_op import SeparateClothesOP
 from follow_guiding import FollowGuiding
 
@@ -48,7 +48,7 @@ class TaskBook:
         self.book['RoboNurse'] = RoboNurse(planning_module)
         self.book['TodayShow'] = TodayShow(planning_module)
         self.book['RestaurantVDO'] = RestaurantVDO(planning_module)
-        # self.book['RestaurantFrank'] = RestaurantFrank(planning_module)
+        self.book['RestaurantFrank'] = RestaurantFrank(planning_module)
         self.book['SeparateClothesOP'] = SeparateClothesOP(planning_module)
         self.book['FollowGuiding'] = FollowGuiding(planning_module)
 

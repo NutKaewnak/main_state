@@ -1,5 +1,5 @@
 <launch>
-  <include file="$(find speech_processing)/launch/restaurantJapan.launch"/>
+  <include file="$(find speech_processing)/launch/restaurantGer2016.launch"/>
   <node name="main_state" pkg="main_state" type="main.py" output="screen" args="RestaurantFrank" />
   <node ns="people" name="people_detection" pkg="people_detection" type="people_detection_node"></node>
 
@@ -8,5 +8,9 @@
   </node> -->
 
   <!--<node name="static_pub" pkg="rostopic" type="rostopic" args="pub /door/status std_msgs/String hello "/>-->
-
+  <include file="$(find athome_leg_tracker)/launch/leg_detector.launch"/>
+  <node name="gesture_detection" pkg="gesture_detection" type="NIHandtracker" output="screen" >
+        <remap from="/points" to="/gesture/points"/>
+  </node>
+  <node pkg="rosbag" type="record" name="logging_navigation_task" args="-o ../restaurant_task_bag/logging_navigation_bag /navigation/move_base_node/global_costmap/obstacle_layer_footprint/footprint_stamped /navigation/athome_move_base_node/TebLocalPlannerROS/teb_poses  /tf /navigation/move_base_node/TrajectoryPlannerROS/local_plan /laser/scan" />
 </launch>
