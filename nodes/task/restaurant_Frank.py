@@ -25,8 +25,8 @@ class RestaurantFrank(AbstractTask):
         self.current_table = None
         self.stack_table = None
         self.order = {'table one': [], 'table two': [], 'table three': []}
-        self.food = ['green tea', 'cafe au lait', 'iced tea', 'orange juice', 'strawberry juice', 'potato chips',
-                     'cookie', 'potato stick', 'potage soup', 'egg soup', 'orange', 'apple']
+        self.food = ['choco syrup', 'chips', 'bisquits', 'pretzels', 'baby sweets', 'pringles',
+                     'egg', 'beer', 'apple', 'coconut milk', 'paprika', 'coke', 'pumper nickel', 'tea']
         self.say = None
         self.follow = None
         self.move_to = None
@@ -41,7 +41,7 @@ class RestaurantFrank(AbstractTask):
         self.subtask = None
 
     def perform(self, perception_data):
-        # print self.state, '***'
+        print self.state, '***'
         # print self.say.state, '------'
         # if self.say.speak.controlModule.speaker.process is not None:
         # print self.say.speak.controlModule.speaker.is_finish(), "++++++++"
@@ -73,7 +73,7 @@ class RestaurantFrank(AbstractTask):
 
         elif self.state is 'follow_init':
             if perception_data.device is self.Devices.PEOPLE_LEG:
-                print 'hi'
+                # print 'hi'
                 min_distance = 99
                 self.track_id = -1
                 for person in perception_data.input.people:
@@ -95,6 +95,7 @@ class RestaurantFrank(AbstractTask):
             if perception_data.device is self.Devices.VOICE:
                 if 'robot stop' in perception_data.input:
                     self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(0, 0)
+                    self.track_id = -1
                     if self.location_list['table one'] != [] and self.location_list['table two'] != [] and \
                                     self.location_list['table three'] != []:
                         self.say = self.subtaskBook.get_subtask(self, 'Say')
@@ -119,11 +120,11 @@ class RestaurantFrank(AbstractTask):
                         self.track_id = self.follow.guess_id
                         print 'change track id = ', self.track_id
                     # elif perception_data.input.people[-1]:
-                    elif self.follow.isLost:
-                        self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                        self.subtask.say('I am lost tracking. Please wave your hand.')
-                        self.delay.wait(2)
-                        self.change_state('detect_waving_people')
+                    # elif self.follow.isLost:
+                    #     self.subtask = self.subtaskBook.get_subtask(self, 'Say')
+                    #     self.subtask.say('I am lost tracking. Please wave your hand.')
+                    #     self.delay.wait(2)
+                    #     self.change_state('detect_waving_people')
 
         elif self.state is 'ask_for_location':
             if self.say.state is not 'finish':
@@ -446,10 +447,11 @@ class RestaurantFrank(AbstractTask):
         elif self.state is 'say_for_order':
             self.say = self.subtaskBook.get_subtask(self, 'Say')
             self.say.say('Hello sir, What order you will take ?')
+            self.delay.wait(5)
             self.change_state('wait_for_order')
 
         elif self.state is 'wait_for_order':
-            if self.say.state is not 'finish':
+            if self.say.state is not 'finish' or self.delay.is_waiting():
                 return
             if perception_data.device is self.Devices.VOICE:
                 for food in self.food:
@@ -464,10 +466,11 @@ class RestaurantFrank(AbstractTask):
         elif self.state is 'ask_for_order':
             self.say.say(
                 'Do you want ' + " and ".join(self.order[self.current_table]) + ' . Please say robot yes or robot no.')
+            self.delay.wait(7)
             self.change_state('confirm_for_order')
 
         elif self.state is 'confirm_for_order':
-            if self.say.state is not 'finish':
+            if self.say.state is not 'finish' or self.delay.is_waiting():
                 return
             if perception_data.device is self.Devices.VOICE and 'robot yes' in perception_data.input:
                 self.say = self.subtaskBook.get_subtask(self, 'Say')
@@ -491,16 +494,16 @@ class RestaurantFrank(AbstractTask):
             # self.command = location
             self.say = self.subtaskBook.get_subtask(self, 'Say')
             self.say.say('I am going to' + self.command + '.')
-            # self.delay.wait(5)
+            self.delay.wait(5)
             self.change_state('confirm_command_auto')
 
         elif self.state == 'confirm_command_auto':
-            if self.say.state is not 'finish':
+            if self.say.state is not 'finish' or self.delay.is_waiting():
                 return
             self.move_abs = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
             self.move_abs.set_position(self.location_list[self.command][0], self.location_list[self.command][1],
                                        self.location_list[self.command][2])
-            self.change_state('move_to_location_auto')
+            self.change_state('turning_1_2')
 
         # elif self.state == 'move_to_location_auto':
         elif self.state is 'turning_1_2':
