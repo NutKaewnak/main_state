@@ -167,7 +167,7 @@ class CommandExtractor(object):
             if verb in sentence:
                 sentence = sentence.replace(verb, ' bring ')
                 # sentence = sentence.strip()
-        for verb in	[' find ', ' look for ', ' locate ']:
+        for verb in	[' find ', ' look for ', ' locate ', ' meet ']:
             if verb in sentence:
                 sentence = sentence.replace(verb, ' find ')
                 # return sentence.strip()
@@ -208,7 +208,7 @@ class CommandExtractor(object):
             return 'answer'
         elif word in ['follow']:
             return 'follow'
-        elif word in ['detect', 'find', 'identify', 'look for']:
+        elif word in ['detect', 'find', 'identify', 'look for', 'meet']:
             return 'find'
         elif word in ['introduce']:
             return 'introduce'
@@ -503,9 +503,14 @@ class CommandExtractor(object):
                 sentence = sentence.strip() + ', '
             elif action.action == 'find':
                 sentence += 'find '
-                sentence += '%s '%action.object
-                if action.data != None:
-                    sentence += 'in %s '%action.data
+                print action
+                if action.object != None and action.data != None:
+                    sentence += '%s ' % action.data
+                    sentence += 'in %s ' % action.object
+                else:
+                    sentence += '%s '%action.object
+                    if action.data != None:
+                        sentence += 'in %s '%action.data
                 sentence = sentence.strip() + ', '
             elif action.action == 'follow':
                 sentence += 'follow '
