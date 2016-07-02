@@ -3,6 +3,7 @@ from include.abstract_task import AbstractTask
 from include.get_distance import get_distance
 from include.delay import Delay
 from std_msgs.msg import Float64
+from math import hypot
 import tf
 
 __author__ = 'Frank'
@@ -24,7 +25,8 @@ class RestaurantFrank(AbstractTask):
         self.current_table = None
         self.stack_table = None
         self.order = {'table one': [], 'table two': [], 'table three': []}
-        self.food = ['green tea', 'cafe au lait', 'iced tea', 'orange juice', 'strawberry juice', 'potato chips', 'cookie', 'potato stick', 'potage soup','egg soup', 'orange', 'apple']
+        self.food = ['green tea', 'cafe au lait', 'iced tea', 'orange juice', 'strawberry juice', 'potato chips',
+                     'cookie', 'potato stick', 'potage soup', 'egg soup', 'orange', 'apple']
         self.say = None
         self.follow = None
         self.move_to = None
@@ -35,6 +37,8 @@ class RestaurantFrank(AbstractTask):
         self.first_table = True
         self.tf_listener = tf.TransformListener()
         self.delay = Delay()
+        self.track_id = None
+        self.subtask = None
 
     def perform(self, perception_data):
         # print self.state, '***'
@@ -46,19 +50,53 @@ class RestaurantFrank(AbstractTask):
             self.turn_neck.turn_absolute(0, 0)
             self.change_state('wait_for_command')
 
+        elif self.state is 'wait_for_command':
+            # print 'subtask state ='+self.subtask.state
+            # print 'state =' + self.state
+            # if self.subtask.state is 'finish' or not self.timer.is_waiting():
+            if perception_data.device is self.Devices.VOICE:
+                print 'input = ' + str(perception_data.input)
+                if 'follow me' in perception_data.input:
+                    self.subtaskBook.get_subtask(self, 'Say').say('I will follow you')
+                    self.follow = self.subtaskBook.get_subtask(self, 'FollowLeg')
+                    self.change_state('follow_init')
+
+        # elif self.state is 'confirm_follow':
+        #     if perception_data.device is self.Devices.VOICE:
+        #         if perception_data.input == 'robot yes':
+        #             self.subtaskBook.get_subtask(self, 'Say').say('I will follow you.')
+        #             self.follow = self.subtaskBook.get_subtask(self, 'FollowLeg')
+        #             self.change_state('follow_init')
+        #         elif perception_data.input == 'robot no':
+        #             self.subtaskBook.get_subtask(self, 'Say').say('Sorry. Please tell me again.')
+        #             self.change_state('wait_for_command')
+
         elif self.state is 'follow_init':
-            if self.say.state is not 'finish':
-                return
-            self.follow = self.subtaskBook.get_subtask(self, 'FollowMe')
-            self.follow.start()
-            self.change_state("follow")
+            if perception_data.device is self.Devices.PEOPLE_LEG:
+                print 'hi'
+                min_distance = 99
+                self.track_id = -1
+                for person in perception_data.input.people:
+                    print 'person = ', person
+                    if (person.pos.x > 0.8 and person.pos.x < 1.8
+                        and person.pos.y > -1 and person.pos.y < 1):
+                        distance = hypot(person.pos.x, person.pos.y)
+                        print 'person id =', person.object_id
+                        if distance < min_distance:
+                            self.track_id = person.object_id
+                if self.track_id != -1:
+                    print self.track_id
+                    self.follow.set_person_id(self.track_id)
+                    self.change_state('follow')
 
         elif self.state is 'follow':
+            print 'state =' + self.state
+            # recovery follow
             if perception_data.device is self.Devices.VOICE:
                 if 'robot stop' in perception_data.input:
-                    self.follow.stop()
-                    # self.say = self.subtaskBook.get_subtask(self, 'Say')
-                    if self.location_list['table one'] != [] and self.location_list['table two'] != [] and self.location_list['table three'] != []:
+                    self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(0, 0)
+                    if self.location_list['table one'] != [] and self.location_list['table two'] != [] and \
+                                    self.location_list['table three'] != []:
                         self.say = self.subtaskBook.get_subtask(self, 'Say')
                         self.say.say('I am at the kitchen bar. Is it on your left or on your right ?')
                         self.change_state('ask_for_kitchen')
@@ -70,6 +108,22 @@ class RestaurantFrank(AbstractTask):
                     self.say = self.subtaskBook.get_subtask(self, 'Say')
                     self.say.say('Wait for command.')
                     self.change_state('wait_for_command')
+
+            if perception_data.device is self.Devices.PEOPLE_LEG and perception_data.input.people:
+                print 'track_id =', self.track_id
+                for person in perception_data.input.people:
+                    print ' person.id =', person.object_id
+                    if self.track_id == person.object_id:
+                        break
+                    elif self.follow.guess_id == person.object_id:
+                        self.track_id = self.follow.guess_id
+                        print 'change track id = ', self.track_id
+                    # elif perception_data.input.people[-1]:
+                    elif self.follow.isLost:
+                        self.subtask = self.subtaskBook.get_subtask(self, 'Say')
+                        self.subtask.say('I am lost tracking. Please wave your hand.')
+                        self.delay.wait(2)
+                        self.change_state('detect_waving_people')
 
         elif self.state is 'ask_for_location':
             if self.say.state is not 'finish':
@@ -90,11 +144,15 @@ class RestaurantFrank(AbstractTask):
                 self.say.say('I remember ' + self.location + '.')
                 self.location_list[self.location] = self.perception_module.base_status.position
                 if 'left' in self.location:
-                    self.location_list[self.location] = (self.perception_module.base_status.position[0], self.perception_module.base_status.position[1], self.perception_module.base_status.position[2] + 1.57)
+                    self.location_list[self.location] = (
+                    self.perception_module.base_status.position[0], self.perception_module.base_status.position[1],
+                    self.perception_module.base_status.position[2] + 1.57)
 
                     # self.direction_list[self.location] = 'left'
                 else:
-                    self.location_list[self.location] = (self.perception_module.base_status.position[0], self.perception_module.base_status.position[1], self.perception_module.base_status.position[2] - 1.57)
+                    self.location_list[self.location] = (
+                    self.perception_module.base_status.position[0], self.perception_module.base_status.position[1],
+                    self.perception_module.base_status.position[2] - 1.57)
 
                     # self.direction_list[self.location] = 'right'
                 print self.location_list
@@ -128,10 +186,14 @@ class RestaurantFrank(AbstractTask):
                 self.say.say('I remember ' + self.location + '.')
                 self.location_list[self.location] = self.perception_module.base_status.position
                 if 'left' in self.location:
-                    self.location_list[self.location] = (self.perception_module.base_status.position[0], self.perception_module.base_status.position[1], self.perception_module.base_status.position[2] + 1.57)
+                    self.location_list[self.location] = (
+                    self.perception_module.base_status.position[0], self.perception_module.base_status.position[1],
+                    self.perception_module.base_status.position[2] + 1.57)
                     # self.direction_list[self.location] = 'left'
                 else:
-                    self.location_list[self.location] = (self.perception_module.base_status.position[0], self.perception_module.base_status.position[1], self.perception_module.base_status.position[2] - 1.57)
+                    self.location_list[self.location] = (
+                    self.perception_module.base_status.position[0], self.perception_module.base_status.position[1],
+                    self.perception_module.base_status.position[2] - 1.57)
                     # self.direction_list[self.location] = 'right'
                 print self.location_list
                 # print self.direction_list
@@ -141,15 +203,6 @@ class RestaurantFrank(AbstractTask):
                 self.say = self.subtaskBook.get_subtask(self, 'Say')
                 self.say.say('Sorry , Is it on your left or on your right ?')
                 self.change_state('ask_for_kitchen')
-
-        elif self.state is 'wait_for_command':
-            # if self.say.state is not 'init' and self.say.state is not 'finish':
-            #     return
-            if perception_data.device is self.Devices.VOICE:
-                if 'follow me' in perception_data.input:
-                    self.say = self.subtaskBook.get_subtask(self, 'Say')
-                    self.say.say('I will follow you.')
-                    self.change_state('follow_init')
 
         elif self.state is 'talk_to_barman':
             if self.say.state is not 'finish':
@@ -169,7 +222,7 @@ class RestaurantFrank(AbstractTask):
                     if location in perception_data.input:
                         self.command = location
                         self.say = self.subtaskBook.get_subtask(self, 'Say')
-                        self.say.say('Do you want me to go '+ self.command +'. robot yes or robot no .')
+                        self.say.say('Do you want me to go ' + self.command + '. robot yes or robot no .')
                         # self.delay.wait(5)
                         self.change_state('confirm_command')
 
@@ -181,7 +234,8 @@ class RestaurantFrank(AbstractTask):
                 self.say.say('I will go to ' + self.command + '.')
                 self.current_table = self.command
                 self.move_abs = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
-                self.move_abs.set_position(self.location_list[self.command][0], self.location_list[self.command][1], self.location_list[self.command][2])
+                self.move_abs.set_position(self.location_list[self.command][0], self.location_list[self.command][1],
+                                           self.location_list[self.command][2])
                 self.change_state('move_to_location')
             elif perception_data.device is self.Devices.VOICE and 'robot no' in perception_data.input:
                 self.say = self.subtaskBook.get_subtask(self, 'Say')
@@ -401,14 +455,15 @@ class RestaurantFrank(AbstractTask):
                 for food in self.food:
                     if food in perception_data.input:
                         self.order[self.current_table].append(food)
-                if self.order[self.current_table] == []:
+                if not self.order[self.current_table]:
                     return
                 else:
                     self.change_state('ask_for_order')
-                # self.say.say('Your orders are ' + " and ".join(self.order[self.current_table]))
+                    # self.say.say('Your orders are ' + " and ".join(self.order[self.current_table]))
 
         elif self.state is 'ask_for_order':
-            self.say.say('Do you want ' + " and ".join(self.order[self.current_table]) + ' . Please say robot yes or robot no.')
+            self.say.say(
+                'Do you want ' + " and ".join(self.order[self.current_table]) + ' . Please say robot yes or robot no.')
             self.change_state('confirm_for_order')
 
         elif self.state is 'confirm_for_order':
@@ -432,7 +487,6 @@ class RestaurantFrank(AbstractTask):
                 self.say.say('Sorry , What did you say ?')
                 self.change_state('wait_for_order')
 
-
         elif self.state == 'move_to_another_table':
             # self.command = location
             self.say = self.subtaskBook.get_subtask(self, 'Say')
@@ -449,16 +503,6 @@ class RestaurantFrank(AbstractTask):
             self.change_state('move_to_location_auto')
 
         # elif self.state == 'move_to_location_auto':
-
-
-
-
-
-
-
-
-
-
         elif self.state is 'turning_1_2':
             self.say = self.subtaskBook.get_subtask(self, 'Say')
             self.say.say("I am searching for waving person.")
@@ -477,13 +521,13 @@ class RestaurantFrank(AbstractTask):
                 self.change_state('turning_2_2')
             elif self.detect_waving_people.state is 'finish':
                 if not self.detect_waving_people.get_point() == None:
-                    self.waving_people.append(self.detect_waving_people.get_point()) #!!!!!!
+                    self.waving_people.append(self.detect_waving_people.get_point())  # !!!!!!
                     self.say = self.subtaskBook.get_subtask(self, 'Say')
                     self.say.say("Please waiting. I will go there.")
                     self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
                     self.move_relative.set_position(self.detect_waving_people.get_point())
                     self.change_state('move_to_location')
-                # self.change_state('turning_2_2')
+                    # self.change_state('turning_2_2')
 
         elif self.state is 'turning_2_2':
             self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
@@ -501,13 +545,13 @@ class RestaurantFrank(AbstractTask):
                 self.change_state('turning_3_2')
             elif self.detect_waving_people.state is 'finish':
                 if not self.detect_waving_people.get_point() == None:
-                    self.waving_people.append(self.detect_waving_people.get_point()) #!!!!!!
+                    self.waving_people.append(self.detect_waving_people.get_point())  # !!!!!!
                     self.say = self.subtaskBook.get_subtask(self, 'Say')
                     self.say.say("Please waiting. I will go there.")
                     self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
                     self.move_relative.set_position(self.detect_waving_people.get_point())
                     self.change_state('move_to_location')
-                # self.change_state('turning_3_2')
+                    # self.change_state('turning_3_2')
 
         elif self.state is 'turning_3_2':
             self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
@@ -525,13 +569,13 @@ class RestaurantFrank(AbstractTask):
                 self.change_state('turning_4_2')
             elif self.detect_waving_people.state is 'finish':
                 if not self.detect_waving_people.get_point() == None:
-                    self.waving_people.append(self.detect_waving_people.get_point()) #!!!!!!
+                    self.waving_people.append(self.detect_waving_people.get_point())  # !!!!!!
                     self.say = self.subtaskBook.get_subtask(self, 'Say')
                     self.say.say("Please waiting. I will go there.")
                     self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
                     self.move_relative.set_position(self.detect_waving_people.get_point())
                     self.change_state('move_to_location')
-                # self.change_state('turning_4_2')
+                    # self.change_state('turning_4_2')
 
         elif self.state is 'turning_4_2':
             self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
@@ -549,13 +593,13 @@ class RestaurantFrank(AbstractTask):
                 self.change_state('turning_5_2')
             elif self.detect_waving_people.state is 'finish':
                 if not self.detect_waving_people.get_point() == None:
-                    self.waving_people.append(self.detect_waving_people.get_point()) #!!!!!!
+                    self.waving_people.append(self.detect_waving_people.get_point())  # !!!!!!
                     self.say = self.subtaskBook.get_subtask(self, 'Say')
                     self.say.say("Please waiting. I will go there.")
                     self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
                     self.move_relative.set_position(self.detect_waving_people.get_point())
                     self.change_state('move_to_location')
-                # self.change_state('turning_5_2')
+                    # self.change_state('turning_5_2')
 
         elif self.state is 'turning_5_2':
             self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
@@ -573,13 +617,13 @@ class RestaurantFrank(AbstractTask):
                 self.change_state('turning_6_2')
             elif self.detect_waving_people.state is 'finish':
                 if not self.detect_waving_people.get_point() == None:
-                    self.waving_people.append(self.detect_waving_people.get_point()) #!!!!!!
+                    self.waving_people.append(self.detect_waving_people.get_point())  # !!!!!!
                     self.say = self.subtaskBook.get_subtask(self, 'Say')
                     self.say.say("Please waiting. I will go there.")
                     self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
                     self.move_relative.set_position(self.detect_waving_people.get_point())
                     self.change_state('move_to_location')
-                # self.change_state('turning_6_2')
+                    # self.change_state('turning_6_2')
 
         elif self.state is 'turning_6_2':
             self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
@@ -597,13 +641,13 @@ class RestaurantFrank(AbstractTask):
                 self.change_state('turning_7_2')
             elif self.detect_waving_people.state is 'finish':
                 if not self.detect_waving_people.get_point() == None:
-                    self.waving_people.append(self.detect_waving_people.get_point()) #!!!!!!
+                    self.waving_people.append(self.detect_waving_people.get_point())  # !!!!!!
                     self.say = self.subtaskBook.get_subtask(self, 'Say')
                     self.say.say("Please waiting. I will go there.")
                     self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
                     self.move_relative.set_position(self.detect_waving_people.get_point())
                     self.change_state('move_to_location')
-                # self.change_state('turning_7_2')
+                    # self.change_state('turning_7_2')
 
         elif self.state is 'turning_7_2':
             self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
@@ -621,13 +665,13 @@ class RestaurantFrank(AbstractTask):
                 self.change_state('turning_8_2')
             elif self.detect_waving_people.state is 'finish':
                 if not self.detect_waving_people.get_point() == None:
-                    self.waving_people.append(self.detect_waving_people.get_point()) #!!!!!!
+                    self.waving_people.append(self.detect_waving_people.get_point())  # !!!!!!
                     self.say = self.subtaskBook.get_subtask(self, 'Say')
                     self.say.say("Please waiting. I will go there.")
                     self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
                     self.move_relative.set_position(self.detect_waving_people.get_point())
                     self.change_state('move_to_location')
-                # self.change_state('turning_8_2')
+                    # self.change_state('turning_8_2')
 
         elif self.state is 'turning_8_2':
             self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
@@ -645,13 +689,13 @@ class RestaurantFrank(AbstractTask):
                 self.change_state('turning_9_2')
             elif self.detect_waving_people.state is 'finish':
                 if not self.detect_waving_people.get_point() == None:
-                    self.waving_people.append(self.detect_waving_people.get_point()) #!!!!!!
+                    self.waving_people.append(self.detect_waving_people.get_point())  # !!!!!!
                     self.say = self.subtaskBook.get_subtask(self, 'Say')
                     self.say.say("Please waiting. I will go there.")
                     self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
                     self.move_relative.set_position(self.detect_waving_people.get_point())
                     self.change_state('move_to_location')
-                # self.change_state('turning_9_2')
+                    # self.change_state('turning_9_2')
 
         elif self.state is 'turning_9_2':
             self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
@@ -669,13 +713,13 @@ class RestaurantFrank(AbstractTask):
                 self.change_state('turning_10_2')
             elif self.detect_waving_people.state is 'finish':
                 if not self.detect_waving_people.get_point() == None:
-                    self.waving_people.append(self.detect_waving_people.get_point()) #!!!!!!
+                    self.waving_people.append(self.detect_waving_people.get_point())  # !!!!!!
                     self.say = self.subtaskBook.get_subtask(self, 'Say')
                     self.say.say("Please waiting. I will go there.")
                     self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
                     self.move_relative.set_position(self.detect_waving_people.get_point())
                     self.change_state('move_to_location')
-                # self.change_state('turning_10_2')
+                    # self.change_state('turning_10_2')
 
         elif self.state is 'turning_10_2':
             self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
@@ -693,13 +737,13 @@ class RestaurantFrank(AbstractTask):
                 self.change_state('set_to_kitchen')
             elif self.detect_waving_people.state is 'finish':
                 if not self.detect_waving_people.get_point() == None:
-                    self.waving_people.append(self.detect_waving_people.get_point()) #!!!!!!
+                    self.waving_people.append(self.detect_waving_people.get_point())  # !!!!!!
                     self.say = self.subtaskBook.get_subtask(self, 'Say')
                     self.say.say("Please waiting. I will go there.")
                     self.move_relative = self.subtaskBook.get_subtask(self, 'MoveRelative')
                     self.move_relative.set_position(self.detect_waving_people.get_point())
                     self.change_state('move_to_location')
-                # self.change_state('decision_for_waving')
+                    # self.change_state('decision_for_waving')
 
         elif self.state is 'decision_for_waving':
             if self.waving_people != []:
@@ -712,7 +756,9 @@ class RestaurantFrank(AbstractTask):
                 self.say = self.subtaskBook.get_subtask(self, 'Say')
                 self.say.say('I am going to ' + self.stack_table + ' to get a order.')
                 self.move_abs = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
-                self.move_abs.set_position(self.location_list[self.stack_table][0], self.location_list[self.stack_table][1], self.location_list[self.stack_table][2])
+                self.move_abs.set_position(self.location_list[self.stack_table][0],
+                                           self.location_list[self.stack_table][1],
+                                           self.location_list[self.stack_table][2])
                 self.current_table = self.stack_table
                 self.change_state('move_to_waving_table')
 
@@ -727,7 +773,8 @@ class RestaurantFrank(AbstractTask):
             self.say = self.subtaskBook.get_subtask(self, 'Say')
             self.say.say('I will go back to kitchen bar .')
             self.move_abs = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
-            self.move_abs.set_position(self.location_list['kitchen'][0], self.location_list['kitchen'][1], self.location_list['kitchen'][2])
+            self.move_abs.set_position(self.location_list['kitchen'][0], self.location_list['kitchen'][1],
+                                       self.location_list['kitchen'][2])
             self.current_table = self.stack_table
             self.change_state('move_to_kitchen')
 
@@ -755,29 +802,29 @@ class RestaurantFrank(AbstractTask):
                 self.change_state("wait_repeat_order")
 
 
-        # elif self.state is 'wait_for_barman_first':
-        #     if perception_data.device is self.Devices.VOICE
+                # elif self.state is 'wait_for_barman_first':
+                #     if perception_data.device is self.Devices.VOICE
 
-        # elif self.state is 'wait_for_order':
-        #     self.say.say('I will go to ' + self.command + '.')
+                # elif self.state is 'wait_for_order':
+                #     self.say.say('I will go to ' + self.command + '.')
 
-        # elif self.state is 'move_to_gpsr_start':
-        #     if self.moveTo.state is 'finish':
-        #         self.change_state('wait_for_command')
-        # elif perception_data.device is self.Devices.VOICE:
-        #     if 'robot stop' == perception_data.input:
-        #         self.follow.stop()
+                # elif self.state is 'move_to_gpsr_start':
+                #     if self.moveTo.state is 'finish':
+                #         self.change_state('wait_for_command')
+                # elif perception_data.device is self.Devices.VOICE:
+                #     if 'robot stop' == perception_data.input:
+                #         self.follow.stop()
 
-    # def add_waving_people(self, tables ,points):
-    #     for point in points:
-    #         point_tf = self.tf_listener.transformPoint('map', point)
-    #         # for i in self.waving_people:
-    #         #     if not self.is_overlap(i, point):
-    #         #         self.waving_people.append()
-    #         temp
-    #         self.location_list["table one"]
-    #         if self.location_list["table one"]:
-    #
-    #
-    # def is_overlap(self, a, b):
-    #     if
+                # def add_waving_people(self, tables ,points):
+                #     for point in points:
+                #         point_tf = self.tf_listener.transformPoint('map', point)
+                #         # for i in self.waving_people:
+                #         #     if not self.is_overlap(i, point):
+                #         #         self.waving_people.append()
+                #         temp
+                #         self.location_list["table one"]
+                #         if self.location_list["table one"]:
+                #
+                #
+                # def is_overlap(self, a, b):
+                #     if
