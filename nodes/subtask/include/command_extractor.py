@@ -273,15 +273,8 @@ class CommandExtractor(object):
     # Get actions from command
     def getActions(self, command):
         """
-        >>> CommandExtractor().getActions("answer a what city is the capital of the germany")
-        [(go, bedroom, None), (grasp, None, coke), (go, bathroom, None), (give, frank, None)]
-        >>> CommandExtractor().getActions("could you please look for james in the living table and escort him to the office")
-        [(go, bedroom, None), (grasp, None, coke), (go, bathroom, None), (give, frank, None)]
-        >>> CommandExtractor().make_question(CommandExtractor().getActions("could you please look for james in the living table and escort him to the office"))
+        >>> CommandExtractor().make_question(CommandExtractor().getActions("Please find the woman dressed with orange t-shirt in the office and follow them"))
         []
-        >>> CommandExtractor().getActions("pick up the pringles from the drawer deliver it to jacob in the cabinet and find mason in the tv stand")
-        []
-        >>> CommandExtractor().getActions("robot please find the waving person in the office follow him and guide ava from the living table to the dining room")
         """
         output = []
         for sentence in self.cut_sentence(command):
@@ -517,7 +510,8 @@ class CommandExtractor(object):
             elif action.action == 'follow':
                 sentence += 'follow '
                 sentence += '%s '%action.object
-                sentence += 'to the %s '%action.data
+                if action.data != None:
+                    sentence += 'to the %s '%action.data
                 sentence = sentence.strip() + ', '
             elif action.action == 'tell':
                 sentence += 'tell '

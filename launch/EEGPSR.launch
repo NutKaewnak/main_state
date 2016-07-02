@@ -1,0 +1,11 @@
+<launch>
+  <node name="main_state" pkg="main_state" type="main.py" output="screen" args="EEGPSR" />
+  <node ns="door" name="door_detection" pkg="door_detection" type="door_detection_node">
+    <remap from="/scan" to="/laser/scan"/>
+  </node>
+
+<node ns="z_bar" name="barcode_reader" pkg="zbar_ros" type="barcode_reader_node">
+    <remap from="image" to="/external_cam/image_raw"/>
+</node>
+  <!-- <include file="$(find speech_processing)/dic/EEGPSR/EEGPSR.launch"/>-->
+</launch>
