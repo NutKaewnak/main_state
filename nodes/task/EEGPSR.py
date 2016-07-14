@@ -17,15 +17,16 @@ class EEGPSR(AbstractTask):
     def perform(self, perception_data):
         # print self.state
         if self.state is 'init' and perception_data.device == self.Devices.DOOR:
-            self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
-            self.subtask.turn_absolute( 0, 0)
-            self.subtask = self.subtaskBook.get_subtask(self, 'MovePassDoor')
-            self.change_state('move_pass_door')
+            # self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
+            # self.subtask.turn_absolute( 0, 0)
+            # self.subtask = self.subtaskBook.get_subtask(self, 'MovePassDoor')
+            self.change_state('introduce')
 
         elif self.state == 'move_pass_door' and perception_data.device == self.Devices.DOOR:
-            self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
-            self.subtask.to_location('EEGPSR_start')
-            self.change_state("moved_to_start_position")
+            if self.subtask.state == 'finish':
+                self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
+                self.subtask.to_location('EEGPSR_start')
+                self.change_state("moved_to_start_position")
 
         elif self.state == 'moved_to_start_position':
             if self.subtask.state == 'finish' and perception_data.device == self.Devices.DOOR:
@@ -81,7 +82,7 @@ class EEGPSR(AbstractTask):
                 self.say = self.subtaskBook.get_subtask(self, 'Say')
                 self.say.say('I am going to ' + self.action.data)
                 self.move_location = self.subtaskBook.get_subtask(self, 'MoveToLocation')
-                self.subtask.to_location(self.action.data)
+                self.move_location.to_location(self.action.data)
                 self.actions.pop(0)
                 self.change_state('perform_move')
             elif self.action.action == 'greet':

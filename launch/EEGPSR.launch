@@ -7,5 +7,6 @@
 <node ns="z_bar" name="barcode_reader" pkg="zbar_ros" type="barcode_reader_node">
     <remap from="image" to="/external_cam/image_raw"/>
 </node>
-  <!-- <include file="$(find speech_processing)/dic/EEGPSR/EEGPSR.launch"/>-->
+  <include file="$(find speech_processing)/launch/EEGPSRCAT5.launch"/>
+  <node pkg="rosbag" type="record" name="logging_navigation_task" args="-o ../EEGPSR_task_bag/logging_EEGPSR_bag /navigation/move_base_node/global_costmap/obstacle_layer_footprint/footprint_stamped /navigation/athome_move_base_node/TebLocalPlannerROS/teb_poses  /tf /navigation/move_base_node/TrajectoryPlannerROS/local_plan /laser/scan"  />
 </launch>
