@@ -22,14 +22,32 @@ class GPSR(AbstractTask):
 
     def perform(self, perception_data):
         print self.state
+
         #rospy.loginfo('state in: ' + self.state + ' from: ' + str(perception_data.device) +
         #' data: ' + str(perception_data.input))
         if self.state is 'init':
             self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
-            self.subtask.turn_absolute(-0.2, 0)
+            self.subtask.turn_absolute(-0.8, 0)
+
             self.subtask = self.subtaskBook.get_subtask(self, 'MovePassDoor')
-            self.change_state('move_pass_door')
+            # self.subtask = self.subtaskBook.get_subtask(self, 'MoveRelative')
+            # self.subtask = self.subtask.set_position(2, 0, -1.7)
+            self.time = Delay()
+            self.time.wait(10)
+            # self.subtask = self.subtaskBook.get_subtask(self, 'MovePassDoor')
+            self.change_state('pre_start')
             # self.change_state('move_to_start')
+
+        if not perception_data.device in ['DOOR', 'VOICE']:
+            return
+
+        if self.state == 'pre_start':
+            if not self.time.is_waiting():
+                self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
+                self.subtask = self.subtask.set_position(3, 1, -1.7)
+                self.time = Delay()
+                self.time.wait(10)
+                self.change_state('move_to_start')
 
         elif self.state is 'move_pass_door':
             if self.subtask.state is 'finish':
@@ -78,16 +96,18 @@ class GPSR(AbstractTask):
                 self.timer.wait(5)
                 self.change_state('move_to_start')
 
-        elif self.state is 'move_to_start':
-            if self.subtask.state is 'finish' or not self.timer.is_waiting():
-                self.subtask = self.subtaskBook.get_subtask(self, 'Introduce')
-                self.change_state('introduce')
+        elif self.state is 'move_to_start' and not self.time.is_waiting():
+            # if self.subtask.state is 'finish' or not self.timer.is_waiting():
+            self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
+            self.subtask.turn_absolute(0, 0)
+            self.subtask = self.subtaskBook.get_subtask(self, 'Introduce')
+            self.change_state('introduce')
 
         elif self.state is 'introduce':
             if self.subtask.state is 'finish':
                 # self.say.state = 'finish'
-                self.voice_mode = self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode')
-                self.voice_mode.recognize(7)
+                # self.voice_mode = self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode')
+                # self.voice_mode.recognize(7)
                 self.change_state('wait_for_command')
 
         elif self.state == 'wait_for_command':
@@ -97,8 +117,8 @@ class GPSR(AbstractTask):
                 self.say = self.subtaskBook.get_subtask(self, 'Say')
                 self.say.say(self.command_extractor.make_question(self.command) + ' Please say robot yes or robot no.')
                 rospy.loginfo(perception_data.input)
-                self.voice_mode = self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode')
-                self.voice_mode.recognize(6)
+                # self.voice_mode = self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode')
+                # self.voice_mode.recognize(6)
                 self.timer.wait(7)
                 self.change_state('confirm')
 
@@ -108,13 +128,15 @@ class GPSR(AbstractTask):
                     if 'robot yes' in perception_data.input:
                         self.say = self.subtaskBook.get_subtask(self, 'Say')
                         self.say.say('OK, I will do it.')
+                        self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
+                        self.subtask.turn_absolute(-0.8, 0)
                         self.change_state('action')
 
                     elif 'robot no' in perception_data.input:
                         self.say = self.subtaskBook.get_subtask(self, 'Say')
                         self.say.say('Sorry, Please say again.')
-                        self.voice_mode = self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode')
-                        self.voice_mode.recognize(7)
+                        # self.voice_mode = self.subtaskBook.get_subtask(self, 'VoiceRecognitionMode')
+                        # self.voice_mode.recognize(7)
                         self.change_state('wait_for_command')
 
         # elif self.state == 'action_1':
@@ -151,21 +173,27 @@ class GPSR(AbstractTask):
                     self.pick.side_arm = 'right_arm'
                     self.change_state('wait_for_arm_init')
                     self.command.pop(0)
-                elif goal.action == 'tell':
+                elif goal.action == 'tell' or goal.action == 'say':
                     self.say = self.subtaskBook.get_subtask(self, 'Say')
-                    if goal.object in ['your name']:
+                    if goal.object in ['something about yourself']:
                         self.say.say(utility.tell_my_name())
                         self.change_state('action')
-                    elif goal.object == 'the name of your team':
-                        self.say.say(utility.tell_team_name())
+                    elif goal.object == "your team's name":
+                        self.say.say("My team name is skuba.")
+                        self.change_state('action')
+                    elif goal.object == "your team's country":
+                        self.say.say("I come from thailand")
+                        self.change_state('action')
+                    elif goal.object == "your team's country":
+                        self.say.say("I come from thailand")
                         self.change_state('action')
                     elif goal.object in ['the time', 'what time is it']:
                         self.say.say(utility.tell_the_time())
                         self.change_state('action')
-                    elif goal.object == 'the date today':
+                    elif goal.object == 'what day is today':
                         self.say.say(utility.tell_the_date_today())
                         self.change_state('action')
-                    elif goal.object == 'the date tomorrow':
+                    elif goal.object == 'what day is tomorrow':
                         self.say.say(utility.tell_day_tomorrow())
                         self.change_state('action')
                     elif goal.object == 'the day of the month':
@@ -174,10 +202,13 @@ class GPSR(AbstractTask):
                     elif goal.object == 'the day of the week':
                         self.say.say(utility.tell_the_day_of_the_week())
                         self.change_state('action')
-                    elif goal.object == 'affiliation':
+                    elif goal.object == "your team's affiliation":
                         self.say.say(utility.tell_affiliation())
                         self.change_state('action')
-                    self.command.pop(0)
+                    elif goal.object == 'a joke':
+                        self.say.say("LA La La La La")
+                        self.change_state('action')
+                        self.command.pop(0)
                 elif goal.action == 'follow':
                     self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(0, 0)
                     self.change_state('wait_for_command_follow')
@@ -188,7 +219,7 @@ class GPSR(AbstractTask):
                     self.change_state("wait_for_answer")
                     self.say.say('Please ask me the question.')
                     self.timer.wait(4)
-                    self.voice_mode.recognize(8)
+                    # self.voice_mode.recognize(8)
                     self.command.pop(0)
             else:
                 self.change_state('finish')

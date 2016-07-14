@@ -1,9 +1,10 @@
 import rospy
 from include.abstract_subtask import AbstractSubtask
-from include.pick_available_range import is_in_range, find_new_available_point
+from include.pick_available_range import is_in_right_range,is_in_left_range, find_right_arm_available_point, find_left_arm_available_point
 
 __author__ = 'CinDy'
 
+LEFT_ARM_MINIMUM = 0.21
 
 class Pick(AbstractSubtask):
     def __init__(self, planning_module):
@@ -49,15 +50,26 @@ class Pick(AbstractSubtask):
                 self.change_state('finish')
 
         elif self.state is 'solve_unreachable':
-            if not is_in_range(self.input_object_pose.pose.position):
-                new_point = find_new_available_point(self.input_object_pose.pose.position)
-                self.base = self.skillBook.get_skill(self, 'MoveBaseRelativeTwist')
-                self.base.set_position(self.input_object_pose.pose.position.x - new_point.x,
-                                       self.input_object_pose.pose.position.y - new_point.y,
-                                       0
-                                       )
-                self.input_object_pose.pose.position = new_point
-                self.change_state('wait_for_twist')
+            if self.side_arm is 'right_arm':
+                if not is_in_right_range(self.input_object_pose.pose.position):
+                    new_point = find_right_arm_available_point(self.input_object_pose.pose.position)
+                    self.base = self.skillBook.get_skill(self, 'MoveBaseRelativeTwist')
+                    self.base.set_position(self.input_object_pose.pose.position.x - new_point.x,
+                                           self.input_object_pose.pose.position.y - new_point.y,
+                                           0
+                                           )
+                    self.input_object_pose.pose.position = new_point
+                    self.change_state('wait_for_twist')
+            elif self.side_arm is 'left_arm':
+                if not is_in_left_range(self.input_object_pose.pose.position):
+                    new_point = find_left_arm_available_point(self.input_object_pose.pose.position)
+                    self.base = self.skillBook.get_skill(self, 'MoveBaseRelativeTwist')
+                    self.base.set_position(self.input_object_pose.pose.position.x - new_point.x,
+                                           self.input_object_pose.pose.position.y - new_point.y,
+                                           0
+                                           )
+                    self.input_object_pose.pose.position = new_point
+                    self.change_state('wait_for_twist')
 
         elif self.state is 'wait_for_twist':
             if self.base.state == 'succeeded':
@@ -73,7 +85,10 @@ class Pick(AbstractSubtask):
         self.input_object_pose = pose_stamped
         self.object_name = object_name
         if self.side_arm is None:
-            self.side_arm = 'right_arm'
+            if input_object_pose.y > LEFT_ARM_MINIMUM :
+                self.side_arm = 'left_arm'
+            else :
+                self.side_arm = 'right_arm'
         self.change_state('receive_point')
 
     def gripper_open(self):

@@ -6,7 +6,7 @@ def tell_team_name():
 
 
 def tell_my_name():
-    return "My name is Lumyai."
+    return "My name is Lumyai. I am a member of skuba team. I come from Thailand."
 
 
 def tell_the_time():

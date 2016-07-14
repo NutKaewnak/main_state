@@ -14,6 +14,7 @@ class TestFollowLeg(AbstractTask):
         self.count = 0
 
     def perform(self, perception_data):
+        print self.state
         if self.state is 'init':
             self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(0, 0)
             self.marker_pub = rospy.Publisher("/visualization_marker", Marker)
@@ -38,7 +39,7 @@ class TestFollowLeg(AbstractTask):
             box_marker.pose.position.z = 0.7/2
 
             self.marker_pub.publish(box_marker)
-            # print "----"
+            print "----"
             if perception_data.device is self.Devices.VOICE and 'follow me' in perception_data.input:
                 self.subtaskBook.get_subtask(self, 'Say').say('I will follow you.')
                 self.follow = self.subtaskBook.get_subtask(self, 'FollowLeg')
@@ -48,6 +49,7 @@ class TestFollowLeg(AbstractTask):
         elif self.state is 'follow_init' and perception_data.device is self.Devices.PEOPLE_LEG:
             min_distance = 99
             track_id = -1
+            print perception_data.input.people
             for person in perception_data.input.people:
                 if (person.pos.x > 0.8 and person.pos.x < 1.8
                     and person.pos.y > -1 and person.pos.y < 1):
@@ -55,7 +57,7 @@ class TestFollowLeg(AbstractTask):
                     if distance < min_distance:
                         track_id = person.object_id
             if track_id != -1:
-                # print track_id
+                print track_id
                 self.follow.set_person_id(track_id)
                 self.change_state('follow')
 

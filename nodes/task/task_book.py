@@ -12,7 +12,7 @@ from robozoo import RoboZoo
 from robo_nurse import RoboNurse
 from today_show import TodayShow
 from restaurant_vdo import RestaurantVDO
-# from restaurant_Frank import RestaurantFrank
+from restaurant_Frank import RestaurantFrank
 from separate_clothes_op import SeparateClothesOP
 from follow_guiding import FollowGuiding
 
@@ -26,6 +26,7 @@ from test_neck import TestNeck
 from test_pill import TestPill
 from test_detect_object import TestDetectObject
 from test_follow_leg import TestFollowLeg
+from EEGPSR import EEGPSR
 
 __author__ = "AThousandYears"
 
@@ -47,7 +48,7 @@ class TaskBook:
         self.book['RoboNurse'] = RoboNurse(planning_module)
         self.book['TodayShow'] = TodayShow(planning_module)
         self.book['RestaurantVDO'] = RestaurantVDO(planning_module)
-        # self.book['RestaurantFrank'] = RestaurantFrank(planning_module)
+        self.book['RestaurantFrank'] = RestaurantFrank(planning_module)
         self.book['SeparateClothesOP'] = SeparateClothesOP(planning_module)
         self.book['FollowGuiding'] = FollowGuiding(planning_module)
 
@@ -61,6 +62,7 @@ class TaskBook:
         self.book['TestPill'] = TestPill(planning_module)
         self.book['TestDetectObject'] = TestDetectObject(planning_module)
         self.book['TestFollowLeg'] = TestFollowLeg(planning_module)
+        self.book['EEGPSR'] = EEGPSR(planning_module)
 
     def set_perception(self, perception_module):
         for task in self.book:

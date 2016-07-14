@@ -1,35 +1,50 @@
 <location_information>
     <location name="gpsr_start" position="8.571, -0.042 " rotation="0.057" height="0.70"/>
-
+    <!--GPSR arena A -->
+    <location name="EEGPSR_start" position="3.003, 2.353" rotation=" -1.626" height="1.29"/>
     <room name="living room" position=" 12.700, -0.766" rotation=" -1.594 " height="0.70">
-		<locaiton name="living table" position="13.369, -3.148" rotation="-0.082" height="0.70"/>
-		<locaiton name="sofa" position="15.978, 3.264" rotation="-1.870" height="0.70"/>
-        <location name="tv board" position="16.100, 3.919" rotation="1.240" height="0.70"/>
+		<locaiton name="living table" position=" 4.999, -0.037" rotation=" 0.594" height="0.70"/>
+		<locaiton name="living shelf" position=" 2.992, 2.091 " rotation=" 1.517" height="0.70"/>
+        <location name="TV stand" position="1.469, 2.090" rotation=" 3.132" height="1.29"/>
 	</room>
-
-    <room name="library" position="11.729, -3.418" rotation="-0.397" height="0.70">
-		<locaiton name="shelf" position="14.759, -5.615" rotation="-1.978" height="1.29"/>
-	</room>
+    <room name="kitchen" position=" 3.266, -3.953" rotation=" 2.808" height="1.29">
+        <location name="bar" position=" 3.596, -4.569" rotation=" -0.006" height="1.29" />
+        <location name="cupboard" position=" 1.123, -2.955" rotation=" -3.124" height="1.29" />
+        <location name="sink" position=" 3.568, -3.570" rotation=" 0.040" height="1.29" />
+        <location name="sideshelf" position=" 4.361, -2.117" rotation="-1.606" height="1.29" />
+        <location name="bookcase" position="1.764, -4.586" rotation=" -1.610" height="1.29" />
+        <location name="dining table" position="1.446, -2.925" rotation=" 0.793" height="1.29"/>
+    </room>
+    <!--<room name="library" position="11.729, -3.418" rotation="-0.397" height="0.70">-->
+		<!--<locaiton name="shelf" position="14.759, -5.615" rotation="-1.978" height="1.29"/>-->
+	<!--</room>-->
     <room name="dining room" position=" 9.091, 1.497" rotation="1.003" height="0.70">
 		<!--<location name="dining table" position=" 0.235, 5.881" rotation=" -0.398" height="0.70"/>-->
 		<!--<location name="dining table1" position="-0.383, 6.163" rotation="-0.344" height="0.70" />-->
-		<location name="dining table 1" position=" 11.690, 2.090 " rotation="-0.446 " height="0.70"/>
-		<locaiton name="table set" position="10.019, 1.295" rotation="1.288" height="0.70"/>
-        <locaiton name="dining table" position="11.699, 2.044 " rotation="-0.259" height="0.70"/>
+		<!--<location name="dining table 1" position=" 11.690, 2.090 " rotation="-0.446 " height="0.70"/>-->
+		<!--<locaiton name="table set" position="10.019, 1.295" rotation="1.288" height="0.70"/>-->
+        <!--<locaiton name="dining table" position="11.699, 2.044 " rotation="-0.259" height="0.70"/>-->
 		<!--<location name="granny" position=" -3.803, 2.424 " rotation="1.293" height="0.70"/>-->
         <!--<locaiton name="granny" position="0.010, 5.852" rotation="1.203" height="0.70"/>-->
-		<locaiton name="granny" position=" 9.369, 3.183" rotation="0.689" height="0.70"/>
-		<locaiton name="side table" position="12.877, 4.978" rotation="-0.325" height="0.70"/>
+		<!--<locaiton name="granny" position=" 9.369, 3.183" rotation="0.689" height="0.70"/>-->
+		<locaiton name="side shelf" position="12.877, 4.978" rotation="-0.325" height="0.70"/>
 	</room>
-    <room name="bedroom" position="7.024, -1.518" rotation="-0.018" height="1.29">
-        <location name="bed" position="10.541, -0.487" rotation="-1.557" height="1.29"/>
-        <location name="desk" position="7.634, -2.048" rotation="-1.550" height="0.70"/>
+    <room name="bedroom" position=" 3.861, -7.016" rotation=" 3.056" height="1.29">
+        <location name="bed" position=" 2.930, -6.839" rotation=" 3.128" height="1.29"/>
+        <location name="bedside" position="0.918, -5.905 " rotation=" 3.105" height="0.70"/>
     </room>
-    <room name="hallway" position="4.590, -2.352" rotation="3.139" height="1.29">
-        <location name="bookcase" position="1.850, -1.937" rotation="3.119" height="1.29"/>
-        <location name="hallway table" position="2.660, -1.286" rotation="1.581" height="0.70"/>
+    <room name="office" position=" 1.749, -10.652" rotation=" -3.138" height="1.29">
+            <location name="drawer" position=" 1.326, -11.463" rotation=" -1.605" height="1.29"/>
+            <location name="desk" position="1.352, -9.575" rotation=" 2.306" height="1.29"/>
     </room>
-    <room name="corridor" position="6.668, -2.676" rotation="0.164" height="0.70"/>
+    <!--<room name="hallway" position="4.590, -2.352" rotation="3.139" height="1.29">-->
+        <!--<location name="bookcase" position="1.850, -1.937" rotation="3.119" height="1.29"/>-->
+        <!--<location name="hallway table" position="2.660, -1.286" rotation="1.581" height="0.70"/>-->
+    <!--</room>-->
+
+    <room name="corridor" position=" 6.156, -6.160" rotation=" -1.542" height="0.70">
+        <location name="cabinet" position=" 6.715, -8.144" rotation=" -0.034" height="1.29"/>
+    </room>
 
 	<location name="entrance" position="2.656, -7.349" rotation="3.126" height="1.29"/>
     <location name="exit" position="11.672, -6.486" rotation="-1.864" height="1.29"/>
@@ -41,6 +56,7 @@
     <location name="waypoint_3" position=" 4.584, -10.540" rotation=" -1.685" height="1.29"/>
     <location name="door_1" position="3.606, -12.690" rotation=" 1.600" height="1.29"/>
     <location name="door_2" position=" 6.027, -13.011" rotation=" 1.597" height="1.29"/>
+
     <!--navigate arena B -->
     <!--<location name="waypoint_1" position=" 10.337, -0.796" rotation=" 3.062" height="1.29"/>-->
     <!--<location name="pre_waypoint_2" position=" 13.051, 1.381" rotation=" -1.624" height="1.29"/>-->
@@ -52,7 +68,7 @@
     <!--<location name="gpsr_start" position="25.972, 3.633" rotation="-0.795" height="1.29"/>-->
     <location name="shelf" position="12.396, -5.975  " rotation="3.131" height="1.29"/>
 
-    <!--below this is in arena B -->
+    <!--rips task in arena B -->
     <location name="check_point" position=" 9.870, -0.441" rotation=" -0.024" height="1.29"/>
     <location name="exit_arena" position=" 14.902, 5.800"  rotation=" 1.539" height="1.29"/>
 </location_information>

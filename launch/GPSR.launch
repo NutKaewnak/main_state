@@ -3,10 +3,13 @@
   <node ns="door" name="door_detection" pkg="door_detection" type="door_detection_node">
     <remap from="/scan" to="/laser/scan"/>
   </node>
-  <node name="NIHandtracker" pkg="gesture_detection" type="NIHandtracker" output="screen" >
+  <!--<node name="NIHandtracker" pkg="gesture_detection" type="NIHandtracker" output="screen" >
     <remap from="points" to="/gesture/points"/>
-  </node>
+  </node>-->
 
+<node ns="z_bar" name="barcode_reader" pkg="zbar_ros" type="barcode_reader_node">
+    <remap from="image" to="/external_cam/image_raw"/>
+</node>
   <!--<include file="$(find speech_processing)/dic/GPSR_Frank/GPSR_Frank.launch"/>-->
-  <include file="$(find speech_processing)/launch/switch.launch"/>
+  <!--<include file="$(find speech_processing)/launch/switch.launch"/>-->
 </launch>
