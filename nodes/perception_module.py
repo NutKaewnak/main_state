@@ -23,6 +23,7 @@ from perception.sound_source_localize_back import SoundSourceLocalizeBack
 from perception.guess_object import GuessObjectPerception
 from perception.door_handle_detect import DoorHandleDetection
 from perception.qr import Qr
+from perception.state_flow import StateFlow
 
 __author__ = "AThousandYears"
 
@@ -55,3 +56,4 @@ class PerceptionModule:
         self.guess_object = GuessObjectPerception(main_state.planningModule)
         self.door_handle = DoorHandleDetection(main_state.planningModule)
         self.qr = Qr(main_state.planningModule)
+        self.state_flow = StateFlow(main_state.planningModule)

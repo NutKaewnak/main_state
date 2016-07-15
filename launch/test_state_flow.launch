@@ -1,0 +1,7 @@
+<launch>
+
+  <node name="state_flow" pkg="main_state" type="state_flow.py" output="screen">
+	<rosparam param="rate">1.3</rosparam>
+  </node>
+
+</launch>
