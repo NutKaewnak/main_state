@@ -1,0 +1,8 @@
+<launch>
+
+    <node name="main_state" pkg="main_state" type="main.py" output="screen" args="JoyState" />
+    <node name="state_flow" pkg="main_state" type="state_flow.py" output="screen">
+	    <rosparam param="rate">90</rosparam>
+    </node>
+
+</launch>

@@ -13,6 +13,8 @@ class JoyInput(AbstractPerception):
 
     def callback_joy_status(self, data):
         self.broadcast(Devices.JOY, joy_array_transform(data))
+        print 'joy data ', data
+        print 'joy_array', joy_array_transform(data)
 
 
 def joy_array_transform(data_array):
@@ -35,3 +37,5 @@ def joy_array_transform(data_array):
         if bool(data_array.buttons[x]):
             output.append(button_array[x])
     return output
+
+

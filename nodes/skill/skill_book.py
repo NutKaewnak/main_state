@@ -13,7 +13,7 @@ from detect_object_3ds import DetectObject3Ds
 from voice_recognition_mode import VoiceRecognitionMode
 from arm_static_pose import ArmStaticPose
 from detect_clothes import DetectClothes
-
+from play_sound import PlaySound
 __author__ = "AThousandYears"
 
 
@@ -35,6 +35,7 @@ class SkillBook:
         self.book['VoiceRecognitionMode'] = VoiceRecognitionMode(control_module)
         self.book['ArmStaticPose'] = ArmStaticPose(control_module)
         self.book['DetectClothes'] = DetectClothes(control_module)
+        self.book['PlaySound'] = PlaySound(control_module)
 
     def get_skill(self, subtask, skill_name):
         self.book[skill_name].reset()

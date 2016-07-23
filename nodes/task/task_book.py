@@ -27,7 +27,8 @@ from test_pill import TestPill
 from test_detect_object import TestDetectObject
 from test_follow_leg import TestFollowLeg
 from EEGPSR import EEGPSR
-
+from test_move import TestMove
+from joy_state import JoyState
 __author__ = "AThousandYears"
 
 
@@ -63,6 +64,8 @@ class TaskBook:
         self.book['TestDetectObject'] = TestDetectObject(planning_module)
         self.book['TestFollowLeg'] = TestFollowLeg(planning_module)
         self.book['EEGPSR'] = EEGPSR(planning_module)
+        self.book['TestMove'] = TestMove(planning_module)
+        self.book['JoyState'] = JoyState(planning_module)
 
     def set_perception(self, perception_module):
         for task in self.book:

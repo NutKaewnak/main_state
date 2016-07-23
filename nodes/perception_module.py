@@ -15,11 +15,11 @@ from perception.height import Height
 from perception.clothes_detector_status import ClothesDetectorPerception
 from perception.recognize_objects_status import RecognizeObjectsPerception
 from perception.voice_recognition_mode_status import VoiceRecognitionModePerception
-# from perception.people_leg_detect import PeopleLegDetection
+from perception.people_leg_detect import PeopleLegDetection
 from perception.navigate import Navigate
 from perception.sound_source_localize_front import SoundSourceLocalizeFront
 from perception.sound_source_localize_back import SoundSourceLocalizeBack
-# from perception.joy import JoyInput
+from perception.joy import JoyInput
 from perception.guess_object import GuessObjectPerception
 from perception.door_handle_detect import DoorHandleDetection
 from perception.qr import Qr
@@ -48,7 +48,7 @@ class PerceptionModule:
         self.recognize_objects = RecognizeObjectsPerception(main_state.planningModule)
         self.voice_recognition_mode = VoiceRecognitionModePerception(main_state.planningModule)
         self.clothes_detector_perception = ClothesDetectorPerception(main_state.planningModule)
-        # self.leg_people = PeopleLegDetection(main_state.planningModule)
+        self.leg_people = PeopleLegDetection(main_state.planningModule)
         self.navigate_path = Navigate(main_state.planningModule)
         # self.joy = JoyInput(main_state.planningModule)
         self.sound_source_localize_front = SoundSourceLocalizeFront(main_state.planningModule)
@@ -57,3 +57,4 @@ class PerceptionModule:
         self.door_handle = DoorHandleDetection(main_state.planningModule)
         self.qr = Qr(main_state.planningModule)
         self.state_flow = StateFlow(main_state.planningModule)
+        self.joy = JoyInput(main_state.planningModule)

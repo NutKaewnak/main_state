@@ -8,6 +8,7 @@ from controller.recognize_objects_controller import RecognizeObjectsObController
 from controller.object_3d_detector_controller import Object3dsDetectorController
 from controller.voice_recognition_mode_controller import VoiceRecognitionModeController
 from controller.clothes_detector_controller import ClothesDetectorController
+from controller.sound_player import SoundPlayer
 
 __author__ = "AThousandYears"
 
@@ -25,6 +26,7 @@ class ControlModule:
     object_3d_detector = Object3dsDetectorController()
     voice_recognition_mode = VoiceRecognitionModeController()
     cloth_detector = ClothesDetectorController()
+    sound_player = SoundPlayer()
 
     def __init__(self):
         pass
