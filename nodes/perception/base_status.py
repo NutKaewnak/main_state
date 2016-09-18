@@ -22,11 +22,11 @@ class BaseStatusPerception(AbstractPerception):
         self.flag = False
 
     def callback_base_status(self, data):
-        if data.status.status == 3:
-            if not self.flag:
-                self.flag = True
-                threading.Timer(5, self.callback_delay).start()
-            return
+        # if data.status.status == 3:
+        #     if not self.flag:
+        #         self.flag = True
+        #         threading.Timer(5, self.callback_delay).start()
+        #     return
         self.broadcast(Devices.BASE_STATUS, data.status.status)
 
     def callback_base_position(self, data):

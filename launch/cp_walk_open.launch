@@ -1,0 +1,10 @@
+<launch>
+
+  <!--<include file="$(find speech_processing)/launch/followme.launch"/>-->
+
+  <node name="main_state" pkg="main_state" type="main.py" output="screen" args="CPWalkOpen" />
+  <node name="state_flow" pkg="main_state" type="state_flow.py" output="screen">
+	    <rosparam param="rate">2</rosparam>
+  </node>
+
+</launch>

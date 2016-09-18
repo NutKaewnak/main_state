@@ -29,7 +29,6 @@ class FollowLeg(AbstractSubtask):
         self.path = []
         self.guess_id = None
 
-
     def set_person_id(self, person_id):
         self.person_id = person_id
         self.change_state('follow')
@@ -57,20 +56,20 @@ class FollowLeg(AbstractSubtask):
                 self.distance_from_last = sqrt(
                     (position.x - self.last_point.x) ** 2 + (position.y - self.last_point.y) ** 2)
 
-                if position.x > 1 and not self.timer.is_waiting():
+                if position.x > 0.5 and not self.timer.is_waiting():
                     self.timer.wait(1)
                     size = sqrt(position.x ** 2 + position.y ** 2)
 
                     x = max(position.x / size * (size * 0.5), 0)
                     y = position.y / size * (size * 0.5)
-                    self.move.set_position_with_clear_point(x, y, theta)
-                    pos = Pose2D()
-                    pos.x = x
-                    pos.y = y
-                    pos.theta = theta
+                    self.move.set_position_with_clear_poin(x, y, theta, 1.0)
+                    # pos = Pose2D()
+                    # pos.x = x
+                    # pos.y = y
+                    # pos.theta = theta
 
-                    print 'pos', pos
-                    self.path.append(pos)
+                    # print 'pos', pos
+                    # self.path.append(pos)
 
                 self.last_point = position
                 self.last_theta = theta
@@ -105,7 +104,8 @@ class FollowLeg(AbstractSubtask):
                     if distance < min_distance:
                         min_distance = distance
                         self.guess_id = person.object_id
-                if min_distance < 0.4 and self.guess_id != -1:
+                print min_distance, self.guess_id
+                if min_distance < 0.6 and self.guess_id != -1:
                     self.set_person_id(self.guess_id)
                     rospy.loginfo("Change To Person ID:" + str(self.guess_id))
                 else:

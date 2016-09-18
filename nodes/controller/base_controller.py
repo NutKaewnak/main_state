@@ -16,20 +16,20 @@ class BaseController:
         self.clear_point_costmap = rospy.ServiceProxy('/navigation/athome_move_base_node/clear_point_costmaps', ClearPointCostmap)
         self.move_twist = rospy.Publisher('/base/cmd_vel', Twist, queue_size=1)
         self.goal_with_clear_point = rospy.Publisher('navigation/goal_with_clear_costmap', PoseStamped)
-
-    def set_goal_with_clear_point(self, x, y, theta, frame_id):
-        new_goal = PoseStamped()
-        new_goal.header.frame_id = frame_id
-        new_goal.header.stamp = rospy.Time.now()
-
-        new_goal.pose.position.x = x
-        new_goal.pose.position.y = y
-
-        quaternion = quaternion_from_euler(0, 0, theta)
-        new_goal.pose.orientation.z = quaternion[2]
-        new_goal.pose.orientation.w = quaternion[3]
-        # self.move_base.send_goal(new_goal)
-        self.goal_with_clear_point(new_goal)
+    #
+    # def set_goal_with_clear_point(self, x, y, theta, frame_id):
+    #     new_goal = PoseStamped()
+    #     new_goal.header.frame_id = frame_id
+    #     new_goal.header.stamp = rospy.Time.now()
+    #
+    #     new_goal.pose.position.x = x
+    #     new_goal.pose.position.y = y
+    #
+    #     quaternion = quaternion_from_euler(0, 0, theta)
+    #     new_goal.pose.orientation.z = quaternion[2]
+    #     new_goal.pose.orientation.w = quaternion[3]
+    #     # self.move_base.send_goal(new_goal)
+    #     self.goal_with_clear_point(new_goal)
 
     def set_twist(self, twist):
         rospy.loginfo("Send Twist " + str((twist.linear.x, twist.linear.y, twist.angular.z)) + ' to robot.')
@@ -51,17 +51,17 @@ class BaseController:
         self.clear_costmaps()
         self.set_new_goal(x, y, theta, 'base_link')
 
-    def set_absolute_position_with_clear_point(self, x, y, theta):
-        rospy.loginfo("Move robot to " + str((x, y, theta)) + ' in map')
+    # def set_absolute_position_with_clear_point(self, x, y, theta):
+    #     rospy.loginfo("Move robot to " + str((x, y, theta)) + ' in map')
         # self.move_base.cancel_goal()
         # self.clear_costmaps()
-        self.set_goal_with_clear_point(x, y, theta, 'map')
+        # self.set_goal_with_clear_point(x, y, theta, 'map')
 
-    def set_relative_position_with_clear_point(self, x, y, theta):
-        rospy.loginfo("Move robot to " + str((x, y, theta)) + ' from current pose')
-        # self.move_base.cancel_g/oal()
+    # def set_relative_position_with_clear_point(self, x, y, theta):
+    #     rospy.loginfo("Move robot to " + str((x, y, theta)) + ' from current pose')
+        # self.move_base.cancel_goal()
         # self.clear_costmaps()
-        self.set_goal_with_clear_point(x, y, theta, 'base_link')
+        # self.set_goal_with_clear_point(x, y, theta, 'base_link')
 
     def set_relative_position_without_clear_costmap(self, x, y, theta):
         rospy.loginfo("Move robot to " + str((x, y, theta)) + ' from current pose')
@@ -86,8 +86,9 @@ class BaseController:
         rospy.loginfo("Clear Costmaps")
         # self.clear_costmap()
 
+    #Input frame_id: base_link
     def clear_point_costmaps(self, x, y, box_size):
         rospy.loginfo("Clear Point Costmaps")
-        # self.clear_point_costmap(x, y, box_size)
+        self.clear_point_costmap(x, y, box_size)
 
 

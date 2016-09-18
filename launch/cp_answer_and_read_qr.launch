@@ -1,0 +1,13 @@
+<launch>
+
+  <!--<include file="$(find speech_processing)/launch/followme.launch"/>-->
+
+  <node name="main_state" pkg="main_state" type="main.py" output="screen" args="CPAnswerAndReadQR" />
+  <node ns="z_bar" name="barcode_reader" pkg="zbar_ros" type="barcode_reader_node">
+    	<remap from="image" to="/external_cam/image_raw"/>
+  </node>
+  <node name="state_flow" pkg="main_state" type="state_flow.py" output="screen">
+	    <rosparam param="rate">2</rosparam>
+  </node>
+
+</launch>

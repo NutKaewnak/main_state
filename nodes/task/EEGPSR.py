@@ -16,11 +16,12 @@ class EEGPSR(AbstractTask):
 
     def perform(self, perception_data):
         # print self.state
-        if self.state is 'init' and perception_data.device == self.Devices.DOOR:
+        if self.state is 'init' and perception_data.device == self.Devices.STATE_FLOW:
+            pass
             # self.subtask = self.subtaskBook.get_subtask(self, 'TurnNeck')
             # self.subtask.turn_absolute( 0, 0)
             # self.subtask = self.subtaskBook.get_subtask(self, 'MovePassDoor')
-            self.change_state('introduce')
+            # self.change_state('introduce')
 
         elif self.state == 'move_pass_door' and perception_data.device == self.Devices.DOOR:
             if self.subtask.state == 'finish':

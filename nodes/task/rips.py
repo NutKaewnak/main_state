@@ -14,18 +14,20 @@ class RIPS(AbstractTask):
 
     def perform(self, perception_data):
         # print self.state
-        if self.state is 'init':
+        if self.state is 'init' and perception_data.device is self.Devices.STATE_FLOW:
             self.subtaskBook.get_subtask(self, 'Say').say('I\'m ready to start')
             self.subtask = self.subtaskBook.get_subtask(self, 'MovePassDoor')
-            self.delay.wait(13)
+            # self.delay.wait(13)
             self.change_state('movePassDoor')
             # self.change_state('qr_check')
    
         elif self.state is 'movePassDoor':
-            if self.subtask.state is 'finish' and not self.delay.is_waiting():
-                self.subtask = self.subtaskBook.get_subtask(self, 'MoveToLocation')
-                self.subtask.to_location('check_point')
+            if self.subtask.state is 'finish':
+                self.subtask = self.subtaskBook.get_subtask(self, 'MoveRelative')
+                # self.subtask.to_location('check_point')
+                self.subtask.set_position(2,0,0)
                 self.change_state('moveToCheckpoint')
+
 
         elif self.state is 'moveToCheckpoint':
             print self.subtask.state

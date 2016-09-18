@@ -9,17 +9,17 @@ class MoveBaseAbsolute(AbstractSkill):
         AbstractSkill.__init__(self, control_module)
         self.is_active = True
 
-    def set_point(self, point):
-        self.set_position(point.x, point.y, point.z)
+    # def set_point(self, point):
+    #     self.set_position(point.x, point.y, point.z)
 
     def set_position(self, x, y, theta):
         self.change_state('active')
         # self.controlModule.base.clear_costmaps()
         self.controlModule.base.set_absolute_position(x, y, theta)
 
-    def set_position_with_clear_point(self, dx, dy, dtheta):
-        self.change_state('active')
-        self.controlModule.base.set_absolute_position(dx, dy, dtheta)
+    # def set_position_with_clear_point(self, dx, dy, dtheta):
+    #     self.change_state('active')
+    #     self.controlModule.base.set_absolute_position(dx, dy, dtheta)
 
     def perform(self, perception_data):
         if self.state is 'active':
@@ -30,5 +30,5 @@ class MoveBaseAbsolute(AbstractSkill):
                 self.is_active = MoveBaseStatus.is_active(perception_data.input)
                 self.change_state(state)
 
-    def clear_cosmap(self):
+    def clear_costmap(self):
         self.controlModule.base.clear_costmap()

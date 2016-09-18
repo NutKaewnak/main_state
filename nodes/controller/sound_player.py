@@ -24,5 +24,5 @@ class SoundPlayer:
         elif self.process.poll() != 0:
             return False
         else:
-            self.process = None
+            # self.process = None
             return True

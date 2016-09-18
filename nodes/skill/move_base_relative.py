@@ -17,9 +17,10 @@ class MoveBaseRelative(AbstractSkill):
         self.change_state('active')
         self.controlModule.base.set_relative_position(dx, dy, dtheta)
 
-    def set_position_with_clear_point(self, dx, dy, dtheta):
+    def set_position_with_clear_point(self, dx, dy, dtheta, box_size):
         self.change_state('active')
-        self.controlModule.base.set_relative_position(dx, dy, dtheta)
+        self.clear_point_costmaps(dx, dy, box_size)
+        self.controlModule.base.set_relative_position_without_clear_costmap(dx, dy, dtheta)
 
     def set_position_without_clear_costmap(self, dx, dy, dtheta):
         self.change_state('active')

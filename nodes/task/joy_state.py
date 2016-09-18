@@ -111,6 +111,8 @@ class JoyState(AbstractTask):
     def __init__(self, planning_module):
         AbstractTask.__init__(self, planning_module)
         self.subtask = None
+        self.right_arm = None
+        self.left_arm = None
         self.delay = Delay()
 
     def perform(self, perception_data):
@@ -119,247 +121,279 @@ class JoyState(AbstractTask):
             self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.1, 0)
             rospack = rospkg.RosPack()
             self.path = rospack.get_path('main_state')
+            # print self.path
             self.right_arm = RightArm()
+            # print 'right_arm', self.right_arm
             self.left_arm = LeftArm()
+            # print 'left_arm', self.left_arm
+
             self.change_state("wait_joy")
 
-        # if self.state is 'wait_joy':
-        if perception_data.device is self.Devices.JOY and perception_data.input:
-            print 'input ', perception_data.input
+        elif self.state is 'wait_joy':
+            if perception_data.device is self.Devices.JOY and perception_data.input:
+                # print 'input ', perception_data.input
+                #LB
+                if 'B' in perception_data.input and 'LB' in perception_data.input:
+                    self.right_arm.close()
+                    self.left_arm.close()
+                    self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.1, 0)
+                    # self.right_arm.move_right_joint([0, 0, 0, 0, 0, 1.6])
+                    # self.left_arm.move_left_joint([0, 0, 0, 0, 0, -1.6])
 
-            #LB
-            if 'B' in perception_data.input and 'LB' in perception_data.input:
-                self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
-                self.subtask_name = 'PlaySound'
-                self.subtask.play(os.path.join(self.path, 'sound', 'intro_hello.wav'))
-                self.change_state('doing')
-            elif 'A' in perception_data.input and 'LB' in perception_data.input:
-                self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
-                self.subtask_name = 'PlaySound'
-                self.subtask.play(os.path.join(self.path, 'sound', 'intro_me.wav'))
-                self.change_state('doing')
+                    # self.right_arm.move_right_joint([-0.3, 0, 0.1, 0, -0.5, 1.6])
+                    # self.left_arm.move_left_joint([0.5, 0, -0.1, -0.5, -1.6])
 
-            elif 'X' in perception_data.input and 'LB' in perception_data.input:
-                self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
-                self.subtask_name = 'PlaySound'
-                self.subtask.play(os.path.join(self.path, 'sound', 'intro_open.wav'))
-                self.change_state('doing')
+                    # self.right_arm.move_right_joint([-0.4, 0.3, 0.1, 0, -0.5, 1.6])
+                    # self.left_arm.move_left_joint([0.5, -0.35, 0, -0.1, -0.5, -1.6])
 
-            elif 'Y' in perception_data.input and 'LB' in perception_data.input:
-                self.change_state('intro')
+                    self.left_arm.move_left_joint([0.7, 0, 0.2, 0, 0, 0])
 
-            #RB
-            elif 'B' in perception_data.input and 'RB' in perception_data.input:
-                self.left_arm.move_left_joint([0, 0, 0, 0, 0, 0])
-                self.right_arm.move_right_joint([0, 0, 0, 0, 0, 0])
+                    self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
+                    self.subtask_name = 'PlaySound'
+                    self.subtask.play(os.path.join(self.path, 'sound', 'greeting_jp.wav'))
 
-                self.left_arm.move_left_joint([0, 0.1, -0.05, 1.6, -0.7, 1.5])
-                self.right_arm.move_right_joint([-0.1, 0.1, -0.1, 1.5, 0.5, 1.5])
+                    self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.5, 0)
+                    self.delay.wait(4)
+                    self.change_state("wait_neck_joy")
 
-                self.left_arm.close()
-                self.right_arm.close()
-                print ">>>>>>>>>>>>>>>>>>>>>>>>>>>"
-                self.change_state('doing')
+                elif 'A' in perception_data.input and 'LB' in perception_data.input:
+                    self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
+                    self.subtask_name = 'PlaySound'
+                    self.subtask.play(os.path.join(self.path, 'sound', 'ask_country.wav'))
+                    self.change_state('doing')
 
-            elif 'A' in perception_data.input and 'RB' in perception_data.input:
-                # self.right_arm = RightArm()
-                # self.left_arm = LeftArm()
-                self.right_arm.move_right_joint([0, 0, 0, 0, 1.2, 0])
-                self.left_arm.move_left_joint([0, 0, 0, 0, 1.2, 0])
+                elif 'X' in perception_data.input and 'LB' in perception_data.input:
+                    self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
+                    self.subtask_name = 'PlaySound'
+                    self.subtask.play(os.path.join(self.path, 'sound', 'ask_university.wav'))
+                    self.change_state('doing')
 
-                self.left_arm.close()
-                self.right_arm.close()
-                self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.1, 0)
-                print "<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-                self.change_state('doing')
-            elif 'X' in perception_data.input and 'RB' in perception_data.input:
-                # print 'X'
-                # self.left_arm = LeftArm()
-                # self.right_arm = RightArm()
-                # # arm_l.move_left_joint([0, 0, 0, 0.8, 0, 1.5])
-                # # arm_r.move_right_joint([0, 0, 0, 0.8, 0, 1.5])
+                elif 'Y' in perception_data.input and 'LB' in perception_data.input:
+                    self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
+                    self.subtask_name = 'PlaySound'
+                    self.subtask.play(os.path.join(self.path, 'sound', 'see_you.wav'))
+                    self.change_state('doing')
+
+                # RB
+                # elif 'B' in perception_data.input and 'RB' in perception_data.input:
+                # self.left_arm.move_left_joint([0, 0, 0, 0, 0, 0])
+                # # self.right_arm.move_right_joint([0, 0, 0, 0, 0, 0])
                 #
-                # self.left_arm.move_left_joint([0, -0.1, -0.1, 1.8, -0.8, 1.5])
-                # self.right_arm.move_right_joint([0, 0.1, -0.1, 1.5, 0.7, 1.5])
+                # self.left_arm.move_left_joint([0, 0.1, -0.05, 1.6, -0.7, 1.5])
+                # # self.right_arm.move_right_joint([-0.1, 0.1, -0.1, 1.5, 0.5, 1.5])
+                #
+                # self.left_arm.close()
+                # # self.right_arm.close()
+                # print ">>>>>>>>>>>>>>>>>>>>>>>>>>>"
                 # self.change_state('doing')
-                # self.delay(0)
-                self.change_state("wait_joy")
-            elif 'Y' in perception_data.input and 'RB' in perception_data.input:
-                self.right_arm.close()
-                self.left_arm.close()
-                self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.1, 0)
-                self.right_arm.move_right_joint([0, 0, 0, 0, 0, 1.6])
-                self.left_arm.move_left_joint([0, 0, 0, 0, 0, -1.6])
+                #
+                # elif 'A' in perception_data.input and 'RB' in perception_data.input:
+                    # self.right_arm = RightArm()
+                    # self.left_arm = LeftArm()
+                    # self.right_arm.move_right_joint([0, 0, 0, 0, 1.2, 0])
+                    # self.left_arm.move_left_joint([0, 0, 0, 0, 1.2, 0])
+                    #
+                    # self.left_arm.close()
+                    # self.right_arm.close()
+                    # self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.1, 0)
+                    # print "<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+                    # self.change_state('doing')
+                # elif 'X' in perception_data.input and 'RB' in perception_data.input:
+                    # print 'X'
+                    # self.left_arm = LeftArm()
+                    # self.right_arm = RightArm()
+                    # # arm_l.move_left_joint([0, 0, 0, 0.8, 0, 1.5])
+                    # # arm_r.move_right_joint([0, 0, 0, 0.8, 0, 1.5])
+                    #
+                    # self.left_arm.move_left_joint([0, -0.1, -0.1, 1.8, -0.8, 1.5])
+                    # self.right_arm.move_right_joint([0, 0.1, -0.1, 1.5, 0.7, 1.5])
+                    # self.change_state('doing')
+                    # self.delay(0)
+                    # self.change_state("wait_joy")
+                # elif 'Y' in perception_data.input and 'RB' in perception_data.input:
+                #     self.right_arm.close()
+                #     self.left_arm.close()
+                #     self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.1, 0)
+                #     self.right_arm.move_right_joint([0, 0, 0, 0, 0, 1.6])
+                #     self.left_arm.move_left_joint([0, 0, 0, 0, 0, -1.6])
+                #
+                #     self.right_arm.move_right_joint([-0.3, 0, 0.1, 0, -0.5, 1.6])
+                #     self.left_arm.move_left_joint([0.5, 0, -0.1, -0.5, -1.6])
 
-                self.right_arm.move_right_joint([-0.3, 0, 0.1, 0, -0.5, 1.6])
-                self.left_arm.move_left_joint([0.5, 0, -0.1, -0.5, -1.6])
+                #     self.right_arm.move_right_joint([-0.4, 0.3, 0.1, 0, -0.5, 1.6])
+                #     self.left_arm.move_left_joint([0.5, -0.35, 0, -0.1, -0.5, -1.6])
+                #     self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.5, 0)
+                #     self.delay.wait(4)
+                #     self.change_state("wait_neck_joy")
 
-                self.right_arm.move_right_joint([-0.4, 0.3, 0.1, 0, -0.5, 1.6])
-                self.left_arm.move_left_joint([0.5, -0.35, 0, -0.1, -0.5, -1.6])
-                self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.5, 0)
-                self.delay.wait(4)
-                self.change_state("wait_neck_joy")
+                # LT
+                # elif 'B' in perception_data.input and 'LEFT_TRIGGER' in perception_data.input:
+                #     self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
+                #     self.subtask_name = 'PlaySound'
+                #     self.subtask.play(os.path.join(self.path, 'sound', 'loop_next.wav'))
+                #     self.change_state('doing')
+                # elif 'A' in perception_data.input and 'LEFT_TRIGGER' in perception_data.input:
+                #     self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
+                #     self.subtask_name = 'PlaySound'
+                #     self.subtask.play(os.path.join(self.path, 'sound', 'ask_for_job.wav'))
+                #     self.change_state('doing')
+                # elif 'X' in perception_data.input and 'LEFT_TRIGGER' in perception_data.input:
+                #     self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
+                #     self.subtask_name = 'PlaySound'
+                #     self.subtask.play(os.path.join(self.path, 'sound', 'what_r_u_doing_here.wav'))
+                #     self.change_state('doing')
+                # elif 'Y' in perception_data.input and 'LEFT_TRIGGER' in perception_data.input:
+                #     self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
+                #     self.subtask_name = 'PlaySound'
+                #     self.subtask.play(os.path.join(self.path, 'sound', 'can_i_help.wav'))
+                #     self.change_state('doing')
 
-            #LT
-            elif 'B' in perception_data.input and 'LEFT_TRIGGER' in perception_data.input:
-                self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
-                self.subtask_name = 'PlaySound'
-                self.subtask.play(os.path.join(self.path, 'sound', 'loop_next.wav'))
-                self.change_state('doing')
-            elif 'A' in perception_data.input and 'LEFT_TRIGGER' in perception_data.input:
-                pass
-            elif 'X' in perception_data.input and 'LEFT_TRIGGER' in perception_data.input:
-                pass
-            elif 'Y' in perception_data.input and 'LEFT_TRIGGER' in perception_data.input:
-                self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
-                self.subtask_name = 'PlaySound'
-                self.subtask.play(os.path.join(self.path, 'sound', 'intro_eng.wav'))
-                self.change_state('doing')
-
-            #RT
-            elif 'B' in perception_data.input and 'RIGHT_TRIGGER' in perception_data.input:
-                pass
-            elif 'A' in perception_data.input and 'RIGHT_TRIGGER' in perception_data.input:
-                pass
-            elif 'X' in perception_data.input and 'RIGHT_TRIGGER' in perception_data.input:
-                pass
-            elif 'Y' in perception_data.input and 'RIGHT_TRIGGER' in perception_data.input:
-                print 111111111111111
-                self.change_state('repeat')
+                # #RT
+                # elif 'B' in perception_data.input and 'RIGHT_TRIGGER' in perception_data.input:
+                #     pass
+                # elif 'A' in perception_data.input and 'RIGHT_TRIGGER' in perception_data.input:
+                #     pass
+                # elif 'X' in perception_data.input and 'RIGHT_TRIGGER' in perception_data.input:
+                #     pass
+                # elif 'Y' in perception_data.input and 'RIGHT_TRIGGER' in perception_data.input:
+                #     self.change_state('repeat')
 
         elif self.state == 'wait_neck_joy' and perception_data.device == self.Devices.STATE_FLOW:
             if not self.delay.is_waiting():
-                self.right_arm.move_right_joint([0, 0, 0, 0, 1.2, 0])
+                # self.right_arm.move_right_joint([0, 0, 0, 0, 1.2, 0])
                 self.left_arm.move_left_joint([0, 0, 0, 0, 1.2, 0])
                 self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.1, 0)
-                self.change_state("doing")
+                self.delay.wait(5)
+                self.change_state("greet_eng")
 
-        elif self.state == 'intro' and perception_data.device == self.Devices.STATE_FLOW:
-            # self.right_arm = RightArm()
-            # self.left_arm = LeftArm()
-            self.right_arm.close()
-            self.left_arm.close()
-            self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.1, 0)
-            self.right_arm.move_right_joint([0, 0, 0, 0, 0, 1.6])
-            self.left_arm.move_left_joint([0, 0, 0, 0, 0, -1.6])
-
-            self.right_arm.move_right_joint([0.3, 0, 0.1, 0, -0.5, 1.6])
-            self.left_arm.move_left_joint([0.5, 0, -0.1, -0.5, -1.6])
-
-            self.right_arm.move_right_joint([0.40, 0.3, 0.1, 0, -0.5, 1.6])
-            self.left_arm.move_left_joint([0.5, -0.35, 0, -0.1, -0.5, -1.6])
-
-            self.neck = self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.5, 0)
-            self.delay.wait(4)
-
-            self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
-            self.subtask_name = 'PlaySound'
-            self.subtask.play(os.path.join(self.path, 'sound', 'intro_hello.wav'))
-
-            self.change_state('intro_turn_neck')
-
-        elif self.state is 'intro_turn_neck' and perception_data.device == self.Devices.STATE_FLOW:
+        elif self.state == 'greet_eng' and perception_data.device == self.Devices.STATE_FLOW:
             if not self.delay.is_waiting():
-                self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.1, 0)
-                self.delay.wait(2)
-                self.change_state("intro_turn_neck_2")
-
-        elif self.state is 'intro_turn_neck_2' :
-            if not self.delay.is_waiting():
-                # self.right_arm = RightArm()
-                # self.left_arm = LeftArm()
-                self.right_arm.move_right_joint([0, 0, 0, 0, 1.2, 0])
-                self.left_arm.move_left_joint([0, 0, 0, 0, 1.2, 0])
-                self.delay.wait(3)
-                self.change_state("wait_speak_intro_open")
-
-        elif self.state is 'wait_speak_intro_open' and perception_data.device == self.Devices.STATE_FLOW:
-            if self.subtask.state is 'finish' or not self.delay.is_waiting():
-                self.delay.wait(3)
                 self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
                 self.subtask_name = 'PlaySound'
-                self.subtask.play(os.path.join(self.path, 'sound', 'intro_me.wav'))
-                self.change_state("wait_speak_intro_open_2")
+                self.subtask.play(os.path.join(self.path, 'sound', 'greeting_eng.wav'))
+                self.delay.wait(5)
+                self.change_state("descript")
 
-        elif self.state is "wait_speak_intro_open_2" and perception_data.device == self.Devices.STATE_FLOW:
+        elif self.state == 'descript' and perception_data.device == self.Devices.STATE_FLOW:
             if not self.delay.is_waiting():
-                self.change_state("wait_intro_me")
-
-        elif self.state is "wait_intro_me" and perception_data.device == self.Devices.STATE_FLOW:
-            self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
-            self.subtask_name = 'PlaySound'
-            self.subtask.play(os.path.join(self.path, 'sound', 'intro_open.wav'))
-            self.delay.wait(4)
-            self.change_state("wait_intro_me_2")
-
-        elif self.state is "wait_intro_me_2" and perception_data.device == self.Devices.STATE_FLOW:
-            if not self.delay.is_waiting():
-                self.change_state("wait_intro_eng")
-
-        elif self.state is "wait_intro_eng" and perception_data.device == self.Devices.STATE_FLOW:
-            self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
-            self.subtask_name = 'PlaySound'
-            self.subtask.play(os.path.join(self.path, 'sound', 'intro_eng.wav'))
-            self.delay.wait(5)
-            self.change_state("wait_intro_eng_2")
-
-        elif self.state is 'wait_intro_eng_2' and perception_data.device == self.Devices.STATE_FLOW:
-            if not self.delay.is_waiting():
-                self.change_state("wait_intro_next")
-
-        elif self.state is 'wait_intro_next' and perception_data.device == self.Devices.STATE_FLOW:
-            self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
-            self.subtask_name = 'PlaySound'
-            self.subtask.play(os.path.join(self.path, 'sound', 'intro_next.wav'))
-            self.delay.wait(7)
-            self.change_state('wait_intro_next_2')
-
-        elif self.state is 'wait_intro_next_2' and perception_data.device == self.Devices.STATE_FLOW:
-            if not self.delay.is_waiting():
+                self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
+                self.subtask_name = 'PlaySound'
+                self.subtask.play(os.path.join(self.path, 'sound', 'descript_myself.wav'))
+                self.delay.wait(5)
                 self.change_state("doing")
 
-        elif self.state is 'repeat' and perception_data.device == self.Devices.STATE_FLOW:
-            self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
-            self.subtask_name = 'PlaySound'
-            self.subtask.play(os.path.join(self.path, 'sound', 'loop_engAccent.wav'))
-            self.delay.wait(120)
-            self.change_state('wait_repeat')
-
-        elif self.state is 'wait_repeat' and perception_data.device == self.Devices.STATE_FLOW:
-            if not self.delay.is_waiting():
-                self.change_state("repeat")
+        # elif self.state == 'intro' and perception_data.device == self.Devices.STATE_FLOW:
+        #     # self.right_arm = RightArm()
+        #     # self.left_arm = LeftArm()
+        #     self.right_arm.close()
+        #     self.left_arm.close()
+        #     self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.1, 0)
+        #     self.right_arm.move_right_joint([0, 0, 0, 0, 0, 1.6])
+        #     self.left_arm.move_left_joint([0, 0, 0, 0, 0, -1.6])
+        #
+        #     self.right_arm.move_right_joint([0.3, 0, 0.1, 0, -0.5, 1.6])
+        #     self.left_arm.move_left_joint([0.5, 0, -0.1, -0.5, -1.6])
+        #
+        #     self.right_arm.move_right_joint([0.40, 0.3, 0.1, 0, -0.5, 1.6])
+        #     self.left_arm.move_left_joint([0.5, -0.35, 0, -0.1, -0.5, -1.6])
+        #
+        #     self.neck = self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.5, 0)
+        #     self.delay.wait(4)
+        #
+        #     self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
+        #     self.subtask_name = 'PlaySound'
+        #     self.subtask.play(os.path.join(self.path, 'sound', 'intro_hello.wav'))
+        #
+        #     self.change_state('intro_turn_neck')
+        #
+        # elif self.state is 'intro_turn_neck' and perception_data.device == self.Devices.STATE_FLOW:
+        #     if not self.delay.is_waiting():
+        #         self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.1, 0)
+        #         self.delay.wait(2)
+        #         self.change_state("intro_turn_neck_2")
+        #
+        # elif self.state is 'intro_turn_neck_2' :
+        #     if not self.delay.is_waiting():
+        #         # self.right_arm = RightArm()
+        #         # self.left_arm = LeftArm()
+        #         self.right_arm.move_right_joint([0, 0, 0, 0, 1.2, 0])
+        #         self.left_arm.move_left_joint([0, 0, 0, 0, 1.2, 0])
+        #         self.delay.wait(3)
+        #         self.change_state("wait_speak_intro_open")
+        #
+        # elif self.state is 'wait_speak_intro_open' and perception_data.device == self.Devices.STATE_FLOW:
+        #     if self.subtask.state is 'finish' or not self.delay.is_waiting():
+        #         self.delay.wait(3)
+        #         self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
+        #         self.subtask_name = 'PlaySound'
+        #         self.subtask.play(os.path.join(self.path, 'sound', 'intro_me.wav'))
+        #         self.change_state("wait_speak_intro_open_2")
+        #
+        # elif self.state is "wait_speak_intro_open_2" and perception_data.device == self.Devices.STATE_FLOW:
+        #     if not self.delay.is_waiting():
+        #         self.change_state("wait_intro_me")
+        #
+        # elif self.state is "wait_intro_me" and perception_data.device == self.Devices.STATE_FLOW:
+        #     self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
+        #     self.subtask_name = 'PlaySound'
+        #     self.subtask.play(os.path.join(self.path, 'sound', 'intro_open.wav'))
+        #     self.delay.wait(4)
+        #     self.change_state("wait_intro_me_2")
+        #
+        # elif self.state is "wait_intro_me_2" and perception_data.device == self.Devices.STATE_FLOW:
+        #     if not self.delay.is_waiting():
+        #         self.change_state("wait_intro_eng")
+        #
+        # elif self.state is "wait_intro_eng" and perception_data.device == self.Devices.STATE_FLOW:
+        #     self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
+        #     self.subtask_name = 'PlaySound'
+        #     self.subtask.play(os.path.join(self.path, 'sound', 'intro_eng.wav'))
+        #     self.delay.wait(5)
+        #     self.change_state("wait_intro_eng_2")
+        #
+        # elif self.state is 'wait_intro_eng_2' and perception_data.device == self.Devices.STATE_FLOW:
+        #     if not self.delay.is_waiting():
+        #         self.change_state("wait_intro_next")
+        #
+        # elif self.state is 'wait_intro_next' and perception_data.device == self.Devices.STATE_FLOW:
+        #     self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
+        #     self.subtask_name = 'PlaySound'
+        #     self.subtask.play(os.path.join(self.path, 'sound', 'intro_next.wav'))
+        #     self.delay.wait(7)
+        #     self.change_state('wait_intro_next_2')
+        #
+        # elif self.state is 'wait_intro_next_2' and perception_data.device == self.Devices.STATE_FLOW:
+        #     if not self.delay.is_waiting():
+        #         self.change_state("doing")
+        #
+        # elif self.state is 'repeat' and perception_data.device == self.Devices.STATE_FLOW:
+        #     self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
+        #     self.subtask_name = 'PlaySound'
+        #     self.subtask.play(os.path.join(self.path, 'sound', 'loop_engAccent.wav'))
+        #     self.delay.wait(120)
+        #     self.change_state('wait_repeat')
+        #
+        # elif self.state is 'wait_repeat' and perception_data.device == self.Devices.STATE_FLOW:
+        #     if not self.delay.is_waiting():
+        #         self.change_state("repeat")
 
         elif self.state is 'doing':
-            if perception_data.device is self.Devices.JOY and 'RB' in perception_data.input \
-                    and 'RIGHT_TRIGGER' in perception_data.input:
-                # print dir(self.subtask.subtaskBook)
-                if self.subtask_name == 'PlaySound':
-                    self.subtask.terminate_sound()
-                    self.subtask_name = None
-                # print '----------------terminate------------------'
-
+            print 'doing'
             if self.subtask_name == 'PlaySound' and (self.subtask.state is 'finish' or self.subtask.state is 'aborted'):
                 print '1'
                 self.change_state('wait_joy')
             else:
                 self.change_state('wait_joy')
-    #
-    # def normal(self):
-    #     self.pub_right_shoulder_1.publish(0.0)
-    #     self.pub_right_shoulder_2.publish(0.0)
-    #     self.pub_right_elbow.publish(0.0)
-    #     self.pub_right_wrist_1.publish(0.0)
-    #     self.pub_right_wrist_2.publish(1.2)
-    #     self.pub_right_wrist_3.publish(0.0)
-    #     self.pub_right_gripper.publish(0.0)
-        # close gripper
-        # self.delay.wait(500)
-        # self.pub_left_shoulder_1.publish(0.0)
-        # self.pub_left_shoulder_2.publish(0.0)
-        # self.pub_left_elbow.publish(0.0)
-        # self.pub_left_wrist_1.publish(0.0)
-        # self.pub_left_wrist_2.publish(1.3)
-        # self.pub_left_wrist_3.publish(0.0)
-        # self.pub_left_gripper.publish(0.1)
-        # self.pub_tilt.publish(0.0)
-        # self.pub_pan.publish(0.0)
+
+        # function terminate
+        if perception_data.device is self.Devices.JOY and 'RB' in perception_data.input \
+                and 'RIGHT_TRIGGER' in perception_data.input:
+            # print dir(self.subtask.subtaskBook)
+            if self.subtask_name == 'PlaySound':
+                self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(-0.1, 0)
+                # self.right_arm.move_right_joint([0, 0, 0, 0, 1.2, 0])
+                self.left_arm.move_left_joint([0, 0, 0, 0, 1.2, 0])
+                self.subtask.terminate_sound()
+                self.subtask_name = None
+                self.change_state('wait_joy')
+                # print '----------------terminate------------------'

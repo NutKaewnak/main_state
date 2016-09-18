@@ -198,12 +198,13 @@ class RoboZoo(AbstractTask):
         self.pub_pan = rospy.Publisher('/dynamixel/pan_controller/command', Float64)
 
     def send(self):
-        self.pub_left_shoulder_1.publish(-2.3)
-        self.pub_left_shoulder_2.publish(0.2)
-        self.pub_left_elbow.publish(0.2)
-        self.pub_left_wrist_1.publish(0.0)
-        self.pub_left_wrist_2.publish(0.8)
-        self.pub_left_wrist_3.publish(0.0)
+        pass
+        # self.pub_left_shoulder_1.publish(-2.3)
+        # self.pub_left_shoulder_2.publish(0.2)
+        # self.pub_left_elbow.publish(0.2)
+        # self.pub_left_wrist_1.publish(0.0)
+        # self.pub_left_wrist_2.publish(0.8)
+        # self.pub_left_wrist_3.publish(0.0)
 
     def normal(self):
         self.pub_right_shoulder_1.publish(0.0)

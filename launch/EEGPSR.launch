@@ -1,4 +1,7 @@
 <launch>
+  <node name="state_flow" pkg="main_state" type="state_flow.py" output="screen">
+	<rosparam param="rate">1.3</rosparam>
+  </node>
   <node name="main_state" pkg="main_state" type="main.py" output="screen" args="EEGPSR" />
   <node ns="door" name="door_detection" pkg="door_detection" type="door_detection_node">
     <remap from="/scan" to="/laser/scan"/>

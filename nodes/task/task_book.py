@@ -29,6 +29,8 @@ from test_follow_leg import TestFollowLeg
 from EEGPSR import EEGPSR
 from test_move import TestMove
 from joy_state import JoyState
+from cp_answer_and_read_qr import CPAnswerAndReadQR
+from cp_walk_open import CPWalkOpen
 __author__ = "AThousandYears"
 
 
@@ -66,6 +68,8 @@ class TaskBook:
         self.book['EEGPSR'] = EEGPSR(planning_module)
         self.book['TestMove'] = TestMove(planning_module)
         self.book['JoyState'] = JoyState(planning_module)
+        self.book['CPAnswerAndReadQR'] = CPAnswerAndReadQR(planning_module)
+        self.book['CPWalkOpen'] = CPWalkOpen(planning_module)
 
     def set_perception(self, perception_module):
         for task in self.book:

@@ -51,8 +51,8 @@ class TestFollowLeg(AbstractTask):
             track_id = -1
             print perception_data.input.people
             for person in perception_data.input.people:
-                if (person.pos.x > 0.8 and person.pos.x < 1.8
-                    and person.pos.y > -1 and person.pos.y < 1):
+                if (person.pos.x > 0.2 and person.pos.x < 1.2
+                    and person.pos.y > -0.5 and person.pos.y < 0.5):
                     distance = hypot(person.pos.x, person.pos.y)
                     if distance < min_distance:
                         track_id = person.object_id

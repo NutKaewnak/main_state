@@ -3,7 +3,7 @@ from include.abstract_task import AbstractTask
 from include.delay import Delay
 from geometry_msgs.msg import Pose2D
 
-__author__ = 'CinDy'
+__author__ = 'Cindy'
 
 
 class FollowGuiding(AbstractTask):
@@ -75,13 +75,13 @@ class FollowGuiding(AbstractTask):
         elif self.state is 'follow_init':
             # print 'state =' + self.state
             if perception_data.device is self.Devices.PEOPLE_LEG:
-                print 'hi'
+                # print 'hi'
                 min_distance = 99
                 self.track_id = -1
                 for person in perception_data.input.people:
                     print 'person = ', person
                     if (person.pos.x > 0.8 and person.pos.x < 1.8
-                        and person.pos.y > -1 and person.pos.y < 1):
+                        and person.pos.y > -0.5 and person.pos.y < 0.5):
                         distance = hypot(person.pos.x, person.pos.y)
                         print 'person id =', person.object_id
                         if distance < min_distance:
@@ -111,11 +111,12 @@ class FollowGuiding(AbstractTask):
                         self.track_id = self.follow.guess_id
                         print 'change track id = ', self.track_id
                     # elif perception_data.input.people[-1]:
-                    elif self.follow.isLost: 
-                        self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                        self.subtask.say('I am lost tracking. Please wave your hand.')
-                        self.timer.wait(2)
-                        self.change_state('detect_waving_people')
+
+                    # elif self.follow.isLost:
+                    #     self.subtask = self.subtaskBook.get_subtask(self, 'Say')
+                    #     self.subtask.say('I am lost tracking. Please wave your hand.')
+                    #     self.timer.wait(2)
+                    #     self.change_state('detect_waving_people')
             # if perception_data.device is self.Devices.BASE_STATUS and self.perception_module.base_status.position:
             #     robot_position = self.perception_module.base_status.position
             #     pos = Pose2D()

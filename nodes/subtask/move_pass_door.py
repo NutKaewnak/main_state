@@ -11,7 +11,7 @@ class MovePassDoor(AbstractSubtask):
         self.moveRelative = None
 
     def perform(self, perception_data):
-        print 'state_move_passDoor ='+self.state
+        # print 'state_move_passDoor ='+self.state
         if self.state is 'init':
             if perception_data.device is self.Devices.DOOR and perception_data.input == 'open':
                 self.moveRelative = self.skillBook.get_skill(self, 'MoveBaseRelative')
@@ -19,7 +19,7 @@ class MovePassDoor(AbstractSubtask):
                 self.change_state('move')
         elif self.state is 'move':
             # check if base succeed
-            print self.moveRelative.state
+            # print self.moveRelative.state
             if self.moveRelative.state is 'succeeded':
                 self.change_state('finish')
             elif self.moveRelative.state is 'aborted':
