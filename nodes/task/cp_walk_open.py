@@ -24,7 +24,7 @@ class CPWalkOpen(AbstractTask):
         elif self.state is 'check_move':
             if self.subtask.state is 'finish':
                 self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
-                self.subtask.play(os.path.join(self.path, 'sound', 'greeting_eng.wav'))
+                self.subtask.play(os.path.join(self.path, 'robot_sound', 'sound', 'greeting_eng.wav'))
                 self.delay.wait(10)
                 self.change_state('move_back')
 
@@ -39,5 +39,3 @@ class CPWalkOpen(AbstractTask):
                 self.subtask = self.subtaskBook.get_subtask(self, 'MoveRelative')
                 self.subtask.set_position(1, 0, 0)
                 self.change_state('finish')
-                # Don't forget to add task to task_book
-            # Don't forget to create launch file

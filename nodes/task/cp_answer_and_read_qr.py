@@ -64,7 +64,7 @@ class CPAnswerAndReadQR(AbstractTask):
         elif self.state is 'answer_question':
             if perception_data.device is self.Devices.VOICE and perception_data.input:
                 self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
-                self.subtask.play(os.path.join(self.path, 'cp_sound/40_QA',
+                self.subtask.play(os.path.join(self.path, 'robot_sound/cp_sound/40_QA',
                                                answer_question_cp.answers(perception_data.input)))
                 self.delay.wait(10)
                 self.change_state('direct_asking')
@@ -77,7 +77,7 @@ class CPAnswerAndReadQR(AbstractTask):
             if perception_data.device is 'VOICE' and perception_data.input:
                 print perception_data.input
                 self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
-                self.subtask.play(os.path.join(self.path, 'cp_sound/Promotion',
+                self.subtask.play(os.path.join(self.path, 'robot_sound/cp_sound/Promotion',
                                                qr_read_cp.answers(perception_data.input)))
                 self.delay.wait(10)
                 self.change_state('finish_read')
