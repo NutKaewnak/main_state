@@ -2,6 +2,7 @@ from include.abstract_task import AbstractTask
 from include.delay import Delay
 from include import answer_question_cp, qr_read_cp, arm_control
 import rospkg
+from std_srvs.srv import Empty
 import rospy
 import os
 __author__ = 'cindy'
@@ -44,17 +45,17 @@ class CPAnswerAndReadQR(AbstractTask):
                 if perception_data.input == 'robot answer question':
                     self.mic_control_close()
                     self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
-                    self.subtask.play(os.path.join(self.path, 'openhouse_sound', 'imListening.wav'))
+                    self.subtask.play(os.path.join(self.path, 'robot_sound/openhouse_sound', 'imListening.wav'))
                     self.change_state('answer_question')
                 elif perception_data.input == 'robot read q r':
                     self.mic_control_close()
                     self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
-                    self.subtask.play(os.path.join(self.path, 'openhouse_sound', 'ReadQRCode.wav'))
+                    self.subtask.play(os.path.join(self.path, 'robot_sound/openhouse_sound', 'ReadQRCode.wav'))
                     self.change_state('check_qr')
                 elif perception_data.input == 'robot supermarket mode':
                     self.mic_control_close()
                     self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
-                    self.subtask.play(os.path.join(self.path, 'openhouse_sound', 'LiftingInSupermarket.wav'))
+                    self.subtask.play(os.path.join(self.path, 'robot_sound/openhouse_sound', 'LiftingInSupermarket.wav'))
                     self.delay.wait(5)
                     self.change_state('lift_mode')
 
@@ -65,7 +66,7 @@ class CPAnswerAndReadQR(AbstractTask):
         elif self.state is 'listening_ques':
             if perception_data.device is self.Devices.VOICE and perception_data.input:
                 self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
-                self.subtask.play(os.path.join(self.path, 'robot_sound/cp_sound/40_QA',
+                self.subtask.play(os.path.join(self.path, 'robot_sound/openhouse_sound',
                                                answer_question_cp.answers(perception_data.input)))
                 self.delay.wait(10)
                 self.change_state('direct_asking')
@@ -79,7 +80,7 @@ class CPAnswerAndReadQR(AbstractTask):
             if perception_data.device is 'VOICE' and perception_data.input:
                 print perception_data.input
                 self.subtask = self.subtaskBook.get_subtask(self, 'PlaySound')
-                self.subtask.play(os.path.join(self.path, 'robot_sound/cp_sound/Promotion',
+                self.subtask.play(os.path.join(self.path, 'robot_sound/openhouse_sound',
                                                qr_read_cp.answers(perception_data.input)))
                 self.delay.wait(10)
                 self.change_state('finish_read')

@@ -35,6 +35,7 @@ class BaseController:
         rospy.loginfo("Send Twist " + str((twist.linear.x, twist.linear.y, twist.angular.z)) + ' to robot.')
         self.move_twist.publish(twist)
 
+
     def set_twist_stop(self):
         stop_twist = Twist()
         self.move_twist.publish(stop_twist)
@@ -90,5 +91,4 @@ class BaseController:
     def clear_point_costmaps(self, x, y, box_size):
         rospy.loginfo("Clear Point Costmaps")
         self.clear_point_costmap(x, y, box_size)
-
 

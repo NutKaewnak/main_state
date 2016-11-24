@@ -1,6 +1,6 @@
 <launch>
 
-  <!--<include file="$(find speech_processing)/launch/followme.launch"/>-->
+  <include file="$(find speech_processing)/launch/openhouse2016.launch"/>
 
   <node name="main_state" pkg="main_state" type="main.py" output="screen" args="CPAnswerAndReadQR" />
   <node ns="z_bar" name="barcode_reader" pkg="zbar_ros" type="barcode_reader_node">

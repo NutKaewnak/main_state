@@ -53,9 +53,12 @@ class MoveBaseRelativeTwist(AbstractSkill):
         print 'self.timer_linear:', self.timer_linear.period
 
     def perform(self, perception_data):
-        # print 'self.timer_angular:', self.timer_angular.period
-        # print 'self.timer_linear:', self.timer_linear.period
-        print 'self.state:', self.state
+        if self.state != 'stop':
+            print 'self.timer_angular:', self.timer_angular.period
+            print 'self.timer_linear:', self.timer_linear.period
+            # print self.current_twist
+            print 'self.state:', self.state
+
         if self.is_performing:
             return
         else:
@@ -83,7 +86,7 @@ class MoveBaseRelativeTwist(AbstractSkill):
 
                 print 'goal_angular', goal_temp.theta
                 self.cal_wait_time(goal_temp, self.current_twist)
-                self.controlModule.base.set_twist(self.current_twist)
+                # self.controlModule.base.set_twist(self.current_twist)
                 self.change_state('send_xy_goal')
             else:
                 if self.goal_pose_2d.x > 0:
@@ -99,6 +102,7 @@ class MoveBaseRelativeTwist(AbstractSkill):
                 self.cal_wait_time(self.goal_pose_2d, twist)
                 self.current_twist = twist
                 self.controlModule.base.set_twist(self.current_twist)
+
                 self.change_state('send_xy_goal')
 
         elif self.state is 'send_xy_goal':
@@ -107,10 +111,13 @@ class MoveBaseRelativeTwist(AbstractSkill):
                 twist = Twist()
                 if self.goal_pose_2d.theta > 0:
                     twist.angular.z = VEL_ANGULAR_Z
+                    print "z+"
                 elif self.goal_pose_2d.theta < 0:
                     twist.angular.z = -1 * VEL_ANGULAR_Z
+                    print "z-"
                 self.cal_wait_time(self.goal_pose_2d, twist)
                 self.controlModule.base.set_twist(twist)
+                self.current_twist = twist
                 self.change_state('send_theta_goal')
 
         elif self.state is 'send_theta_goal':
