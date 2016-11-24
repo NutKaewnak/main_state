@@ -1,13 +1,12 @@
 #!/usr/bin/env python
+__author__ = "AThousandYears"
+
 import rospy
 import sys
 
 from control_module import ControlModule
 from planning_module import PlanningModule
 from perception_module import PerceptionModule
-
-
-__author__ = "AThousandYears"
 
 
 class MainState:
@@ -26,6 +25,7 @@ class MainState:
 
 
 if __name__ == "__main__":
+    print "Remove all the goddamn sound"
     if len(sys.argv) >= 2:
         MainState(sys.argv[1])
     else:
