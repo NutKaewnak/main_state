@@ -5,3 +5,4 @@ SKUBA_*.log
 SKUBA_*.aux
 *~
 *.pdf
+.DS_Store
