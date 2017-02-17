@@ -8,7 +8,7 @@ from math import hypot
 __author__ = 'cin'
 
 
-class RestaurantVDO(AbstractTask):
+class RestaurantCin(AbstractTask):
     def __init__(self, planning_module):
         AbstractTask.__init__(self, planning_module)
         self.follow = None
@@ -22,6 +22,7 @@ class RestaurantVDO(AbstractTask):
 
     def perform(self, perception_data):
         if self.state is 'init':
+            rospy.loginfo('--------------------init--------------')
             self.subtask = self.subtaskBook.get_subtask(self, 'Say')
             self.subtask.say('i\'m ready for commands.')
             self.change_state('wait_for_command')
@@ -112,6 +113,8 @@ class RestaurantVDO(AbstractTask):
                     for location in self.location_list:
                         if location in perception_data.input:
                             self.serve_table.append(location)
-                            
+
+
+
 
 
