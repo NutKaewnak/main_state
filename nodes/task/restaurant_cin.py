@@ -15,7 +15,8 @@ class RestaurantVDO(AbstractTask):
         self.move = None
         self.location = None
         self.location_list = {'table a': [], 'table b': [], 'table c': [], 'kitchen bar': []}
-        self.list_order = {}
+        self.items = ['apple', 'banana', 'orange', 'cookie', 'coke', 'mike', 'soda', 'ice cream']
+        self.table_order = {'table a': [], 'table b': [], 'table c': []}
         self.serve_table = []
         self.list_table = []
         self.delay = Delay()
@@ -107,11 +108,76 @@ class RestaurantVDO(AbstractTask):
                     for location in self.location_list:
                         if location in perception_data.input:
                             self.list_table.append(location)
+                    self.subtaskBook.get_subtask(self, 'Say').say('I\'m going to ' + self.list_table[0])
+                    self.change_state('go_take_order')
 
                 elif 'serve order' in perception_data.input:
                     for location in self.location_list:
                         if location in perception_data.input:
                             self.serve_table.append(location)
-                            
+                    self.subtaskBook.get_subtask(self, 'Say').say('I\'m going to ' + self.serve_table[0])
+                    self.change_state('go_serving_order')
+
+        elif self.state is 'go_take_order':
+            if self.list_table:
+                self.subtask = self.subtaskBook.get_subtask(self, 'MoveBaseAbsolute')
+                self.subtask.set_position(self.location_list[self.list_table[0]])
+                self.change_state('reach_table')
+            elif not self.list_table:
+                self.subtaskBook.get_subtask(self, 'Say').say('I\'m moving back to kitchen bar.')
+                self.subtask = self.subtaskBook.get_subtask(self, 'MoveBaseAbsolute')
+                self.subtask.set_position(self.location_list['kitchen bar'])
+
+        elif self.state is 'reach_table':
+            if perception_data.device is 'BASE_STATUS':
+                if perception_data.input.status_list[0].status is 3:
+                    self.subtaskBook.get_subtask(self, 'Say').say('I reach ' + self.list_table[0] + ' and ready to take order.')
+                    self.command = self.list_table.pop(0)
+                    print self.command
+                    self.state = 'take_order'
+
+        elif self.state is 'take_order':
+            if perception_data.device is 'VOICE':
+                for item in self.items:
+                    if item in perception_data.input:
+                        self.table_order[self.command].append(item)
+                # print 'table_order' + self.table_order[self.command]
+                foods = ""
+                for food in self.table_order[self.command]:
+                    foods += food + " "
+                print 'foods =' + foods
+                self.subtaskBook.get_subtask(self, 'Say').say('Is your order ' + foods + ' yes or no?')
+                self.change_state('confirm_order')
+
+        elif self.state is 'confirm_order':
+            if perception_data.device is 'VOICE':
+                if 'robot yes' in perception_data.input:
+                    self.subtaskBook.get_subtask(self, 'Say').say('I remember that.')
+                    self.state = 'go_take_order'
+                elif 'robot no' in perception_data.input:
+                    self.subtaskBook.get_subtask(self, 'Say').say('sorry, What are your order?')
+                    self.change_state('take_order')
+
+        elif self.state is 'go_serving_order':
+            if self.serve_table:
+                self.subtask = self.subtaskBook.get_subtask(self, 'MoveBaseAbsolute')
+                self.subtask.set_position(self.location_list[self.serve_table[0]])
+                self.change_state('serve_order')
+            elif not self.serve_table:
+                self.subtaskBook.get_subtask(self, 'Say').say('I\'m moving to kitchen bar.')
+                self.change_state('stand_by_mode')
+
+        elif self.state is 'serve_order':
+            if self.subtask.state is 'succeeded':
+                foods = ""
+                for item in self.table_order[self.serve_table[0]]:
+                    foods += item + ' '
+                self.subtaskBook.get_subtask(self, 'Say').say('Order is ' + foods + 'please take it and if you finish please say. I\'ve already take my order.')
+                self.change_state('confirm_receive_food')
+
+        elif self.state is 'confirm_receive_food':
+            if perception_data.device is self.Devices.VOICE and 'I\'ve already take my order' in perception_data.input:
+                self.subtaskBook.get_subtask(self, 'Say').say('Ok, I\'m moving.')
+                self.change_state('go_serving_order')
 
 
