@@ -31,6 +31,7 @@ from test_move import TestMove
 from joy_state import JoyState
 from cp_answer_and_read_qr import CPAnswerAndReadQR
 from cp_walk_open import CPWalkOpen
+from restaurant_cin import RestaurantCin
 __author__ = "AThousandYears"
 
 
@@ -70,7 +71,9 @@ class TaskBook:
         self.book['JoyState'] = JoyState(planning_module)
         self.book['CPAnswerAndReadQR'] = CPAnswerAndReadQR(planning_module)
         self.book['CPWalkOpen'] = CPWalkOpen(planning_module)
+        self.book['RestaurantCin'] = RestaurantCin(planning_module)
 
-    def set_perception(self, perception_module):
-        for task in self.book:
-            self.book[task].set_perception(perception_module)
+
+def set_perception(self, perception_module):
+    for task in self.book:
+        self.book[task].set_perception(perception_module)
