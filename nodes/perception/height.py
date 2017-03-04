@@ -10,7 +10,7 @@ class Height(AbstractPerception):
     def __init__(self, planning_module):
         AbstractPerception.__init__(self, planning_module)
         self.height_data = HeightData()
-        rospy.Subscriber('/dynamixel/torso_controller/state', 
+        rospy.Subscriber('/dynamixel/torso_controller/state',
                          FollowJointTrajectoryFeedback, self.callback_position)
         rospy.Subscriber('/dynamixel/torso_controller/follow_joint_trajectory/result',
                          FollowJointTrajectoryActionResult, self.callback_status)

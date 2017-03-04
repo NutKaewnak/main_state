@@ -74,6 +74,6 @@ class TaskBook:
         self.book['RestaurantCin'] = RestaurantCin(planning_module)
 
 
-def set_perception(self, perception_module):
-    for task in self.book:
-        self.book[task].set_perception(perception_module)
+    def set_perception(self, perception_module):
+        for task in self.book:
+            self.book[task].set_perception(perception_module)

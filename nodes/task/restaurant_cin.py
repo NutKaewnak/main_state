@@ -30,31 +30,30 @@ class RestaurantCin(AbstractTask):
             self.subtask = self.subtaskBook.get_subtask(self, 'Say')
             self.subtask.say('i\'m ready for commands.')
             self.change_state('wait_for_command')
+            # self.change_state('follow_init')
 
         elif self.state is 'wait_for_command':
-            if self.subtask.state is 'finish':
-                if perception_data.device is self.Devices.VOICE:
-                    print perception_data.input
-                    if 'follow me' in perception_data.input:
-                        self.subtaskBook.get_subtask(self, 'Say').say('I will follow you.')
-                        self.follow = self.subtaskBook.get_subtask(self, 'FollowLeg')
-                        self.change_state('follow_init')
-                    elif 'stand by' in perception_data.input:
-                        self.change_state('init_stand_by_mode')
+            # if self.subtask.state is 'finish':
+            # print perception_data.device
+            if perception_data.device is self.Devices.VOICE:
+                if 'lamyai follow me' in perception_data.input:
+                    self.subtaskBook.get_subtask(self, 'Say').say('I will follow you.')
+                    self.follow = self.subtaskBook.get_subtask(self, 'FollowLeg')
+                    self.change_state('follow_init')
+                elif 'lamyai stand by' in perception_data.input:
+                    self.change_state('init_stand_by_mode')
 
 # ----------------------------------------------------------------------------------------------------------------------
 # follow phase
         elif self.state is 'follow_init':
             if perception_data.device is self.Devices.PEOPLE_LEG:
-                # print 'hi'
                 min_distance = 99
                 self.track_id = -1
                 for person in perception_data.input.people:
-                    print 'person = ', person
                     if (person.pos.x > 0.8 and person.pos.x < 1.8
                         and person.pos.y > -0.5 and person.pos.y < 0.5):
                         distance = hypot(person.pos.x, person.pos.y)
-                        print 'person id =', person.object_id
+                        # print 'person id =', person.object_id
                         if distance < min_distance:
                             self.track_id = person.object_id
                 if self.track_id != -1:
@@ -65,7 +64,7 @@ class RestaurantCin(AbstractTask):
             elif self.state is 'follow':
                 print 'state =' + self.state
                 # recovery follow
-                if perception_data.device is self.Devices.VOICE and 'robot stop' in perception_data.input:
+                if perception_data.device is self.Devices.VOICE and 'lamyai stop' in perception_data.input:
                     self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(0, 0)
                     self.subtask = self.subtaskBook.get_subtask(self, 'Say')
                     self.subtask.say('Where is this place ?')
@@ -74,10 +73,10 @@ class RestaurantCin(AbstractTask):
                 if perception_data.device is self.Devices.PEOPLE_LEG and perception_data.input.people:
                     print 'track_id =', self.track_id
                     for person in perception_data.input.people:
-                        print ' person.id =', person.object_id
-                        if self.track_id == person.object_id:
+                        print ' person.id =', person.name
+                        if self.track_id == person.name:
                             break
-                        elif self.follow.guess_id == person.object_id:
+                        elif self.follow.guess_id == person.name:
                             self.track_id = self.follow.guess_id
                             print 'change track id = ', self.track_id
                 if perception_data.device is self.Devices.NAVIGATE and perception_data.input:
@@ -91,18 +90,18 @@ class RestaurantCin(AbstractTask):
                     if location in perception_data.input:
                         self.location = location
                         self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                        self.subtask.say('This is ' + location + ' yes or no ?')
+                        self.subtask.say('This is "' + location + '" yes or no ?')
                         self.change_state('confirm_location')
 
         elif self.state is 'confirm_location':
             if self.subtask.state is not 'finish':
                 return
-            if perception_data.device is self.Devices.VOICE and 'robot yes' in perception_data.input:
+            if perception_data.device is self.Devices.VOICE and 'lamyai yes' in perception_data.input:
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
                 self.subtask.say('I remember ' + self.location + '.')
                 self.location_list[self.location] = self.perception_module.base_status.position
                 self.change_state('wait_for_command')
-            elif perception_data.device is self.Devices.VOICE and 'robot no' in perception_data.input:
+            elif perception_data.device is self.Devices.VOICE and 'lamyai no' in perception_data.input:
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
                 self.subtask.say('Sorry , Where is this place ?')
                 self.change_state('ask_for_location')
@@ -121,10 +120,10 @@ class RestaurantCin(AbstractTask):
 
         elif self.state is 'stand_by_mode':
             if perception_data.device is self.Devices.VOICE:
-                if 'robot go take order' in perception_data.input:
+                if 'lamyai take order' in perception_data.input:
                     self.subtaskBook.get_subtask(self, 'Say').say('Where should i go?')
                     self.change_state('table_order')
-                elif 'robot go serve order' in perception_data.input:
+                elif 'lamyai serve order' in perception_data.input:
                     for location in self.location_list:
                         if location in perception_data.input:
                             self.serve_table.append(location)
@@ -300,7 +299,8 @@ class RestaurantCin(AbstractTask):
                 foods = ""
                 for item in self.table_order[self.serve_table[0]]:
                     foods += item + ' '
-                self.subtaskBook.get_subtask(self, 'Say').say('Order is ' + foods + 'please take it and if you finish please say. I\'ve already take my order.')
+                self.subtaskBook.get_subtask(self, 'Say').say('Order is ' + foods + 'please take it and if you finish '
+                                                                                    'please say. I\'ve already take my order.')
                 self.change_state('confirm_receive_food')
 
         elif self.state is 'confirm_receive_food':

@@ -1,8 +1,8 @@
 <launch>
   <node name="main_state" pkg="main_state" type="main.py" output="screen" args="RestaurantCin" />
-  <!--<include file="$(find speech_processing)/launch/restaurantGer2016.launch"/>
-  <include file="$(find athome_leg_tracker)/launch/leg_detector.launch"/>
-  <node name="gesture_detection" pkg="gesture_detection" type="NIHandtracker" output="screen" >
+  <include file="$(find speech_processing)/launch/Lumyai_RestaurantVDO.launch"/>
+  <include file="$(find cob_leg_detection)/launch/leg_detector.launch"/>
+  <!--<node name="gesture_detection" pkg="gesture_detection" type="NIHandtracker" output="screen" >
         <remap from="/points" to="/gesture/points"/>
   </node> -->
 </launch>

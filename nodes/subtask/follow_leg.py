@@ -62,7 +62,7 @@ class FollowLeg(AbstractSubtask):
 
                     x = max(position.x / size * (size * 0.5), 0)
                     y = position.y / size * (size * 0.5)
-                    self.move.set_position_with_clear_poin(x, y, theta, 1.0)
+                    self.move.set_position_with_clear_point(x, y, theta, 1.0)
                     # pos = Pose2D()
                     # pos.x = x
                     # pos.y = y
