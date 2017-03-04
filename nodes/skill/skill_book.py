@@ -14,6 +14,7 @@ from voice_recognition_mode import VoiceRecognitionMode
 from arm_static_pose import ArmStaticPose
 from detect_clothes import DetectClothes
 from play_sound import PlaySound
+from web_commu import WebCommu
 __author__ = "AThousandYears"
 
 
@@ -36,6 +37,7 @@ class SkillBook:
         self.book['ArmStaticPose'] = ArmStaticPose(control_module)
         self.book['DetectClothes'] = DetectClothes(control_module)
         self.book['PlaySound'] = PlaySound(control_module)
+        self.book['WebCommu'] = WebCommu(control_module)
 
     def get_skill(self, subtask, skill_name):
         self.book[skill_name].reset()

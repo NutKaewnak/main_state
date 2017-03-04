@@ -9,6 +9,7 @@ from controller.object_3d_detector_controller import Object3dsDetectorController
 from controller.voice_recognition_mode_controller import VoiceRecognitionModeController
 from controller.clothes_detector_controller import ClothesDetectorController
 from controller.sound_player import SoundPlayer
+from controller.web_commu import WebCommu
 
 __author__ = "AThousandYears"
 
@@ -27,6 +28,7 @@ class ControlModule:
     voice_recognition_mode = VoiceRecognitionModeController()
     cloth_detector = ClothesDetectorController()
     sound_player = SoundPlayer()
+    web_commu = WebCommu()
 
     def __init__(self):
         pass
