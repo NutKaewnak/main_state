@@ -37,6 +37,7 @@ from find_cloth import FindCloth
 from test_subtask_skill import TestSubtaskSkill
 from question_answer_indirect import QuestionAnswerIndirect
 from play_sound import PlaySound
+from web_commu import WebCommu
 
 __author__ = "AThousandYears"
 
@@ -87,6 +88,7 @@ class SubtaskBook:
         self.book['TestSubtaskSkill'] = TestSubtaskSkill(planning_module)
         self.book['QuestionAnswerIndirect'] = QuestionAnswerIndirect(planning_module)
         self.book['PlaySound'] = PlaySound(planning_module)
+        self.book['WebCommu'] = WebCommu(planning_module)
 
     def get_subtask(self, task, subtask_name):
         self.book[subtask_name].reset()
