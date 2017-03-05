@@ -35,6 +35,7 @@ class FollowLeg(AbstractSubtask):
 
     def perform(self, perception_data):
         if self.state is 'init':
+            print '-------------------------------------------------------'
             self.move = self.skillBook.get_skill(self, 'MoveBaseRelative')
             self.timer = Delay()
             self.marker_pub = rospy.Publisher("/visualization_marker", Marker)
@@ -42,7 +43,7 @@ class FollowLeg(AbstractSubtask):
             self.change_state('wait')
 
         elif self.state is 'follow' and perception_data.device is self.Devices.PEOPLE_LEG:
-            rospy.loginfo("Track Person id %s", self.person_id)
+            # rospy.loginfo("Track Person id %s", self.person_id)
             position = None
             orientation = None
             for person in perception_data.input.people:

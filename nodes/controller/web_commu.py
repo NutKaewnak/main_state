@@ -10,7 +10,7 @@ port = 1883
 
 class WebCommu:
     def __init__(self):
-        self.client= mqtt.Client()
+        self.client = mqtt.Client()
         self.client.connect(broker, port)
 
     def set_data(self, status, table, order):
