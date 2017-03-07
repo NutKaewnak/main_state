@@ -32,6 +32,7 @@ from joy_state import JoyState
 from cp_answer_and_read_qr import CPAnswerAndReadQR
 from cp_walk_open import CPWalkOpen
 from restaurant_cin import RestaurantCin
+from test_webcommu import TestWebCommu
 __author__ = "AThousandYears"
 
 
@@ -72,7 +73,7 @@ class TaskBook:
         self.book['CPAnswerAndReadQR'] = CPAnswerAndReadQR(planning_module)
         self.book['CPWalkOpen'] = CPWalkOpen(planning_module)
         self.book['RestaurantCin'] = RestaurantCin(planning_module)
-
+        self.book['TestWebCommu'] = TestWebCommu(planning_module)
 
     def set_perception(self, perception_module):
         for task in self.book:
