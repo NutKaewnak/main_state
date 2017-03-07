@@ -13,7 +13,6 @@ class MainState:
     def __init__(self, task="GPSR"):
         rospy.init_node(task)
         self.task = task
-
         self.controlModule = ControlModule()
         self.planningModule = PlanningModule(self)
         self.perceptionModule = PerceptionModule(self)

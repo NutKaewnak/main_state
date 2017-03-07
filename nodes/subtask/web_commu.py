@@ -17,7 +17,3 @@ class WebCommu(AbstractSubtask):
     def send_info(self, status, table, order):
         self.skill.set_info(status, table, order)
         self.change_state('sending')
-
-
-
-            # Don't forget to add this subtask to subtask book

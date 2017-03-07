@@ -18,4 +18,7 @@ class WebCommu:
         self.on_publish(data)
 
     def on_publish(self, data):
-        self.client.public("/ROBOT", json.dumps(data))
+        self.client.publish("/ROBOT", json.dumps(data))
+
+    def disconnect(self):
+        self.client.disconnect()
