@@ -85,7 +85,7 @@ class BaseController:
 
     def clear_costmaps(self):
         rospy.loginfo("Clear Costmaps")
-        # self.clear_costmap()
+        self.clear_costmap()
 
     #Input frame_id: base_link
     def clear_point_costmaps(self, x, y, box_size):
