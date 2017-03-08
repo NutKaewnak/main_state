@@ -26,13 +26,15 @@ class RestaurantCin(AbstractTask):
         self.side = None
 
     def perform(self, perception_data):
+        # print self.state
         if self.state is 'init':
             rospy.loginfo('--------------------init--------------')
             self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(0, 0)
             self.subtask = self.subtaskBook.get_subtask(self, 'Say')
             self.subtask.say('i\'m ready for commands.')
             self.change_state('wait_for_command')
-            # self.change_state('ask_for_location')
+            # self.command = 'table a'
+            # self.change_state('take_order')
 
         elif self.state is 'wait_for_command':
             # if self.subtask.state is 'finish':
@@ -98,10 +100,17 @@ class RestaurantCin(AbstractTask):
                     if location in perception_data.input:
                         # print perception_data.input
                         self.location = location
-                        self.side = perception_data.input.replace("my", "your")
                         self.subtask = self.subtaskBook.get_subtask(self, 'Say')
-                        self.subtask.say('This is ' + self.side + '. yes or no ?')
-                        self.change_state('confirm_location')
+                        self.subtask.say('Where is ' + self.location + '?')
+                        self.change_state('get_location_side')
+
+        elif self.state is 'get_location_side':
+            if perception_data.device is self.Devices.VOICE:
+                if 'right' in perception_data.input or 'left' in perception_data.input:
+                    self.side = perception_data.input.replace("my", "your")
+                    self.subtask = self.subtaskBook.get_subtask(self, 'Say')
+                    self.subtask.say(self.location + ' is ' + self.side + '. yes or no ?')
+                    self.change_state('confirm_location')
 
         elif self.state is 'confirm_location':
             if self.subtask.state is not 'finish':
@@ -158,7 +167,7 @@ class RestaurantCin(AbstractTask):
             if perception_data.device is self.Devices.VOICE:
                 if not self.list_table or 'please' not in perception_data.input:
                     for location in self.location_list:
-                        if location in perception_data.input:
+                        if location in perception_data.input and location not in self.list_table:
                             self.table = location
                             self.list_table.append(location)
                             print 'table' + str(self.table)
@@ -188,7 +197,7 @@ class RestaurantCin(AbstractTask):
                     self.state = 'go_take_order'
                 else:
                     for location in self.location_list:
-                        if location in perception_data.input:
+                        if location in perception_data.input and location not in self.list_table:
                             print location
                             self.list_table.append(location)
                     print self.list_table
@@ -222,8 +231,8 @@ class RestaurantCin(AbstractTask):
             if perception_data.device is 'VOICE':
                 if not self.table_order[self.command] or 'please' not in perception_data.input:
                     for item in self.items:
-                        if item in perception_data.input:
-                            self.item_order = item
+                        if item in perception_data.input and item not in self.table_order[self.command]:
+                            # self.item_order = item
                             self.table_order[self.command].append(item)
                             self.subtaskBook.get_subtask(self, 'WebCommu').send_info('active', self.command,
                                                                                      self.table_order[self.command])
@@ -254,7 +263,7 @@ class RestaurantCin(AbstractTask):
                     self.state = 'confirm_order'
                 else:
                     for item in self.items:
-                        if item in perception_data.input:
+                        if item in perception_data.input and item not in self.table_order[self.command]:
                             self.table_order[self.command].append(item)
                             self.subtaskBook.get_subtask(self, 'WebCommu').send_info('active', self.command,
                                                                                      self.table_order[self.command])
@@ -269,7 +278,8 @@ class RestaurantCin(AbstractTask):
                 elif 'lamyai no' in perception_data.input:
                     self.subtaskBook.get_subtask(self, 'Say').say('sorry, What are your order?')
                     self.table_order[self.command] = []
-                    self.subtaskBook.get_subtask(self, 'WebCommu').send_info('active', self.command, '')
+                    self.subtaskBook.get_subtask(self, 'WebCommu').send_info('active', self.command,
+                                                                             self.table_order[self.command])
                     self.change_state('take_order')
 
 # ----------------------------------------------------------------------------------------------------------------------
