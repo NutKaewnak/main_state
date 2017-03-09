@@ -15,7 +15,7 @@ class BaseController:
         self.clear_costmap = rospy.ServiceProxy('/navigation/athome_move_base_node/clear_costmaps', Empty)
         self.clear_point_costmap = rospy.ServiceProxy('/navigation/athome_move_base_node/clear_point_costmaps', ClearPointCostmap)
         self.move_twist = rospy.Publisher('/base/cmd_vel', Twist, queue_size=1)
-        self.goal_with_clear_point = rospy.Publisher('navigation/goal_with_clear_costmap', PoseStamped)
+        self.goal_with_clear_point = rospy.Publisher('navigation/goal_with_clear_costmap', PoseStamped, queue_size=3)
     #
     # def set_goal_with_clear_point(self, x, y, theta, frame_id):
     #     new_goal = PoseStamped()
