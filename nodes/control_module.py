@@ -28,7 +28,7 @@ class ControlModule:
     voice_recognition_mode = VoiceRecognitionModeController()
     cloth_detector = ClothesDetectorController()
     sound_player = SoundPlayer()
-    web_commu = WebCommu()
+    # web_commu = WebCommu()
 
     def __init__(self):
         pass

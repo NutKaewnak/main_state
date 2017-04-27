@@ -26,7 +26,7 @@ class RestaurantCin(AbstractTask):
         self.side = None
 
     def perform(self, perception_data):
-        print self.state
+        # print self.state
         if self.is_performing:
             return
         self.is_performing = True
@@ -43,7 +43,7 @@ class RestaurantCin(AbstractTask):
         elif self.state is 'wait_for_command':
             # if self.subtask.state is 'finish':
             # print perception_data.device
-            print self.state
+            # print self.state
             if perception_data.device is self.Devices.VOICE:
                 if 'lamyai follow me' in perception_data.input:
                     self.subtaskBook.get_subtask(self, 'Say').say('I will follow you.')
@@ -79,7 +79,7 @@ class RestaurantCin(AbstractTask):
         elif self.state is 'follow':
             # print 'follow state =' + self.follow.state
             # recovery follow
-            print self.state
+            # print self.state
             if perception_data.device is self.Devices.VOICE and 'lamyai stop' in perception_data.input:
                 self.subtaskBook.get_subtask(self, 'TurnNeck').turn_absolute(0, 0)
                 self.subtaskBook.get_subtask(self, 'Say').say('Where is this place ?')
@@ -87,9 +87,9 @@ class RestaurantCin(AbstractTask):
 
             if perception_data.device is self.Devices.PEOPLE_LEG and perception_data.input.people:
                 for person in perception_data.input.people:
-                    print ' person >>>>>>>>> =', self.track_id
-                    print ' follow guess_id =', self.follow.guess_id
-                    print 'person.object_id =', person.object_id
+                    # print ' person >>>>>>>>> =', self.track_id
+                    # print ' follow guess_id =', self.follow.guess_id
+                    # print 'person.object_id =', person.object_id
                     if self.track_id == person.object_id:
                         break
                     elif self.follow.guess_id == person.object_id:
@@ -132,13 +132,13 @@ class RestaurantCin(AbstractTask):
                 if 'left' in self.side:
                     self.location_list[self.location] = (
                     self.perception_module.base_status.position[0], self.perception_module.base_status.position[1],
-                    self.perception_module.base_status.position[2] - 1.57)
+                    self.perception_module.base_status.position[2] - 1.6)
 
                     # self.direction_list[self.location] = 'left'
                 else:
                     self.location_list[self.location] = (
                     self.perception_module.base_status.position[0], self.perception_module.base_status.position[1],
-                    self.perception_module.base_status.position[2] + 1.57)
+                    self.perception_module.base_status.position[2] + 1.6)
                 self.change_state('wait_for_command')
             elif perception_data.device is self.Devices.VOICE and 'lamyai no' in perception_data.input:
                 self.subtask = self.subtaskBook.get_subtask(self, 'Say')
@@ -188,7 +188,7 @@ class RestaurantCin(AbstractTask):
                     for lis in self.list_table:
                         table += lis + ' '
                     self.subtaskBook.get_subtask(self, 'Say').say('I\'m going to ' + table)
-                    self.subtaskBook.get_subtask(self, 'WebCommu').send_info('active', table, [])
+                    self.subtaskBook.get_subtask(self, 'WebCommu').send_info('active', '', [])
                     self.change_state('go_take_order')
 
         # elif self.state is 'chk_table':
@@ -204,6 +204,7 @@ class RestaurantCin(AbstractTask):
                     for lis in self.list_table:
                         table += lis + ' '
                     self.subtaskBook.get_subtask(self, 'Say').say('I\'m going to ' + table)
+                    self.subtaskBook.get_subtask(self, 'WebCommu').send_info('active', '', [])
                     self.state = 'go_take_order'
                 else:
                     for location in self.location_list:
@@ -220,7 +221,7 @@ class RestaurantCin(AbstractTask):
                                           self.location_list[self.list_table[0]][1],
                                           self.location_list[self.list_table[0]][2])
                 self.change_state('reach_table')
-            elif not self.list_table:
+            elif not self.list_table and self.subtask.state is 'finish':
                 self.subtaskBook.get_subtask(self, 'Say').say('I\'m moving back to kitchen bar.')
                 # self.subtask = self.subtaskBook.get_subtask(self, 'MoveAbsolute')
                 # self.subtask.set_position(self.location_list['kitchen bar'][0], self.location_list['kitchen bar'][1],
@@ -230,15 +231,16 @@ class RestaurantCin(AbstractTask):
         elif self.state is 'reach_table':
             if perception_data.device is self.Devices.BASE_STATUS:
                 if perception_data.input is 3:
-                    self.subtaskBook.get_subtask(self, 'Say').say('I reach ' + self.list_table[0] +
+                    self.subtask = self.subtaskBook.get_subtask(self, 'Say')
+                    self.subtask.say('I reach ' + self.list_table[0] +
                                                                   ' and ready to take order.')
                     self.command = self.list_table.pop(0)
                     self.ordered_table.append(self.command)
                     print self.command
-                    self.state = 'take_order'
+                    self.change_state('take_order')
 
         elif self.state is 'take_order':
-            if perception_data.device is 'VOICE':
+            if perception_data.device is 'VOICE' and self.subtask.state is 'finish':
                 if not self.table_order[self.command] or 'please' not in perception_data.input:
                     for item in self.items:
                         if item in perception_data.input and item not in self.table_order[self.command]:
@@ -283,7 +285,8 @@ class RestaurantCin(AbstractTask):
         elif self.state is 'confirm_order':
             if perception_data.device is 'VOICE':
                 if 'lamyai yes' in perception_data.input:
-                    self.subtaskBook.get_subtask(self, 'Say').say('I remember that.')
+                    self.subtask = self.subtaskBook.get_subtask(self, 'Say')
+                    self.subtask.say('I remember that.')
                     self.state = 'go_take_order'
                 elif 'lamyai no' in perception_data.input:
                     self.subtaskBook.get_subtask(self, 'Say').say('sorry, What are your order?')
@@ -375,19 +378,23 @@ class RestaurantCin(AbstractTask):
 
         elif self.state is 'serve_order':
             if self.subtask.state is 'finish':
-                foods = ""
-                for item in self.table_order[self.serve_table[0]]:
+                foods = ''
+                print self.table_order
+                print self.command
+                for item in self.table_order[self.command]:
                     foods += item + ' '
-                self.subtaskBook.get_subtask(self, 'Say').say('Order is ' + foods + 'please take it and if you finish '
-                                                                                    'please say. I\'ve already take my order.')
+                self.subtask = self.subtaskBook.get_subtask(self, 'Say')
+                self.subtask.say('Order is ' + foods + 'please take it and if you finish.'
+                                                       ' please say. I\'ve already take my order.')
                 self.change_state('confirm_receive_food')
             elif self.subtask.state is 'error':
                 self.change_state('go_serving_order1')
 
         elif self.state is 'confirm_receive_food':
-            if perception_data.device is self.Devices.VOICE and 'I\'ve already take my order' in perception_data.input:
+            if perception_data.device is self.Devices.VOICE and 'i\'ve already take my order' in perception_data.input \
+                    and self.subtask.state is 'finish':
                 self.subtaskBook.get_subtask(self, 'Say').say('Ok, I\'m moving.')
-                self.subtaskBook.get_subtask(self, 'WebCommu').send_info('active', self.command, [])
-                # self.change_state('go_serving_order')
+                self.subtaskBook.get_subtask(self, 'WebCommu').send_info('finish', self.command, [])
+                self.change_state('go_serving_order')
 
 
